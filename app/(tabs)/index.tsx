@@ -304,13 +304,11 @@ out center 60;`;
       const { latitude, longitude } = location.coords;
     const tileZoom = 15;
     const tile = latLonToTile(latitude, longitude, tileZoom);
-    const osmProviders = [
-      `https://maps.wikimedia.org/img/osm-intl,15,${latitude},${longitude},600x300.png`,
-      `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=15&size=600x300&maptype=mapnik&markers=${latitude},${longitude},red-pushpin`,
+    const mapTileUrls = [
       `https://tile.openstreetmap.org/${tileZoom}/${tile.x}/${tile.y}.png`,
     ];
 
-    return osmProviders;
+    return mapTileUrls;
   }, [location]);
 
   const mapUrl = mapProviders[mapProviderIndex];
@@ -465,13 +463,11 @@ out center 60;`;
         {mapUrl && mapError && (!useNativeMaps || isWeb) && (
           <View>
             <Text style={styles.bodyText}>
-              Map preview is unavailable. If using Google Static Maps, make
-              sure Maps Static API is enabled, billing is active, and the key
-              is not restricted for HTTP referrers.
+              Map preview is unavailable. Tap "Open in Maps" to view your location in OpenStreetMap.
             </Text>
             <Pressable style={styles.secondaryButton} onPress={retryMapPreview}>
               <Text style={styles.secondaryButtonText}>
-                Try another provider
+                Retry map
               </Text>
             </Pressable>
           </View>
