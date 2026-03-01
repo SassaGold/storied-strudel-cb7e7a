@@ -112,61 +112,55 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
-type Category = "parking" | "fuel" | "workshops";
+type Category = "dealers" | "workshops" | "shops";
 
 const CATEGORIES: { key: Category; label: string }[] = [
-  { key: "parking", label: "🅿️ Parking" },
-  { key: "fuel", label: "⛽ Fuel" },
+  { key: "dealers", label: "🏍️ MC Dealers" },
   { key: "workshops", label: "🔧 Workshops" },
+  { key: "shops", label: "🛒 MC Shops" },
 ];
 
 export default function McScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Category>("parking");
+  const [selected, setSelected] = useState<Category>("dealers");
   const [places, setPlaces] = useState<Place[]>([]);
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
-    if (category === "parking") {
+    if (category === "dealers") {
       return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[amenity=motorcycle_parking];
-  way(around:5000,${lat},${lon})[amenity=motorcycle_parking];
-  relation(around:5000,${lat},${lon})[amenity=motorcycle_parking];
-  node(around:5000,${lat},${lon})[amenity=parking][parking=motorcycle];
-  way(around:5000,${lat},${lon})[amenity=parking][parking=motorcycle];
-  relation(around:5000,${lat},${lon})[amenity=parking][parking=motorcycle];
-  node(around:5000,${lat},${lon})[amenity=parking_space][parking=motorcycle];
-  way(around:5000,${lat},${lon})[amenity=parking_space][parking=motorcycle];
-  relation(around:5000,${lat},${lon})[amenity=parking_space][parking=motorcycle];
+  node(around:5000,${lat},${lon})[shop=motorcycle];
+  way(around:5000,${lat},${lon})[shop=motorcycle];
+  relation(around:5000,${lat},${lon})[shop=motorcycle];
 );
 out center 120;`;
     }
-    if (category === "fuel") {
+    if (category === "workshops") {
       return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[amenity=fuel];
-  way(around:5000,${lat},${lon})[amenity=fuel];
-  relation(around:5000,${lat},${lon})[amenity=fuel];
+  node(around:5000,${lat},${lon})[shop=motorcycle_repair];
+  way(around:5000,${lat},${lon})[shop=motorcycle_repair];
+  relation(around:5000,${lat},${lon})[shop=motorcycle_repair];
 );
 out center 120;`;
     }
     return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-  way(around:5000,${lat},${lon})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-  relation(around:5000,${lat},${lon})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
+  node(around:5000,${lat},${lon})[shop=motorcycle_parts];
+  way(around:5000,${lat},${lon})[shop=motorcycle_parts];
+  relation(around:5000,${lat},${lon})[shop=motorcycle_parts];
 );
 out center 120;`;
   };
 
   const fallbackLabel = (category: Category) => {
-    if (category === "parking") return "Parking";
-    if (category === "fuel") return "Fuel";
-    return "Motorbike workshop";
+    if (category === "dealers") return "MC Dealer";
+    if (category === "workshops") return "MC Workshop";
+    return "MC Shop";
   };
 
   const loadPlaces = useCallback(async () => {
@@ -218,18 +212,18 @@ out center 120;`;
   }, []);
 
   const sectionTitle =
-    selected === "parking"
-      ? "Motorcycle Parking"
-      : selected === "fuel"
-        ? "Fuel Stations"
-        : "MC Stores and Workshops";
+    selected === "dealers"
+      ? "MC Dealers"
+      : selected === "workshops"
+        ? "MC Workshops"
+        : "MC Shops";
 
   const emptyText =
-    selected === "parking"
-      ? "No motorcycle parking found yet. Try updating your location."
-      : selected === "fuel"
-        ? "No fuel stations found yet. Try updating your location."
-        : "No motorbike workshops found yet. Try updating your location.";
+    selected === "dealers"
+      ? "No MC dealers found yet. Try updating your location."
+      : selected === "workshops"
+        ? "No MC workshops found yet. Try updating your location."
+        : "No MC shops found yet. Try updating your location.";
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -237,7 +231,7 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>Motorcycle Parking, Fuel & Workshops</Text>
+        <Text style={styles.title}>MC Dealers, Workshops & Shops</Text>
         <Text style={styles.subtitle}>
           Choose a category and find nearby spots.
         </Text>

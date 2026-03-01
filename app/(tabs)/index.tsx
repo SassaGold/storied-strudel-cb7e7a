@@ -222,9 +222,9 @@ export default function Index() {
       const overpassQuery = `
 [out:json][timeout:25];
 (
-  node(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
-  way(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
-  relation(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
+  node(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts"];
+  way(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts"];
+  relation(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts"];
 );
 out center 60;`;
 
