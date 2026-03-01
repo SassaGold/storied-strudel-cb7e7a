@@ -112,16 +112,67 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
+type Category = "parking" | "fuel" | "workshops";
+
+const CATEGORIES: { key: Category; label: string }[] = [
+  { key: "parking", label: "🅿️ Parking" },
+  { key: "fuel", label: "⛽ Fuel" },
+  { key: "workshops", label: "🔧 Workshops" },
+];
+
 export default function McScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [parking, setParking] = useState<Place[]>([]);
-  const [fuelStations, setFuelStations] = useState<Place[]>([]);
-  const [workshops, setWorkshops] = useState<Place[]>([]);
+  const [selected, setSelected] = useState<Category>("parking");
+  const [places, setPlaces] = useState<Place[]>([]);
+
+  const buildQuery = (category: Category, lat: number, lon: number) => {
+    if (category === "parking") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:5000,${lat},${lon})[amenity=motorcycle_parking];
+  way(around:5000,${lat},${lon})[amenity=motorcycle_parking];
+  relation(around:5000,${lat},${lon})[amenity=motorcycle_parking];
+  node(around:5000,${lat},${lon})[amenity=parking][parking=motorcycle];
+  way(around:5000,${lat},${lon})[amenity=parking][parking=motorcycle];
+  relation(around:5000,${lat},${lon})[amenity=parking][parking=motorcycle];
+  node(around:5000,${lat},${lon})[amenity=parking_space][parking=motorcycle];
+  way(around:5000,${lat},${lon})[amenity=parking_space][parking=motorcycle];
+  relation(around:5000,${lat},${lon})[amenity=parking_space][parking=motorcycle];
+);
+out center 120;`;
+    }
+    if (category === "fuel") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:5000,${lat},${lon})[amenity=fuel];
+  way(around:5000,${lat},${lon})[amenity=fuel];
+  relation(around:5000,${lat},${lon})[amenity=fuel];
+);
+out center 120;`;
+    }
+    return `
+[out:json][timeout:25];
+(
+  node(around:5000,${lat},${lon})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
+  way(around:5000,${lat},${lon})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
+  relation(around:5000,${lat},${lon})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
+);
+out center 120;`;
+  };
+
+  const fallbackLabel = (category: Category) => {
+    if (category === "parking") return "Parking";
+    if (category === "fuel") return "Fuel";
+    return "Motorbike workshop";
+  };
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setPlaces([]);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
@@ -134,93 +185,51 @@ export default function McScreen() {
       });
 
       const { latitude, longitude } = position.coords;
-
-      const parkingQuery = `
-[out:json][timeout:25];
-(
-  node(around:5000,${latitude},${longitude})[amenity=motorcycle_parking];
-  way(around:5000,${latitude},${longitude})[amenity=motorcycle_parking];
-  relation(around:5000,${latitude},${longitude})[amenity=motorcycle_parking];
-  node(around:5000,${latitude},${longitude})[amenity=parking][parking=motorcycle];
-  way(around:5000,${latitude},${longitude})[amenity=parking][parking=motorcycle];
-  relation(around:5000,${latitude},${longitude})[amenity=parking][parking=motorcycle];
-  node(around:5000,${latitude},${longitude})[amenity=parking_space][parking=motorcycle];
-  way(around:5000,${latitude},${longitude})[amenity=parking_space][parking=motorcycle];
-  relation(around:5000,${latitude},${longitude})[amenity=parking_space][parking=motorcycle];
-);
-out center 120;`;
-
-      const fuelQuery = `
-[out:json][timeout:25];
-(
-  node(around:5000,${latitude},${longitude})[amenity=fuel];
-  way(around:5000,${latitude},${longitude})[amenity=fuel];
-  relation(around:5000,${latitude},${longitude})[amenity=fuel];
-);
-out center 120;`;
-
-      const workshopQuery = `
-[out:json][timeout:25];
-(
-  node(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-  way(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-  relation(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-);
-out center 120;`;
-
-      const [parkingData, fuelData, workshopData] = await Promise.all([
-        fetchOverpass(parkingQuery),
-        fetchOverpass(fuelQuery),
-        fetchOverpass(workshopQuery),
-      ]);
-
-      const parkingResults = parkingData.elements
-        ? mapElements(parkingData.elements, latitude, longitude, "Parking")
-        : [];
-
-      const fuelResults = fuelData.elements
-        ? mapElements(fuelData.elements, latitude, longitude, "Fuel")
-        : [];
-
-      const workshopResults = workshopData.elements
+      const query = buildQuery(selected, latitude, longitude);
+      const data = await fetchOverpass(query);
+      const results = data.elements
         ? mapElements(
-            workshopData.elements,
+            data.elements,
             latitude,
             longitude,
-            "Motorbike workshop"
+            fallbackLabel(selected)
           )
         : [];
 
-      setParking(
-        parkingResults
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
-      setFuelStations(
-        fuelResults
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
-      setWorkshops(
-        workshopResults
+      setPlaces(
+        results
           .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
           .slice(0, 20)
       );
     } catch (err) {
       const message =
         err instanceof Error && err.message
-          ? `Unable to load motorcycle data (${err.message}). Please try again.`
-          : "Unable to load motorcycle data. Please try again.";
+          ? `Unable to load data (${err.message}). Please try again.`
+          : "Unable to load data. Please try again.";
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selected]);
 
   const openInMaps = useCallback((place: Place) => {
     const url = `https://www.openstreetmap.org/?mlat=${place.latitude}&mlon=${place.longitude}&zoom=16`;
     Linking.openURL(url).catch(() => null);
   }, []);
+
+  const sectionTitle =
+    selected === "parking"
+      ? "Motorcycle Parking"
+      : selected === "fuel"
+        ? "Fuel Stations"
+        : "MC Stores and Workshops";
+
+  const emptyText =
+    selected === "parking"
+      ? "No motorcycle parking found yet. Try updating your location."
+      : selected === "fuel"
+        ? "No fuel stations found yet. Try updating your location."
+        : "No motorbike workshops found yet. Try updating your location.";
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -230,15 +239,44 @@ out center 120;`;
         <Text style={styles.headerBadge}>Ride nearby</Text>
         <Text style={styles.title}>Motorcycle Parking, Fuel & Workshops</Text>
         <Text style={styles.subtitle}>
-          Motorcycle parking, fuel stations, and workshops nearby.
+          Choose a category and find nearby spots.
         </Text>
       </View>
 
-      <Pressable style={styles.primaryButton} onPress={loadPlaces}>
+      {/* Category selector */}
+      <View style={styles.segmentRow}>
+        {CATEGORIES.map(({ key, label }) => (
+          <Pressable
+            key={key}
+            style={[
+              styles.segmentButton,
+              selected === key && styles.segmentButtonActive,
+            ]}
+            onPress={() => {
+              setSelected(key);
+              setPlaces([]);
+              setError(null);
+            }}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                selected === key && styles.segmentTextActive,
+              ]}
+            >
+              {label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Pressable
+        style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
+        onPress={loadPlaces}
+        disabled={loading}
+      >
         <Text style={styles.primaryButtonText}>
-          {loading
-            ? "Loading..."
-            : "Find motorcycle parking, fuel, and workshops"}
+          {loading ? "Loading..." : `Find ${sectionTitle}`}
         </Text>
       </Pressable>
 
@@ -252,13 +290,11 @@ out center 120;`;
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       <View style={styles.sectionCard}>
-        <Text style={styles.cardTitle}>Motorcycle Parking</Text>
-        {parking.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>
-            No motorcycle parking found yet. Try updating your location.
-          </Text>
+        <Text style={styles.cardTitle}>{sectionTitle}</Text>
+        {places.length === 0 && !loading ? (
+          <Text style={styles.bodyText}>{emptyText}</Text>
         ) : (
-          parking.map((place) => (
+          places.map((place) => (
             <Pressable
               key={place.id}
               style={styles.placeRow}
@@ -272,56 +308,6 @@ out center 120;`;
                     <Text style={styles.highlightTag}>{place.note}</Text>
                   )}
                 </View>
-              </View>
-              <Text style={styles.metaText}>
-                {formatDistance(place.distanceMeters)}
-              </Text>
-            </Pressable>
-          ))
-        )}
-      </View>
-
-      <View style={styles.sectionCard}>
-        <Text style={styles.cardTitle}>Fuel Stations</Text>
-        {fuelStations.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>
-            No fuel stations found yet. Try updating your location.
-          </Text>
-        ) : (
-          fuelStations.map((place) => (
-            <Pressable
-              key={place.id}
-              style={styles.placeRow}
-              onPress={() => openInMaps(place)}
-            >
-              <View style={styles.placeInfo}>
-                <Text style={styles.bodyText}>{place.name}</Text>
-                <Text style={styles.metaText}>{place.category}</Text>
-              </View>
-              <Text style={styles.metaText}>
-                {formatDistance(place.distanceMeters)}
-              </Text>
-            </Pressable>
-          ))
-        )}
-      </View>
-
-      <View style={styles.sectionCard}>
-        <Text style={styles.cardTitle}>MC Stores and Workshop</Text>
-        {workshops.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>
-            No motorbike workshops found yet. Try updating your location.
-          </Text>
-        ) : (
-          workshops.map((place) => (
-            <Pressable
-              key={place.id}
-              style={styles.placeRow}
-              onPress={() => openInMaps(place)}
-            >
-              <View style={styles.placeInfo}>
-                <Text style={styles.bodyText}>{place.name}</Text>
-                <Text style={styles.metaText}>{place.category}</Text>
               </View>
               <Text style={styles.metaText}>
                 {formatDistance(place.distanceMeters)}
@@ -406,11 +392,40 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     elevation: 8,
   },
+  primaryButtonDisabled: {
+    opacity: 0.6,
+  },
   primaryButtonText: {
     color: "#ffffff",
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 0.3,
+  },
+  segmentRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 14,
+  },
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: "center",
+    backgroundColor: "#0f1e33",
+    borderWidth: 1,
+    borderColor: "rgba(59,130,246,0.25)",
+  },
+  segmentButtonActive: {
+    backgroundColor: "#1d4ed8",
+    borderColor: "#3b82f6",
+  },
+  segmentText: {
+    color: "#64748b",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  segmentTextActive: {
+    color: "#ffffff",
   },
   loadingRow: {
     flexDirection: "row",
