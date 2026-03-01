@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { fetchOverpass } from "../../lib/overpass";
 
 type Place = {
   id: string;
@@ -80,12 +81,7 @@ export default function HotelsScreen() {
 );
 out center 120;`;
 
-      const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-          overpassQuery
-        )}`
-      );
-      const data = await response.json();
+      const data = await fetchOverpass(overpassQuery);
 
       if (!data.elements) {
         setPlaces([]);
