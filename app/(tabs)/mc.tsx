@@ -112,12 +112,13 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
-type Category = "dealers" | "workshops" | "shops";
+type Category = "dealers" | "workshops" | "shops" | "fuel";
 
 const CATEGORIES: { key: Category; label: string }[] = [
   { key: "dealers", label: "🏍️ MC Dealers" },
   { key: "workshops", label: "🔧 Workshops" },
   { key: "shops", label: "🛒 MC Shops" },
+  { key: "fuel", label: "⛽ Fuel Stations" },
 ];
 
 export default function McScreen() {
@@ -147,6 +148,16 @@ out center 120;`;
 );
 out center 120;`;
     }
+    if (category === "fuel") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:20000,${lat},${lon})[amenity=fuel];
+  way(around:20000,${lat},${lon})[amenity=fuel];
+  relation(around:20000,${lat},${lon})[amenity=fuel];
+);
+out center 120;`;
+    }
     return `
 [out:json][timeout:25];
 (
@@ -160,6 +171,7 @@ out center 120;`;
   const fallbackLabel = (category: Category) => {
     if (category === "dealers") return "MC Dealer";
     if (category === "workshops") return "MC Workshop";
+    if (category === "fuel") return "Fuel Station";
     return "MC Shop";
   };
 
@@ -216,14 +228,18 @@ out center 120;`;
       ? "MC Dealers"
       : selected === "workshops"
         ? "MC Workshops"
-        : "MC Shops";
+        : selected === "fuel"
+          ? "Fuel Stations"
+          : "MC Shops";
 
   const emptyText =
     selected === "dealers"
       ? "No MC dealers found yet. Try updating your location."
       : selected === "workshops"
         ? "No MC workshops found yet. Try updating your location."
-        : "No MC shops found yet. Try updating your location.";
+        : selected === "fuel"
+          ? "No fuel stations found yet. Try updating your location."
+          : "No MC shops found yet. Try updating your location.";
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -231,7 +247,7 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>MC Dealers, Workshops & Shops</Text>
+        <Text style={styles.title}>MC Dealers, Workshops, Shops & Fuel</Text>
         <Text style={styles.subtitle}>
           Choose a category and find nearby spots.
         </Text>
