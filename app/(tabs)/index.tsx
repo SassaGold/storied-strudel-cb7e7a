@@ -396,6 +396,7 @@ out center 60;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Live nearby</Text>
+        <Text style={styles.greeting}>Hello!</Text>
         <Text style={styles.title}>Where Am I?</Text>
         <Text style={styles.subtitle}>Your location and what’s around you.</Text>
       </View>
@@ -628,6 +629,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 8,
     letterSpacing: 0.4,
+  },
+  greeting: {
+    color: "#fde68a",
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 4,
   },
   title: {
     color: "#f8fafc",
