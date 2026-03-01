@@ -297,21 +297,11 @@ out center 60;`;
     const useNativeMaps =
       !isWeb && !!NativeMapView && appOwnership !== "expo";
 
-    const googleMapsStaticKey = useMemo(() => {
-      return (
-        (Constants.expoConfig?.extra as any)?.googleMapsStaticKey ??
-        (Constants.manifest as any)?.extra?.googleMapsStaticKey
-      );
-    }, []);
-
     const mapProviders = useMemo(() => {
       if (!location) {
         return [] as string[];
       }
       const { latitude, longitude } = location.coords;
-      const googleUrl = googleMapsStaticKey
-      ? `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=600x300&scale=2&maptype=roadmap&markers=color:red%7C${latitude},${longitude}&key=${googleMapsStaticKey}`
-      : undefined;
     const tileZoom = 15;
     const tile = latLonToTile(latitude, longitude, tileZoom);
     const osmProviders = [
@@ -320,11 +310,8 @@ out center 60;`;
       `https://tile.openstreetmap.org/${tileZoom}/${tile.x}/${tile.y}.png`,
     ];
 
-    return [
-      ...(googleUrl ? [googleUrl] : []),
-      ...osmProviders,
-    ];
-  }, [location, googleMapsStaticKey]);
+    return osmProviders;
+  }, [location]);
 
   const mapUrl = mapProviders[mapProviderIndex];
   const mapImageSource = mapUrl
@@ -342,9 +329,7 @@ out center 60;`;
     : undefined;
 
   const mapProviderLabel = mapUrl ? mapUrl.split("/")[2] : "";
-  const mapAttribution = mapUrl?.includes("googleapis.com")
-    ? "© Google"
-    : "© OpenStreetMap contributors";
+  const mapAttribution = "© OpenStreetMap contributors";
 
   const nativeRegion = location
     ? {
@@ -386,7 +371,7 @@ out center 60;`;
       return;
     }
     const { latitude, longitude } = location.coords;
-    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    const url = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}&zoom=16`;
     Linking.openURL(url).catch(() => null);
   }, [location]);
 
@@ -470,12 +455,6 @@ out center 60;`;
             />
             <Text style={styles.attributionText}>{mapAttribution}</Text>
           </View>
-        )}
-        {!useNativeMaps && !isWeb && !googleMapsStaticKey && (
-          <Text style={styles.metaText}>
-            Google Maps preview requires a Static Maps API key in
-            extra.googleMapsStaticKey.
-          </Text>
         )}
         {mapUrl && mapImageLoading && (!useNativeMaps || isWeb) && (
           <View style={styles.loadingRow}>
