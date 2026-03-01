@@ -112,16 +112,85 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
+type Category = "dealers" | "workshops" | "shops" | "fuel" | "parking";
+
+const CATEGORIES: { key: Category; label: string }[] = [
+  { key: "dealers", label: "🏍️ MC Dealers" },
+  { key: "workshops", label: "🔧 Workshops" },
+  { key: "shops", label: "🛒 MC Shops" },
+  { key: "fuel", label: "⛽ Fuel Stations" },
+  { key: "parking", label: "🅿️ Parking" },
+];
+
 export default function McScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [parking, setParking] = useState<Place[]>([]);
-  const [fuelStations, setFuelStations] = useState<Place[]>([]);
-  const [workshops, setWorkshops] = useState<Place[]>([]);
+  const [selected, setSelected] = useState<Category>("dealers");
+  const [places, setPlaces] = useState<Place[]>([]);
+
+  const buildQuery = (category: Category, lat: number, lon: number) => {
+    if (category === "dealers") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:20000,${lat},${lon})[shop=motorcycle];
+  way(around:20000,${lat},${lon})[shop=motorcycle];
+  relation(around:20000,${lat},${lon})[shop=motorcycle];
+);
+out center 120;`;
+    }
+    if (category === "workshops") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:20000,${lat},${lon})[shop=motorcycle_repair];
+  way(around:20000,${lat},${lon})[shop=motorcycle_repair];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_repair];
+);
+out center 120;`;
+    }
+    if (category === "fuel") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:20000,${lat},${lon})[amenity=fuel];
+  way(around:20000,${lat},${lon})[amenity=fuel];
+  relation(around:20000,${lat},${lon})[amenity=fuel];
+);
+out center 120;`;
+    }
+    if (category === "parking") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:5000,${lat},${lon})[amenity=parking];
+  way(around:5000,${lat},${lon})[amenity=parking];
+  relation(around:5000,${lat},${lon})[amenity=parking];
+);
+out center 120;`;
+    }
+    return `
+[out:json][timeout:25];
+(
+  node(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  way(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_parts];
+);
+out center 120;`;
+  };
+
+  const fallbackLabel = (category: Category) => {
+    if (category === "dealers") return "MC Dealer";
+    if (category === "workshops") return "MC Workshop";
+    if (category === "fuel") return "Fuel Station";
+    if (category === "parking") return "Parking";
+    return "MC Shop";
+  };
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setPlaces([]);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
@@ -134,93 +203,59 @@ export default function McScreen() {
       });
 
       const { latitude, longitude } = position.coords;
-
-      const parkingQuery = `
-[out:json][timeout:25];
-(
-  node(around:5000,${latitude},${longitude})[amenity=motorcycle_parking];
-  way(around:5000,${latitude},${longitude})[amenity=motorcycle_parking];
-  relation(around:5000,${latitude},${longitude})[amenity=motorcycle_parking];
-  node(around:5000,${latitude},${longitude})[amenity=parking][parking=motorcycle];
-  way(around:5000,${latitude},${longitude})[amenity=parking][parking=motorcycle];
-  relation(around:5000,${latitude},${longitude})[amenity=parking][parking=motorcycle];
-  node(around:5000,${latitude},${longitude})[amenity=parking_space][parking=motorcycle];
-  way(around:5000,${latitude},${longitude})[amenity=parking_space][parking=motorcycle];
-  relation(around:5000,${latitude},${longitude})[amenity=parking_space][parking=motorcycle];
-);
-out center 120;`;
-
-      const fuelQuery = `
-[out:json][timeout:25];
-(
-  node(around:5000,${latitude},${longitude})[amenity=fuel];
-  way(around:5000,${latitude},${longitude})[amenity=fuel];
-  relation(around:5000,${latitude},${longitude})[amenity=fuel];
-);
-out center 120;`;
-
-      const workshopQuery = `
-[out:json][timeout:25];
-(
-  node(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-  way(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-  relation(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts|car_repair"];
-);
-out center 120;`;
-
-      const [parkingData, fuelData, workshopData] = await Promise.all([
-        fetchOverpass(parkingQuery),
-        fetchOverpass(fuelQuery),
-        fetchOverpass(workshopQuery),
-      ]);
-
-      const parkingResults = parkingData.elements
-        ? mapElements(parkingData.elements, latitude, longitude, "Parking")
-        : [];
-
-      const fuelResults = fuelData.elements
-        ? mapElements(fuelData.elements, latitude, longitude, "Fuel")
-        : [];
-
-      const workshopResults = workshopData.elements
+      const query = buildQuery(selected, latitude, longitude);
+      const data = await fetchOverpass(query);
+      const results = data.elements
         ? mapElements(
-            workshopData.elements,
+            data.elements,
             latitude,
             longitude,
-            "Motorbike workshop"
+            fallbackLabel(selected)
           )
         : [];
 
-      setParking(
-        parkingResults
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
-      setFuelStations(
-        fuelResults
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
-      setWorkshops(
-        workshopResults
+      setPlaces(
+        results
           .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
           .slice(0, 20)
       );
     } catch (err) {
       const message =
         err instanceof Error && err.message
-          ? `Unable to load motorcycle data (${err.message}). Please try again.`
-          : "Unable to load motorcycle data. Please try again.";
+          ? `Unable to load data (${err.message}). Please try again.`
+          : "Unable to load data. Please try again.";
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [selected]);
 
   const openInMaps = useCallback((place: Place) => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
+    const url = `https://www.openstreetmap.org/?mlat=${place.latitude}&mlon=${place.longitude}&zoom=16`;
     Linking.openURL(url).catch(() => null);
   }, []);
+
+  const sectionTitle =
+    selected === "dealers"
+      ? "MC Dealers"
+      : selected === "workshops"
+        ? "MC Workshops"
+        : selected === "fuel"
+          ? "Fuel Stations"
+          : selected === "parking"
+            ? "Parking"
+            : "MC Shops";
+
+  const emptyText =
+    selected === "dealers"
+      ? "No MC dealers found yet. Try updating your location."
+      : selected === "workshops"
+        ? "No MC workshops found yet. Try updating your location."
+        : selected === "fuel"
+          ? "No fuel stations found yet. Try updating your location."
+          : selected === "parking"
+            ? "No parking found yet. Try updating your location."
+            : "No MC shops found yet. Try updating your location.";
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -228,17 +263,46 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>Motorcycle Parking, Fuel & Workshops</Text>
+        <Text style={styles.title}>MC Dealers, Workshops, Shops, Fuel & Parking</Text>
         <Text style={styles.subtitle}>
-          Motorcycle parking, fuel stations, and workshops nearby.
+          Choose a category and find nearby spots.
         </Text>
       </View>
 
-      <Pressable style={styles.primaryButton} onPress={loadPlaces}>
+      {/* Category selector */}
+      <View style={styles.segmentRow}>
+        {CATEGORIES.map(({ key, label }) => (
+          <Pressable
+            key={key}
+            style={[
+              styles.segmentButton,
+              selected === key && styles.segmentButtonActive,
+            ]}
+            onPress={() => {
+              setSelected(key);
+              setPlaces([]);
+              setError(null);
+            }}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                selected === key && styles.segmentTextActive,
+              ]}
+            >
+              {label}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Pressable
+        style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
+        onPress={loadPlaces}
+        disabled={loading}
+      >
         <Text style={styles.primaryButtonText}>
-          {loading
-            ? "Loading..."
-            : "Find motorcycle parking, fuel, and workshops"}
+          {loading ? "Loading..." : `Find ${sectionTitle}`}
         </Text>
       </Pressable>
 
@@ -252,13 +316,11 @@ out center 120;`;
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       <View style={styles.sectionCard}>
-        <Text style={styles.cardTitle}>Motorcycle Parking</Text>
-        {parking.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>
-            No motorcycle parking found yet. Try updating your location.
-          </Text>
+        <Text style={styles.cardTitle}>{sectionTitle}</Text>
+        {places.length === 0 && !loading ? (
+          <Text style={styles.bodyText}>{emptyText}</Text>
         ) : (
-          parking.map((place) => (
+          places.map((place) => (
             <Pressable
               key={place.id}
               style={styles.placeRow}
@@ -280,56 +342,6 @@ out center 120;`;
           ))
         )}
       </View>
-
-      <View style={styles.sectionCard}>
-        <Text style={styles.cardTitle}>Fuel Stations</Text>
-        {fuelStations.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>
-            No fuel stations found yet. Try updating your location.
-          </Text>
-        ) : (
-          fuelStations.map((place) => (
-            <Pressable
-              key={place.id}
-              style={styles.placeRow}
-              onPress={() => openInMaps(place)}
-            >
-              <View style={styles.placeInfo}>
-                <Text style={styles.bodyText}>{place.name}</Text>
-                <Text style={styles.metaText}>{place.category}</Text>
-              </View>
-              <Text style={styles.metaText}>
-                {formatDistance(place.distanceMeters)}
-              </Text>
-            </Pressable>
-          ))
-        )}
-      </View>
-
-      <View style={styles.sectionCard}>
-        <Text style={styles.cardTitle}>MC Stores and Workshop</Text>
-        {workshops.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>
-            No motorbike workshops found yet. Try updating your location.
-          </Text>
-        ) : (
-          workshops.map((place) => (
-            <Pressable
-              key={place.id}
-              style={styles.placeRow}
-              onPress={() => openInMaps(place)}
-            >
-              <View style={styles.placeInfo}>
-                <Text style={styles.bodyText}>{place.name}</Text>
-                <Text style={styles.metaText}>{place.category}</Text>
-              </View>
-              <Text style={styles.metaText}>
-                {formatDistance(place.distanceMeters)}
-              </Text>
-            </Pressable>
-          ))
-        )}
-      </View>
     </ScrollView>
   );
 }
@@ -338,75 +350,108 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0f0a1a",
+    backgroundColor: "#070b14",
   },
   header: {
     marginTop: 18,
     marginBottom: 20,
-    padding: 16,
-    borderRadius: 18,
+    padding: 20,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: "rgba(52,211,153,0.25)",
     overflow: "hidden",
-    backgroundColor: "#14532d",
+    backgroundColor: "#0a1f0a",
   },
   headerGlow: {
     position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "rgba(34,197,94,0.5)",
-    top: -80,
-    right: -40,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "rgba(34,197,94,0.4)",
+    top: -90,
+    right: -50,
   },
   headerGlowSecondary: {
     position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(20,184,166,0.45)",
-    bottom: -60,
-    left: -20,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: "rgba(20,184,166,0.35)",
+    bottom: -70,
+    left: -30,
   },
   headerBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(15,10,26,0.35)",
-    color: "#f8fafc",
-    paddingHorizontal: 10,
+    backgroundColor: "rgba(7,11,20,0.5)",
+    color: "#6ee7b7",
+    paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 999,
     fontSize: 12,
-    fontWeight: "600",
-    marginBottom: 8,
-    letterSpacing: 0.4,
+    fontWeight: "700",
+    marginBottom: 10,
+    letterSpacing: 0.6,
+    borderWidth: 1,
+    borderColor: "rgba(34,197,94,0.35)",
   },
   title: {
-    color: "#f8fafc",
+    color: "#f1f5f9",
     fontSize: 30,
+    fontWeight: "800",
+    letterSpacing: 0.2,
+  },
+  subtitle: {
+    color: "#6ee7b7",
+    marginTop: 6,
+    fontSize: 15,
+    opacity: 0.85,
+  },
+  primaryButton: {
+    backgroundColor: "#3b82f6",
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: "center",
+    marginBottom: 16,
+    shadowColor: "#3b82f6",
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+  primaryButtonDisabled: {
+    opacity: 0.6,
+  },
+  primaryButtonText: {
+    color: "#ffffff",
+    fontSize: 16,
     fontWeight: "700",
     letterSpacing: 0.3,
   },
-  subtitle: {
-    color: "#ffffff",
-    marginTop: 6,
-    fontSize: 15,
+  segmentRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 14,
   },
-  primaryButton: {
-    backgroundColor: "#f59e0b",
-    paddingVertical: 12,
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 10,
     borderRadius: 12,
     alignItems: "center",
-    marginBottom: 16,
-    shadowColor: "#f59e0b",
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+    backgroundColor: "#0f1e33",
+    borderWidth: 1,
+    borderColor: "rgba(59,130,246,0.25)",
   },
-  primaryButtonText: {
-    color: "#2b0a3d",
-    fontSize: 16,
+  segmentButtonActive: {
+    backgroundColor: "#1d4ed8",
+    borderColor: "#3b82f6",
+  },
+  segmentText: {
+    color: "#64748b",
+    fontSize: 13,
     fontWeight: "600",
+  },
+  segmentTextActive: {
+    color: "#ffffff",
   },
   loadingRow: {
     flexDirection: "row",
@@ -415,55 +460,56 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    color: "#cbd5f5",
+    color: "#60a5fa",
   },
   errorText: {
     color: "#f87171",
     marginBottom: 12,
   },
   sectionCard: {
-    backgroundColor: "#1b1030",
-    padding: 14,
-    borderRadius: 16,
+    backgroundColor: "#0f1e33",
+    padding: 16,
+    borderRadius: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#2d1b4d",
-    shadowColor: "#020617",
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
+    borderColor: "rgba(59,130,246,0.2)",
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
+    elevation: 8,
   },
   cardTitle: {
-    color: "#f8fafc",
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 12,
+    color: "#f1f5f9",
+    fontSize: 17,
+    fontWeight: "700",
+    marginBottom: 14,
+    letterSpacing: 0.1,
   },
   bodyText: {
-    color: "#e2e8f0",
+    color: "#cbd5e1",
     fontSize: 15,
     marginBottom: 12,
   },
   metaText: {
-    color: "#94a3b8",
+    color: "#64748b",
     fontSize: 13,
   },
   placeRow: {
-    backgroundColor: "#140c24",
+    backgroundColor: "#0a1626",
     padding: 14,
     borderRadius: 14,
-    marginBottom: 12,
+    marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2d1b4d",
-    shadowColor: "#020617",
+    borderColor: "rgba(59,130,246,0.15)",
+    shadowColor: "#000",
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 5,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
   placeInfo: {
     flex: 1,
@@ -475,8 +521,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   highlightTag: {
-    color: "#22c55e",
+    color: "#34d399",
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });

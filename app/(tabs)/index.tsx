@@ -222,9 +222,9 @@ export default function Index() {
       const overpassQuery = `
 [out:json][timeout:25];
 (
-  node(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
-  way(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
-  relation(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
+  node(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts"];
+  way(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts"];
+  relation(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|motorcycle_parts"];
 );
 out center 60;`;
 
@@ -297,34 +297,19 @@ out center 60;`;
     const useNativeMaps =
       !isWeb && !!NativeMapView && appOwnership !== "expo";
 
-    const googleMapsStaticKey = useMemo(() => {
-      return (
-        (Constants.expoConfig?.extra as any)?.googleMapsStaticKey ??
-        (Constants.manifest as any)?.extra?.googleMapsStaticKey
-      );
-    }, []);
-
     const mapProviders = useMemo(() => {
       if (!location) {
         return [] as string[];
       }
       const { latitude, longitude } = location.coords;
-      const googleUrl = googleMapsStaticKey
-      ? `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=600x300&scale=2&maptype=roadmap&markers=color:red%7C${latitude},${longitude}&key=${googleMapsStaticKey}`
-      : undefined;
     const tileZoom = 15;
     const tile = latLonToTile(latitude, longitude, tileZoom);
-    const osmProviders = [
-      `https://maps.wikimedia.org/img/osm-intl,15,${latitude},${longitude},600x300.png`,
-      `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=15&size=600x300&maptype=mapnik&markers=${latitude},${longitude},red-pushpin`,
+    const mapTileUrls = [
       `https://tile.openstreetmap.org/${tileZoom}/${tile.x}/${tile.y}.png`,
     ];
 
-    return [
-      ...(googleUrl ? [googleUrl] : []),
-      ...osmProviders,
-    ];
-  }, [location, googleMapsStaticKey]);
+    return mapTileUrls;
+  }, [location]);
 
   const mapUrl = mapProviders[mapProviderIndex];
   const mapImageSource = mapUrl
@@ -342,9 +327,7 @@ out center 60;`;
     : undefined;
 
   const mapProviderLabel = mapUrl ? mapUrl.split("/")[2] : "";
-  const mapAttribution = mapUrl?.includes("googleapis.com")
-    ? "© Google"
-    : "© OpenStreetMap contributors";
+  const mapAttribution = "© OpenStreetMap contributors";
 
   const nativeRegion = location
     ? {
@@ -386,7 +369,7 @@ out center 60;`;
       return;
     }
     const { latitude, longitude } = location.coords;
-    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    const url = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}&zoom=16`;
     Linking.openURL(url).catch(() => null);
   }, [location]);
 
@@ -471,12 +454,6 @@ out center 60;`;
             <Text style={styles.attributionText}>{mapAttribution}</Text>
           </View>
         )}
-        {!useNativeMaps && !isWeb && !googleMapsStaticKey && (
-          <Text style={styles.metaText}>
-            Google Maps preview requires a Static Maps API key in
-            extra.googleMapsStaticKey.
-          </Text>
-        )}
         {mapUrl && mapImageLoading && (!useNativeMaps || isWeb) && (
           <View style={styles.loadingRow}>
             <ActivityIndicator size="small" />
@@ -486,13 +463,11 @@ out center 60;`;
         {mapUrl && mapError && (!useNativeMaps || isWeb) && (
           <View>
             <Text style={styles.bodyText}>
-              Map preview is unavailable. If using Google Static Maps, make
-              sure Maps Static API is enabled, billing is active, and the key
-              is not restricted for HTTP referrers.
+              Map preview is unavailable. Tap "Open in Maps" to view your location in OpenStreetMap.
             </Text>
             <Pressable style={styles.secondaryButton} onPress={retryMapPreview}>
               <Text style={styles.secondaryButtonText}>
-                Try another provider
+                Retry map
               </Text>
             </Pressable>
           </View>
@@ -587,88 +562,93 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0f0a1a",
+    backgroundColor: "#070b14",
   },
   header: {
     marginTop: 18,
     marginBottom: 20,
-    padding: 16,
-    borderRadius: 18,
+    padding: 20,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: "rgba(96,165,250,0.25)",
     overflow: "hidden",
-    backgroundColor: "#3b0764",
+    backgroundColor: "#0c1845",
   },
   headerGlow: {
     position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "rgba(236,72,153,0.55)",
-    top: -80,
-    right: -40,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "rgba(99,102,241,0.45)",
+    top: -90,
+    right: -50,
   },
   headerGlowSecondary: {
     position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(59,130,246,0.45)",
-    bottom: -60,
-    left: -20,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: "rgba(56,189,248,0.3)",
+    bottom: -70,
+    left: -30,
   },
   headerBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(15,10,26,0.35)",
-    color: "#f8fafc",
-    paddingHorizontal: 10,
+    backgroundColor: "rgba(7,11,20,0.5)",
+    color: "#93c5fd",
+    paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 999,
     fontSize: 12,
-    fontWeight: "600",
-    marginBottom: 8,
-    letterSpacing: 0.4,
+    fontWeight: "700",
+    marginBottom: 10,
+    letterSpacing: 0.6,
+    borderWidth: 1,
+    borderColor: "rgba(96,165,250,0.3)",
   },
   title: {
-    color: "#f8fafc",
+    color: "#f1f5f9",
     fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: 0.3,
+    fontWeight: "800",
+    letterSpacing: 0.2,
   },
   subtitle: {
-    color: "#c4b5fd",
+    color: "#93c5fd",
     marginTop: 6,
-    fontSize: 16,
+    fontSize: 15,
+    opacity: 0.85,
   },
   primaryButton: {
-    backgroundColor: "#f59e0b",
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: "#3b82f6",
+    paddingVertical: 14,
+    borderRadius: 14,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#f59e0b",
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    shadowColor: "#3b82f6",
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+    elevation: 8,
   },
   primaryButtonText: {
-    color: "#2b0a3d",
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
   secondaryButton: {
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#6d28d9",
-    backgroundColor: "#1b1030",
-    paddingVertical: 8,
-    borderRadius: 10,
+    borderColor: "rgba(59,130,246,0.4)",
+    backgroundColor: "rgba(59,130,246,0.08)",
+    paddingVertical: 10,
+    borderRadius: 12,
     alignItems: "center",
   },
   secondaryButtonText: {
-    color: "#e2e8f0",
+    color: "#93c5fd",
     fontSize: 14,
+    fontWeight: "600",
   },
   loadingRow: {
     flexDirection: "row",
@@ -677,65 +657,66 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    color: "#cbd5f5",
+    color: "#60a5fa",
   },
   errorText: {
     color: "#f87171",
     marginBottom: 12,
   },
   card: {
-    backgroundColor: "#1b1030",
-    padding: 16,
-    borderRadius: 16,
+    backgroundColor: "#0f1e33",
+    padding: 18,
+    borderRadius: 18,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#2d1b4d",
-    shadowColor: "#020617",
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
+    borderColor: "rgba(59,130,246,0.2)",
+    shadowColor: "#000",
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
+    elevation: 8,
   },
   alertCard: {
-    borderColor: "#f59e0b",
+    borderColor: "rgba(251,191,36,0.5)",
     borderWidth: 1,
   },
   cardTitle: {
-    color: "#f8fafc",
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 8,
+    color: "#f1f5f9",
+    fontSize: 17,
+    fontWeight: "700",
+    marginBottom: 10,
+    letterSpacing: 0.1,
   },
   bodyText: {
-    color: "#e2e8f0",
+    color: "#cbd5e1",
     fontSize: 15,
     marginBottom: 4,
   },
   metaText: {
-    color: "#94a3b8",
+    color: "#64748b",
     fontSize: 13,
   },
   mapImage: {
     width: "100%",
     height: 180,
-    borderRadius: 12,
+    borderRadius: 14,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#2d1b4d",
+    borderColor: "rgba(59,130,246,0.2)",
   },
   mapNativeContainer: {
     marginTop: 12,
-    borderRadius: 12,
+    borderRadius: 14,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#2d1b4d",
+    borderColor: "rgba(59,130,246,0.2)",
   },
   mapNative: {
     width: "100%",
     height: 220,
   },
   attributionText: {
-    color: "#c4b5fd",
+    color: "#475569",
     fontSize: 11,
     marginTop: 6,
   },
