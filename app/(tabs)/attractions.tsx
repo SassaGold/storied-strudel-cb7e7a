@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { Image as ExpoImage } from "expo-image";
 import * as Location from "expo-location";
 
 type Place = {
@@ -54,6 +55,7 @@ export default function AttractionsScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
@@ -70,6 +72,9 @@ export default function AttractionsScreen() {
       });
 
       const { latitude, longitude } = position.coords;
+      setMapUrl(
+        `https://maps.wikimedia.org/img/osm-intl,15,${latitude},${longitude},600x300.png`
+      );
 
       const overpassQuery = `
 [out:json][timeout:25];
@@ -147,6 +152,18 @@ out center 120;`;
           {loading ? "Loading..." : "Find attractions near me"}
         </Text>
       </Pressable>
+
+      {mapUrl && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Map Preview</Text>
+          <ExpoImage
+            source={{ uri: mapUrl }}
+            style={styles.mapImage}
+            contentFit="cover"
+          />
+          <Text style={styles.attributionText}>© OpenStreetMap contributors</Text>
+        </View>
+      )}
 
       {loading && (
         <View style={styles.loadingRow}>
@@ -304,5 +321,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+  },
+  card: {
+    backgroundColor: "#1b1030",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+  },
+  cardTitle: {
+    color: "#f8fafc",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  mapImage: {
+    width: "100%",
+    height: 180,
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+  },
+  attributionText: {
+    color: "#94a3b8",
+    fontSize: 11,
+    marginTop: 6,
   },
 });
