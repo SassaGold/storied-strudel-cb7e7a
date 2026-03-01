@@ -133,9 +133,9 @@ export default function McScreen() {
       return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[shop=motorcycle];
-  way(around:5000,${lat},${lon})[shop=motorcycle];
-  relation(around:5000,${lat},${lon})[shop=motorcycle];
+  node(around:20000,${lat},${lon})[shop=motorcycle];
+  way(around:20000,${lat},${lon})[shop=motorcycle];
+  relation(around:20000,${lat},${lon})[shop=motorcycle];
 );
 out center 120;`;
     }
@@ -143,9 +143,9 @@ out center 120;`;
       return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[shop=motorcycle_repair];
-  way(around:5000,${lat},${lon})[shop=motorcycle_repair];
-  relation(around:5000,${lat},${lon})[shop=motorcycle_repair];
+  node(around:20000,${lat},${lon})[shop=motorcycle_repair];
+  way(around:20000,${lat},${lon})[shop=motorcycle_repair];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_repair];
 );
 out center 120;`;
     }
@@ -153,9 +153,9 @@ out center 120;`;
       return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[amenity=fuel];
-  way(around:5000,${lat},${lon})[amenity=fuel];
-  relation(around:5000,${lat},${lon})[amenity=fuel];
+  node(around:20000,${lat},${lon})[amenity=fuel];
+  way(around:20000,${lat},${lon})[amenity=fuel];
+  relation(around:20000,${lat},${lon})[amenity=fuel];
 );
 out center 120;`;
     }
@@ -172,9 +172,9 @@ out center 120;`;
     return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[shop=motorcycle_parts];
-  way(around:5000,${lat},${lon})[shop=motorcycle_parts];
-  relation(around:5000,${lat},${lon})[shop=motorcycle_parts];
+  node(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  way(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_parts];
 );
 out center 120;`;
   };
