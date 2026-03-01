@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { fetchOverpass } from "../../lib/overpass";
 
 type Place = {
   id: string;
@@ -19,12 +20,6 @@ type Place = {
   longitude: number;
   note?: string;
 };
-
-const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://overpass.nchc.org.tw/api/interpreter",
-];
 
 const haversineMeters = (
   lat1: number,
@@ -85,32 +80,6 @@ const mapElements = (
       } as Place;
     })
     .filter(Boolean) as Place[];
-
-const fetchOverpass = async (query: string) => {
-  let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        },
-        body: `data=${encodeURIComponent(query)}`,
-      });
-
-      if (!response.ok) {
-        lastError = `Overpass error ${response.status}`;
-        continue;
-      }
-
-      return await response.json();
-    } catch (err) {
-      lastError = "Network error";
-    }
-  }
-
-  throw new Error(lastError ?? "Overpass request failed");
-};
 
 export default function McScreen() {
   const [loading, setLoading] = useState(false);
