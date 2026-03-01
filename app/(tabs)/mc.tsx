@@ -112,13 +112,14 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
-type Category = "dealers" | "workshops" | "shops" | "fuel";
+type Category = "dealers" | "workshops" | "shops" | "fuel" | "parking";
 
 const CATEGORIES: { key: Category; label: string }[] = [
   { key: "dealers", label: "🏍️ MC Dealers" },
   { key: "workshops", label: "🔧 Workshops" },
   { key: "shops", label: "🛒 MC Shops" },
   { key: "fuel", label: "⛽ Fuel Stations" },
+  { key: "parking", label: "🅿️ Parking" },
 ];
 
 export default function McScreen() {
@@ -132,9 +133,9 @@ export default function McScreen() {
       return `
 [out:json][timeout:25];
 (
-  node(around:20000,${lat},${lon})[shop=motorcycle];
-  way(around:20000,${lat},${lon})[shop=motorcycle];
-  relation(around:20000,${lat},${lon})[shop=motorcycle];
+  node(around:5000,${lat},${lon})[shop=motorcycle];
+  way(around:5000,${lat},${lon})[shop=motorcycle];
+  relation(around:5000,${lat},${lon})[shop=motorcycle];
 );
 out center 120;`;
     }
@@ -142,9 +143,9 @@ out center 120;`;
       return `
 [out:json][timeout:25];
 (
-  node(around:20000,${lat},${lon})[shop=motorcycle_repair];
-  way(around:20000,${lat},${lon})[shop=motorcycle_repair];
-  relation(around:20000,${lat},${lon})[shop=motorcycle_repair];
+  node(around:5000,${lat},${lon})[shop=motorcycle_repair];
+  way(around:5000,${lat},${lon})[shop=motorcycle_repair];
+  relation(around:5000,${lat},${lon})[shop=motorcycle_repair];
 );
 out center 120;`;
     }
@@ -152,18 +153,28 @@ out center 120;`;
       return `
 [out:json][timeout:25];
 (
-  node(around:20000,${lat},${lon})[amenity=fuel];
-  way(around:20000,${lat},${lon})[amenity=fuel];
-  relation(around:20000,${lat},${lon})[amenity=fuel];
+  node(around:5000,${lat},${lon})[amenity=fuel];
+  way(around:5000,${lat},${lon})[amenity=fuel];
+  relation(around:5000,${lat},${lon})[amenity=fuel];
+);
+out center 120;`;
+    }
+    if (category === "parking") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:5000,${lat},${lon})[amenity=parking];
+  way(around:5000,${lat},${lon})[amenity=parking];
+  relation(around:5000,${lat},${lon})[amenity=parking];
 );
 out center 120;`;
     }
     return `
 [out:json][timeout:25];
 (
-  node(around:20000,${lat},${lon})[shop=motorcycle_parts];
-  way(around:20000,${lat},${lon})[shop=motorcycle_parts];
-  relation(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  node(around:5000,${lat},${lon})[shop=motorcycle_parts];
+  way(around:5000,${lat},${lon})[shop=motorcycle_parts];
+  relation(around:5000,${lat},${lon})[shop=motorcycle_parts];
 );
 out center 120;`;
   };
@@ -172,6 +183,7 @@ out center 120;`;
     if (category === "dealers") return "MC Dealer";
     if (category === "workshops") return "MC Workshop";
     if (category === "fuel") return "Fuel Station";
+    if (category === "parking") return "Parking";
     return "MC Shop";
   };
 
@@ -230,7 +242,9 @@ out center 120;`;
         ? "MC Workshops"
         : selected === "fuel"
           ? "Fuel Stations"
-          : "MC Shops";
+          : selected === "parking"
+            ? "Parking"
+            : "MC Shops";
 
   const emptyText =
     selected === "dealers"
@@ -239,7 +253,9 @@ out center 120;`;
         ? "No MC workshops found yet. Try updating your location."
         : selected === "fuel"
           ? "No fuel stations found yet. Try updating your location."
-          : "No MC shops found yet. Try updating your location.";
+          : selected === "parking"
+            ? "No parking found yet. Try updating your location."
+            : "No MC shops found yet. Try updating your location.";
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -247,7 +263,7 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>MC Dealers, Workshops, Shops & Fuel</Text>
+        <Text style={styles.title}>MC Dealers, Workshops, Shops, Fuel & Parking</Text>
         <Text style={styles.subtitle}>
           Choose a category and find nearby spots.
         </Text>
