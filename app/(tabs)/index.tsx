@@ -540,11 +540,11 @@ out center 60;`;
           )}
 
           {/* 3-Day Forecast */}
-          {weather.forecast && weather.forecast.length > 1 && (
+          {weather.forecast && weather.forecast.length > 0 && (
             <View style={styles.weatherSection}>
               <Text style={styles.weatherSectionTitle}>3-Day Forecast</Text>
               <View style={styles.forecastCardsRow}>
-                {weather.forecast.slice(1, 4).map((day) => (
+                {weather.forecast.slice(0, 3).map((day) => (
                   <View key={day.date} style={styles.forecastCard}>
                     <Text style={styles.forecastCardDay}>
                       {formatForecastDate(day.date).split(",")[0]}
@@ -570,7 +570,7 @@ out center 60;`;
             style={styles.secondaryButton}
             onPress={() => Linking.openURL(weatherUrl).catch(() => null)}
           >
-            <Text style={styles.secondaryButtonText}>Open yr.no</Text>
+            <Text style={styles.secondaryButtonText}>Open YR</Text>
           </Pressable>
         </View>
       )}
