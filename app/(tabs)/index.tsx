@@ -18,7 +18,7 @@ type GeoAddress = {
 
 type ForecastDay = {
   date: string;
-  weatherCode: number;
+  weatherCode: string;
   maxTempC: number;
   minTempC: number;
   precipitationProbability: number;
@@ -29,7 +29,7 @@ type WeatherInfo = {
   windSpeed?: number;
   precipitation?: number;
   precipitationProbability?: number;
-  weatherCode?: number;
+  weatherCode?: string;
   forecast?: ForecastDay[];
 };
 
@@ -70,50 +70,70 @@ const formatDistance = (distance?: number) => {
   return `${(distance / 1000).toFixed(1)} km`;
 };
 
-const formatWeatherCode = (code?: number) => {
-  if (code === undefined) {
-    return "";
-  }
-  const mapping: Record<number, string> = {
-    0: "Clear",
-    1: "Mostly clear",
-    2: "Partly cloudy",
-    3: "Overcast",
-    45: "Fog",
-    48: "Depositing rime fog",
-    51: "Light drizzle",
-    53: "Drizzle",
-    55: "Heavy drizzle",
-    61: "Light rain",
-    63: "Rain",
-    65: "Heavy rain",
-    71: "Light snow",
-    73: "Snow",
-    75: "Heavy snow",
-    80: "Rain showers",
-    81: "Heavy rain showers",
-    82: "Violent rain showers",
-    95: "Thunderstorm",
-    96: "Thunderstorm w/ hail",
-    99: "Thunderstorm w/ heavy hail",
+const normalizeSymbol = (sym: string) =>
+  sym.replace(/_(day|night|polartwilight)$/, "");
+
+const formatWeatherCode = (sym?: string) => {
+  if (!sym) return "";
+  const s = normalizeSymbol(sym);
+  const labels: Record<string, string> = {
+    clearsky: "Clear",
+    fair: "Fair",
+    partlycloudy: "Partly cloudy",
+    cloudy: "Cloudy",
+    fog: "Fog",
+    lightrainshowers: "Light rain showers",
+    rainshowers: "Rain showers",
+    heavyrainshowers: "Heavy rain showers",
+    lightrain: "Light rain",
+    rain: "Rain",
+    heavyrain: "Heavy rain",
+    lightsleetshowers: "Light sleet showers",
+    sleetshowers: "Sleet showers",
+    heavysleetshowers: "Heavy sleet showers",
+    lightsleet: "Light sleet",
+    sleet: "Sleet",
+    heavysleet: "Heavy sleet",
+    lightsnowshowers: "Light snow showers",
+    snowshowers: "Snow showers",
+    heavysnowshowers: "Heavy snow showers",
+    lightsnow: "Light snow",
+    snow: "Snow",
+    heavysnow: "Heavy snow",
+    thunder: "Thunder",
+    rainandthunder: "Rain and thunder",
+    heavyrainandthunder: "Heavy rain and thunder",
+    snowandthunder: "Snow and thunder",
+    heavysnowandthunder: "Heavy snow and thunder",
+    sleetandthunder: "Sleet and thunder",
+    rainshowersandthunder: "Rain showers and thunder",
+    heavyrainshowersandthunder: "Heavy rain showers and thunder",
+    snowshowersandthunder: "Snow showers and thunder",
+    sleetshowersandthunder: "Sleet showers and thunder",
+    lightrainandthunder: "Light rain and thunder",
+    lightsnowandthunder: "Light snow and thunder",
+    lightsleetandthunder: "Light sleet and thunder",
+    lightrainshowersandthunder: "Light rain showers and thunder",
+    lightsnowshowersandthunder: "Light snow showers and thunder",
+    lightsleetshowersandthunder: "Light sleet showers and thunder",
   };
-  return mapping[code] ?? "Unknown";
+  return labels[s] ?? s;
 };
 
 
 
-const weatherEmoji = (code?: number) => {
-  if (code === undefined) {
-    return "❓";
-  }
-  if (code === 0) return "☀️";
-  if (code === 1 || code === 2) return "🌤️";
-  if (code === 3) return "☁️";
-  if (code === 45 || code === 48) return "🌫️";
-  if ([51, 53, 55].includes(code)) return "🌦️";
-  if ([61, 63, 65, 80, 81, 82].includes(code)) return "🌧️";
-  if ([71, 73, 75].includes(code)) return "❄️";
-  if ([95, 96, 99].includes(code)) return "⛈️";
+const weatherEmoji = (sym?: string) => {
+  if (!sym) return "❓";
+  const s = normalizeSymbol(sym);
+  if (s === "clearsky") return "☀️";
+  if (s === "fair") return "🌤️";
+  if (s === "partlycloudy") return "⛅";
+  if (s === "cloudy") return "☁️";
+  if (s === "fog") return "🌫️";
+  if (s.includes("thunder")) return "⛈️";
+  if (s.includes("snow")) return "❄️";
+  if (s.includes("sleet")) return "🌨️";
+  if (s.includes("rain")) return "🌧️";
   return "🌡️";
 };
 
@@ -260,40 +280,66 @@ export default function Index() {
         .catch(() => null);
 
       const weatherPromise = fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,precipitation,weather_code&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=4`
+        `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude.toFixed(4)}&lon=${longitude.toFixed(4)}`,
+        { headers: { "User-Agent": "leander/1.0 com.sassagold.leander" } }
       )
         .then((response) => response.json())
         .then((data) => {
-          const precipitationProbability =
-            data.hourly?.precipitation_probability?.[0] ?? undefined;
-          const dailyTimes: string[] = data.daily?.time ?? [];
-          const dailyCodes: number[] = data.daily?.weather_code ?? [];
-          const dailyMaxTemps: number[] = data.daily?.temperature_2m_max ?? [];
-          const dailyMinTemps: number[] = data.daily?.temperature_2m_min ?? [];
-          const dailyRainProbs: number[] = data.daily?.precipitation_probability_max ?? [];
-          const forecast: ForecastDay[] = dailyTimes
-            .map((date, i) => {
-              const weatherCode = dailyCodes[i];
-              const maxTempC = dailyMaxTemps[i];
-              const minTempC = dailyMinTemps[i];
-              const precipitationProbability = dailyRainProbs[i];
-              if (
-                weatherCode === undefined ||
-                maxTempC === undefined ||
-                minTempC === undefined ||
-                precipitationProbability === undefined
-              ) {
-                return null;
-              }
-              return { date, weatherCode, maxTempC, minTempC, precipitationProbability };
-            })
-            .filter((d): d is ForecastDay => d !== null);
+          const timeseries: any[] = data.properties?.timeseries ?? [];
+          if (timeseries.length === 0) return null;
+
+          // Current conditions from first entry
+          const current = timeseries[0];
+          const instant = current.data?.instant?.details ?? {};
+          const next1h = current.data?.next_1_hours ?? current.data?.next_6_hours ?? {};
+          const symbol: string = next1h.summary?.symbol_code ?? "";
+          const precipProbability: number = next1h.details?.probability_of_precipitation ?? 0;
+          const precipitation: number = next1h.details?.precipitation_amount ?? 0;
+
+          // Build 3-day forecast grouped by date
+          const dayMap = new Map<string, any[]>();
+          for (const entry of timeseries) {
+            const dateKey: string = entry.time.slice(0, 10);
+            if (!dayMap.has(dateKey)) dayMap.set(dateKey, []);
+            dayMap.get(dateKey)!.push(entry);
+          }
+
+          // yr.no API returns all timestamps in UTC; .toISOString() is consistently UTC
+          const today = new Date().toISOString().slice(0, 10);
+          const forecast: ForecastDay[] = [];
+          for (const [date, entries] of dayMap.entries()) {
+            if (date <= today) continue;
+            if (forecast.length >= 3) break;
+            // Pick entry closest to noon UTC (yr.no times are always UTC)
+            const noonEntry = entries.reduce((best: any, e: any) => {
+              const hour = parseInt(e.time.slice(11, 13), 10);
+              const bestHour = parseInt(best.time.slice(11, 13), 10);
+              return Math.abs(hour - 12) < Math.abs(bestHour - 12) ? e : best;
+            });
+            const n6h = noonEntry.data?.next_6_hours ?? noonEntry.data?.next_12_hours ?? {};
+            const daySymbol: string =
+              n6h.summary?.symbol_code ??
+              noonEntry.data?.next_1_hours?.summary?.symbol_code ??
+              "";
+            const maxTempC: number | undefined = n6h.details?.air_temperature_max;
+            const minTempC: number | undefined = n6h.details?.air_temperature_min;
+            const rainProb: number = n6h.details?.probability_of_precipitation ?? 0;
+            if (maxTempC === undefined || minTempC === undefined) continue;
+            forecast.push({
+              date,
+              weatherCode: daySymbol,
+              maxTempC,
+              minTempC,
+              precipitationProbability: Math.round(rainProb),
+            });
+          }
+
           return {
-            temperatureC: data.current?.temperature_2m ?? undefined,
-            windSpeed: data.current?.wind_speed_10m ?? undefined,
-            precipitation: data.current?.precipitation ?? undefined,
-            weatherCode: data.current?.weather_code ?? undefined,
-            precipitationProbability,
+            temperatureC: instant.air_temperature,
+            windSpeed: instant.wind_speed,
+            precipitation,
+            precipitationProbability: Math.round(precipProbability),
+            weatherCode: symbol,
             forecast,
           } as WeatherInfo;
         })
@@ -373,7 +419,9 @@ out center 60;`;
   const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
   const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
   const recommendations = useMemo(() => buildRecommendations(weather ?? undefined), [weather]);
-  const weatherUrl = "https://www.yr.no";
+  const weatherUrl = location
+    ? `https://www.yr.no/en/forecast/daily-table/${location.coords.latitude.toFixed(4)},${location.coords.longitude.toFixed(4)}`
+    : "https://www.yr.no";
 
   useEffect(() => {
     loadData();
