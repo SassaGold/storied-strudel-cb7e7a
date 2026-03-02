@@ -54,7 +54,6 @@
     },
     "extra": {
       "router": {},
-      "googleMapsStaticKey": "AIzaSyCulGSMoPj_Zfe_0szO82pTOmL9sVZdagE",
       "eas": {
         "projectId": "625b8a7c-5d22-4ebc-a8a6-d0a47451870e"
       }
