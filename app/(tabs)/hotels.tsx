@@ -61,7 +61,7 @@ export default function HotelsScreen() {
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
-        setError("Location permission is required to find hotels.");
+        setError("Location permission is required to find accommodation.");
         return;
       }
 
@@ -71,12 +71,14 @@ export default function HotelsScreen() {
 
       const { latitude, longitude } = position.coords;
 
+      const accommodationTypes =
+        "hotel|motel|hostel|guest_house|apartment|chalet|resort|camp_site|caravan_site|alpine_hut|wilderness_hut|villa|bungalow";
       const overpassQuery = `
 [out:json][timeout:25];
 (
-  node(around:5000,${latitude},${longitude})[tourism~"hotel|motel|hostel|guest_house"];
-  way(around:5000,${latitude},${longitude})[tourism~"hotel|motel|hostel|guest_house"];
-  relation(around:5000,${latitude},${longitude})[tourism~"hotel|motel|hostel|guest_house"];
+  node(around:5000,${latitude},${longitude})[tourism~"${accommodationTypes}"];
+  way(around:5000,${latitude},${longitude})[tourism~"${accommodationTypes}"];
+  relation(around:5000,${latitude},${longitude})[tourism~"${accommodationTypes}"];
 );
 out center 120;`;
 
@@ -100,7 +102,7 @@ out center 120;`;
             return null;
           }
           const tags = element.tags ?? {};
-          const name = tags.name || tags.tourism || "Hotel";
+          const name = tags.name || tags.tourism || "Accommodation";
           const stars = tags.stars || tags["stars:official"] || undefined;
           return {
             id: String(element.id),
@@ -120,7 +122,7 @@ out center 120;`;
           .slice(0, 20)
       );
     } catch (err) {
-      setError("Unable to load hotels. Please try again.");
+      setError("Unable to load accommodation. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -137,20 +139,20 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Stay nearby</Text>
-        <Text style={styles.title}>Hotels Near You</Text>
-        <Text style={styles.subtitle}>Find hotels and stays nearby.</Text>
+        <Text style={styles.title}>Accommodation Near You</Text>
+        <Text style={styles.subtitle}>Discover hotels, apartments, campsites & more nearby.</Text>
       </View>
 
       <Pressable style={styles.primaryButton} onPress={loadPlaces}>
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : "Find hotels near me"}
+          {loading ? "Loading..." : "Find accommodation near me"}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>Searching nearby stays…</Text>
+          <Text style={styles.loadingText}>Searching nearby accommodation…</Text>
         </View>
       )}
 
@@ -158,7 +160,7 @@ out center 120;`;
 
       {places.length === 0 && !loading ? (
         <Text style={styles.bodyText}>
-          No hotels found yet. Try updating your location.
+          No accommodation found nearby. Try updating your location.
         </Text>
       ) : (
         places.map((place) => (

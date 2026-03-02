@@ -39,6 +39,27 @@ const haversineMeters = (
   return R * c;
 };
 
+const AMENITY_TYPES =
+  "restaurant|cafe|fast_food|bar|pub|food_court|ice_cream|bakery";
+
+const categoryLabel: Record<string, string> = {
+  restaurant: "🍽️ Restaurant",
+  cafe: "☕ Café",
+  fast_food: "🍔 Fast Food",
+  bar: "🍺 Bar",
+  pub: "🍻 Pub",
+  food_court: "🏪 Food Court",
+  ice_cream: "🍦 Ice Cream",
+  bakery: "🥐 Bakery",
+};
+
+const formatCategory = (category: string) =>
+  categoryLabel[category] ??
+  `🍴 ${category
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ")}`;
+
 const formatDistance = (distance?: number) => {
   if (distance === undefined) {
     return "";
@@ -73,9 +94,9 @@ export default function RestaurantsScreen() {
       const overpassQuery = `
 [out:json][timeout:25];
 (
-  node(around:5000,${latitude},${longitude})[amenity~"restaurant|cafe"];
-  way(around:5000,${latitude},${longitude})[amenity~"restaurant|cafe"];
-  relation(around:5000,${latitude},${longitude})[amenity~"restaurant|cafe"];
+  node(around:5000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
+  way(around:5000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
+  relation(around:5000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
 );
 out center 120;`;
 
@@ -135,7 +156,7 @@ out center 120;`;
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Eat nearby</Text>
         <Text style={styles.title}>Restaurants Near You</Text>
-        <Text style={styles.subtitle}>Discover places to eat nearby.</Text>
+        <Text style={styles.subtitle}>Restaurants, cafés, fast food, bars, pubs, bakeries & more nearby.</Text>
       </View>
 
       <Pressable style={styles.primaryButton} onPress={loadPlaces}>
@@ -167,7 +188,7 @@ out center 120;`;
             <View style={styles.placeInfo}>
               <Text style={styles.bodyText}>{place.name}</Text>
               <View style={styles.tagRow}>
-                <Text style={styles.metaText}>{place.category}</Text>
+                <Text style={styles.metaText}>{formatCategory(place.category)}</Text>
               </View>
             </View>
             <Text style={styles.metaText}>{formatDistance(place.distanceMeters)}</Text>
