@@ -292,7 +292,7 @@ export default function Index() {
         .catch(() => null);
 
       const weatherPromise = fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,precipitation,weather_code&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=3`
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,precipitation,weather_code&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=4`
       )
         .then((response) => response.json())
         .then((data) => {
@@ -709,17 +709,29 @@ out center 60;`;
           )}
 
           {/* 3-Day Forecast */}
-          {weather.forecast && weather.forecast.length > 0 && (
+          {weather.forecast && weather.forecast.length > 1 && (
             <View style={styles.weatherSection}>
               <Text style={styles.weatherSectionTitle}>3-Day Forecast</Text>
-              {weather.forecast.map((day) => (
-                <View key={day.date} style={styles.forecastRow}>
-                  <Text style={styles.forecastDate}>{formatForecastDate(day.date)}</Text>
-                  <Text style={styles.forecastEmoji}>{weatherEmoji(day.weatherCode)}</Text>
-                  <Text style={styles.forecastTemps}>{Math.round(day.maxTempC)}° / {Math.round(day.minTempC)}°</Text>
-                  <Text style={styles.forecastRain}>{day.precipitationProbability}% rain</Text>
-                </View>
-              ))}
+              <View style={styles.forecastCardsRow}>
+                {weather.forecast.slice(1, 4).map((day) => (
+                  <View key={day.date} style={styles.forecastCard}>
+                    <Text style={styles.forecastCardDay}>
+                      {formatForecastDate(day.date).split(",")[0]}
+                    </Text>
+                    <Text style={styles.forecastCardDate}>
+                      {formatForecastDate(day.date).split(",")[1]?.trim() ?? ""}
+                    </Text>
+                    <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
+                    <Text style={styles.forecastCardCondition}>{formatWeatherCode(day.weatherCode)}</Text>
+                    <Text style={styles.forecastCardTemp}>
+                      {Math.round(day.maxTempC)}° / {Math.round(day.minTempC)}°
+                    </Text>
+                    <View style={styles.forecastCardRainRow}>
+                      <Text style={styles.forecastCardRain}>💧 {day.precipitationProbability}%</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
             </View>
           )}
 
@@ -1005,34 +1017,63 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     paddingLeft: 4,
   },
-  forecastRow: {
+  forecastCardsRow: {
     flexDirection: "row",
+    gap: 8,
+    marginTop: 8,
+  },
+  forecastCard: {
+    flex: 1,
+    backgroundColor: "#120926",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+    paddingVertical: 14,
+    paddingHorizontal: 6,
     alignItems: "center",
-    paddingVertical: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: "#1e1040",
+    shadowColor: "#020617",
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
-  forecastDate: {
-    color: "#e2e8f0",
-    fontSize: 13,
-    flex: 2,
+  forecastCardDay: {
+    color: "#f8fafc",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
-  forecastEmoji: {
-    fontSize: 18,
-    flex: 0,
-    marginHorizontal: 8,
+  forecastCardDate: {
+    color: "#94a3b8",
+    fontSize: 11,
+    marginBottom: 8,
+    marginTop: 1,
   },
-  forecastTemps: {
+  forecastCardEmoji: {
+    fontSize: 30,
+    marginBottom: 6,
+  },
+  forecastCardCondition: {
+    color: "#c4b5fd",
+    fontSize: 10,
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  forecastCardTemp: {
     color: "#f8fafc",
     fontSize: 13,
     fontWeight: "600",
-    flex: 2,
-    textAlign: "center",
+    marginBottom: 6,
   },
-  forecastRain: {
+  forecastCardRainRow: {
+    backgroundColor: "rgba(125,211,252,0.12)",
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  forecastCardRain: {
     color: "#7dd3fc",
-    fontSize: 13,
-    flex: 1.5,
-    textAlign: "right",
+    fontSize: 11,
+    fontWeight: "600",
   },
 });
