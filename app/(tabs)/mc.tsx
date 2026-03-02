@@ -1,13 +1,15 @@
-import { useCallback, useState } from "react";
+import { createElement, useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { Image as ExpoImage } from "expo-image";
 import * as Location from "expo-location";
 
 type Place = {
@@ -118,6 +120,7 @@ export default function McScreen() {
   const [parking, setParking] = useState<Place[]>([]);
   const [fuelStations, setFuelStations] = useState<Place[]>([]);
   const [workshops, setWorkshops] = useState<Place[]>([]);
+  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
@@ -134,6 +137,7 @@ export default function McScreen() {
       });
 
       const { latitude, longitude } = position.coords;
+      setCoords({ latitude, longitude });
 
       const parkingQuery = `
 [out:json][timeout:25];
@@ -250,6 +254,33 @@ out center 120;`;
       )}
 
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {coords && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Map Preview</Text>
+          {Platform.OS === "web"
+            ? (() => {
+                const { latitude: lat, longitude: lon } = coords;
+                const bboxWest = lon - 0.015;
+                const bboxSouth = lat - 0.01;
+                const bboxEast = lon + 0.015;
+                const bboxNorth = lat + 0.01;
+                return createElement("iframe", {
+                  src: `https://www.openstreetmap.org/export/embed.html?bbox=${bboxWest},${bboxSouth},${bboxEast},${bboxNorth}&layer=mapnik&marker=${lat},${lon}`,
+                  style: { width: "100%", height: 180, border: "none", borderRadius: 12, display: "block" },
+                  title: "OpenStreetMap",
+                });
+              })()
+            : (
+                <ExpoImage
+                  source={{ uri: `https://staticmap.openstreetmap.de/staticmap.php?center=${coords.latitude},${coords.longitude}&zoom=15&size=600x300&maptype=mapnik&markers=${coords.latitude},${coords.longitude},red-pushpin` }}
+                  style={styles.mapImage}
+                  contentFit="cover"
+                />
+              )}
+          <Text style={styles.attributionText}>© OpenStreetMap contributors</Text>
+        </View>
+      )}
 
       <View style={styles.sectionCard}>
         <Text style={styles.cardTitle}>Motorcycle Parking</Text>
@@ -478,5 +509,26 @@ const styles = StyleSheet.create({
     color: "#22c55e",
     fontSize: 12,
     fontWeight: "600",
+  },
+  card: {
+    backgroundColor: "#1b1030",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+  },
+  mapImage: {
+    width: "100%",
+    height: 180,
+    borderRadius: 12,
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+  },
+  attributionText: {
+    color: "#94a3b8",
+    fontSize: 11,
+    marginTop: 6,
   },
 });
