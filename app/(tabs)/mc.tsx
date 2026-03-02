@@ -73,7 +73,7 @@ const mapElements = (
       const name = tags.name || tags.brand || tags.operator || fallbackCategory;
       const note = tags.fee === "no" ? "Free parking" : undefined;
       const category =
-        tags.shop || tags.amenity || tags.tourism || fallbackCategory;
+        tags.shop || tags.amenity || tags.tourism || tags.club || tags.leisure || tags.craft || fallbackCategory;
       return {
         id: String(element.id),
         name,
@@ -112,7 +112,7 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
-type Category = "dealers" | "workshops" | "shops" | "fuel" | "parking";
+type Category = "dealers" | "workshops" | "shops" | "fuel" | "parking" | "clubs" | "tracks";
 
 const CATEGORIES: { key: Category; label: string }[] = [
   { key: "dealers", label: "🏍️ MC Dealers" },
@@ -120,6 +120,8 @@ const CATEGORIES: { key: Category; label: string }[] = [
   { key: "shops", label: "🛒 MC Shops" },
   { key: "fuel", label: "⛽ Fuel Stations" },
   { key: "parking", label: "🅿️ Parking" },
+  { key: "clubs", label: "🤝 MC Clubs" },
+  { key: "tracks", label: "🏁 MC Tracks" },
 ];
 
 export default function McScreen() {
@@ -136,6 +138,9 @@ export default function McScreen() {
   node(around:20000,${lat},${lon})[shop=motorcycle];
   way(around:20000,${lat},${lon})[shop=motorcycle];
   relation(around:20000,${lat},${lon})[shop=motorcycle];
+  node(around:20000,${lat},${lon})[shop=motorbike];
+  way(around:20000,${lat},${lon})[shop=motorbike];
+  relation(around:20000,${lat},${lon})[shop=motorbike];
 );
 out center 120;`;
     }
@@ -146,6 +151,9 @@ out center 120;`;
   node(around:20000,${lat},${lon})[shop=motorcycle_repair];
   way(around:20000,${lat},${lon})[shop=motorcycle_repair];
   relation(around:20000,${lat},${lon})[shop=motorcycle_repair];
+  node(around:20000,${lat},${lon})[craft=motorcycle_repair];
+  way(around:20000,${lat},${lon})[craft=motorcycle_repair];
+  relation(around:20000,${lat},${lon})[craft=motorcycle_repair];
 );
 out center 120;`;
     }
@@ -166,6 +174,32 @@ out center 120;`;
   node(around:5000,${lat},${lon})[amenity=parking];
   way(around:5000,${lat},${lon})[amenity=parking];
   relation(around:5000,${lat},${lon})[amenity=parking];
+  node(around:5000,${lat},${lon})[amenity=motorcycle_parking];
+  way(around:5000,${lat},${lon})[amenity=motorcycle_parking];
+  relation(around:5000,${lat},${lon})[amenity=motorcycle_parking];
+);
+out center 120;`;
+    }
+    if (category === "clubs") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:50000,${lat},${lon})[club=motorcycle];
+  way(around:50000,${lat},${lon})[club=motorcycle];
+  relation(around:50000,${lat},${lon})[club=motorcycle];
+);
+out center 120;`;
+    }
+    if (category === "tracks") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:50000,${lat},${lon})[leisure=motorcycle_track];
+  way(around:50000,${lat},${lon})[leisure=motorcycle_track];
+  relation(around:50000,${lat},${lon})[leisure=motorcycle_track];
+  node(around:50000,${lat},${lon})[sport=motorcycling];
+  way(around:50000,${lat},${lon})[sport=motorcycling];
+  relation(around:50000,${lat},${lon})[sport=motorcycling];
 );
 out center 120;`;
     }
@@ -175,6 +209,9 @@ out center 120;`;
   node(around:20000,${lat},${lon})[shop=motorcycle_parts];
   way(around:20000,${lat},${lon})[shop=motorcycle_parts];
   relation(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  node(around:20000,${lat},${lon})[shop=motorbike_parts];
+  way(around:20000,${lat},${lon})[shop=motorbike_parts];
+  relation(around:20000,${lat},${lon})[shop=motorbike_parts];
 );
 out center 120;`;
   };
@@ -184,6 +221,8 @@ out center 120;`;
     if (category === "workshops") return "MC Workshop";
     if (category === "fuel") return "Fuel Station";
     if (category === "parking") return "Parking";
+    if (category === "clubs") return "MC Club";
+    if (category === "tracks") return "MC Track";
     return "MC Shop";
   };
 
@@ -235,27 +274,28 @@ out center 120;`;
     Linking.openURL(url).catch(() => null);
   }, []);
 
-  const sectionTitle =
-    selected === "dealers"
-      ? "MC Dealers"
-      : selected === "workshops"
-        ? "MC Workshops"
-        : selected === "fuel"
-          ? "Fuel Stations"
-          : selected === "parking"
-            ? "Parking"
-            : "MC Shops";
+  const SECTION_TITLES: Record<Category, string> = {
+    dealers: "MC Dealers",
+    workshops: "MC Workshops",
+    shops: "MC Shops",
+    fuel: "Fuel Stations",
+    parking: "Parking",
+    clubs: "MC Clubs",
+    tracks: "MC Tracks",
+  };
 
-  const emptyText =
-    selected === "dealers"
-      ? "No MC dealers found yet. Try updating your location."
-      : selected === "workshops"
-        ? "No MC workshops found yet. Try updating your location."
-        : selected === "fuel"
-          ? "No fuel stations found yet. Try updating your location."
-          : selected === "parking"
-            ? "No parking found yet. Try updating your location."
-            : "No MC shops found yet. Try updating your location.";
+  const EMPTY_TEXTS: Record<Category, string> = {
+    dealers: "No MC dealers found yet. Try updating your location.",
+    workshops: "No MC workshops found yet. Try updating your location.",
+    shops: "No MC shops found yet. Try updating your location.",
+    fuel: "No fuel stations found yet. Try updating your location.",
+    parking: "No parking found yet. Try updating your location.",
+    clubs: "No MC clubs found within 50 km. Try updating your location.",
+    tracks: "No MC tracks found within 50 km. Try updating your location.",
+  };
+
+  const sectionTitle = SECTION_TITLES[selected];
+  const emptyText = EMPTY_TEXTS[selected];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -263,7 +303,7 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>MC Dealers, Workshops, Shops, Fuel & Parking</Text>
+        <Text style={styles.title}>MC Dealers, Workshops, Shops, Fuel, Parking, Clubs & Tracks</Text>
         <Text style={styles.subtitle}>
           Choose a category and find nearby spots.
         </Text>
@@ -429,12 +469,13 @@ const styles = StyleSheet.create({
   },
   segmentRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: 14,
   },
   segmentButton: {
-    flex: 1,
     paddingVertical: 10,
+    paddingHorizontal: 10,
     borderRadius: 12,
     alignItems: "center",
     backgroundColor: "#0f1e33",
