@@ -112,7 +112,7 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
-type Category = "dealers" | "workshops" | "shops" | "fuel" | "parking" | "clubs" | "tracks";
+type Category = "dealers" | "workshops" | "shops" | "fuel" | "parking" | "rentals" | "clubs" | "tracks";
 
 const CATEGORIES: { key: Category; label: string }[] = [
   { key: "dealers", label: "🏍️ MC Dealers" },
@@ -120,6 +120,7 @@ const CATEGORIES: { key: Category; label: string }[] = [
   { key: "shops", label: "🛒 MC Shops" },
   { key: "fuel", label: "⛽ Fuel Stations" },
   { key: "parking", label: "🅿️ Parking" },
+  { key: "rentals", label: "🔑 MC Rentals" },
   { key: "clubs", label: "🤝 MC Clubs" },
   { key: "tracks", label: "🏁 MC Tracks" },
 ];
@@ -141,6 +142,9 @@ export default function McScreen() {
   node(around:20000,${lat},${lon})[shop=motorbike];
   way(around:20000,${lat},${lon})[shop=motorbike];
   relation(around:20000,${lat},${lon})[shop=motorbike];
+  node(around:20000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
+  way(around:20000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
+  relation(around:20000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
 );
 out center 120;`;
     }
@@ -174,9 +178,22 @@ out center 120;`;
   node(around:5000,${lat},${lon})[amenity=parking];
   way(around:5000,${lat},${lon})[amenity=parking];
   relation(around:5000,${lat},${lon})[amenity=parking];
-  node(around:5000,${lat},${lon})[amenity=motorcycle_parking];
-  way(around:5000,${lat},${lon})[amenity=motorcycle_parking];
-  relation(around:5000,${lat},${lon})[amenity=motorcycle_parking];
+  node(around:10000,${lat},${lon})[amenity=motorcycle_parking];
+  way(around:10000,${lat},${lon})[amenity=motorcycle_parking];
+  relation(around:10000,${lat},${lon})[amenity=motorcycle_parking];
+);
+out center 120;`;
+    }
+    if (category === "rentals") {
+      return `
+[out:json][timeout:25];
+(
+  node(around:20000,${lat},${lon})[amenity=motorcycle_rental];
+  way(around:20000,${lat},${lon})[amenity=motorcycle_rental];
+  relation(around:20000,${lat},${lon})[amenity=motorcycle_rental];
+  node(around:20000,${lat},${lon})[shop=motorcycle_rental];
+  way(around:20000,${lat},${lon})[shop=motorcycle_rental];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_rental];
 );
 out center 120;`;
     }
@@ -212,6 +229,9 @@ out center 120;`;
   node(around:20000,${lat},${lon})[shop=motorbike_parts];
   way(around:20000,${lat},${lon})[shop=motorbike_parts];
   relation(around:20000,${lat},${lon})[shop=motorbike_parts];
+  node(around:20000,${lat},${lon})[shop=motorcycle_accessories];
+  way(around:20000,${lat},${lon})[shop=motorcycle_accessories];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_accessories];
 );
 out center 120;`;
   };
@@ -221,6 +241,7 @@ out center 120;`;
     if (category === "workshops") return "MC Workshop";
     if (category === "fuel") return "Fuel Station";
     if (category === "parking") return "Parking";
+    if (category === "rentals") return "MC Rental";
     if (category === "clubs") return "MC Club";
     if (category === "tracks") return "MC Track";
     return "MC Shop";
@@ -280,6 +301,7 @@ out center 120;`;
     shops: "MC Shops",
     fuel: "Fuel Stations",
     parking: "Parking",
+    rentals: "MC Rentals",
     clubs: "MC Clubs",
     tracks: "MC Tracks",
   };
@@ -290,6 +312,7 @@ out center 120;`;
     shops: "No MC shops found yet. Try updating your location.",
     fuel: "No fuel stations found yet. Try updating your location.",
     parking: "No parking found yet. Try updating your location.",
+    rentals: "No MC rentals found yet. Try updating your location.",
     clubs: "No MC clubs found within 50 km. Try updating your location.",
     tracks: "No MC tracks found within 50 km. Try updating your location.",
   };
@@ -303,7 +326,7 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>MC Dealers, Workshops, Shops, Fuel, Parking, Clubs & Tracks</Text>
+        <Text style={styles.title}>MC Dealers, Workshops, Shops, Fuel, Parking, Rentals, Clubs & Tracks</Text>
         <Text style={styles.subtitle}>
           Choose a category and find nearby spots.
         </Text>
