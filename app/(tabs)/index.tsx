@@ -321,9 +321,27 @@ export default function Index() {
               n6h.summary?.symbol_code ??
               noonEntry.data?.next_1_hours?.summary?.symbol_code ??
               "";
-            const maxTempC: number | undefined = n6h.details?.air_temperature_max;
-            const minTempC: number | undefined = n6h.details?.air_temperature_min;
             const rainProb: number = n6h.details?.probability_of_precipitation ?? 0;
+            // Scan all entries for the day to find max/min temps (not every entry has them)
+            let maxTempC: number | undefined;
+            let minTempC: number | undefined;
+            for (const e of entries) {
+              const block = e.data?.next_6_hours ?? e.data?.next_12_hours ?? {};
+              const mx: number | undefined = block.details?.air_temperature_max;
+              const mn: number | undefined = block.details?.air_temperature_min;
+              if (mx !== undefined) maxTempC = maxTempC === undefined ? mx : Math.max(maxTempC, mx);
+              if (mn !== undefined) minTempC = minTempC === undefined ? mn : Math.min(minTempC, mn);
+            }
+            // Fall back to instant temperatures if no 6h/12h blocks had them
+            if (maxTempC === undefined || minTempC === undefined) {
+              const temps: number[] = entries
+                .map((e: any) => e.data?.instant?.details?.air_temperature as number | undefined)
+                .filter((t): t is number => t !== undefined);
+              if (temps.length > 0) {
+                if (maxTempC === undefined) maxTempC = Math.max(...temps);
+                if (minTempC === undefined) minTempC = Math.min(...temps);
+              }
+            }
             if (maxTempC === undefined || minTempC === undefined) continue;
             forecast.push({
               date,
