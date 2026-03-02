@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { createElement, useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -429,7 +429,6 @@ out center 60;`;
     const tileZoom = 15;
     const tile = latLonToTile(latitude, longitude, tileZoom);
     const osmProviders = [
-      `https://maps.wikimedia.org/img/osm-intl,15,${latitude},${longitude},600x300.png`,
       `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=15&size=600x300&maptype=mapnik&markers=${latitude},${longitude},red-pushpin`,
       `https://tile.openstreetmap.org/${tileZoom}/${tile.x}/${tile.y}.png`,
     ];
@@ -441,19 +440,7 @@ out center 60;`;
   }, [location, googleMapsStaticKey]);
 
   const mapUrl = mapProviders[mapProviderIndex];
-  const mapImageSource = mapUrl
-    ? {
-        uri: mapUrl,
-        ...(Platform.OS === "web"
-          ? {
-              headers: {
-                "User-Agent": "Mozilla/5.0",
-                Accept: "image/png,image/*;q=0.8,*/*;q=0.5",
-              },
-            }
-          : {}),
-      }
-    : undefined;
+  const mapImageSource = mapUrl ? { uri: mapUrl } : undefined;
 
   const mapProviderLabel = mapUrl ? mapUrl.split("/")[2] : "";
   const mapAttribution = mapUrl?.includes("googleapis.com")
@@ -562,7 +549,7 @@ out center 60;`;
             </Text>
           </View>
         )}
-        {mapUrl && !mapError && mapImageSource && (!useNativeMaps || isWeb) && (
+        {mapUrl && !mapError && mapImageSource && !useNativeMaps && !isWeb && (
           <View>
             <ExpoImage
               source={mapImageSource}
@@ -573,10 +560,10 @@ out center 60;`;
                 setMapImageLoading(false);
               }}
               onError={() => {
-                setMapErrorMessage("Image failed to load");
                 if (mapProviderIndex < mapProviders.length - 1) {
                   setMapProviderIndex((prev) => prev + 1);
                 } else {
+                  setMapErrorMessage("Image failed to load");
                   setMapError(true);
                 }
                 setMapImageLoading(false);
@@ -585,19 +572,36 @@ out center 60;`;
             <Text style={styles.attributionText}>{mapAttribution}</Text>
           </View>
         )}
+        {isWeb && location && (
+          <View style={styles.mapNativeContainer}>
+            {(() => {
+              const { latitude: lat, longitude: lon } = location.coords;
+              const bboxWest = lon - 0.015;
+              const bboxSouth = lat - 0.01;
+              const bboxEast = lon + 0.015;
+              const bboxNorth = lat + 0.01;
+              return createElement("iframe", {
+                src: `https://www.openstreetmap.org/export/embed.html?bbox=${bboxWest},${bboxSouth},${bboxEast},${bboxNorth}&layer=mapnik&marker=${lat},${lon}`,
+                style: { width: "100%", height: 220, border: "none", borderRadius: 12, display: "block" },
+                title: "OpenStreetMap",
+              });
+            })()}
+            <Text style={styles.attributionText}>© OpenStreetMap contributors</Text>
+          </View>
+        )}
         {!useNativeMaps && !isWeb && !googleMapsStaticKey && (
           <Text style={styles.metaText}>
             Google Maps preview requires a Static Maps API key in
             extra.googleMapsStaticKey.
           </Text>
         )}
-        {mapUrl && mapImageLoading && (!useNativeMaps || isWeb) && (
+        {mapUrl && mapImageLoading && !useNativeMaps && !isWeb && (
           <View style={styles.loadingRow}>
             <ActivityIndicator size="small" />
             <Text style={styles.loadingText}>Loading map preview…</Text>
           </View>
         )}
-        {mapUrl && mapError && (!useNativeMaps || isWeb) && (
+        {mapUrl && mapError && !useNativeMaps && !isWeb && (
           <View>
             <Text style={styles.bodyText}>
               Map preview is unavailable. If using Google Static Maps, make
@@ -611,7 +615,7 @@ out center 60;`;
             </Pressable>
           </View>
         )}
-        {mapErrorMessage && (!useNativeMaps || isWeb) && (
+        {mapError && mapErrorMessage && !useNativeMaps && !isWeb && (
           <Text style={styles.metaText}>Map error: {mapErrorMessage}</Text>
         )}
       </View>
