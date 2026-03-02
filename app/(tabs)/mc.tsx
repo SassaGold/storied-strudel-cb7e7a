@@ -235,7 +235,7 @@ out center 120;`;
   }, [selected]);
 
   const openInMaps = useCallback((place: Place) => {
-    const url = `https://www.openstreetmap.org/?mlat=${place.latitude}&mlon=${place.longitude}&zoom=16`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
     Linking.openURL(url).catch(() => null);
   }, []);
 
