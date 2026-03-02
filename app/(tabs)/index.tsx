@@ -34,12 +34,21 @@ type GeoAddress = {
   country?: string;
 };
 
+type ForecastDay = {
+  date: string;
+  weatherCode: number;
+  maxTempC: number;
+  minTempC: number;
+  precipitationProbability: number;
+};
+
 type WeatherInfo = {
   temperatureC?: number;
   windSpeed?: number;
   precipitation?: number;
   precipitationProbability?: number;
   weatherCode?: number;
+  forecast?: ForecastDay[];
 };
 
 type Place = {
