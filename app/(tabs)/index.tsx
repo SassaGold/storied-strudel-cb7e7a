@@ -149,19 +149,99 @@ const buildAlerts = (weather?: WeatherInfo) => {
     return [] as string[];
   }
   const alerts: string[] = [];
-  if ((weather.precipitationProbability ?? 0) >= 60) {
-    alerts.push("Rain likely in the next hour.");
+  const temp = weather.temperatureC ?? 20;
+  const wind = weather.windSpeed ?? 0;
+  const rainChance = weather.precipitationProbability ?? 0;
+
+  if (temp <= 0) {
+    alerts.push("Very cold - risk of frostbite");
+  } else if (temp <= 5) {
+    alerts.push("Cold temperatures - watch for ice patches");
   }
-  if ((weather.windSpeed ?? 0) >= 10) {
-    alerts.push("Windy conditions nearby.");
+  if (temp >= 35) {
+    alerts.push("Extreme heat - risk of dehydration");
+  } else if (temp >= 30) {
+    alerts.push("High heat - stay hydrated");
   }
-  if ((weather.temperatureC ?? 0) <= 0) {
-    alerts.push("Freezing temperatures detected.");
+  if (wind >= 15) {
+    alerts.push("Strong winds - dangerous for riding");
+  } else if (wind >= 10) {
+    alerts.push("Gusty winds - ride with caution");
   }
-  if ((weather.temperatureC ?? 0) >= 32) {
-    alerts.push("High heat — stay hydrated.");
+  if (rainChance >= 60) {
+    alerts.push("Rain expected - slippery roads ahead");
   }
   return alerts;
+};
+
+const ridingSuitability = (weather?: WeatherInfo): { score: number; label: string; color: string } => {
+  if (!weather) {
+    return { score: 0, label: "N/A", color: "#94a3b8" };
+  }
+  let score = 100;
+  const temp = weather.temperatureC ?? 20;
+  const wind = weather.windSpeed ?? 0;
+  const precip = weather.precipitation ?? 0;
+  const rainChance = weather.precipitationProbability ?? 0;
+
+  if (temp <= 0) score -= 40;
+  else if (temp <= 5) score -= 20;
+  else if (temp >= 35) score -= 20;
+  else if (temp >= 30) score -= 10;
+
+  if (wind >= 15) score -= 30;
+  else if (wind >= 10) score -= 15;
+  else if (wind >= 7) score -= 8;
+
+  if (precip >= 5) score -= 20;
+  else if (precip >= 1) score -= 10;
+
+  if (rainChance >= 80) score -= 20;
+  else if (rainChance >= 60) score -= 10;
+
+  score = Math.max(0, Math.min(100, score));
+
+  if (score >= 80) return { score, label: "GREAT", color: "#22c55e" };
+  if (score >= 60) return { score, label: "GOOD", color: "#84cc16" };
+  if (score >= 40) return { score, label: "FAIR", color: "#f59e0b" };
+  if (score >= 20) return { score, label: "POOR", color: "#f97316" };
+  return { score, label: "DANGEROUS", color: "#ef4444" };
+};
+
+const buildRecommendations = (weather?: WeatherInfo) => {
+  if (!weather) {
+    return [] as string[];
+  }
+  const recs: string[] = [];
+  const temp = weather.temperatureC ?? 20;
+  const wind = weather.windSpeed ?? 0;
+  const rainChance = weather.precipitationProbability ?? 0;
+
+  if (temp <= 0) {
+    recs.push("Wear thermal gear, consider heated grips");
+  } else if (temp <= 10) {
+    recs.push("Layer up, wear windproof jacket");
+  }
+  if (temp >= 30) {
+    recs.push("Light breathable gear, carry water");
+  }
+  if (wind >= 10) {
+    recs.push("Secure loose clothing and luggage");
+  }
+  if (rainChance >= 60) {
+    recs.push("Bring rain gear, waterproof your bags");
+  }
+  return recs;
+};
+
+const formatForecastDate = (dateStr: string) => {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
 };
 
 export default function Index() {
@@ -212,18 +292,41 @@ export default function Index() {
         .catch(() => null);
 
       const weatherPromise = fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,precipitation,weather_code&hourly=precipitation_probability&forecast_days=1`
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,precipitation,weather_code&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=3`
       )
         .then((response) => response.json())
         .then((data) => {
           const precipitationProbability =
             data.hourly?.precipitation_probability?.[0] ?? undefined;
+          const dailyTimes: string[] = data.daily?.time ?? [];
+          const dailyCodes: number[] = data.daily?.weather_code ?? [];
+          const dailyMaxTemps: number[] = data.daily?.temperature_2m_max ?? [];
+          const dailyMinTemps: number[] = data.daily?.temperature_2m_min ?? [];
+          const dailyRainProbs: number[] = data.daily?.precipitation_probability_max ?? [];
+          const forecast: ForecastDay[] = dailyTimes
+            .map((date, i) => {
+              const weatherCode = dailyCodes[i];
+              const maxTempC = dailyMaxTemps[i];
+              const minTempC = dailyMinTemps[i];
+              const precipitationProbability = dailyRainProbs[i];
+              if (
+                weatherCode === undefined ||
+                maxTempC === undefined ||
+                minTempC === undefined ||
+                precipitationProbability === undefined
+              ) {
+                return null;
+              }
+              return { date, weatherCode, maxTempC, minTempC, precipitationProbability };
+            })
+            .filter((d): d is ForecastDay => d !== null);
           return {
             temperatureC: data.current?.temperature_2m ?? undefined,
             windSpeed: data.current?.wind_speed_10m ?? undefined,
             precipitation: data.current?.precipitation ?? undefined,
             weatherCode: data.current?.weather_code ?? undefined,
             precipitationProbability,
+            forecast,
           } as WeatherInfo;
         })
         .catch(() => null);
@@ -300,6 +403,8 @@ out center 60;`;
   }, []);
 
   const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
+  const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
+  const recommendations = useMemo(() => buildRecommendations(weather ?? undefined), [weather]);
   const weatherUrl = "https://www.yr.no";
     const appOwnership = Constants.appOwnership ?? "expo";
     const isWeb = Platform.OS === "web";
@@ -547,20 +652,77 @@ out center 60;`;
       {weather && (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Local Weather</Text>
-          <View style={styles.weatherRow}>
-            <Text style={styles.weatherEmoji}>{weatherEmoji(weather.weatherCode)}</Text>
-            <View>
-              <Text style={styles.bodyText}>
-                {formatWeatherCode(weather.weatherCode)} · {weather.temperatureC?.toFixed(1)}°C
-              </Text>
-              <Text style={styles.metaText}>
-                Wind {weather.windSpeed?.toFixed(1)} m/s · Precip {weather.precipitation ?? 0} mm
-              </Text>
+
+          {/* Main condition row */}
+          <View style={styles.weatherMainRow}>
+            <Text style={styles.weatherEmojiLarge}>{weatherEmoji(weather.weatherCode)}</Text>
+            <View style={styles.weatherMainInfo}>
+              <Text style={styles.weatherTempText}>{weather.temperatureC?.toFixed(1)}°C</Text>
+              <Text style={styles.weatherConditionText}>{formatWeatherCode(weather.weatherCode)}</Text>
             </View>
           </View>
-          <Text style={styles.bodyText}>
-            Rain chance {weather.precipitationProbability ?? 0}%
-          </Text>
+
+          {/* Stats grid */}
+          <View style={styles.weatherStatsGrid}>
+            <View style={styles.weatherStatItem}>
+              <Text style={styles.weatherStatValue}>{weather.windSpeed?.toFixed(1) ?? "0"}</Text>
+              <Text style={styles.weatherStatLabel}>Wind (m/s)</Text>
+            </View>
+            <View style={styles.weatherStatDivider} />
+            <View style={styles.weatherStatItem}>
+              <Text style={styles.weatherStatValue}>{weather.precipitation ?? 0}</Text>
+              <Text style={styles.weatherStatLabel}>Precip (mm)</Text>
+            </View>
+            <View style={styles.weatherStatDivider} />
+            <View style={styles.weatherStatItem}>
+              <Text style={styles.weatherStatValue}>{weather.precipitationProbability ?? 0}%</Text>
+              <Text style={styles.weatherStatLabel}>Rain Chance</Text>
+            </View>
+          </View>
+
+          {/* Riding Suitability */}
+          <View style={styles.suitabilityRow}>
+            <Text style={styles.suitabilityLabel}>Riding Suitability: {suitability.score}/100</Text>
+            <View style={[styles.suitabilityBadge, { backgroundColor: suitability.color }]}>
+              <Text style={styles.suitabilityBadgeText}>{suitability.label}</Text>
+            </View>
+          </View>
+
+          {/* Riding Alerts */}
+          {alerts.length > 0 && (
+            <View style={styles.weatherSection}>
+              <Text style={styles.weatherSectionTitle}>⚠️ Riding Alerts:</Text>
+              {alerts.map((alert) => (
+                <Text key={alert} style={styles.weatherBullet}>• {alert}</Text>
+              ))}
+            </View>
+          )}
+
+          {/* Recommendations */}
+          {recommendations.length > 0 && (
+            <View style={styles.weatherSection}>
+              <Text style={styles.weatherSectionTitle}>💡 Recommendations:</Text>
+              {recommendations.map((rec) => (
+                <Text key={rec} style={styles.weatherBullet}>• {rec}</Text>
+              ))}
+            </View>
+          )}
+
+          {/* 3-Day Forecast */}
+          {weather.forecast && weather.forecast.length > 0 && (
+            <View style={styles.weatherSection}>
+              <Text style={styles.weatherSectionTitle}>3-Day Forecast</Text>
+              {weather.forecast.map((day) => (
+                <View key={day.date} style={styles.forecastRow}>
+                  <Text style={styles.forecastDate}>{formatForecastDate(day.date)}</Text>
+                  <Text style={styles.forecastEmoji}>{weatherEmoji(day.weatherCode)}</Text>
+                  <Text style={styles.forecastTemps}>{Math.round(day.maxTempC)}° / {Math.round(day.minTempC)}°</Text>
+                  <Text style={styles.forecastRain}>{day.precipitationProbability}% rain</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
           <Pressable
             style={styles.secondaryButton}
             onPress={() => Linking.openURL(weatherUrl).catch(() => null)}
@@ -569,18 +731,6 @@ out center 60;`;
           </Pressable>
         </View>
       )}
-
-      {alerts.length > 0 && (
-        <View style={[styles.card, styles.alertCard]}>
-          <Text style={styles.cardTitle}>Alerts</Text>
-          {alerts.map((alert) => (
-            <Text key={alert} style={styles.bodyText}>
-              • {alert}
-            </Text>
-          ))}
-        </View>
-      )}
-
 
 
       {lastUpdated && (
@@ -766,5 +916,123 @@ const styles = StyleSheet.create({
   },
   weatherEmoji: {
     fontSize: 36,
+  },
+  weatherMainRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    marginBottom: 16,
+  },
+  weatherEmojiLarge: {
+    fontSize: 52,
+  },
+  weatherMainInfo: {
+    flex: 1,
+  },
+  weatherTempText: {
+    color: "#f8fafc",
+    fontSize: 32,
+    fontWeight: "700",
+    lineHeight: 36,
+  },
+  weatherConditionText: {
+    color: "#c4b5fd",
+    fontSize: 16,
+    marginTop: 2,
+  },
+  weatherStatsGrid: {
+    flexDirection: "row",
+    backgroundColor: "#120926",
+    borderRadius: 12,
+    paddingVertical: 12,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+  },
+  weatherStatItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  weatherStatDivider: {
+    width: 1,
+    backgroundColor: "#2d1b4d",
+    marginVertical: 4,
+  },
+  weatherStatValue: {
+    color: "#f8fafc",
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  weatherStatLabel: {
+    color: "#94a3b8",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  suitabilityRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
+  },
+  suitabilityLabel: {
+    color: "#e2e8f0",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  suitabilityBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  suitabilityBadgeText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  weatherSection: {
+    marginBottom: 12,
+  },
+  weatherSectionTitle: {
+    color: "#e2e8f0",
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  weatherBullet: {
+    color: "#cbd5e1",
+    fontSize: 14,
+    marginBottom: 2,
+    paddingLeft: 4,
+  },
+  forecastRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1e1040",
+  },
+  forecastDate: {
+    color: "#e2e8f0",
+    fontSize: 13,
+    flex: 2,
+  },
+  forecastEmoji: {
+    fontSize: 18,
+    flex: 0,
+    marginHorizontal: 8,
+  },
+  forecastTemps: {
+    color: "#f8fafc",
+    fontSize: 13,
+    fontWeight: "600",
+    flex: 2,
+    textAlign: "center",
+  },
+  forecastRain: {
+    color: "#7dd3fc",
+    fontSize: 13,
+    flex: 1.5,
+    textAlign: "right",
   },
 });
