@@ -1,32 +1,14 @@
-import { createElement, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { Image as ExpoImage } from "expo-image";
 import * as Location from "expo-location";
-import Constants from "expo-constants";
-
-let NativeMapView: any = null;
-let NativeMarker: any = null;
-
-if (Platform.OS !== "web") {
-  try {
-    const maps = require("react-native-maps");
-    NativeMapView = maps.default ?? maps.MapView ?? maps;
-    NativeMarker = null;
-  } catch (e) {
-    // Handle error if react-native-maps is not available
-    NativeMapView = null;
-    NativeMarker = null;
-  }
-}
 
 type GeoAddress = {
   displayName: string;
@@ -118,15 +100,6 @@ const formatWeatherCode = (code?: number) => {
   return mapping[code] ?? "Unknown";
 };
 
-const latLonToTile = (lat: number, lon: number, zoom: number) => {
-  const latRad = (lat * Math.PI) / 180;
-  const n = Math.pow(2, zoom);
-  const x = Math.floor(((lon + 180) / 360) * n);
-  const y = Math.floor(
-    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n
-  );
-  return { x, y };
-};
 
 
 const weatherEmoji = (code?: number) => {
@@ -252,11 +225,6 @@ export default function Index() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [mapError, setMapError] = useState(false);
-  const [mapErrorMessage, setMapErrorMessage] = useState<string | null>(null);
-  const [mapProviderIndex, setMapProviderIndex] = useState(0);
-  const [mapImageLoading, setMapImageLoading] = useState(false);
-  const [mapImageLoaded, setMapImageLoaded] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -406,81 +374,10 @@ out center 60;`;
   const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
   const recommendations = useMemo(() => buildRecommendations(weather ?? undefined), [weather]);
   const weatherUrl = "https://www.yr.no";
-    const appOwnership = Constants.appOwnership ?? "expo";
-    const isWeb = Platform.OS === "web";
-    const useNativeMaps =
-      !isWeb && !!NativeMapView && appOwnership !== "expo";
-
-    const googleMapsStaticKey = useMemo(() => {
-      return (
-        (Constants.expoConfig?.extra as any)?.googleMapsStaticKey ??
-        (Constants.manifest as any)?.extra?.googleMapsStaticKey
-      );
-    }, []);
-
-    const mapProviders = useMemo(() => {
-      if (!location) {
-        return [] as string[];
-      }
-      const { latitude, longitude } = location.coords;
-      const googleUrl = googleMapsStaticKey
-      ? `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=15&size=600x300&scale=2&maptype=roadmap&markers=color:red%7C${latitude},${longitude}&key=${googleMapsStaticKey}`
-      : undefined;
-    const tileZoom = 15;
-    const tile = latLonToTile(latitude, longitude, tileZoom);
-    const osmProviders = [
-      `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=15&size=600x300&maptype=mapnik&markers=${latitude},${longitude},red-pushpin`,
-      `https://tile.openstreetmap.org/${tileZoom}/${tile.x}/${tile.y}.png`,
-    ];
-
-    return [
-      ...(googleUrl ? [googleUrl] : []),
-      ...osmProviders,
-    ];
-  }, [location, googleMapsStaticKey]);
-
-  const mapUrl = mapProviders[mapProviderIndex];
-  const mapImageSource = mapUrl ? { uri: mapUrl } : undefined;
-
-  const mapProviderLabel = mapUrl ? mapUrl.split("/")[2] : "";
-  const mapAttribution = mapUrl?.includes("googleapis.com")
-    ? "© Google"
-    : "© OpenStreetMap contributors";
-
-  const nativeRegion = location
-    ? {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      }
-    : undefined;
-
-
-  useEffect(() => {
-    setMapError(false);
-    setMapErrorMessage(null);
-    setMapProviderIndex(0);
-  }, [mapProviders]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
-
-  useEffect(() => {
-    if (mapUrl && (!useNativeMaps || isWeb)) {
-      setMapImageLoading(true);
-      setMapImageLoaded(false);
-    }
-  }, [mapUrl, useNativeMaps, isWeb]);
-
-  const retryMapPreview = () => {
-    if (!mapProviders.length) {
-      return;
-    }
-    setMapError(false);
-    setMapProviderIndex((prev) => (prev + 1) % mapProviders.length);
-  };
 
   const openMaps = useCallback(() => {
     if (!location) {
@@ -501,124 +398,6 @@ out center 60;`;
         <Text style={styles.subtitle}>Your location and what’s around you.</Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Map Preview</Text>
-        {!isWeb && !location && (
-          <Text style={styles.bodyText}>
-            Tap “Update my location” to load the map.
-          </Text>
-        )}
-        {useNativeMaps && location && NativeMapView && nativeRegion && (
-          <View style={styles.mapNativeContainer}>
-            <NativeMapView
-              style={styles.mapNative}
-              region={nativeRegion}
-              showsUserLocation
-              showsMyLocationButton
-            >
-              {NativeMarker && (
-                <NativeMarker
-                  coordinate={{
-                    latitude: nativeRegion.latitude,
-                    longitude: nativeRegion.longitude,
-                  }}
-                  title="You are here"
-                />
-              )}
-            </NativeMapView>
-          </View>
-        )}
-        {!useNativeMaps && !isWeb && location && (
-          <Text style={styles.bodyText}>
-            Showing a static map preview. Use “Open in Maps” for live navigation.
-          </Text>
-        )}
-        {!mapUrl && isWeb && (
-          <Text style={styles.bodyText}>
-            Tap “Update my location” to load the map.
-          </Text>
-        )}
-        {!mapUrl && !isWeb && location && (
-          <View>
-            <Text style={styles.bodyText}>
-              Map preview is unavailable right now. Tap “Update my location” to
-              retry.
-            </Text>
-            <Text style={styles.metaText}>
-              Debug: map URL not generated.
-            </Text>
-          </View>
-        )}
-        {mapUrl && !mapError && mapImageSource && !useNativeMaps && !isWeb && (
-          <View>
-            <ExpoImage
-              source={mapImageSource}
-              style={styles.mapImage}
-              contentFit="cover"
-              onLoad={() => {
-                setMapImageLoaded(true);
-                setMapImageLoading(false);
-              }}
-              onError={() => {
-                if (mapProviderIndex < mapProviders.length - 1) {
-                  setMapProviderIndex((prev) => prev + 1);
-                } else {
-                  setMapErrorMessage("Image failed to load");
-                  setMapError(true);
-                }
-                setMapImageLoading(false);
-              }}
-            />
-            <Text style={styles.attributionText}>{mapAttribution}</Text>
-          </View>
-        )}
-        {isWeb && location && (
-          <View style={styles.mapNativeContainer}>
-            {(() => {
-              const { latitude: lat, longitude: lon } = location.coords;
-              const bboxWest = lon - 0.015;
-              const bboxSouth = lat - 0.01;
-              const bboxEast = lon + 0.015;
-              const bboxNorth = lat + 0.01;
-              return createElement("iframe", {
-                src: `https://www.openstreetmap.org/export/embed.html?bbox=${bboxWest},${bboxSouth},${bboxEast},${bboxNorth}&layer=mapnik&marker=${lat},${lon}`,
-                style: { width: "100%", height: 220, border: "none", borderRadius: 12, display: "block" },
-                title: "OpenStreetMap",
-              });
-            })()}
-            <Text style={styles.attributionText}>© OpenStreetMap contributors</Text>
-          </View>
-        )}
-        {!useNativeMaps && !isWeb && !googleMapsStaticKey && (
-          <Text style={styles.metaText}>
-            Google Maps preview requires a Static Maps API key in
-            extra.googleMapsStaticKey.
-          </Text>
-        )}
-        {mapUrl && mapImageLoading && !useNativeMaps && !isWeb && (
-          <View style={styles.loadingRow}>
-            <ActivityIndicator size="small" />
-            <Text style={styles.loadingText}>Loading map preview…</Text>
-          </View>
-        )}
-        {mapUrl && mapError && !useNativeMaps && !isWeb && (
-          <View>
-            <Text style={styles.bodyText}>
-              Map preview is unavailable. If using Google Static Maps, make
-              sure Maps Static API is enabled, billing is active, and the key
-              is not restricted for HTTP referrers.
-            </Text>
-            <Pressable style={styles.secondaryButton} onPress={retryMapPreview}>
-              <Text style={styles.secondaryButtonText}>
-                Try another provider
-              </Text>
-            </Pressable>
-          </View>
-        )}
-        {mapError && mapErrorMessage && !useNativeMaps && !isWeb && (
-          <Text style={styles.metaText}>Map error: {mapErrorMessage}</Text>
-        )}
-      </View>
 
       <Pressable style={styles.primaryButton} onPress={loadData}>
         <Text style={styles.primaryButtonText}>
@@ -889,30 +668,6 @@ const styles = StyleSheet.create({
   metaText: {
     color: "#94a3b8",
     fontSize: 13,
-  },
-  mapImage: {
-    width: "100%",
-    height: 180,
-    borderRadius: 12,
-    marginTop: 12,
-    borderWidth: 1,
-    borderColor: "#2d1b4d",
-  },
-  mapNativeContainer: {
-    marginTop: 12,
-    borderRadius: 12,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#2d1b4d",
-  },
-  mapNative: {
-    width: "100%",
-    height: 220,
-  },
-  attributionText: {
-    color: "#c4b5fd",
-    fontSize: 11,
-    marginTop: 6,
   },
   placeRow: {
     flexDirection: "row",
