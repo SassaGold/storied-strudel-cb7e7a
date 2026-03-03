@@ -154,8 +154,8 @@ export default function McScreen() {
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
     if (category === "services") {
-      // \\b produces a literal \b word-boundary anchor in the Overpass QL regex string
-      const motoNameRegex = "\\bmoto\\b|\\bmotorrad\\b|\\bmotorcycle\\b|\\bmotorbike\\b|\\bmotorfiets\\b";
+      // Overpass QL uses POSIX ERE which does not support \b word boundaries; plain alternation is sufficient
+      const motoNameRegex = "moto|motorrad|motorcycle|motorbike|motorfiets";
       const shopTypes = "motorcycle|motorbike|motor_vehicle|vehicle_repair|motorcycle_repair|motorcycle_parts|motorcycle_accessories|motorcycle_rental|motor";
       const craftTypes = "motorcycle_repair|car_repair";
       return `
