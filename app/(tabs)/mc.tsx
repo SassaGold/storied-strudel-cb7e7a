@@ -154,6 +154,14 @@ const fetchOverpass = async (query: string, timeoutMs: number = DEFAULT_FETCH_TI
 
 type Category = "services" | "fuel" | "parking" | "clubs_tracks";
 
+const CATEGORY_RADIUS_M = {
+  services: 30000,
+  fuel: 20000,
+  parking_general: 5000,
+  parking_moto: 10000,
+  clubs_tracks: 50000,
+} as const;
+
 const CATEGORIES: { key: Category; label: string }[] = [
   { key: "services", label: "🏍️ MC Services" },
   { key: "fuel", label: "⛽ Fuel Stations" },
@@ -172,84 +180,89 @@ export default function McScreen() {
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
     if (category === "services") {
+      const r = CATEGORY_RADIUS_M.services;
       return `
 [out:json][timeout:25];
 (
-  node(around:30000,${lat},${lon})[shop=motorcycle];
-  way(around:30000,${lat},${lon})[shop=motorcycle];
-  relation(around:30000,${lat},${lon})[shop=motorcycle];
-  node(around:30000,${lat},${lon})[shop=motorbike];
-  way(around:30000,${lat},${lon})[shop=motorbike];
-  relation(around:30000,${lat},${lon})[shop=motorbike];
-  node(around:30000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
-  way(around:30000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
-  relation(around:30000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
-  node(around:30000,${lat},${lon})[shop=motorcycle_repair];
-  way(around:30000,${lat},${lon})[shop=motorcycle_repair];
-  relation(around:30000,${lat},${lon})[shop=motorcycle_repair];
-  node(around:30000,${lat},${lon})[craft=motorcycle_repair];
-  way(around:30000,${lat},${lon})[craft=motorcycle_repair];
-  relation(around:30000,${lat},${lon})[craft=motorcycle_repair];
-  node(around:30000,${lat},${lon})[shop=motorcycle_parts];
-  way(around:30000,${lat},${lon})[shop=motorcycle_parts];
-  relation(around:30000,${lat},${lon})[shop=motorcycle_parts];
-  node(around:30000,${lat},${lon})[shop=motorbike_parts];
-  way(around:30000,${lat},${lon})[shop=motorbike_parts];
-  relation(around:30000,${lat},${lon})[shop=motorbike_parts];
-  node(around:30000,${lat},${lon})[shop=motorcycle_accessories];
-  way(around:30000,${lat},${lon})[shop=motorcycle_accessories];
-  relation(around:30000,${lat},${lon})[shop=motorcycle_accessories];
-  node(around:30000,${lat},${lon})[amenity=motorcycle_rental];
-  way(around:30000,${lat},${lon})[amenity=motorcycle_rental];
-  relation(around:30000,${lat},${lon})[amenity=motorcycle_rental];
-  node(around:30000,${lat},${lon})[shop=motorcycle_rental];
-  way(around:30000,${lat},${lon})[shop=motorcycle_rental];
-  relation(around:30000,${lat},${lon})[shop=motorcycle_rental];
-  node(around:30000,${lat},${lon})[craft=car_repair][motorcycle=yes];
-  way(around:30000,${lat},${lon})[craft=car_repair][motorcycle=yes];
-  relation(around:30000,${lat},${lon})[craft=car_repair][motorcycle=yes];
-  node(around:30000,${lat},${lon})[amenity=car_repair][motorcycle=yes];
-  way(around:30000,${lat},${lon})[amenity=car_repair][motorcycle=yes];
-  relation(around:30000,${lat},${lon})[amenity=car_repair][motorcycle=yes];
+  node(around:${r},${lat},${lon})[shop=motorcycle];
+  way(around:${r},${lat},${lon})[shop=motorcycle];
+  relation(around:${r},${lat},${lon})[shop=motorcycle];
+  node(around:${r},${lat},${lon})[shop=motorbike];
+  way(around:${r},${lat},${lon})[shop=motorbike];
+  relation(around:${r},${lat},${lon})[shop=motorbike];
+  node(around:${r},${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
+  way(around:${r},${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
+  relation(around:${r},${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
+  node(around:${r},${lat},${lon})[shop=motorcycle_repair];
+  way(around:${r},${lat},${lon})[shop=motorcycle_repair];
+  relation(around:${r},${lat},${lon})[shop=motorcycle_repair];
+  node(around:${r},${lat},${lon})[craft=motorcycle_repair];
+  way(around:${r},${lat},${lon})[craft=motorcycle_repair];
+  relation(around:${r},${lat},${lon})[craft=motorcycle_repair];
+  node(around:${r},${lat},${lon})[shop=motorcycle_parts];
+  way(around:${r},${lat},${lon})[shop=motorcycle_parts];
+  relation(around:${r},${lat},${lon})[shop=motorcycle_parts];
+  node(around:${r},${lat},${lon})[shop=motorbike_parts];
+  way(around:${r},${lat},${lon})[shop=motorbike_parts];
+  relation(around:${r},${lat},${lon})[shop=motorbike_parts];
+  node(around:${r},${lat},${lon})[shop=motorcycle_accessories];
+  way(around:${r},${lat},${lon})[shop=motorcycle_accessories];
+  relation(around:${r},${lat},${lon})[shop=motorcycle_accessories];
+  node(around:${r},${lat},${lon})[amenity=motorcycle_rental];
+  way(around:${r},${lat},${lon})[amenity=motorcycle_rental];
+  relation(around:${r},${lat},${lon})[amenity=motorcycle_rental];
+  node(around:${r},${lat},${lon})[shop=motorcycle_rental];
+  way(around:${r},${lat},${lon})[shop=motorcycle_rental];
+  relation(around:${r},${lat},${lon})[shop=motorcycle_rental];
+  node(around:${r},${lat},${lon})[craft=car_repair][motorcycle=yes];
+  way(around:${r},${lat},${lon})[craft=car_repair][motorcycle=yes];
+  relation(around:${r},${lat},${lon})[craft=car_repair][motorcycle=yes];
+  node(around:${r},${lat},${lon})[amenity=car_repair][motorcycle=yes];
+  way(around:${r},${lat},${lon})[amenity=car_repair][motorcycle=yes];
+  relation(around:${r},${lat},${lon})[amenity=car_repair][motorcycle=yes];
 );
 out center 120;`;
     }
     if (category === "fuel") {
+      const r = CATEGORY_RADIUS_M.fuel;
       return `
 [out:json][timeout:25];
 (
-  node(around:20000,${lat},${lon})[amenity=fuel];
-  way(around:20000,${lat},${lon})[amenity=fuel];
-  relation(around:20000,${lat},${lon})[amenity=fuel];
+  node(around:${r},${lat},${lon})[amenity=fuel];
+  way(around:${r},${lat},${lon})[amenity=fuel];
+  relation(around:${r},${lat},${lon})[amenity=fuel];
 );
 out center 120;`;
     }
     if (category === "parking") {
+      const rg = CATEGORY_RADIUS_M.parking_general;
+      const rm = CATEGORY_RADIUS_M.parking_moto;
       return `
 [out:json][timeout:25];
 (
-  node(around:5000,${lat},${lon})[amenity=parking];
-  way(around:5000,${lat},${lon})[amenity=parking];
-  relation(around:5000,${lat},${lon})[amenity=parking];
-  node(around:10000,${lat},${lon})[amenity=motorcycle_parking];
-  way(around:10000,${lat},${lon})[amenity=motorcycle_parking];
-  relation(around:10000,${lat},${lon})[amenity=motorcycle_parking];
+  node(around:${rg},${lat},${lon})[amenity=parking];
+  way(around:${rg},${lat},${lon})[amenity=parking];
+  relation(around:${rg},${lat},${lon})[amenity=parking];
+  node(around:${rm},${lat},${lon})[amenity=motorcycle_parking];
+  way(around:${rm},${lat},${lon})[amenity=motorcycle_parking];
+  relation(around:${rm},${lat},${lon})[amenity=motorcycle_parking];
 );
 out center 120;`;
     }
     // clubs_tracks
+    const r = CATEGORY_RADIUS_M.clubs_tracks;
     return `
 [out:json][timeout:30];
 (
-  node(around:50000,${lat},${lon})[club=motorcycle];
-  way(around:50000,${lat},${lon})[club=motorcycle];
-  relation(around:50000,${lat},${lon})[club=motorcycle];
-  node(around:50000,${lat},${lon})[leisure=motorcycle_track];
-  way(around:50000,${lat},${lon})[leisure=motorcycle_track];
-  relation(around:50000,${lat},${lon})[leisure=motorcycle_track];
-  node(around:50000,${lat},${lon})[sport=motorcycling];
-  way(around:50000,${lat},${lon})[sport=motorcycling];
-  relation(around:50000,${lat},${lon})[sport=motorcycling];
+  node(around:${r},${lat},${lon})[club=motorcycle];
+  way(around:${r},${lat},${lon})[club=motorcycle];
+  relation(around:${r},${lat},${lon})[club=motorcycle];
+  node(around:${r},${lat},${lon})[leisure=motorcycle_track];
+  way(around:${r},${lat},${lon})[leisure=motorcycle_track];
+  relation(around:${r},${lat},${lon})[leisure=motorcycle_track];
+  node(around:${r},${lat},${lon})[sport=motorcycling];
+  way(around:${r},${lat},${lon})[sport=motorcycling];
+  relation(around:${r},${lat},${lon})[sport=motorcycling];
 );
 out center 120;`;
   };
@@ -331,6 +344,13 @@ out center 120;`;
     clubs_tracks: "Clubs & Tracks",
   };
 
+  const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
+    services: `Searches within ${CATEGORY_RADIUS_M.services / 1000} km for motorcycle dealers, repair workshops, parts & accessories shops, and rental shops.`,
+    fuel: `Searches within ${CATEGORY_RADIUS_M.fuel / 1000} km for all fuel/petrol stations.`,
+    parking: `Searches within ${CATEGORY_RADIUS_M.parking_general / 1000} km for general parking and within ${CATEGORY_RADIUS_M.parking_moto / 1000} km for dedicated motorcycle parking.`,
+    clubs_tracks: `Searches within ${CATEGORY_RADIUS_M.clubs_tracks / 1000} km for motorcycle clubs and racing/riding tracks.`,
+  };
+
   const EMPTY_TEXTS: Record<Category, string> = {
     services: "No MC dealers, workshops, shops, or rentals found yet. Try updating your location.",
     fuel: "No fuel stations found yet. Try updating your location.",
@@ -339,6 +359,7 @@ out center 120;`;
   };
 
   const sectionTitle = SECTION_TITLES[selected];
+  const sectionDescription = CATEGORY_DESCRIPTIONS[selected];
   const emptyText = EMPTY_TEXTS[selected];
 
   return (
@@ -504,6 +525,7 @@ out center 120;`;
 
       <View style={styles.sectionCard}>
         <Text style={styles.cardTitle}>{sectionTitle}</Text>
+        <Text style={styles.cardDescription}>{sectionDescription}</Text>
         {places.length === 0 && !loading ? (
           <Text style={styles.bodyText}>{emptyText}</Text>
         ) : (
@@ -680,8 +702,14 @@ const styles = StyleSheet.create({
     color: "#f1f5f9",
     fontSize: 17,
     fontWeight: "700",
-    marginBottom: 14,
+    marginBottom: 4,
     letterSpacing: 0.1,
+  },
+  cardDescription: {
+    color: "#64748b",
+    fontSize: 13,
+    marginBottom: 14,
+    lineHeight: 18,
   },
   bodyText: {
     color: "#cbd5e1",
