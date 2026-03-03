@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -74,6 +75,7 @@ export default function RestaurantsScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
+  const [infoPlace, setInfoPlace] = useState<Place | null>(null);
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
@@ -151,6 +153,35 @@ out center 120;`;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Modal
+        visible={infoPlace !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setInfoPlace(null)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setInfoPlace(null)}>
+          <Pressable style={styles.modalCard} onPress={() => {}}>
+            <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
+            <View style={styles.modalRow}>
+              <Text style={styles.modalLabel}>Category</Text>
+              <Text style={styles.modalValue}>{formatCategory(infoPlace?.category ?? "")}</Text>
+            </View>
+            <View style={styles.modalRow}>
+              <Text style={styles.modalLabel}>Distance</Text>
+              <Text style={styles.modalValue}>{formatDistance(infoPlace?.distanceMeters)}</Text>
+            </View>
+            <View style={styles.modalRow}>
+              <Text style={styles.modalLabel}>Coordinates</Text>
+              <Text style={styles.modalValue}>
+                {(infoPlace?.latitude ?? 0).toFixed(5)}, {(infoPlace?.longitude ?? 0).toFixed(5)}
+              </Text>
+            </View>
+            <Pressable style={styles.modalClose} onPress={() => setInfoPlace(null)}>
+              <Text style={styles.modalCloseText}>Close</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
@@ -191,7 +222,16 @@ out center 120;`;
                 <Text style={styles.metaText}>{formatCategory(place.category)}</Text>
               </View>
             </View>
-            <Text style={styles.metaText}>{formatDistance(place.distanceMeters)}</Text>
+            <View style={styles.placeRight}>
+              <Text style={styles.metaText}>{formatDistance(place.distanceMeters)}</Text>
+              <Pressable
+                style={styles.infoButton}
+                onPress={(e) => { e.stopPropagation(); setInfoPlace(place); }}
+                hitSlop={8}
+              >
+                <Text style={styles.infoButtonText}>ⓘ</Text>
+              </Pressable>
+            </View>
           </Pressable>
         ))
       )}
@@ -319,5 +359,68 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
+  },
+  placeRight: {
+    alignItems: "flex-end",
+    gap: 6,
+  },
+  infoButton: {
+    padding: 2,
+  },
+  infoButtonText: {
+    color: "#38bdf8",
+    fontSize: 20,
+    lineHeight: 22,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  modalCard: {
+    backgroundColor: "#1b1030",
+    borderRadius: 18,
+    padding: 22,
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+    gap: 12,
+  },
+  modalTitle: {
+    color: "#f8fafc",
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  modalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 8,
+  },
+  modalLabel: {
+    color: "#94a3b8",
+    fontSize: 13,
+  },
+  modalValue: {
+    color: "#e2e8f0",
+    fontSize: 13,
+    fontWeight: "500",
+    flexShrink: 1,
+    textAlign: "right",
+  },
+  modalClose: {
+    marginTop: 8,
+    backgroundColor: "#38bdf8",
+    borderRadius: 10,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  modalCloseText: {
+    color: "#0f172a",
+    fontWeight: "700",
+    fontSize: 15,
   },
 });
