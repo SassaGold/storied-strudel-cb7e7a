@@ -108,9 +108,13 @@ const mapElements = (
     })
     .filter(Boolean) as Place[];
 
+const FETCH_TIMEOUT_MS = 15000;
+
 const fetchOverpass = async (query: string) => {
   let lastError: string | null = null;
   for (const endpoint of OVERPASS_ENDPOINTS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
       const response = await fetch(endpoint, {
         method: "POST",
@@ -118,7 +122,9 @@ const fetchOverpass = async (query: string) => {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
         },
         body: `data=${encodeURIComponent(query)}`,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         lastError = `Overpass error ${response.status}`;
@@ -127,7 +133,11 @@ const fetchOverpass = async (query: string) => {
 
       return await response.json();
     } catch (err) {
-      lastError = "Network error";
+      clearTimeout(timeoutId);
+      lastError =
+        err instanceof Error && err.name === "AbortError"
+          ? "Timeout"
+          : "Network error";
     }
   }
 
