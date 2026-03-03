@@ -19,6 +19,9 @@ type Place = {
   latitude: number;
   longitude: number;
   note?: string;
+  website?: string;
+  phone?: string;
+  openingHours?: string;
 };
 
 const OVERPASS_ENDPOINTS = [
@@ -83,6 +86,9 @@ const mapElements = (
         longitude: lon,
         distanceMeters: haversineMeters(latitude, longitude, lat, lon),
         note,
+        website: (tags.website || tags["contact:website"] || "").trim() || undefined,
+        phone: (tags.phone || tags["contact:phone"] || "").trim() || undefined,
+        openingHours: (tags.opening_hours || "").trim() || undefined,
       } as Place;
     })
     .filter(Boolean) as Place[];
@@ -343,16 +349,38 @@ out center 120;`;
                 <Text style={styles.modalValue}>{infoPlace.note}</Text>
               </View>
             )}
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Distance</Text>
-              <Text style={styles.modalValue}>{formatDistance(infoPlace?.distanceMeters)}</Text>
-            </View>
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Coordinates</Text>
-              <Text style={styles.modalValue}>
-                {(infoPlace?.latitude ?? 0).toFixed(5)}, {(infoPlace?.longitude ?? 0).toFixed(5)}
-              </Text>
-            </View>
+            {infoPlace?.phone && (
+              <View style={styles.modalRow}>
+                <Text style={styles.modalLabel}>📞 Phone</Text>
+                <Text
+                  style={styles.modalLink}
+                  onPress={() => Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null)}
+                >
+                  {infoPlace.phone}
+                </Text>
+              </View>
+            )}
+            {infoPlace?.website && (
+              <View style={styles.modalRow}>
+                <Text style={styles.modalLabel}>🌐 Website</Text>
+                <Text
+                  style={styles.modalLink}
+                  onPress={() => Linking.openURL(infoPlace.website!).catch(() => null)}
+                  numberOfLines={1}
+                >
+                  {infoPlace.website.replace(/^https?:\/\/(www\.)?/, "")}
+                </Text>
+              </View>
+            )}
+            {infoPlace?.openingHours && (
+              <View style={styles.modalRow}>
+                <Text style={styles.modalLabel}>🕐 Hours</Text>
+                <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
+              </View>
+            )}
+            {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && (
+              <Text style={styles.modalNoInfo}>No contact info available in OpenStreetMap for this place.</Text>
+            )}
             <Pressable style={styles.modalClose} onPress={() => setInfoPlace(null)}>
               <Text style={styles.modalCloseText}>Close</Text>
             </Pressable>
@@ -685,6 +713,19 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     flexShrink: 1,
     textAlign: "right",
+  },
+  modalLink: {
+    color: "#60a5fa",
+    fontSize: 13,
+    fontWeight: "500",
+    flexShrink: 1,
+    textAlign: "right",
+    textDecorationLine: "underline",
+  },
+  modalNoInfo: {
+    color: "#475569",
+    fontSize: 13,
+    fontStyle: "italic",
   },
   modalClose: {
     marginTop: 8,
