@@ -109,9 +109,9 @@ const mapElements = (
     .filter(Boolean) as Place[];
 
 // Per-category fetch timeouts must exceed the Overpass server-side [timeout:N] value.
-// services uses [timeout:40], others use [timeout:25-30]; add a ~15 s buffer each.
+// All categories use [timeout:25-30]; add a ~15 s buffer each.
 const CATEGORY_FETCH_TIMEOUT_MS: Record<string, number> = {
-  services: 55000,     // Overpass [timeout:40] + 15 s buffer
+  services: 40000,     // Overpass [timeout:25] + 15 s buffer
   fuel: 40000,         // Overpass [timeout:25] + 15 s buffer
   parking: 40000,      // Overpass [timeout:25] + 15 s buffer
   clubs_tracks: 45000, // Overpass [timeout:30] + 15 s buffer
@@ -172,12 +172,8 @@ export default function McScreen() {
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
     if (category === "services") {
-      // Overpass QL uses POSIX ERE which does not support \b word boundaries; plain alternation is sufficient
-      const motoNameRegex = "moto|motorrad|motorcycle|motorbike|motorfiets";
-      const shopTypes = "motorcycle|motorbike|motor_vehicle|vehicle_repair|motorcycle_repair|motorcycle_parts|motorcycle_accessories|motorcycle_rental|motor";
-      const craftTypes = "motorcycle_repair|car_repair";
       return `
-[out:json][timeout:40];
+[out:json][timeout:25];
 (
   node(around:30000,${lat},${lon})[shop=motorcycle];
   way(around:30000,${lat},${lon})[shop=motorcycle];
@@ -209,27 +205,12 @@ export default function McScreen() {
   node(around:30000,${lat},${lon})[shop=motorcycle_rental];
   way(around:30000,${lat},${lon})[shop=motorcycle_rental];
   relation(around:30000,${lat},${lon})[shop=motorcycle_rental];
-  node(around:30000,${lat},${lon})[shop=vehicle_repair][motorcycle!=no];
-  way(around:30000,${lat},${lon})[shop=vehicle_repair][motorcycle!=no];
-  relation(around:30000,${lat},${lon})[shop=vehicle_repair][motorcycle!=no];
   node(around:30000,${lat},${lon})[craft=car_repair][motorcycle=yes];
   way(around:30000,${lat},${lon})[craft=car_repair][motorcycle=yes];
   relation(around:30000,${lat},${lon})[craft=car_repair][motorcycle=yes];
   node(around:30000,${lat},${lon})[amenity=car_repair][motorcycle=yes];
   way(around:30000,${lat},${lon})[amenity=car_repair][motorcycle=yes];
   relation(around:30000,${lat},${lon})[amenity=car_repair][motorcycle=yes];
-  node(around:30000,${lat},${lon})[shop=motor];
-  way(around:30000,${lat},${lon})[shop=motor];
-  relation(around:30000,${lat},${lon})[shop=motor];
-  node(around:30000,${lat},${lon})[shop=tyres][motorcycle!=no];
-  way(around:30000,${lat},${lon})[shop=tyres][motorcycle!=no];
-  relation(around:30000,${lat},${lon})[shop=tyres][motorcycle!=no];
-  node(around:30000,${lat},${lon})[name~"${motoNameRegex}",i][shop~"${shopTypes}"];
-  way(around:30000,${lat},${lon})[name~"${motoNameRegex}",i][shop~"${shopTypes}"];
-  relation(around:30000,${lat},${lon})[name~"${motoNameRegex}",i][shop~"${shopTypes}"];
-  node(around:30000,${lat},${lon})[name~"${motoNameRegex}",i][craft~"${craftTypes}"];
-  way(around:30000,${lat},${lon})[name~"${motoNameRegex}",i][craft~"${craftTypes}"];
-  relation(around:30000,${lat},${lon})[name~"${motoNameRegex}",i][craft~"${craftTypes}"];
 );
 out center 120;`;
     }
