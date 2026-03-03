@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -55,7 +54,6 @@ export default function HotelsScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
-  const [infoPlace, setInfoPlace] = useState<Place | null>(null);
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
@@ -63,7 +61,7 @@ export default function HotelsScreen() {
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
-        setError("Location permission is required to find hotels.");
+        setError("Location permission is required to find accommodation.");
         return;
       }
 
@@ -73,12 +71,14 @@ export default function HotelsScreen() {
 
       const { latitude, longitude } = position.coords;
 
+      const accommodationTypes =
+        "hotel|motel|hostel|guest_house|apartment|chalet|resort|camp_site|caravan_site|alpine_hut|wilderness_hut|villa|bungalow";
       const overpassQuery = `
 [out:json][timeout:25];
 (
-  node(around:5000,${latitude},${longitude})[tourism~"hotel|motel|hostel|guest_house"];
-  way(around:5000,${latitude},${longitude})[tourism~"hotel|motel|hostel|guest_house"];
-  relation(around:5000,${latitude},${longitude})[tourism~"hotel|motel|hostel|guest_house"];
+  node(around:5000,${latitude},${longitude})[tourism~"${accommodationTypes}"];
+  way(around:5000,${latitude},${longitude})[tourism~"${accommodationTypes}"];
+  relation(around:5000,${latitude},${longitude})[tourism~"${accommodationTypes}"];
 );
 out center 120;`;
 
@@ -102,7 +102,7 @@ out center 120;`;
             return null;
           }
           const tags = element.tags ?? {};
-          const name = tags.name || tags.tourism || "Hotel";
+          const name = tags.name || tags.tourism || "Accommodation";
           const stars = tags.stars || tags["stars:official"] || undefined;
           return {
             id: String(element.id),
@@ -122,7 +122,7 @@ out center 120;`;
           .slice(0, 20)
       );
     } catch (err) {
-      setError("Unable to load hotels. Please try again.");
+      setError("Unable to load accommodation. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -135,59 +135,24 @@ out center 120;`;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Modal
-        visible={infoPlace !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setInfoPlace(null)}
-      >
-        <Pressable style={styles.modalOverlay} onPress={() => setInfoPlace(null)}>
-          <Pressable style={styles.modalCard} onPress={() => {}}>
-            <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Category</Text>
-              <Text style={styles.modalValue}>{infoPlace?.category}</Text>
-            </View>
-            {infoPlace?.stars && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>Stars</Text>
-                <Text style={styles.modalValue}>{infoPlace.stars}★</Text>
-              </View>
-            )}
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Distance</Text>
-              <Text style={styles.modalValue}>{formatDistance(infoPlace?.distanceMeters)}</Text>
-            </View>
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Coordinates</Text>
-              <Text style={styles.modalValue}>
-                {(infoPlace?.latitude ?? 0).toFixed(5)}, {(infoPlace?.longitude ?? 0).toFixed(5)}
-              </Text>
-            </View>
-            <Pressable style={styles.modalClose} onPress={() => setInfoPlace(null)}>
-              <Text style={styles.modalCloseText}>Close</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Stay nearby</Text>
-        <Text style={styles.title}>Hotels Near You</Text>
-        <Text style={styles.subtitle}>Find hotels and stays nearby.</Text>
+        <Text style={styles.title}>Accommodation Near You</Text>
+        <Text style={styles.subtitle}>Discover hotels, apartments, campsites & more nearby.</Text>
       </View>
 
       <Pressable style={styles.primaryButton} onPress={loadPlaces}>
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : "Find hotels near me"}
+          {loading ? "Loading..." : "Find accommodation near me"}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>Searching nearby stays…</Text>
+          <Text style={styles.loadingText}>Searching nearby accommodation…</Text>
         </View>
       )}
 
@@ -195,7 +160,7 @@ out center 120;`;
 
       {places.length === 0 && !loading ? (
         <Text style={styles.bodyText}>
-          No hotels found yet. Try updating your location.
+          No accommodation found nearby. Try updating your location.
         </Text>
       ) : (
         places.map((place) => (
@@ -213,18 +178,9 @@ out center 120;`;
                 )}
               </View>
             </View>
-            <View style={styles.placeRight}>
-              <Text style={styles.metaText}>
-                {formatDistance(place.distanceMeters)}
-              </Text>
-              <Pressable
-                style={styles.infoButton}
-                onPress={(e) => { e.stopPropagation(); setInfoPlace(place); }}
-                hitSlop={8}
-              >
-                <Text style={styles.infoButtonText}>ⓘ</Text>
-              </Pressable>
-            </View>
+            <Text style={styles.metaText}>
+              {formatDistance(place.distanceMeters)}
+            </Text>
           </Pressable>
         ))
       )}
@@ -357,68 +313,5 @@ const styles = StyleSheet.create({
     color: "#f59e0b",
     fontSize: 12,
     fontWeight: "600",
-  },
-  placeRight: {
-    alignItems: "flex-end",
-    gap: 6,
-  },
-  infoButton: {
-    padding: 2,
-  },
-  infoButtonText: {
-    color: "#38bdf8",
-    fontSize: 20,
-    lineHeight: 22,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalCard: {
-    backgroundColor: "#1b1030",
-    borderRadius: 18,
-    padding: 22,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#2d1b4d",
-    gap: 12,
-  },
-  modalTitle: {
-    color: "#f8fafc",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  modalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
-  modalLabel: {
-    color: "#94a3b8",
-    fontSize: 13,
-  },
-  modalValue: {
-    color: "#e2e8f0",
-    fontSize: 13,
-    fontWeight: "500",
-    flexShrink: 1,
-    textAlign: "right",
-  },
-  modalClose: {
-    marginTop: 8,
-    backgroundColor: "#38bdf8",
-    borderRadius: 10,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  modalCloseText: {
-    color: "#0f172a",
-    fontWeight: "700",
-    fontSize: 15,
   },
 });
