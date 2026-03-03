@@ -118,6 +118,7 @@ export default function RestaurantsScreen() {
 );
 out center 120;`;
 
+      // Overpass API (OpenStreetMap) — free place/POI data, no API key required
       const response = await fetch(
         `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
           overpassQuery
@@ -179,6 +180,7 @@ out center 120;`;
     if (place.wikipedia) {
       setWikiLoading(true);
       const { lang, title } = parseWikiTag(place.wikipedia);
+      // Wikipedia REST API — free, no API key required
       fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
         .then((r) => r.json())
         .then((data) => setWikiExtract((data.extract || "").trim() || null))
@@ -250,7 +252,7 @@ out center 120;`;
               </View>
             )}
             {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && (
-              <Text style={styles.modalNoInfo}>No contact info available in OpenStreetMap for this place.</Text>
+              <Text style={styles.modalNoInfo}>No contact info available for this place in OpenStreetMap (free open data).</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
               <Text style={styles.modalLoadingText}>Loading from Wikipedia…</Text>

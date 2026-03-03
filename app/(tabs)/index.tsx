@@ -263,6 +263,7 @@ export default function Index() {
 
       const { latitude, longitude } = position.coords;
 
+      // Nominatim (OpenStreetMap) — free reverse geocoding, no API key required
       const addressPromise = fetch(
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
         {
@@ -279,6 +280,7 @@ export default function Index() {
         }))
         .catch(() => null);
 
+      // MET Norway (api.met.no) — free public weather API, no API key required
       const weatherPromise = fetch(
         `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude.toFixed(4)}&lon=${longitude.toFixed(4)}`,
         { headers: { "User-Agent": "leander/1.0 com.sassagold.leander" } }
@@ -372,6 +374,7 @@ export default function Index() {
 );
 out center 60;`;
 
+      // Overpass API (OpenStreetMap) — free place/POI data, no API key required
       const placesPromise = fetch(
         `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
           overpassQuery
@@ -599,6 +602,58 @@ out center 60;`;
           Last updated {lastUpdated.toLocaleTimeString()}
         </Text>
       )}
+
+      {/* Attribution: all data sources used by this app are free and require no API key */}
+      <View style={styles.attributionCard}>
+        <Text style={styles.attributionTitle}>🔓 Free & Open Data</Text>
+        <Text style={styles.attributionSubtitle}>
+          This app uses only free, open-data services — no paid APIs, no subscriptions, no API keys.
+        </Text>
+        <View style={styles.attributionList}>
+          <View style={styles.attributionRow}>
+            <Text style={styles.attributionIcon}>📍</Text>
+            <View style={styles.attributionInfo}>
+              <Text style={styles.attributionName}>OpenStreetMap · Overpass API</Text>
+              <Text style={styles.attributionDesc}>Places & points of interest — free, open licence</Text>
+            </View>
+          </View>
+          <View style={styles.attributionRow}>
+            <Text style={styles.attributionIcon}>📍</Text>
+            <View style={styles.attributionInfo}>
+              <Text style={styles.attributionName}>Nominatim (OpenStreetMap)</Text>
+              <Text style={styles.attributionDesc}>Reverse geocoding — free, no key required</Text>
+            </View>
+          </View>
+          <View style={styles.attributionRow}>
+            <Text style={styles.attributionIcon}>🌤️</Text>
+            <View style={styles.attributionInfo}>
+              <Text style={styles.attributionName}>MET Norway · api.met.no</Text>
+              <Text style={styles.attributionDesc}>Weather forecasts — free public API, no key required</Text>
+            </View>
+          </View>
+          <View style={styles.attributionRow}>
+            <Text style={styles.attributionIcon}>🌐</Text>
+            <View style={styles.attributionInfo}>
+              <Text style={styles.attributionName}>yr.no</Text>
+              <Text style={styles.attributionDesc}>Full forecast website — free, opens in browser</Text>
+            </View>
+          </View>
+          <View style={styles.attributionRow}>
+            <Text style={styles.attributionIcon}>📖</Text>
+            <View style={styles.attributionInfo}>
+              <Text style={styles.attributionName}>Wikipedia REST API</Text>
+              <Text style={styles.attributionDesc}>Place descriptions — free, no key required</Text>
+            </View>
+          </View>
+          <View style={styles.attributionRow}>
+            <Text style={styles.attributionIcon}>🗺️</Text>
+            <View style={styles.attributionInfo}>
+              <Text style={styles.attributionName}>Google Maps (URL link)</Text>
+              <Text style={styles.attributionDesc}>Map & reviews links — free URL scheme, no Maps API key</Text>
+            </View>
+          </View>
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -900,5 +955,52 @@ const styles = StyleSheet.create({
     color: "#7dd3fc",
     fontSize: 11,
     fontWeight: "600",
+  },
+  attributionCard: {
+    marginTop: 20,
+    backgroundColor: "#1b1030",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#2d1b4d",
+  },
+  attributionTitle: {
+    color: "#f8fafc",
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  attributionSubtitle: {
+    color: "#64748b",
+    fontSize: 12,
+    marginBottom: 14,
+    lineHeight: 18,
+  },
+  attributionList: {
+    gap: 10,
+  },
+  attributionRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  attributionIcon: {
+    fontSize: 16,
+    lineHeight: 20,
+    width: 24,
+    textAlign: "center",
+  },
+  attributionInfo: {
+    flex: 1,
+  },
+  attributionName: {
+    color: "#94a3b8",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  attributionDesc: {
+    color: "#475569",
+    fontSize: 11,
+    lineHeight: 16,
   },
 });
