@@ -134,32 +134,28 @@ const fetchOverpass = async (query: string) => {
   throw new Error(lastError ?? "Overpass request failed");
 };
 
-type Category = "dealers" | "workshops" | "shops" | "fuel" | "parking" | "rentals" | "clubs" | "tracks";
+type Category = "services" | "fuel" | "parking" | "clubs_tracks";
 
 const CATEGORIES: { key: Category; label: string }[] = [
-  { key: "dealers", label: "🏍️ MC Dealers" },
-  { key: "workshops", label: "🔧 Workshops" },
-  { key: "shops", label: "🛒 MC Shops" },
+  { key: "services", label: "🏍️ MC Services" },
   { key: "fuel", label: "⛽ Fuel Stations" },
   { key: "parking", label: "🅿️ Parking" },
-  { key: "rentals", label: "🔑 MC Rentals" },
-  { key: "clubs", label: "🤝 MC Clubs" },
-  { key: "tracks", label: "🏁 MC Tracks" },
+  { key: "clubs_tracks", label: "🏁 Clubs & Tracks" },
 ];
 
 export default function McScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selected, setSelected] = useState<Category>("dealers");
+  const [selected, setSelected] = useState<Category>("services");
   const [places, setPlaces] = useState<Place[]>([]);
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
   const [wikiExtract, setWikiExtract] = useState<string | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
-    if (category === "dealers") {
+    if (category === "services") {
       return `
-[out:json][timeout:25];
+[out:json][timeout:30];
 (
   node(around:20000,${lat},${lon})[shop=motorcycle];
   way(around:20000,${lat},${lon})[shop=motorcycle];
@@ -170,19 +166,27 @@ export default function McScreen() {
   node(around:20000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
   way(around:20000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
   relation(around:20000,${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
-);
-out center 120;`;
-    }
-    if (category === "workshops") {
-      return `
-[out:json][timeout:25];
-(
   node(around:20000,${lat},${lon})[shop=motorcycle_repair];
   way(around:20000,${lat},${lon})[shop=motorcycle_repair];
   relation(around:20000,${lat},${lon})[shop=motorcycle_repair];
   node(around:20000,${lat},${lon})[craft=motorcycle_repair];
   way(around:20000,${lat},${lon})[craft=motorcycle_repair];
   relation(around:20000,${lat},${lon})[craft=motorcycle_repair];
+  node(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  way(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_parts];
+  node(around:20000,${lat},${lon})[shop=motorbike_parts];
+  way(around:20000,${lat},${lon})[shop=motorbike_parts];
+  relation(around:20000,${lat},${lon})[shop=motorbike_parts];
+  node(around:20000,${lat},${lon})[shop=motorcycle_accessories];
+  way(around:20000,${lat},${lon})[shop=motorcycle_accessories];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_accessories];
+  node(around:20000,${lat},${lon})[amenity=motorcycle_rental];
+  way(around:20000,${lat},${lon})[amenity=motorcycle_rental];
+  relation(around:20000,${lat},${lon})[amenity=motorcycle_rental];
+  node(around:20000,${lat},${lon})[shop=motorcycle_rental];
+  way(around:20000,${lat},${lon})[shop=motorcycle_rental];
+  relation(around:20000,${lat},${lon})[shop=motorcycle_rental];
 );
 out center 120;`;
     }
@@ -209,33 +213,13 @@ out center 120;`;
 );
 out center 120;`;
     }
-    if (category === "rentals") {
-      return `
-[out:json][timeout:25];
-(
-  node(around:20000,${lat},${lon})[amenity=motorcycle_rental];
-  way(around:20000,${lat},${lon})[amenity=motorcycle_rental];
-  relation(around:20000,${lat},${lon})[amenity=motorcycle_rental];
-  node(around:20000,${lat},${lon})[shop=motorcycle_rental];
-  way(around:20000,${lat},${lon})[shop=motorcycle_rental];
-  relation(around:20000,${lat},${lon})[shop=motorcycle_rental];
-);
-out center 120;`;
-    }
-    if (category === "clubs") {
-      return `
-[out:json][timeout:25];
+    // clubs_tracks
+    return `
+[out:json][timeout:30];
 (
   node(around:50000,${lat},${lon})[club=motorcycle];
   way(around:50000,${lat},${lon})[club=motorcycle];
   relation(around:50000,${lat},${lon})[club=motorcycle];
-);
-out center 120;`;
-    }
-    if (category === "tracks") {
-      return `
-[out:json][timeout:25];
-(
   node(around:50000,${lat},${lon})[leisure=motorcycle_track];
   way(around:50000,${lat},${lon})[leisure=motorcycle_track];
   relation(around:50000,${lat},${lon})[leisure=motorcycle_track];
@@ -244,32 +228,13 @@ out center 120;`;
   relation(around:50000,${lat},${lon})[sport=motorcycling];
 );
 out center 120;`;
-    }
-    return `
-[out:json][timeout:25];
-(
-  node(around:20000,${lat},${lon})[shop=motorcycle_parts];
-  way(around:20000,${lat},${lon})[shop=motorcycle_parts];
-  relation(around:20000,${lat},${lon})[shop=motorcycle_parts];
-  node(around:20000,${lat},${lon})[shop=motorbike_parts];
-  way(around:20000,${lat},${lon})[shop=motorbike_parts];
-  relation(around:20000,${lat},${lon})[shop=motorbike_parts];
-  node(around:20000,${lat},${lon})[shop=motorcycle_accessories];
-  way(around:20000,${lat},${lon})[shop=motorcycle_accessories];
-  relation(around:20000,${lat},${lon})[shop=motorcycle_accessories];
-);
-out center 120;`;
   };
 
   const fallbackLabel = (category: Category) => {
-    if (category === "dealers") return "MC Dealer";
-    if (category === "workshops") return "MC Workshop";
+    if (category === "services") return "MC Service";
     if (category === "fuel") return "Fuel Station";
     if (category === "parking") return "Parking";
-    if (category === "rentals") return "MC Rental";
-    if (category === "clubs") return "MC Club";
-    if (category === "tracks") return "MC Track";
-    return "MC Shop";
+    return "MC Club / Track";
   };
 
   const loadPlaces = useCallback(async () => {
@@ -336,25 +301,17 @@ out center 120;`;
   }, []);
 
   const SECTION_TITLES: Record<Category, string> = {
-    dealers: "MC Dealers",
-    workshops: "MC Workshops",
-    shops: "MC Shops",
+    services: "MC Services",
     fuel: "Fuel Stations",
     parking: "Parking",
-    rentals: "MC Rentals",
-    clubs: "MC Clubs",
-    tracks: "MC Tracks",
+    clubs_tracks: "Clubs & Tracks",
   };
 
   const EMPTY_TEXTS: Record<Category, string> = {
-    dealers: "No MC dealers found yet. Try updating your location.",
-    workshops: "No MC workshops found yet. Try updating your location.",
-    shops: "No MC shops found yet. Try updating your location.",
+    services: "No MC dealers, workshops, shops, or rentals found yet. Try updating your location.",
     fuel: "No fuel stations found yet. Try updating your location.",
     parking: "No parking found yet. Try updating your location.",
-    rentals: "No MC rentals found yet. Try updating your location.",
-    clubs: "No MC clubs found within 50 km. Try updating your location.",
-    tracks: "No MC tracks found within 50 km. Try updating your location.",
+    clubs_tracks: "No MC clubs or tracks found within 50 km. Try updating your location.",
   };
 
   const sectionTitle = SECTION_TITLES[selected];
@@ -469,7 +426,7 @@ out center 120;`;
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
         <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>MC Dealers, Workshops, Shops, Fuel, Parking, Rentals, Clubs & Tracks</Text>
+        <Text style={styles.title}>MC Services, Fuel, Parking, Clubs & Tracks</Text>
         <Text style={styles.subtitle}>
           Choose a category and find nearby spots.
         </Text>
