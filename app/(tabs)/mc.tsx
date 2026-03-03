@@ -108,13 +108,21 @@ const mapElements = (
     })
     .filter(Boolean) as Place[];
 
-const FETCH_TIMEOUT_MS = 15000;
+// Per-category fetch timeouts must exceed the Overpass server-side [timeout:N] value.
+// services uses [timeout:40], others use [timeout:25-30]; add a ~15 s buffer each.
+const CATEGORY_FETCH_TIMEOUT_MS: Record<string, number> = {
+  services: 55000,     // Overpass [timeout:40] + 15 s buffer
+  fuel: 40000,         // Overpass [timeout:25] + 15 s buffer
+  parking: 40000,      // Overpass [timeout:25] + 15 s buffer
+  clubs_tracks: 45000, // Overpass [timeout:30] + 15 s buffer
+};
+const DEFAULT_FETCH_TIMEOUT_MS = 45000;
 
-const fetchOverpass = async (query: string) => {
+const fetchOverpass = async (query: string, timeoutMs: number = DEFAULT_FETCH_TIMEOUT_MS) => {
   let lastError: string | null = null;
   for (const endpoint of OVERPASS_ENDPOINTS) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
       const response = await fetch(endpoint, {
         method: "POST",
@@ -289,7 +297,7 @@ out center 120;`;
 
       const { latitude, longitude } = position.coords;
       const query = buildQuery(selected, latitude, longitude);
-      const data = await fetchOverpass(query);
+      const data = await fetchOverpass(query, CATEGORY_FETCH_TIMEOUT_MS[selected] ?? DEFAULT_FETCH_TIMEOUT_MS);
       const results = data.elements
         ? mapElements(
             data.elements,
