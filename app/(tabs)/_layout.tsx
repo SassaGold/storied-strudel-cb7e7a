@@ -65,6 +65,20 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="emergency"
+        options={{
+          title: "SOS",
+          tabBarActiveTintColor: "#ef4444",
+          tabBarIcon: ({ focused, size }) => (
+            <Ionicons
+              name="alert-circle"
+              size={size}
+              color={focused ? "#ef4444" : "#555555"}
+            />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
