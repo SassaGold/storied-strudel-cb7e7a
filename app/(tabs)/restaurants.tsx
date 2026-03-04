@@ -162,7 +162,7 @@ out center 120;`;
           .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
           .slice(0, 20)
       );
-    } catch (err) {
+    } catch {
       setError("Unable to load restaurants. Please try again.");
     } finally {
       setLoading(false);

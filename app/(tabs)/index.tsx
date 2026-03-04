@@ -33,43 +33,6 @@ type WeatherInfo = {
   forecast?: ForecastDay[];
 };
 
-type Place = {
-  id: string;
-  name: string;
-  category: string;
-  distanceMeters?: number;
-};
-
-const haversineMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) => {
-  const toRad = (value: number) => (value * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
-const formatDistance = (distance?: number) => {
-  if (distance === undefined) {
-    return "";
-  }
-  if (distance < 1000) {
-    return `${Math.round(distance)} m`;
-  }
-  return `${(distance / 1000).toFixed(1)} km`;
-};
-
 const normalizeSymbol = (sym: string) =>
   sym.replace(/_(day|night|polartwilight)$/, "");
 
@@ -242,7 +205,6 @@ export default function Index() {
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<GeoAddress | null>(null);
   const [weather, setWeather] = useState<WeatherInfo | null>(null);
-  const [places, setPlaces] = useState<Place[]>([]);
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
@@ -365,72 +327,15 @@ export default function Index() {
         })
         .catch(() => null);
 
-      const overpassQuery = `
-[out:json][timeout:25];
-(
-  node(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
-  way(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
-  relation(around:5000,${latitude},${longitude})[shop~"motorcycle|motorcycle_repair|car_repair"];
-);
-out center 60;`;
-
-      // Overpass API (OpenStreetMap) — free place/POI data, no API key required
-      const placesPromise = fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-          overpassQuery
-        )}`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data.elements) {
-            return [] as Place[];
-          }
-          const mapped = (data.elements as any[])
-            .map((element) => {
-              const lat = element.lat ?? element.center?.lat;
-              const lon = element.lon ?? element.center?.lon;
-              if (lat === undefined || lon === undefined) {
-                return null;
-              }
-              const tags = element.tags ?? {};
-              const name =
-                tags.name ||
-                tags.shop ||
-                tags.amenity ||
-                tags.tourism ||
-                tags.leisure ||
-                "Place";
-              const category = tags.shop || tags.amenity || "motorbike workshop";
-              return {
-                id: String(element.id),
-                name,
-                category,
-                distanceMeters: haversineMeters(
-                  latitude,
-                  longitude,
-                  lat,
-                  lon
-                ),
-              } as Place;
-            })
-            .filter(Boolean) as Place[];
-          return mapped
-            .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-            .slice(0, 12);
-        })
-        .catch(() => [] as Place[]);
-
-      const [addressResult, weatherResult, placesResult] = await Promise.all([
+      const [addressResult, weatherResult] = await Promise.all([
         addressPromise,
         weatherPromise,
-        placesPromise,
       ]);
 
       setAddress(addressResult);
       setWeather(weatherResult);
-      setPlaces(placesResult ?? []);
       setLastUpdated(new Date());
-    } catch (err) {
+    } catch {
       setError("Unable to load location data. Please try again.");
     } finally {
       setLoading(false);
