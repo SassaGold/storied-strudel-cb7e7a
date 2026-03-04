@@ -1,20 +1,29 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { View } from "react-native";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#38bdf8",
-        tabBarStyle: { backgroundColor: "#0f172a", borderTopColor: "#1e293b" },
+        tabBarActiveTintColor: "#ff6600",
+        tabBarInactiveTintColor: "#555555",
+        tabBarStyle: {
+          backgroundColor: "#0a0a0a",
+          borderTopColor: "#ff6600",
+          borderTopWidth: 2,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: "700",
+          letterSpacing: 0.5,
+        },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "RIDER HQ",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="compass" size={size} color={color} />
           ),
@@ -23,7 +32,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="restaurants"
         options={{
-          title: "Restaurants",
+          title: "FOOD",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="restaurant" size={size} color={color} />
           ),
@@ -32,30 +41,27 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hotels"
         options={{
-          title: "Hotels",
+          title: "SLEEP",
           tabBarIcon: ({ color, size }) => (
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="bed" size={size * 0.7} color={color} />
-              <Ionicons name="star" size={size * 0.5} color={color} style={{ marginLeft: -4 }} />
-            </View>
+            <Ionicons name="bed" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="attractions"
         options={{
-          title: "Attractions",
+          title: "EXPLORE",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="camera" size={size} color={color} />
+            <Ionicons name="flag" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
         name="mc"
         options={{
-          title: "MC",
+          title: "GARAGE",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bicycle" size={size} color={color} />
+            <Ionicons name="speedometer" size={size} color={color} />
           ),
         }}
       />

@@ -173,7 +173,7 @@ out center 120;`;
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <Modal
         visible={infoPlace !== null}
         transparent
@@ -274,14 +274,14 @@ out center 120;`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>Explore nearby</Text>
-        <Text style={styles.title}>Tourist Attractions</Text>
-        <Text style={styles.subtitle}>Discover interesting places and sights nearby.</Text>
+        <Text style={styles.headerBadge}>🗺️ ROAD STOPS</Text>
+        <Text style={styles.title}>ROADSIDE STOPS</Text>
+        <Text style={styles.subtitle}>Interesting places & sights along your route.</Text>
       </View>
 
       <Pressable style={styles.primaryButton} onPress={loadPlaces}>
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : "Find attractions near me"}
+          {loading ? "Loading..." : "FIND NEARBY STOPS"}
         </Text>
       </Pressable>
 
@@ -296,7 +296,7 @@ out center 120;`;
 
       {places.length === 0 && !loading ? (
         <Text style={styles.bodyText}>
-          No attractions found yet. Try updating your location.
+          No roadside stops found. Tap the button above to search.
         </Text>
       ) : (
         places.map((place) => (
@@ -331,10 +331,14 @@ out center 120;`;
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: "#0a0a0a",
+  },
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0f0a1a",
+    backgroundColor: "#0a0a0a",
   },
   header: {
     marginTop: 18,
@@ -342,16 +346,16 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: "rgba(255,102,0,0.4)",
     overflow: "hidden",
-    backgroundColor: "#0b4b66",
+    backgroundColor: "#1a0900",
   },
   headerGlow: {
     position: "absolute",
     width: 180,
     height: 180,
     borderRadius: 90,
-    backgroundColor: "rgba(56,189,248,0.5)",
+    backgroundColor: "rgba(255,102,0,0.55)",
     top: -80,
     right: -40,
   },
@@ -360,14 +364,14 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: "rgba(34,211,238,0.4)",
+    backgroundColor: "rgba(180,60,0,0.40)",
     bottom: -60,
     left: -20,
   },
   headerBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(15,10,26,0.35)",
-    color: "#f8fafc",
+    backgroundColor: "rgba(255,102,0,0.18)",
+    color: "#ff6600",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -377,32 +381,33 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   title: {
-    color: "#f8fafc",
-    fontSize: 30,
-    fontWeight: "700",
-    letterSpacing: 0.3,
+    color: "#ffffff",
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: 2,
   },
   subtitle: {
-    color: "#c4b5fd",
+    color: "#c8c8c8",
     marginTop: 6,
     fontSize: 15,
   },
   primaryButton: {
-    backgroundColor: "#f59e0b",
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: "#ff6600",
+    paddingVertical: 13,
+    borderRadius: 6,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#f59e0b",
+    shadowColor: "#ff6600",
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
   primaryButtonText: {
-    color: "#2b0a3d",
+    color: "#000000",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "800",
+    letterSpacing: 0.8,
   },
   loadingRow: {
     flexDirection: "row",
@@ -411,32 +416,34 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    color: "#cbd5f5",
+    color: "#c8c8c8",
   },
   errorText: {
     color: "#f87171",
     marginBottom: 12,
   },
   bodyText: {
-    color: "#e2e8f0",
+    color: "#c8c8c8",
     fontSize: 15,
     marginBottom: 12,
   },
   metaText: {
-    color: "#94a3b8",
+    color: "#666666",
     fontSize: 13,
   },
   placeRow: {
-    backgroundColor: "#1b1030",
+    backgroundColor: "#141414",
     padding: 14,
-    borderRadius: 14,
-    marginBottom: 12,
+    borderRadius: 8,
+    marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2d1b4d",
-    shadowColor: "#020617",
+    borderColor: "#2a2a2a",
+    borderLeftWidth: 3,
+    borderLeftColor: "#ff6600",
+    shadowColor: "#000000",
     shadowOpacity: 0.35,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
@@ -459,7 +466,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   infoButtonText: {
-    color: "#38bdf8",
+    color: "#ff6600",
     fontSize: 20,
     lineHeight: 22,
   },
@@ -471,16 +478,16 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   modalCard: {
-    backgroundColor: "#1b1030",
-    borderRadius: 18,
+    backgroundColor: "#141414",
+    borderRadius: 10,
     padding: 22,
     width: "100%",
     borderWidth: 1,
-    borderColor: "#2d1b4d",
+    borderColor: "#2a2a2a",
     gap: 12,
   },
   modalTitle: {
-    color: "#f8fafc",
+    color: "#ffffff",
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 4,
@@ -492,18 +499,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalLabel: {
-    color: "#94a3b8",
+    color: "#666666",
     fontSize: 13,
   },
   modalValue: {
-    color: "#e2e8f0",
+    color: "#c8c8c8",
     fontSize: 13,
     fontWeight: "500",
     flexShrink: 1,
     textAlign: "right",
   },
   modalLink: {
-    color: "#38bdf8",
+    color: "#ff6600",
     fontSize: 13,
     fontWeight: "500",
     flexShrink: 1,
@@ -511,12 +518,12 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   modalNoInfo: {
-    color: "#64748b",
+    color: "#555555",
     fontSize: 13,
     fontStyle: "italic",
   },
   modalLoadingText: {
-    color: "#94a3b8",
+    color: "#666666",
     fontSize: 13,
     fontStyle: "italic",
   },
@@ -541,19 +548,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalActionButton: {
-    backgroundColor: "rgba(56,189,248,0.12)",
-    borderRadius: 10,
+    backgroundColor: "rgba(255,102,0,0.12)",
+    borderRadius: 6,
     paddingVertical: 10,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(56,189,248,0.3)",
+    borderColor: "rgba(255,102,0,0.4)",
   },
   modalActionButtonWiki: {
     backgroundColor: "rgba(250,204,21,0.1)",
     borderColor: "rgba(250,204,21,0.3)",
   },
   modalActionButtonText: {
-    color: "#38bdf8",
+    color: "#ff6600",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -562,14 +569,14 @@ const styles = StyleSheet.create({
   },
   modalClose: {
     marginTop: 8,
-    backgroundColor: "#38bdf8",
-    borderRadius: 10,
+    backgroundColor: "#ff6600",
+    borderRadius: 6,
     paddingVertical: 10,
     alignItems: "center",
   },
   modalCloseText: {
-    color: "#0f172a",
-    fontWeight: "700",
+    color: "#000000",
+    fontWeight: "800",
     fontSize: 15,
   },
 });

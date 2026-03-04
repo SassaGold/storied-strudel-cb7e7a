@@ -363,7 +363,7 @@ out center 120;`;
   const emptyText = EMPTY_TEXTS[selected];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <Modal
         visible={infoPlace !== null}
         transparent
@@ -470,10 +470,10 @@ out center 120;`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>Ride nearby</Text>
-        <Text style={styles.title}>MC Services, Fuel, Parking, Clubs & Tracks</Text>
+        <Text style={styles.headerBadge}>🔧 GEAR UP</Text>
+        <Text style={styles.title}>THE GARAGE</Text>
         <Text style={styles.subtitle}>
-          Choose a category and find nearby spots.
+          Find MC services, fuel, parking & clubs near your ride.
         </Text>
       </View>
 
@@ -565,10 +565,14 @@ out center 120;`;
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: "#0a0a0a",
+  },
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#070b14",
+    backgroundColor: "#0a0a0a",
   },
   header: {
     marginTop: 18,
@@ -576,16 +580,16 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(52,211,153,0.25)",
+    borderColor: "rgba(255,102,0,0.4)",
     overflow: "hidden",
-    backgroundColor: "#0a1f0a",
+    backgroundColor: "#1a0900",
   },
   headerGlow: {
     position: "absolute",
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: "rgba(34,197,94,0.4)",
+    backgroundColor: "rgba(255,102,0,0.55)",
     top: -90,
     right: -50,
   },
@@ -594,14 +598,14 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     borderRadius: 80,
-    backgroundColor: "rgba(20,184,166,0.35)",
+    backgroundColor: "rgba(180,60,0,0.40)",
     bottom: -70,
     left: -30,
   },
   headerBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(7,11,20,0.5)",
-    color: "#6ee7b7",
+    backgroundColor: "rgba(255,102,0,0.18)",
+    color: "#ff6600",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 999,
@@ -610,27 +614,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     letterSpacing: 0.6,
     borderWidth: 1,
-    borderColor: "rgba(34,197,94,0.35)",
+    borderColor: "rgba(255,102,0,0.5)",
   },
   title: {
-    color: "#f1f5f9",
-    fontSize: 30,
+    color: "#ffffff",
+    fontSize: 28,
     fontWeight: "800",
-    letterSpacing: 0.2,
+    letterSpacing: 2,
   },
   subtitle: {
-    color: "#6ee7b7",
+    color: "#c8c8c8",
     marginTop: 6,
     fontSize: 15,
-    opacity: 0.85,
   },
   primaryButton: {
-    backgroundColor: "#3b82f6",
-    paddingVertical: 14,
-    borderRadius: 14,
+    backgroundColor: "#ff6600",
+    paddingVertical: 13,
+    borderRadius: 6,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#3b82f6",
+    shadowColor: "#ff6600",
     shadowOpacity: 0.45,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
@@ -640,10 +643,10 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   primaryButtonText: {
-    color: "#ffffff",
+    color: "#000000",
     fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.3,
+    fontWeight: "800",
+    letterSpacing: 0.8,
   },
   segmentRow: {
     flexDirection: "row",
@@ -654,23 +657,23 @@ const styles = StyleSheet.create({
   segmentButton: {
     paddingVertical: 10,
     paddingHorizontal: 10,
-    borderRadius: 12,
+    borderRadius: 6,
     alignItems: "center",
-    backgroundColor: "#0f1e33",
+    backgroundColor: "#141414",
     borderWidth: 1,
-    borderColor: "rgba(59,130,246,0.25)",
+    borderColor: "rgba(255,102,0,0.25)",
   },
   segmentButtonActive: {
-    backgroundColor: "#1d4ed8",
-    borderColor: "#3b82f6",
+    backgroundColor: "#ff6600",
+    borderColor: "#ff6600",
   },
   segmentText: {
-    color: "#64748b",
+    color: "#666666",
     fontSize: 13,
-    fontWeight: "600",
+    fontWeight: "700",
   },
   segmentTextActive: {
-    color: "#ffffff",
+    color: "#000000",
   },
   loadingRow: {
     flexDirection: "row",
@@ -679,58 +682,60 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    color: "#60a5fa",
+    color: "#c8c8c8",
   },
   errorText: {
     color: "#f87171",
     marginBottom: 12,
   },
   sectionCard: {
-    backgroundColor: "#0f1e33",
+    backgroundColor: "#141414",
     padding: 16,
-    borderRadius: 18,
+    borderRadius: 10,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "rgba(59,130,246,0.2)",
-    shadowColor: "#000",
+    borderColor: "#2a2a2a",
+    shadowColor: "#000000",
     shadowOpacity: 0.5,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
     elevation: 8,
   },
   cardTitle: {
-    color: "#f1f5f9",
-    fontSize: 17,
-    fontWeight: "700",
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "800",
     marginBottom: 4,
-    letterSpacing: 0.1,
+    letterSpacing: 1,
   },
   cardDescription: {
-    color: "#64748b",
+    color: "#666666",
     fontSize: 13,
     marginBottom: 14,
     lineHeight: 18,
   },
   bodyText: {
-    color: "#cbd5e1",
+    color: "#c8c8c8",
     fontSize: 15,
     marginBottom: 12,
   },
   metaText: {
-    color: "#64748b",
+    color: "#666666",
     fontSize: 13,
   },
   placeRow: {
-    backgroundColor: "#0a1626",
+    backgroundColor: "#141414",
     padding: 14,
-    borderRadius: 14,
+    borderRadius: 8,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(59,130,246,0.15)",
-    shadowColor: "#000",
+    borderColor: "#2a2a2a",
+    borderLeftWidth: 3,
+    borderLeftColor: "#ff6600",
+    shadowColor: "#000000",
     shadowOpacity: 0.3,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
@@ -746,7 +751,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   highlightTag: {
-    color: "#34d399",
+    color: "#ff6600",
     fontSize: 12,
     fontWeight: "700",
   },
@@ -758,7 +763,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   infoButtonText: {
-    color: "#38bdf8",
+    color: "#ff6600",
     fontSize: 20,
     lineHeight: 22,
   },
@@ -770,16 +775,16 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   modalCard: {
-    backgroundColor: "#0a1626",
-    borderRadius: 18,
+    backgroundColor: "#141414",
+    borderRadius: 10,
     padding: 22,
     width: "100%",
     borderWidth: 1,
-    borderColor: "rgba(59,130,246,0.25)",
+    borderColor: "#2a2a2a",
     gap: 12,
   },
   modalTitle: {
-    color: "#f1f5f9",
+    color: "#ffffff",
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 4,
@@ -791,18 +796,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalLabel: {
-    color: "#94a3b8",
+    color: "#666666",
     fontSize: 13,
   },
   modalValue: {
-    color: "#e2e8f0",
+    color: "#c8c8c8",
     fontSize: 13,
     fontWeight: "500",
     flexShrink: 1,
     textAlign: "right",
   },
   modalLink: {
-    color: "#60a5fa",
+    color: "#ff6600",
     fontSize: 13,
     fontWeight: "500",
     flexShrink: 1,
@@ -810,12 +815,12 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   modalNoInfo: {
-    color: "#475569",
+    color: "#555555",
     fontSize: 13,
     fontStyle: "italic",
   },
   modalLoadingText: {
-    color: "#64748b",
+    color: "#666666",
     fontSize: 13,
     fontStyle: "italic",
   },
@@ -840,19 +845,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalActionButton: {
-    backgroundColor: "rgba(96,165,250,0.12)",
-    borderRadius: 10,
+    backgroundColor: "rgba(255,102,0,0.12)",
+    borderRadius: 6,
     paddingVertical: 10,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(96,165,250,0.3)",
+    borderColor: "rgba(255,102,0,0.4)",
   },
   modalActionButtonWiki: {
     backgroundColor: "rgba(250,204,21,0.1)",
     borderColor: "rgba(250,204,21,0.3)",
   },
   modalActionButtonText: {
-    color: "#60a5fa",
+    color: "#ff6600",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -861,14 +866,14 @@ const styles = StyleSheet.create({
   },
   modalClose: {
     marginTop: 8,
-    backgroundColor: "#3b82f6",
-    borderRadius: 10,
+    backgroundColor: "#ff6600",
+    borderRadius: 6,
     paddingVertical: 10,
     alignItems: "center",
   },
   modalCloseText: {
-    color: "#ffffff",
-    fontWeight: "700",
+    color: "#000000",
+    fontWeight: "800",
     fontSize: 15,
   },
 });

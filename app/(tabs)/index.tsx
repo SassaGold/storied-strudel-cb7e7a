@@ -363,19 +363,19 @@ export default function Index() {
   }, [location]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>Live nearby</Text>
-        <Text style={styles.title}>Where Am I?</Text>
-        <Text style={styles.subtitle}>Your location and what’s around you.</Text>
+        <Text style={styles.headerBadge}>🏍️ RIDER HQ</Text>
+        <Text style={styles.title}>WHERE AM I?</Text>
+        <Text style={styles.subtitle}>Your location & riding conditions.</Text>
       </View>
 
 
       <Pressable style={styles.primaryButton} onPress={loadData}>
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : "Update my location"}
+          {loading ? "Loading..." : "UPDATE LOCATION"}
         </Text>
       </Pressable>
 
@@ -401,7 +401,7 @@ export default function Index() {
             Accuracy {Math.round(location.coords.accuracy ?? 0)} m
           </Text>
           <Pressable style={styles.secondaryButton} onPress={openMaps}>
-            <Text style={styles.secondaryButtonText}>Open in Maps</Text>
+            <Text style={styles.secondaryButtonText}>OPEN IN MAPS</Text>
           </Pressable>
         </View>
       )}
@@ -496,7 +496,7 @@ export default function Index() {
             style={styles.secondaryButton}
             onPress={() => Linking.openURL(weatherUrl).catch(() => null)}
           >
-            <Text style={styles.secondaryButtonText}>Open YR</Text>
+            <Text style={styles.secondaryButtonText}>OPEN YR WEATHER</Text>
           </Pressable>
         </View>
       )}
@@ -513,10 +513,14 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: "#0a0a0a",
+  },
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0f0a1a",
+    backgroundColor: "#0a0a0a",
   },
   header: {
     marginTop: 18,
@@ -524,16 +528,16 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
+    borderColor: "rgba(255,102,0,0.4)",
     overflow: "hidden",
-    backgroundColor: "#3b0764",
+    backgroundColor: "#1a0900",
   },
   headerGlow: {
     position: "absolute",
     width: 180,
     height: 180,
     borderRadius: 90,
-    backgroundColor: "rgba(236,72,153,0.55)",
+    backgroundColor: "rgba(255,102,0,0.55)",
     top: -80,
     right: -40,
   },
@@ -542,14 +546,14 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: "rgba(59,130,246,0.45)",
+    backgroundColor: "rgba(180,60,0,0.40)",
     bottom: -60,
     left: -20,
   },
   headerBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(15,10,26,0.35)",
-    color: "#f8fafc",
+    backgroundColor: "rgba(255,102,0,0.18)",
+    color: "#ff6600",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -559,45 +563,47 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   title: {
-    color: "#f8fafc",
-    fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: 0.3,
+    color: "#ffffff",
+    fontSize: 30,
+    fontWeight: "800",
+    letterSpacing: 2,
   },
   subtitle: {
-    color: "#c4b5fd",
+    color: "#c8c8c8",
     marginTop: 6,
-    fontSize: 16,
+    fontSize: 15,
   },
   primaryButton: {
-    backgroundColor: "#f59e0b",
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: "#ff6600",
+    paddingVertical: 13,
+    borderRadius: 6,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#f59e0b",
+    shadowColor: "#ff6600",
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
   primaryButtonText: {
-    color: "#2b0a3d",
+    color: "#000000",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "800",
+    letterSpacing: 0.8,
   },
   secondaryButton: {
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#6d28d9",
-    backgroundColor: "#1b1030",
+    borderColor: "#ff6600",
+    backgroundColor: "rgba(255,102,0,0.08)",
     paddingVertical: 8,
     borderRadius: 10,
     alignItems: "center",
   },
   secondaryButtonText: {
-    color: "#e2e8f0",
+    color: "#ff6600",
     fontSize: 14,
+    fontWeight: "700",
   },
   loadingRow: {
     flexDirection: "row",
@@ -606,42 +612,43 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    color: "#cbd5f5",
+    color: "#c8c8c8",
   },
   errorText: {
     color: "#f87171",
     marginBottom: 12,
   },
   card: {
-    backgroundColor: "#1b1030",
+    backgroundColor: "#141414",
     padding: 16,
-    borderRadius: 16,
+    borderRadius: 10,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#2d1b4d",
-    shadowColor: "#020617",
+    borderColor: "#2a2a2a",
+    shadowColor: "#000000",
     shadowOpacity: 0.4,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
   },
   alertCard: {
-    borderColor: "#f59e0b",
+    borderColor: "#ff6600",
     borderWidth: 1,
   },
   cardTitle: {
-    color: "#f8fafc",
-    fontSize: 18,
-    fontWeight: "600",
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "800",
     marginBottom: 8,
+    letterSpacing: 1,
   },
   bodyText: {
-    color: "#e2e8f0",
+    color: "#c8c8c8",
     fontSize: 15,
     marginBottom: 4,
   },
   metaText: {
-    color: "#94a3b8",
+    color: "#666666",
     fontSize: 13,
   },
   placeRow: {
@@ -676,24 +683,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   weatherTempText: {
-    color: "#f8fafc",
+    color: "#ff6600",
     fontSize: 32,
-    fontWeight: "700",
+    fontWeight: "800",
     lineHeight: 36,
   },
   weatherConditionText: {
-    color: "#c4b5fd",
+    color: "#c8c8c8",
     fontSize: 16,
     marginTop: 2,
   },
   weatherStatsGrid: {
     flexDirection: "row",
-    backgroundColor: "#120926",
-    borderRadius: 12,
+    backgroundColor: "#0a0a0a",
+    borderRadius: 8,
     paddingVertical: 12,
     marginBottom: 14,
     borderWidth: 1,
-    borderColor: "#2d1b4d",
+    borderColor: "#2a2a2a",
   },
   weatherStatItem: {
     flex: 1,
@@ -701,16 +708,16 @@ const styles = StyleSheet.create({
   },
   weatherStatDivider: {
     width: 1,
-    backgroundColor: "#2d1b4d",
+    backgroundColor: "#2a2a2a",
     marginVertical: 4,
   },
   weatherStatValue: {
-    color: "#f8fafc",
+    color: "#ff6600",
     fontSize: 20,
-    fontWeight: "700",
+    fontWeight: "800",
   },
   weatherStatLabel: {
-    color: "#94a3b8",
+    color: "#666666",
     fontSize: 12,
     marginTop: 2,
   },
@@ -721,7 +728,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   suitabilityLabel: {
-    color: "#e2e8f0",
+    color: "#c8c8c8",
     fontSize: 15,
     fontWeight: "600",
   },
@@ -740,13 +747,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   weatherSectionTitle: {
-    color: "#e2e8f0",
+    color: "#ff6600",
     fontSize: 14,
     fontWeight: "600",
     marginBottom: 4,
   },
   weatherBullet: {
-    color: "#cbd5e1",
+    color: "#c8c8c8",
     fontSize: 14,
     marginBottom: 2,
     paddingLeft: 4,
@@ -758,10 +765,10 @@ const styles = StyleSheet.create({
   },
   forecastCard: {
     flex: 1,
-    backgroundColor: "#120926",
-    borderRadius: 16,
+    backgroundColor: "#0a0a0a",
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#2d1b4d",
+    borderColor: "#2a2a2a",
     paddingVertical: 14,
     paddingHorizontal: 6,
     alignItems: "center",
@@ -772,13 +779,13 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   forecastCardDay: {
-    color: "#f8fafc",
+    color: "#ffffff",
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 0.3,
   },
   forecastCardDate: {
-    color: "#94a3b8",
+    color: "#666666",
     fontSize: 11,
     marginBottom: 8,
     marginTop: 1,
@@ -788,25 +795,25 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   forecastCardCondition: {
-    color: "#c4b5fd",
+    color: "#c8c8c8",
     fontSize: 10,
     textAlign: "center",
     marginBottom: 6,
   },
   forecastCardTemp: {
-    color: "#f8fafc",
+    color: "#ff6600",
     fontSize: 13,
     fontWeight: "600",
     marginBottom: 6,
   },
   forecastCardRainRow: {
-    backgroundColor: "rgba(125,211,252,0.12)",
+    backgroundColor: "rgba(255,102,0,0.12)",
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
   forecastCardRain: {
-    color: "#7dd3fc",
+    color: "#ff6600",
     fontSize: 11,
     fontWeight: "600",
   },
