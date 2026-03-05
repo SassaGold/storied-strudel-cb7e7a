@@ -148,6 +148,7 @@ const CATEGORY_FETCH_TIMEOUT_MS: Record<string, number> = {
   fuel: 40000,         // Overpass [timeout:25] + 15 s buffer
   parking: 40000,      // Overpass [timeout:25] + 15 s buffer
   clubs_tracks: 45000, // Overpass [timeout:30] + 15 s buffer
+  atm_bank: 40000,     // Overpass [timeout:25] + 15 s buffer
 };
 const DEFAULT_FETCH_TIMEOUT_MS = 45000;
 
@@ -185,7 +186,7 @@ const fetchOverpass = async (query: string, timeoutMs: number = DEFAULT_FETCH_TI
   throw new Error(lastError ?? "Overpass request failed");
 };
 
-type Category = "services" | "fuel" | "parking" | "clubs_tracks";
+type Category = "services" | "fuel" | "parking" | "clubs_tracks" | "atm_bank";
 
 const CATEGORY_RADIUS_M = {
   services: 30000,
@@ -193,6 +194,7 @@ const CATEGORY_RADIUS_M = {
   parking_general: 5000,
   parking_moto: 10000,
   clubs_tracks: 50000,
+  atm_bank: 5000,
 } as const;
 
 const CATEGORIES: { key: Category; label: string }[] = [
@@ -200,6 +202,7 @@ const CATEGORIES: { key: Category; label: string }[] = [
   { key: "fuel", label: "⛽ Fuel Stations" },
   { key: "parking", label: "🅿️ Parking" },
   { key: "clubs_tracks", label: "🏁 Clubs & Tracks" },
+  { key: "atm_bank", label: "🏧 ATMs & Banks" },
 ];
 
 export default function McScreen() {
@@ -286,8 +289,9 @@ out center 120;`;
 out center 120;`;
     }
     // clubs_tracks
-    const r = CATEGORY_RADIUS_M.clubs_tracks;
-    return `
+    if (category === "clubs_tracks") {
+      const r = CATEGORY_RADIUS_M.clubs_tracks;
+      return `
 [out:json][timeout:30];
 (
   node(around:${r},${lat},${lon})[club=motorcycle];
@@ -301,12 +305,26 @@ out center 120;`;
   relation(around:${r},${lat},${lon})[sport=motorcycling];
 );
 out center 120;`;
+    }
+    // atm_bank
+    const r = CATEGORY_RADIUS_M.atm_bank;
+    return `
+[out:json][timeout:25];
+(
+  node(around:${r},${lat},${lon})[amenity=atm];
+  way(around:${r},${lat},${lon})[amenity=atm];
+  node(around:${r},${lat},${lon})[amenity=bank];
+  way(around:${r},${lat},${lon})[amenity=bank];
+  relation(around:${r},${lat},${lon})[amenity=bank];
+);
+out center 120;`;
   };
 
   const fallbackLabel = (category: Category) => {
     if (category === "services") return "MC Service";
     if (category === "fuel") return "Fuel Station";
     if (category === "parking") return "Parking";
+    if (category === "atm_bank") return "ATM / Bank";
     return "MC Club / Track";
   };
 
@@ -391,6 +409,7 @@ out center 120;`;
     fuel: "Fuel Stations",
     parking: "Parking",
     clubs_tracks: "Clubs & Tracks",
+    atm_bank: "ATMs & Banks",
   };
 
   const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
@@ -398,6 +417,7 @@ out center 120;`;
     fuel: `Searches within ${CATEGORY_RADIUS_M.fuel / 1000} km for all fuel/petrol stations. Fuel types shown where available from OpenStreetMap. Tap ⓘ to check live prices via Google Maps (prices shown in supported countries — no API key required).`,
     parking: `Searches within ${CATEGORY_RADIUS_M.parking_general / 1000} km for general parking and within ${CATEGORY_RADIUS_M.parking_moto / 1000} km for dedicated motorcycle parking.`,
     clubs_tracks: `Searches within ${CATEGORY_RADIUS_M.clubs_tracks / 1000} km for motorcycle clubs and racing/riding tracks.`,
+    atm_bank: `Searches within ${CATEGORY_RADIUS_M.atm_bank / 1000} km for ATM machines and bank branches — handy on long-distance rides when cash is needed.`,
   };
 
   const EMPTY_TEXTS: Record<Category, string> = {
@@ -405,6 +425,7 @@ out center 120;`;
     fuel: "No fuel stations found yet. Try updating your location.",
     parking: "No parking found yet. Try updating your location.",
     clubs_tracks: "No MC clubs or tracks found within 50 km. Try updating your location.",
+    atm_bank: "No ATMs or banks found nearby. Try updating your location.",
   };
 
   const sectionTitle = SECTION_TITLES[selected];
