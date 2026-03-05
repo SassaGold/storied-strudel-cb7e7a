@@ -39,6 +39,7 @@ type Place = {
   address?: string;
   openingHours?: string;
   wikipedia?: string;
+  fuelTypes?: string[];
 };
 
 // Overpass API endpoints — free OpenStreetMap data, no API key required (mirrors for reliability)
@@ -86,6 +87,19 @@ const parseWikiTag = (tag: string) => {
   };
 };
 
+// OSM tags that indicate which fuel types a station carries
+const FUEL_TYPE_TAGS: [string, string][] = [
+  ["fuel:diesel", "Diesel"],
+  ["fuel:octane_95", "95"],
+  ["fuel:octane_98", "98"],
+  ["fuel:lpg", "LPG"],
+  ["fuel:cng", "CNG"],
+  ["fuel:e10", "E10"],
+  ["fuel:e85", "E85"],
+  ["fuel:adblue", "AdBlue"],
+  ["fuel:electric", "EV"],
+];
+
 const mapElements = (
   elements: any[],
   latitude: number,
@@ -104,6 +118,10 @@ const mapElements = (
       const note = tags.fee === "no" ? "Free parking" : undefined;
       const category =
         tags.shop || tags.amenity || tags.tourism || tags.club || tags.leisure || tags.craft || fallbackCategory;
+      const fuelTypes: string[] = [];
+      for (const [tag, label] of FUEL_TYPE_TAGS) {
+        if (tags[tag] === "yes") fuelTypes.push(label);
+      }
       return {
         id: String(element.id),
         name,
@@ -118,6 +136,7 @@ const mapElements = (
         address: [tags["addr:housenumber"], tags["addr:street"], tags["addr:city"]].filter(Boolean).join(" ") || undefined,
         openingHours: (tags.opening_hours || "").trim() || undefined,
         wikipedia: (tags.wikipedia || "").trim() || undefined,
+        fuelTypes: fuelTypes.length > 0 ? fuelTypes : undefined,
       } as Place;
     })
     .filter(Boolean) as Place[];
@@ -376,7 +395,7 @@ out center 120;`;
 
   const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
     services: `Searches within ${CATEGORY_RADIUS_M.services / 1000} km for motorcycle dealers, repair workshops, parts & accessories shops, and rental shops.`,
-    fuel: `Searches within ${CATEGORY_RADIUS_M.fuel / 1000} km for all fuel/petrol stations.`,
+    fuel: `Searches within ${CATEGORY_RADIUS_M.fuel / 1000} km for all fuel/petrol stations. Fuel types shown where available from OpenStreetMap. Tap ⓘ to check live prices via Google Maps (prices shown in supported countries — no API key required).`,
     parking: `Searches within ${CATEGORY_RADIUS_M.parking_general / 1000} km for general parking and within ${CATEGORY_RADIUS_M.parking_moto / 1000} km for dedicated motorcycle parking.`,
     clubs_tracks: `Searches within ${CATEGORY_RADIUS_M.clubs_tracks / 1000} km for motorcycle clubs and racing/riding tracks.`,
   };
@@ -460,7 +479,19 @@ out center 120;`;
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
-            {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && (
+            {infoPlace?.fuelTypes && infoPlace.fuelTypes.length > 0 && (
+              <View style={styles.modalRow}>
+                <Text style={styles.modalLabel}>⛽ Fuel Types</Text>
+                <View style={styles.fuelTypesRow}>
+                  {infoPlace.fuelTypes.map((ft) => (
+                    <View key={ft} style={styles.fuelTypeBadge}>
+                      <Text style={styles.fuelTypeBadgeText}>{ft}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+            {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && !infoPlace?.fuelTypes?.length && (
               <Text style={styles.modalNoInfo}>No contact info available for this place in OpenStreetMap (free open data).</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
@@ -473,6 +504,18 @@ out center 120;`;
               </View>
             )}
             <View style={styles.modalActions}>
+              {selected === "fuel" && (
+                <Pressable
+                  style={[styles.modalActionButton, styles.modalActionButtonFuel]}
+                  onPress={() =>
+                    Linking.openURL(
+                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${infoPlace?.latitude},${infoPlace?.longitude}`)}`
+                    ).catch(() => null)
+                  }
+                >
+                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextFuel]}>⛽ Check Fuel Prices</Text>
+                </Pressable>
+              )}
               <Pressable
                 style={styles.modalActionButton}
                 onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null)}
@@ -622,6 +665,15 @@ out center 120;`;
                       <Text style={styles.highlightTag}>{place.note}</Text>
                     )}
                   </View>
+                  {selected === "fuel" && place.fuelTypes && place.fuelTypes.length > 0 && (
+                    <View style={styles.fuelTypesRow}>
+                      {place.fuelTypes.map((ft) => (
+                        <View key={ft} style={styles.fuelTypeBadge}>
+                          <Text style={styles.fuelTypeBadgeText}>{ft}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
                 </View>
                 <View style={styles.placeRight}>
                   <Text style={styles.metaText}>
@@ -936,6 +988,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(250,204,21,0.1)",
     borderColor: "rgba(250,204,21,0.3)",
   },
+  modalActionButtonFuel: {
+    backgroundColor: "rgba(34,197,94,0.12)",
+    borderColor: "rgba(34,197,94,0.4)",
+  },
   modalActionButtonText: {
     color: "#ff6600",
     fontSize: 14,
@@ -943,6 +999,28 @@ const styles = StyleSheet.create({
   },
   modalActionButtonTextWiki: {
     color: "#fbbf24",
+  },
+  modalActionButtonTextFuel: {
+    color: "#22c55e",
+  },
+  fuelTypesRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 4,
+    marginTop: 4,
+  },
+  fuelTypeBadge: {
+    backgroundColor: "rgba(34,197,94,0.12)",
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: "rgba(34,197,94,0.35)",
+  },
+  fuelTypeBadgeText: {
+    color: "#22c55e",
+    fontSize: 11,
+    fontWeight: "700",
   },
   modalClose: {
     marginTop: 8,
