@@ -10,6 +10,8 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import MapView, { Marker } from "react-native-maps";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Place = {
   id: string;
@@ -85,6 +87,8 @@ const parseWikiTag = (tag: string) => {
   };
 };
 
+const CACHE_KEY = "cache_restaurants";
+
 export default function RestaurantsScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,8 +96,23 @@ export default function RestaurantsScreen() {
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
   const [wikiExtract, setWikiExtract] = useState<string | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [fromCache, setFromCache] = useState(false);
 
   const loadPlaces = useCallback(async () => {
+    // Load cache so user sees last-known results immediately while fetching
+    try {
+      const cacheKey = CACHE_KEY;
+      const raw = await AsyncStorage.getItem(cacheKey);
+      if (raw) {
+        const cached: Place[] = JSON.parse(raw);
+        if (cached.length > 0) {
+          setPlaces(cached);
+          setFromCache(true);
+        }
+      }
+    } catch {}
     setLoading(true);
     setError(null);
     try {
@@ -108,6 +127,7 @@ export default function RestaurantsScreen() {
       });
 
       const { latitude, longitude } = position.coords;
+      setUserLocation({ latitude, longitude });
 
       const overpassQuery = `
 [out:json][timeout:25];
@@ -157,11 +177,12 @@ out center 120;`;
         })
         .filter(Boolean) as Place[];
 
-      setPlaces(
-        mapped
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
+      const sorted = mapped
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .slice(0, 20);
+      setPlaces(sorted);
+      setFromCache(false);
+      try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(sorted)); } catch {}
     } catch {
       setError("Unable to load restaurants. Please try again.");
     } finally {
@@ -311,35 +332,85 @@ out center 120;`;
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {places.length === 0 && !loading ? (
-        <Text style={styles.bodyText}>
-          No food stops found yet. Tap the button above to search.
-        </Text>
-      ) : (
-        places.map((place) => (
+      {/* Cache banner */}
+      {fromCache && places.length > 0 && (
+        <View style={styles.cacheBanner}>
+          <Text style={styles.cacheBannerText}>📡 Showing cached results — tap refresh for latest</Text>
+        </View>
+      )}
+
+      {/* View mode toggle */}
+      {places.length > 0 && (
+        <View style={styles.viewToggleRow}>
           <Pressable
-            key={place.id}
-            style={styles.placeRow}
-            onPress={() => openInMaps(place)}
+            style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
+            onPress={() => setViewMode("list")}
           >
-            <View style={styles.placeInfo}>
-              <Text style={styles.bodyText}>{place.name}</Text>
-              <View style={styles.tagRow}>
-                <Text style={styles.metaText}>{formatCategory(place.category)}</Text>
-              </View>
-            </View>
-            <View style={styles.placeRight}>
-              <Text style={styles.metaText}>{formatDistance(place.distanceMeters)}</Text>
-              <Pressable
-                style={styles.infoButton}
-                onPress={(e) => { e.stopPropagation(); openInfo(place); }}
-                hitSlop={8}
-              >
-                <Text style={styles.infoButtonText}>ⓘ</Text>
-              </Pressable>
-            </View>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>☰ List</Text>
           </Pressable>
-        ))
+          <Pressable
+            style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
+            onPress={() => setViewMode("map")}
+          >
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {/* Map view */}
+      {viewMode === "map" && userLocation && (
+        <MapView
+          style={styles.mapView}
+          showsUserLocation
+          initialRegion={{
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+            latitudeDelta: 0.06,
+            longitudeDelta: 0.06,
+          }}
+        >
+          {places.map((place) => (
+            <Marker
+              key={place.id}
+              coordinate={{ latitude: place.latitude, longitude: place.longitude }}
+              title={place.name}
+              onPress={() => setInfoPlace(place)}
+            />
+          ))}
+        </MapView>
+      )}
+
+      {viewMode === "list" && (
+        places.length === 0 && !loading ? (
+          <Text style={styles.bodyText}>
+            No food stops found yet. Tap the button above to search.
+          </Text>
+        ) : (
+          places.map((place) => (
+            <Pressable
+              key={place.id}
+              style={styles.placeRow}
+              onPress={() => openInMaps(place)}
+            >
+              <View style={styles.placeInfo}>
+                <Text style={styles.bodyText}>{place.name}</Text>
+                <View style={styles.tagRow}>
+                  <Text style={styles.metaText}>{formatCategory(place.category)}</Text>
+                </View>
+              </View>
+              <View style={styles.placeRight}>
+                <Text style={styles.metaText}>{formatDistance(place.distanceMeters)}</Text>
+                <Pressable
+                  style={styles.infoButton}
+                  onPress={(e) => { e.stopPropagation(); openInfo(place); }}
+                  hitSlop={8}
+                >
+                  <Text style={styles.infoButtonText}>ⓘ</Text>
+                </Pressable>
+              </View>
+            </Pressable>
+          ))
+        )
       )}
     </ScrollView>
   );
@@ -593,5 +664,52 @@ const styles = StyleSheet.create({
     color: "#000000",
     fontWeight: "800",
     fontSize: 15,
+  },
+  viewToggleRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12,
+  },
+  viewToggleBtn: {
+    flex: 1,
+    paddingVertical: 9,
+    borderRadius: 6,
+    alignItems: "center",
+    backgroundColor: "#141414",
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.25)",
+  },
+  viewToggleBtnActive: {
+    backgroundColor: "#ff6600",
+    borderColor: "#ff6600",
+  },
+  viewToggleText: {
+    color: "#666666",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  viewToggleTextActive: {
+    color: "#000000",
+  },
+  mapView: {
+    width: "100%",
+    height: 340,
+    borderRadius: 10,
+    marginBottom: 12,
+    overflow: "hidden",
+  },
+  cacheBanner: {
+    backgroundColor: "rgba(255,153,0,0.12)",
+    borderRadius: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,153,0,0.3)",
+  },
+  cacheBannerText: {
+    color: "#f59e0b",
+    fontSize: 13,
+    fontWeight: "500",
   },
 });

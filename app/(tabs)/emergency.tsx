@@ -6,11 +6,14 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import MapView, { Marker } from "react-native-maps";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type OverpassElement = {
   id: number;
@@ -118,14 +121,49 @@ const callNumber = (number: string) => {
     });
 };
 
+const CACHE_KEY = "cache_emergency";
+
 export default function EmergencyScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
   const [selected, setSelected] = useState("all");
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [fromCache, setFromCache] = useState(false);
+
+  const shareLocation = useCallback(async () => {
+    try {
+      const perm = await Location.requestForegroundPermissionsAsync();
+      if (perm.status !== "granted") {
+        Alert.alert("Permission required", "Location permission is needed to share your location.");
+        return;
+      }
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      const { latitude, longitude } = pos.coords;
+      const mapsLink = `https://maps.google.com/?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
+      await Share.share({
+        message: `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+      });
+    } catch {
+      Alert.alert("Share Failed", "Could not share your location. Please try again.");
+    }
+  }, []);
 
   const loadPlaces = useCallback(async () => {
+    // Load cache so user sees last-known results immediately while fetching
+    try {
+      const cacheKey = CACHE_KEY;
+      const raw = await AsyncStorage.getItem(cacheKey);
+      if (raw) {
+        const cached: Place[] = JSON.parse(raw);
+        if (cached.length > 0) {
+          setPlaces(cached);
+          setFromCache(true);
+        }
+      }
+    } catch {}
     setLoading(true);
     setError(null);
     try {
@@ -141,6 +179,7 @@ export default function EmergencyScreen() {
         accuracy: Location.Accuracy.High,
       });
       const { latitude, longitude } = pos.coords;
+      setUserLocation({ latitude, longitude });
 
       const overpassQuery = `
 [out:json][timeout:30];
@@ -201,11 +240,12 @@ out center ${MAX_RESULTS};`;
         })
         .filter(Boolean) as Place[];
 
-      setPlaces(
-        mapped
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 40)
-      );
+      const sorted = mapped
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .slice(0, 40);
+      setPlaces(sorted);
+      setFromCache(false);
+      try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(sorted)); } catch {}
     } catch (err) {
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
       setError(
@@ -365,9 +405,10 @@ out center ${MAX_RESULTS};`;
             </Pressable>
           ))}
         </View>
+        <Pressable style={styles.shareButton} onPress={shareLocation}>
+          <Text style={styles.shareButtonText}>📍 Share My Location</Text>
+        </Pressable>
       </View>
-
-      {/* Find nearby button */}
       <Pressable
         style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
         onPress={loadPlaces}
@@ -386,6 +427,54 @@ out center ${MAX_RESULTS};`;
       )}
 
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {/* Cache banner */}
+      {fromCache && places.length > 0 && (
+        <View style={styles.cacheBanner}>
+          <Text style={styles.cacheBannerText}>📡 Showing cached results — tap refresh for latest</Text>
+        </View>
+      )}
+
+      {/* View mode toggle */}
+      {places.length > 0 && (
+        <View style={styles.viewToggleRow}>
+          <Pressable
+            style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
+            onPress={() => setViewMode("list")}
+          >
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>☰ List</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
+            onPress={() => setViewMode("map")}
+          >
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {/* Map view */}
+      {viewMode === "map" && userLocation && (
+        <MapView
+          style={styles.mapView}
+          showsUserLocation
+          initialRegion={{
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+            latitudeDelta: 0.06,
+            longitudeDelta: 0.06,
+          }}
+        >
+          {filtered.map((place) => (
+            <Marker
+              key={place.id}
+              coordinate={{ latitude: place.latitude, longitude: place.longitude }}
+              title={place.name}
+              onPress={() => setInfoPlace(place)}
+            />
+          ))}
+        </MapView>
+      )}
 
       {places.length > 0 && (
         <>
@@ -423,49 +512,51 @@ out center ${MAX_RESULTS};`;
             <Text style={styles.cardDescription}>
               Sorted by distance · Within 10 km
             </Text>
-            {filtered.length === 0 ? (
-              <Text style={styles.bodyText}>
-                None found in this category nearby.
-              </Text>
-            ) : (
-              filtered.map((place) => (
-                <View key={place.id} style={styles.placeRow}>
-                  <View style={styles.placeInfo}>
-                    <Text style={styles.placeName} numberOfLines={1}>
-                      {place.name}
-                    </Text>
-                    <View style={styles.tagRow}>
-                      <Text style={styles.categoryTag}>
-                        {formatCategory(place.category)}
+            {viewMode === "list" && (
+              filtered.length === 0 ? (
+                <Text style={styles.bodyText}>
+                  None found in this category nearby.
+                </Text>
+              ) : (
+                filtered.map((place) => (
+                  <View key={place.id} style={styles.placeRow}>
+                    <View style={styles.placeInfo}>
+                      <Text style={styles.placeName} numberOfLines={1}>
+                        {place.name}
                       </Text>
+                      <View style={styles.tagRow}>
+                        <Text style={styles.categoryTag}>
+                          {formatCategory(place.category)}
+                        </Text>
+                      </View>
+                      {place.address ? (
+                        <Text style={styles.placeAddress} numberOfLines={1}>
+                          {place.address}
+                        </Text>
+                      ) : null}
+                      {place.phone ? (
+                        <Text
+                          style={styles.placePhone}
+                          onPress={() => callNumber(place.phone!)}
+                        >
+                          📞 {place.phone}
+                        </Text>
+                      ) : null}
                     </View>
-                    {place.address ? (
-                      <Text style={styles.placeAddress} numberOfLines={1}>
-                        {place.address}
+                    <View style={styles.placeRight}>
+                      <Text style={styles.distanceText}>
+                        {formatDistance(place.distanceMeters)}
                       </Text>
-                    ) : null}
-                    {place.phone ? (
-                      <Text
-                        style={styles.placePhone}
-                        onPress={() => callNumber(place.phone!)}
+                      <Pressable
+                        style={styles.infoButton}
+                        onPress={() => setInfoPlace(place)}
                       >
-                        📞 {place.phone}
-                      </Text>
-                    ) : null}
+                        <Text style={styles.infoButtonText}>ⓘ</Text>
+                      </Pressable>
+                    </View>
                   </View>
-                  <View style={styles.placeRight}>
-                    <Text style={styles.distanceText}>
-                      {formatDistance(place.distanceMeters)}
-                    </Text>
-                    <Pressable
-                      style={styles.infoButton}
-                      onPress={() => setInfoPlace(place)}
-                    >
-                      <Text style={styles.infoButtonText}>ⓘ</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              ))
+                ))
+              )
             )}
           </View>
         </>
@@ -839,5 +930,66 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontWeight: "800",
     fontSize: 15,
+  },
+  viewToggleRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12,
+  },
+  viewToggleBtn: {
+    flex: 1,
+    paddingVertical: 9,
+    borderRadius: 6,
+    alignItems: "center",
+    backgroundColor: "#141414",
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.25)",
+  },
+  viewToggleBtnActive: {
+    backgroundColor: "#ef4444",
+    borderColor: "#ef4444",
+  },
+  viewToggleText: {
+    color: "#666666",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  viewToggleTextActive: {
+    color: "#ffffff",
+  },
+  mapView: {
+    width: "100%",
+    height: 340,
+    borderRadius: 10,
+    marginBottom: 12,
+    overflow: "hidden",
+  },
+  cacheBanner: {
+    backgroundColor: "rgba(255,153,0,0.12)",
+    borderRadius: 6,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,153,0,0.3)",
+  },
+  cacheBannerText: {
+    color: "#f59e0b",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  shareButton: {
+    marginTop: 10,
+    backgroundColor: "rgba(239,68,68,0.15)",
+    borderRadius: 6,
+    paddingVertical: 9,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.4)",
+  },
+  shareButtonText: {
+    color: "#ef4444",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });
