@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { useTranslation } from "react-i18next";
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -197,15 +198,10 @@ const CATEGORY_RADIUS_M = {
   atm_bank: 5000,
 } as const;
 
-const CATEGORIES: { key: Category; label: string }[] = [
-  { key: "services", label: "🏍️ MC Services" },
-  { key: "fuel", label: "⛽ Fuel Stations" },
-  { key: "parking", label: "🅿️ Parking" },
-  { key: "clubs_tracks", label: "🏁 Clubs & Tracks" },
-  { key: "atm_bank", label: "🏧 ATMs & Banks" },
-];
+const CATEGORY_KEYS: Category[] = ["services", "fuel", "parking", "clubs_tracks", "atm_bank"];
 
 export default function McScreen() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Category>("services");
@@ -346,7 +342,7 @@ out center 120;`;
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
-        setError("Location permission is required to find nearby places.");
+        setError(t("garage.locationError"));
         return;
       }
 
@@ -376,13 +372,13 @@ out center 120;`;
     } catch (err) {
       const message =
         err instanceof Error && err.message
-          ? `Unable to load data (${err.message}). Please try again.`
-          : "Unable to load data. Please try again.";
+          ? `${t("garage.loadError")} (${err.message})`
+          : t("garage.loadError");
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, [selected]);
+  }, [selected, t]);
 
   const openInMaps = useCallback((place: Place) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
@@ -404,33 +400,9 @@ out center 120;`;
     }
   }, []);
 
-  const SECTION_TITLES: Record<Category, string> = {
-    services: "MC Services",
-    fuel: "Fuel Stations",
-    parking: "Parking",
-    clubs_tracks: "Clubs & Tracks",
-    atm_bank: "ATMs & Banks",
-  };
-
-  const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
-    services: `Searches within ${CATEGORY_RADIUS_M.services / 1000} km for motorcycle dealers, repair workshops, parts & accessories shops, and rental shops.`,
-    fuel: `Searches within ${CATEGORY_RADIUS_M.fuel / 1000} km for all fuel/petrol stations. Fuel types shown where available from OpenStreetMap. Tap ⓘ to check live prices via Google Maps (prices shown in supported countries — no API key required).`,
-    parking: `Searches within ${CATEGORY_RADIUS_M.parking_general / 1000} km for general parking and within ${CATEGORY_RADIUS_M.parking_moto / 1000} km for dedicated motorcycle parking.`,
-    clubs_tracks: `Searches within ${CATEGORY_RADIUS_M.clubs_tracks / 1000} km for motorcycle clubs and racing/riding tracks.`,
-    atm_bank: `Searches within ${CATEGORY_RADIUS_M.atm_bank / 1000} km for ATM machines and bank branches — handy on long-distance rides when cash is needed.`,
-  };
-
-  const EMPTY_TEXTS: Record<Category, string> = {
-    services: "No MC dealers, workshops, shops, or rentals found yet. Try updating your location.",
-    fuel: "No fuel stations found yet. Try updating your location.",
-    parking: "No parking found yet. Try updating your location.",
-    clubs_tracks: "No MC clubs or tracks found within 50 km. Try updating your location.",
-    atm_bank: "No ATMs or banks found nearby. Try updating your location.",
-  };
-
-  const sectionTitle = SECTION_TITLES[selected];
-  const sectionDescription = CATEGORY_DESCRIPTIONS[selected];
-  const emptyText = EMPTY_TEXTS[selected];
+  const sectionTitle = t(`garage.titles.${selected}`);
+  const sectionDescription = t(`garage.descriptions.${selected}`);
+  const emptyText = t(`garage.empty.${selected}`);
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
@@ -444,18 +416,18 @@ out center 120;`;
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Category</Text>
+              <Text style={styles.modalLabel}>{t("common.category")}</Text>
               <Text style={styles.modalValue}>{infoPlace?.category}</Text>
             </View>
             {infoPlace?.note && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>Note</Text>
+                <Text style={styles.modalLabel}>{t("common.note")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.note}</Text>
               </View>
             )}
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📞 Phone</Text>
+                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null)}
@@ -466,7 +438,7 @@ out center 120;`;
             )}
             {infoPlace?.email && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📧 Email</Text>
+                <Text style={styles.modalLabel}>{t("common.email")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null)}
@@ -478,13 +450,13 @@ out center 120;`;
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📍 Address</Text>
+                <Text style={styles.modalLabel}>{t("common.address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>🌐 Website</Text>
+                <Text style={styles.modalLabel}>{t("common.website")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => Linking.openURL(infoPlace.website!).catch(() => null)}
@@ -496,13 +468,13 @@ out center 120;`;
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>🕐 Hours</Text>
+                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {infoPlace?.fuelTypes && infoPlace.fuelTypes.length > 0 && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>⛽ Fuel Types</Text>
+                <Text style={styles.modalLabel}>{t("common.fuelTypes")}</Text>
                 <View style={styles.fuelTypesRow}>
                   {infoPlace.fuelTypes.map((ft) => (
                     <View key={ft} style={styles.fuelTypeBadge}>
@@ -513,14 +485,14 @@ out center 120;`;
               </View>
             )}
             {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && !infoPlace?.fuelTypes?.length && (
-              <Text style={styles.modalNoInfo}>No contact info available for this place in OpenStreetMap (free open data).</Text>
+              <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>Loading from Wikipedia…</Text>
+              <Text style={styles.modalLoadingText}>{t("common.wikiLoading")}</Text>
             )}
             {wikiExtract && (
               <View style={styles.modalWikiSection}>
-                <Text style={styles.modalWikiLabel}>📖 From Wikipedia</Text>
+                <Text style={styles.modalWikiLabel}>{t("common.wikiLabel")}</Text>
                 <Text style={styles.modalWikiExtract} numberOfLines={5}>{wikiExtract}</Text>
               </View>
             )}
@@ -534,14 +506,14 @@ out center 120;`;
                     ).catch(() => null)
                   }
                 >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextFuel]}>⛽ Check Fuel Prices</Text>
+                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextFuel]}>{t("common.checkFuelPrices")}</Text>
                 </Pressable>
               )}
               <Pressable
                 style={styles.modalActionButton}
                 onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null)}
               >
-                <Text style={styles.modalActionButtonText}>⭐ Reviews on Google Maps</Text>
+                <Text style={styles.modalActionButtonText}>{t("common.reviewsGoogle")}</Text>
               </Pressable>
               {infoPlace?.wikipedia && (
                 <Pressable
@@ -551,12 +523,12 @@ out center 120;`;
                     Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
                   }}
                 >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>📖 Read on Wikipedia</Text>
+                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common.readWikipedia")}</Text>
                 </Pressable>
               )}
             </View>
             <Pressable style={styles.modalClose} onPress={() => { setInfoPlace(null); setWikiExtract(null); }}>
-              <Text style={styles.modalCloseText}>Close</Text>
+              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -564,16 +536,16 @@ out center 120;`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>🔧 GEAR UP</Text>
-        <Text style={styles.title}>THE GARAGE</Text>
+        <Text style={styles.headerBadge}>{t("garage.badge")}</Text>
+        <Text style={styles.title}>{t("garage.title")}</Text>
         <Text style={styles.subtitle}>
-          Find MC services, fuel, parking & clubs near your ride.
+          {t("garage.subtitle")}
         </Text>
       </View>
 
       {/* Category selector */}
       <View style={styles.segmentRow}>
-        {CATEGORIES.map(({ key, label }) => (
+        {CATEGORY_KEYS.map((key) => (
           <Pressable
             key={key}
             style={[
@@ -592,7 +564,7 @@ out center 120;`;
                 selected === key && styles.segmentTextActive,
               ]}
             >
-              {label}
+              {t(`garage.categories.${key}`)}
             </Text>
           </Pressable>
         ))}
@@ -604,14 +576,14 @@ out center 120;`;
         disabled={loading}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : `Find ${sectionTitle}`}
+          {loading ? t("common.loading") : t("garage.findButton", { title: sectionTitle })}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>Searching nearby places…</Text>
+          <Text style={styles.loadingText}>{t("garage.searching")}</Text>
         </View>
       )}
 
@@ -620,7 +592,7 @@ out center 120;`;
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>📡 Showing cached results — tap refresh for latest</Text>
+          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
         </View>
       )}
 
@@ -631,13 +603,13 @@ out center 120;`;
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => setViewMode("list")}
           >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>☰ List</Text>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => setViewMode("map")}
           >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
           </Pressable>
         </View>
       )}

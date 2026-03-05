@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { useTranslation } from "react-i18next";
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -82,6 +83,7 @@ const parseWikiTag = (tag: string) => {
 const CACHE_KEY = "cache_attractions";
 
 export default function AttractionsScreen() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -110,7 +112,7 @@ export default function AttractionsScreen() {
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
-        setError("Location permission is required to find attractions.");
+        setError(t("explore.locationError"));
         return;
       }
 
@@ -179,11 +181,11 @@ out center 120;`;
       setFromCache(false);
       try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(sorted)); } catch {}
     } catch {
-      setError("Unable to load attractions. Please try again.");
+      setError(t("explore.loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const openInMaps = useCallback((place: Place) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
@@ -217,12 +219,12 @@ out center 120;`;
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Category</Text>
+              <Text style={styles.modalLabel}>{t("common.category")}</Text>
               <Text style={styles.modalValue}>{infoPlace?.category}</Text>
             </View>
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📞 Phone</Text>
+                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null)}
@@ -233,7 +235,7 @@ out center 120;`;
             )}
             {infoPlace?.email && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📧 Email</Text>
+                <Text style={styles.modalLabel}>{t("common.email")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null)}
@@ -245,13 +247,13 @@ out center 120;`;
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📍 Address</Text>
+                <Text style={styles.modalLabel}>{t("common.address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>🌐 Website</Text>
+                <Text style={styles.modalLabel}>{t("common.website")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => Linking.openURL(infoPlace.website!).catch(() => null)}
@@ -263,19 +265,19 @@ out center 120;`;
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>🕐 Hours</Text>
+                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && (
-              <Text style={styles.modalNoInfo}>No contact info available for this place in OpenStreetMap (free open data).</Text>
+              <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>Loading from Wikipedia…</Text>
+              <Text style={styles.modalLoadingText}>{t("common.wikiLoading")}</Text>
             )}
             {wikiExtract && (
               <View style={styles.modalWikiSection}>
-                <Text style={styles.modalWikiLabel}>📖 From Wikipedia</Text>
+                <Text style={styles.modalWikiLabel}>{t("common.wikiLabel")}</Text>
                 <Text style={styles.modalWikiExtract} numberOfLines={5}>{wikiExtract}</Text>
               </View>
             )}
@@ -284,7 +286,7 @@ out center 120;`;
                 style={styles.modalActionButton}
                 onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null)}
               >
-                <Text style={styles.modalActionButtonText}>⭐ Reviews on Google Maps</Text>
+                <Text style={styles.modalActionButtonText}>{t("common.reviewsGoogle")}</Text>
               </Pressable>
               {infoPlace?.wikipedia && (
                 <Pressable
@@ -294,12 +296,12 @@ out center 120;`;
                     Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
                   }}
                 >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>📖 Read on Wikipedia</Text>
+                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common.readWikipedia")}</Text>
                 </Pressable>
               )}
             </View>
             <Pressable style={styles.modalClose} onPress={() => { setInfoPlace(null); setWikiExtract(null); }}>
-              <Text style={styles.modalCloseText}>Close</Text>
+              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -307,21 +309,21 @@ out center 120;`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>🗺️ ROAD STOPS</Text>
-        <Text style={styles.title}>ROADSIDE STOPS</Text>
-        <Text style={styles.subtitle}>Interesting places & sights along your route.</Text>
+        <Text style={styles.headerBadge}>{t("explore.badge")}</Text>
+        <Text style={styles.title}>{t("explore.title")}</Text>
+        <Text style={styles.subtitle}>{t("explore.subtitle")}</Text>
       </View>
 
       <Pressable style={styles.primaryButton} onPress={loadPlaces}>
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : "FIND NEARBY STOPS"}
+          {loading ? t("common.loading") : t("explore.findButton")}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>Searching nearby attractions…</Text>
+          <Text style={styles.loadingText}>{t("explore.searching")}</Text>
         </View>
       )}
 
@@ -330,7 +332,7 @@ out center 120;`;
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>📡 Showing cached results — tap refresh for latest</Text>
+          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
         </View>
       )}
 
@@ -341,13 +343,13 @@ out center 120;`;
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => setViewMode("list")}
           >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>☰ List</Text>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => setViewMode("map")}
           >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
           </Pressable>
         </View>
       )}
@@ -378,7 +380,7 @@ out center 120;`;
       {viewMode === "list" && (
         places.length === 0 && !loading ? (
           <Text style={styles.bodyText}>
-            No roadside stops found. Tap the button above to search.
+            {t("explore.noResults")}
           </Text>
         ) : (
           places.map((place) => (

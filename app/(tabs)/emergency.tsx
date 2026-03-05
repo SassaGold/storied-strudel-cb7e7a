@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { useTranslation } from "react-i18next";
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -73,15 +74,9 @@ const haversineMeters = (
 const AMENITY_TYPES =
   "hospital|police|fire_station|pharmacy|clinic|doctors|ambulance_station";
 
-const CATEGORY_FILTERS = [
-  { key: "all", label: "🔎 All" },
-  { key: "hospital", label: "🏥 Hospital" },
-  { key: "police", label: "👮 Police" },
-  { key: "fire_station", label: "🚒 Fire" },
-  { key: "pharmacy", label: "💊 Pharmacy" },
-];
+const CATEGORY_FILTER_KEYS = ["all", "hospital", "police", "fire_station", "pharmacy"] as const;
 
-const categoryLabel: Record<string, string> = {
+const categoryLabelFallback: Record<string, string> = {
   hospital: "🏥 Hospital",
   police: "👮 Police",
   fire_station: "🚒 Fire Station",
@@ -92,7 +87,7 @@ const categoryLabel: Record<string, string> = {
 };
 
 const formatCategory = (cat: string) =>
-  categoryLabel[cat] ??
+  categoryLabelFallback[cat] ??
   `🔴 ${cat
     .split("_")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -111,31 +106,24 @@ const EMERGENCY_NUMBERS = [
   { region: "NZ", number: "111", emoji: "🇳🇿" },
 ];
 
-/** Initiates a phone call, showing an alert if the device cannot handle it. */
-const callNumber = (number: string) => {
+/** Initiates a phone call; falls back to an alert if the device cannot handle it. */
+const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: string, callFailedTitle: string, callFailedMsg: string) => {
   Linking.canOpenURL(`tel:${number}`)
     .then((supported) => {
       if (supported) {
         return Linking.openURL(`tel:${number}`);
       }
-      Alert.alert(
-        "Cannot Place Call",
-        `Your device does not support calling. Please dial ${number} manually.`,
-        [{ text: "OK" }]
-      );
+      Alert.alert(cannotCallTitle, cannotCallMsg, [{ text: "OK" }]);
     })
     .catch(() => {
-      Alert.alert(
-        "Call Failed",
-        `Could not start a call to ${number}. Please dial manually.`,
-        [{ text: "OK" }]
-      );
+      Alert.alert(callFailedTitle, callFailedMsg, [{ text: "OK" }]);
     });
 };
 
 const CACHE_KEY = "cache_emergency";
 
 export default function EmergencyScreen() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -144,6 +132,16 @@ export default function EmergencyScreen() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
+
+  const call = useCallback((number: string) => {
+    callNumber(
+      number,
+      t("sos.cannotCall"),
+      t("sos.cannotCallMsg", { number }),
+      t("sos.callFailed"),
+      t("sos.callFailedMsg", { number })
+    );
+  }, [t]);
 
   const openInMaps = useCallback((place: Place) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
@@ -154,7 +152,7 @@ export default function EmergencyScreen() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== "granted") {
-        Alert.alert("Permission required", "Location permission is needed to share your location.");
+        Alert.alert(t("sos.permissionAlert"), t("sos.locationPermissionMsg"));
         return;
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
@@ -164,9 +162,9 @@ export default function EmergencyScreen() {
         message: `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
       });
     } catch {
-      Alert.alert("Share Failed", "Could not share your location. Please try again.");
+      Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
     }
-  }, []);
+  }, [t]);
 
   const loadPlaces = useCallback(async () => {
     // Load cache so user sees last-known results immediately while fetching
@@ -186,9 +184,7 @@ export default function EmergencyScreen() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== "granted") {
-        setError(
-          "Location permission is required to find emergency services."
-        );
+        setError(t("sos.locationError"));
         return;
       }
 
@@ -265,15 +261,11 @@ out center ${MAX_RESULTS};`;
       try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(sorted)); } catch {}
     } catch (err) {
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
-      setError(
-        isNetwork
-          ? "Network error — check your connection and try again."
-          : "Unable to load emergency services. Please try again."
-      );
+      setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const filtered =
     selected === "all"
@@ -299,14 +291,14 @@ out center ${MAX_RESULTS};`;
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>Type</Text>
+              <Text style={styles.modalLabel}>{t("common.type")}</Text>
               <Text style={styles.modalValue}>
-                {formatCategory(infoPlace?.category ?? "")}
+                {t(`sos.categoryLabels.${infoPlace?.category}`, { defaultValue: formatCategory(infoPlace?.category ?? "") })}
               </Text>
             </View>
             {infoPlace?.distanceMeters !== undefined && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>Distance</Text>
+                <Text style={styles.modalLabel}>{t("common.distance")}</Text>
                 <Text style={styles.modalValue}>
                   {formatDistance(infoPlace.distanceMeters)}
                 </Text>
@@ -314,10 +306,10 @@ out center ${MAX_RESULTS};`;
             )}
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📞 Phone</Text>
+                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
                 <Text
                   style={styles.modalLink}
-                  onPress={() => callNumber(infoPlace.phone!)}
+                  onPress={() => call(infoPlace.phone!)}
                 >
                   {infoPlace.phone}
                 </Text>
@@ -325,19 +317,19 @@ out center ${MAX_RESULTS};`;
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>📍 Address</Text>
+                <Text style={styles.modalLabel}>{t("common.address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>🕐 Hours</Text>
+                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>🌐 Website</Text>
+                <Text style={styles.modalLabel}>{t("common.website")}</Text>
                 <Text
                   style={styles.modalLink}
                   numberOfLines={1}
@@ -353,14 +345,14 @@ out center ${MAX_RESULTS};`;
               !infoPlace?.address &&
               !infoPlace?.website && (
                 <Text style={styles.modalNoInfo}>
-                  No contact info available in OpenStreetMap for this location.
+                  {t("common.noContactInfoEmergency")}
                 </Text>
               )}
             <View style={styles.modalActions}>
               {infoPlace?.phone && (
                 <Pressable
                   style={[styles.modalActionButton, styles.modalCallButton]}
-                  onPress={() => callNumber(infoPlace.phone!)}
+                  onPress={() => call(infoPlace.phone!)}
                 >
                   <Text
                     style={[
@@ -368,7 +360,7 @@ out center ${MAX_RESULTS};`;
                       styles.modalCallButtonText,
                     ]}
                   >
-                    📞 CALL NOW
+                    {t("sos.callNow")}
                   </Text>
                 </Pressable>
               )}
@@ -381,7 +373,7 @@ out center ${MAX_RESULTS};`;
                 }
               >
                 <Text style={styles.modalActionButtonText}>
-                  🗺️ Navigate There
+                  {t("sos.navigateThere")}
                 </Text>
               </Pressable>
             </View>
@@ -389,7 +381,7 @@ out center ${MAX_RESULTS};`;
               style={styles.modalClose}
               onPress={() => setInfoPlace(null)}
             >
-              <Text style={styles.modalCloseText}>CLOSE</Text>
+              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -399,22 +391,22 @@ out center ${MAX_RESULTS};`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>🆘 EMERGENCY</Text>
-        <Text style={styles.title}>SOS</Text>
+        <Text style={styles.headerBadge}>{t("sos.badge")}</Text>
+        <Text style={styles.title}>{t("sos.title")}</Text>
         <Text style={styles.subtitle}>
-          Police, hospitals & emergency services near you.
+          {t("sos.subtitle")}
         </Text>
       </View>
 
       {/* Universal emergency numbers */}
       <View style={styles.sosCard}>
-        <Text style={styles.sosCardTitle}>⚡ UNIVERSAL EMERGENCY NUMBERS</Text>
+        <Text style={styles.sosCardTitle}>{t("sos.universalNumbers")}</Text>
         <View style={styles.sosNumbersGrid}>
           {EMERGENCY_NUMBERS.map((item) => (
             <Pressable
               key={item.number}
               style={styles.sosNumberButton}
-              onPress={() => callNumber(item.number)}
+              onPress={() => call(item.number)}
             >
               <Text style={styles.sosNumberEmoji}>{item.emoji}</Text>
               <Text style={styles.sosNumber}>{item.number}</Text>
@@ -423,7 +415,7 @@ out center ${MAX_RESULTS};`;
           ))}
         </View>
         <Pressable style={styles.shareButton} onPress={shareLocation}>
-          <Text style={styles.shareButtonText}>📍 Share My Location</Text>
+          <Text style={styles.shareButtonText}>{t("sos.shareLocation")}</Text>
         </Pressable>
       </View>
       <Pressable
@@ -432,14 +424,14 @@ out center ${MAX_RESULTS};`;
         disabled={loading}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? "Searching..." : "FIND NEARBY EMERGENCY SERVICES"}
+          {loading ? t("common.searching") : t("sos.findButton")}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" color="#ef4444" />
-          <Text style={styles.loadingText}>Searching within 10 km…</Text>
+          <Text style={styles.loadingText}>{t("sos.searching")}</Text>
         </View>
       )}
 
@@ -448,7 +440,7 @@ out center ${MAX_RESULTS};`;
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>📡 Showing cached results — tap refresh for latest</Text>
+          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
         </View>
       )}
 
@@ -459,13 +451,13 @@ out center ${MAX_RESULTS};`;
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => setViewMode("list")}
           >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>☰ List</Text>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => setViewMode("map")}
           >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
           </Pressable>
         </View>
       )}
@@ -497,22 +489,22 @@ out center ${MAX_RESULTS};`;
         <>
           {/* Category filter */}
           <View style={styles.segmentRow}>
-            {CATEGORY_FILTERS.map((f) => (
+            {CATEGORY_FILTER_KEYS.map((key) => (
               <Pressable
-                key={f.key}
+                key={key}
                 style={[
                   styles.segmentButton,
-                  selected === f.key && styles.segmentButtonActive,
+                  selected === key && styles.segmentButtonActive,
                 ]}
-                onPress={() => setSelected(f.key)}
+                onPress={() => setSelected(key)}
               >
                 <Text
                   style={[
                     styles.segmentText,
-                    selected === f.key && styles.segmentTextActive,
+                    selected === key && styles.segmentTextActive,
                   ]}
                 >
-                  {f.label}
+                  {t(`sos.categories.${key}`)}
                 </Text>
               </Pressable>
             ))}
@@ -522,17 +514,16 @@ out center ${MAX_RESULTS};`;
           <View style={styles.sectionCard}>
             <Text style={styles.cardTitle}>
               {selected === "all"
-                ? "All Nearby Services"
-                : CATEGORY_FILTERS.find((f) => f.key === selected)?.label ??
-                  "Nearby"}
+                ? t("sos.allNearby")
+                : t(`sos.categories.${selected}`, { defaultValue: selected })}
             </Text>
             <Text style={styles.cardDescription}>
-              Sorted by distance · Within 10 km
+              {t("sos.sortedBy")}
             </Text>
             {viewMode === "list" && (
               filtered.length === 0 ? (
                 <Text style={styles.bodyText}>
-                  None found in this category nearby.
+                  {t("sos.noneInCategory")}
                 </Text>
               ) : (
                 filtered.map((place) => (
@@ -543,7 +534,7 @@ out center ${MAX_RESULTS};`;
                       </Text>
                       <View style={styles.tagRow}>
                         <Text style={styles.categoryTag}>
-                          {formatCategory(place.category)}
+                          {t(`sos.categoryLabels.${place.category}`, { defaultValue: formatCategory(place.category) })}
                         </Text>
                       </View>
                       {place.address ? (
@@ -554,7 +545,7 @@ out center ${MAX_RESULTS};`;
                       {place.phone ? (
                         <Text
                           style={styles.placePhone}
-                          onPress={() => callNumber(place.phone!)}
+                          onPress={() => call(place.phone!)}
                         >
                           📞 {place.phone}
                         </Text>
@@ -581,7 +572,7 @@ out center ${MAX_RESULTS};`;
 
       {!loading && places.length === 0 && !error && (
         <Text style={styles.bodyText}>
-          No emergency services found yet. Tap the button above to search.
+          {t("sos.noResults")}
         </Text>
       )}
     </ScrollView>

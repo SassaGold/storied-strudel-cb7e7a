@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { useTranslation } from "react-i18next";
 
 type GeoAddress = {
   displayName: string;
@@ -39,48 +40,23 @@ const normalizeSymbol = (sym: string) =>
 const formatWeatherCode = (sym?: string) => {
   if (!sym) return "";
   const s = normalizeSymbol(sym);
-  const labels: Record<string, string> = {
-    clearsky: "Clear",
-    fair: "Fair",
-    partlycloudy: "Partly cloudy",
-    cloudy: "Cloudy",
-    fog: "Fog",
-    lightrainshowers: "Light rain showers",
-    rainshowers: "Rain showers",
-    heavyrainshowers: "Heavy rain showers",
-    lightrain: "Light rain",
-    rain: "Rain",
-    heavyrain: "Heavy rain",
-    lightsleetshowers: "Light sleet showers",
-    sleetshowers: "Sleet showers",
-    heavysleetshowers: "Heavy sleet showers",
-    lightsleet: "Light sleet",
-    sleet: "Sleet",
-    heavysleet: "Heavy sleet",
-    lightsnowshowers: "Light snow showers",
-    snowshowers: "Snow showers",
-    heavysnowshowers: "Heavy snow showers",
-    lightsnow: "Light snow",
-    snow: "Snow",
-    heavysnow: "Heavy snow",
-    thunder: "Thunder",
-    rainandthunder: "Rain and thunder",
-    heavyrainandthunder: "Heavy rain and thunder",
-    snowandthunder: "Snow and thunder",
-    heavysnowandthunder: "Heavy snow and thunder",
-    sleetandthunder: "Sleet and thunder",
-    rainshowersandthunder: "Rain showers and thunder",
-    heavyrainshowersandthunder: "Heavy rain showers and thunder",
-    snowshowersandthunder: "Snow showers and thunder",
-    sleetshowersandthunder: "Sleet showers and thunder",
-    lightrainandthunder: "Light rain and thunder",
-    lightsnowandthunder: "Light snow and thunder",
-    lightsleetandthunder: "Light sleet and thunder",
-    lightrainshowersandthunder: "Light rain showers and thunder",
-    lightsnowshowersandthunder: "Light snow showers and thunder",
-    lightsleetshowersandthunder: "Light sleet showers and thunder",
-  };
-  return labels[s] ?? s;
+  const knownKeys = [
+    "clearsky", "fair", "partlycloudy", "cloudy", "fog",
+    "lightrainshowers", "rainshowers", "heavyrainshowers",
+    "lightrain", "rain", "heavyrain",
+    "lightsleetshowers", "sleetshowers", "heavysleetshowers",
+    "lightsleet", "sleet", "heavysleet",
+    "lightsnowshowers", "snowshowers", "heavysnowshowers",
+    "lightsnow", "snow", "heavysnow",
+    "thunder", "rainandthunder", "heavyrainandthunder",
+    "snowandthunder", "heavysnowandthunder", "sleetandthunder",
+    "rainshowersandthunder", "heavyrainshowersandthunder",
+    "snowshowersandthunder", "sleetshowersandthunder",
+    "lightrainandthunder", "lightsnowandthunder", "lightsleetandthunder",
+    "lightrainshowersandthunder", "lightsnowshowersandthunder", "lightsleetshowersandthunder",
+  ];
+  if (knownKeys.includes(s)) return `home.weather.${s}`;
+  return s;
 };
 
 
@@ -110,29 +86,29 @@ const buildAlerts = (weather?: WeatherInfo) => {
   const rainChance = weather.precipitationProbability ?? 0;
 
   if (temp <= 0) {
-    alerts.push("Very cold - risk of frostbite");
+    alerts.push("home.alerts.veryCold");
   } else if (temp <= 5) {
-    alerts.push("Cold temperatures - watch for ice patches");
+    alerts.push("home.alerts.cold");
   }
   if (temp >= 35) {
-    alerts.push("Extreme heat - risk of dehydration");
+    alerts.push("home.alerts.extremeHeat");
   } else if (temp >= 30) {
-    alerts.push("High heat - stay hydrated");
+    alerts.push("home.alerts.highHeat");
   }
   if (wind >= 15) {
-    alerts.push("Strong winds - dangerous for riding");
+    alerts.push("home.alerts.strongWinds");
   } else if (wind >= 10) {
-    alerts.push("Gusty winds - ride with caution");
+    alerts.push("home.alerts.gustyWinds");
   }
   if (rainChance >= 60) {
-    alerts.push("Rain expected - slippery roads ahead");
+    alerts.push("home.alerts.rainExpected");
   }
   return alerts;
 };
 
-const ridingSuitability = (weather?: WeatherInfo): { score: number; label: string; color: string } => {
+const ridingSuitability = (weather?: WeatherInfo): { score: number; labelKey: string; color: string } => {
   if (!weather) {
-    return { score: 0, label: "N/A", color: "#94a3b8" };
+    return { score: 0, labelKey: "home.suitability.na", color: "#94a3b8" };
   }
   let score = 100;
   const temp = weather.temperatureC ?? 20;
@@ -157,11 +133,11 @@ const ridingSuitability = (weather?: WeatherInfo): { score: number; label: strin
 
   score = Math.max(0, Math.min(100, score));
 
-  if (score >= 80) return { score, label: "GREAT", color: "#22c55e" };
-  if (score >= 60) return { score, label: "GOOD", color: "#84cc16" };
-  if (score >= 40) return { score, label: "FAIR", color: "#f59e0b" };
-  if (score >= 20) return { score, label: "POOR", color: "#f97316" };
-  return { score, label: "DANGEROUS", color: "#ef4444" };
+  if (score >= 80) return { score, labelKey: "home.suitability.great", color: "#22c55e" };
+  if (score >= 60) return { score, labelKey: "home.suitability.good", color: "#84cc16" };
+  if (score >= 40) return { score, labelKey: "home.suitability.fair", color: "#f59e0b" };
+  if (score >= 20) return { score, labelKey: "home.suitability.poor", color: "#f97316" };
+  return { score, labelKey: "home.suitability.dangerous", color: "#ef4444" };
 };
 
 const buildRecommendations = (weather?: WeatherInfo) => {
@@ -174,18 +150,18 @@ const buildRecommendations = (weather?: WeatherInfo) => {
   const rainChance = weather.precipitationProbability ?? 0;
 
   if (temp <= 0) {
-    recs.push("Wear thermal gear, consider heated grips");
+    recs.push("home.recs.thermalGear");
   } else if (temp <= 10) {
-    recs.push("Layer up, wear windproof jacket");
+    recs.push("home.recs.layerUp");
   }
   if (temp >= 30) {
-    recs.push("Light breathable gear, carry water");
+    recs.push("home.recs.lightGear");
   }
   if (wind >= 10) {
-    recs.push("Secure loose clothing and luggage");
+    recs.push("home.recs.secureLuggage");
   }
   if (rainChance >= 60) {
-    recs.push("Bring rain gear, waterproof your bags");
+    recs.push("home.recs.rainGear");
   }
   return recs;
 };
@@ -270,6 +246,7 @@ const formatForecastDate = (dateStr: string) => {
 };
 
 export default function Index() {
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<GeoAddress | null>(null);
@@ -283,7 +260,7 @@ export default function Index() {
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
-        setError("Location permission is required to show nearby info.");
+        setError(t("home.locationError"));
         return;
       }
 
@@ -405,11 +382,11 @@ export default function Index() {
       setWeather(weatherResult);
       setLastUpdated(new Date());
     } catch {
-      setError("Unable to load location data. Please try again.");
+      setError(t("home.dataError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
   const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
@@ -443,22 +420,35 @@ export default function Index() {
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>🏍️ RIDER HQ</Text>
-        <Text style={styles.title}>WHERE AM I?</Text>
-        <Text style={styles.subtitle}>Your location & riding conditions.</Text>
+        <Text style={styles.headerBadge}>{t("home.badge")}</Text>
+        <Text style={styles.title}>{t("home.title")}</Text>
+        <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
       </View>
 
+      <View style={styles.languageRow}>
+        {(["en", "es", "de", "fr"] as const).map((lang) => (
+          <Pressable
+            key={lang}
+            style={[styles.langButton, i18n.language === lang && styles.langButtonActive]}
+            onPress={() => i18n.changeLanguage(lang)}
+          >
+            <Text style={[styles.langButtonText, i18n.language === lang && styles.langButtonTextActive]}>
+              {t(`language.${lang}`)}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
 
       <Pressable style={styles.primaryButton} onPress={loadData}>
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : "UPDATE LOCATION"}
+          {loading ? t("common.loading") : t("home.updateLocation")}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>Fetching local data…</Text>
+          <Text style={styles.loadingText}>{t("home.fetchingData")}</Text>
         </View>
       )}
 
@@ -466,32 +456,34 @@ export default function Index() {
 
       {location && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Your Location</Text>
+          <Text style={styles.cardTitle}>{t("home.yourLocation")}</Text>
           <Text style={styles.bodyText}>
-            {address?.displayName ?? "Address not available"}
+            {address?.displayName ?? t("home.addressNotAvailable")}
           </Text>
           <Text style={styles.metaText}>
             Lat {location.coords.latitude.toFixed(5)} · Lon {location.coords.longitude.toFixed(5)}
           </Text>
           <Text style={styles.metaText}>
-            Accuracy {Math.round(location.coords.accuracy ?? 0)} m
+            {t("home.accuracy", { value: Math.round(location.coords.accuracy ?? 0) })}
           </Text>
           <Pressable style={styles.secondaryButton} onPress={openMaps}>
-            <Text style={styles.secondaryButtonText}>OPEN IN MAPS</Text>
+            <Text style={styles.secondaryButtonText}>{t("common.openInMaps")}</Text>
           </Pressable>
         </View>
       )}
 
       {weather && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Local Weather</Text>
+          <Text style={styles.cardTitle}>{t("home.localWeather")}</Text>
 
           {/* Main condition row */}
           <View style={styles.weatherMainRow}>
             <Text style={styles.weatherEmojiLarge}>{weatherEmoji(weather.weatherCode)}</Text>
             <View style={styles.weatherMainInfo}>
               <Text style={styles.weatherTempText}>{weather.temperatureC?.toFixed(1)}°C</Text>
-              <Text style={styles.weatherConditionText}>{formatWeatherCode(weather.weatherCode)}</Text>
+              <Text style={styles.weatherConditionText}>
+                {t(formatWeatherCode(weather.weatherCode), { defaultValue: formatWeatherCode(weather.weatherCode) })}
+              </Text>
             </View>
           </View>
 
@@ -499,34 +491,34 @@ export default function Index() {
           <View style={styles.weatherStatsGrid}>
             <View style={styles.weatherStatItem}>
               <Text style={styles.weatherStatValue}>{weather.windSpeed?.toFixed(1) ?? "0"}</Text>
-              <Text style={styles.weatherStatLabel}>Wind (m/s)</Text>
+              <Text style={styles.weatherStatLabel}>{t("home.wind")}</Text>
             </View>
             <View style={styles.weatherStatDivider} />
             <View style={styles.weatherStatItem}>
               <Text style={styles.weatherStatValue}>{weather.precipitation ?? 0}</Text>
-              <Text style={styles.weatherStatLabel}>Precip (mm)</Text>
+              <Text style={styles.weatherStatLabel}>{t("home.precip")}</Text>
             </View>
             <View style={styles.weatherStatDivider} />
             <View style={styles.weatherStatItem}>
               <Text style={styles.weatherStatValue}>{weather.precipitationProbability ?? 0}%</Text>
-              <Text style={styles.weatherStatLabel}>Rain Chance</Text>
+              <Text style={styles.weatherStatLabel}>{t("home.rainChance")}</Text>
             </View>
           </View>
 
           {/* Riding Suitability */}
           <View style={styles.suitabilityRow}>
-            <Text style={styles.suitabilityLabel}>Riding Suitability: {suitability.score}/100</Text>
+            <Text style={styles.suitabilityLabel}>{t("home.ridingSuitability", { score: suitability.score })}</Text>
             <View style={[styles.suitabilityBadge, { backgroundColor: suitability.color }]}>
-              <Text style={styles.suitabilityBadgeText}>{suitability.label}</Text>
+              <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
             </View>
           </View>
 
           {/* Riding Alerts */}
           {alerts.length > 0 && (
             <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>⚠️ Riding Alerts:</Text>
-              {alerts.map((alert) => (
-                <Text key={alert} style={styles.weatherBullet}>• {alert}</Text>
+              <Text style={styles.weatherSectionTitle}>{t("home.ridingAlerts")}</Text>
+              {alerts.map((key) => (
+                <Text key={key} style={styles.weatherBullet}>• {t(key)}</Text>
               ))}
             </View>
           )}
@@ -534,9 +526,9 @@ export default function Index() {
           {/* Recommendations */}
           {recommendations.length > 0 && (
             <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>💡 Recommendations:</Text>
-              {recommendations.map((rec) => (
-                <Text key={rec} style={styles.weatherBullet}>• {rec}</Text>
+              <Text style={styles.weatherSectionTitle}>{t("home.recommendations")}</Text>
+              {recommendations.map((key) => (
+                <Text key={key} style={styles.weatherBullet}>• {t(key)}</Text>
               ))}
             </View>
           )}
@@ -544,7 +536,7 @@ export default function Index() {
           {/* 3-Day Forecast */}
           {weather.forecast && weather.forecast.length > 0 && (
             <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>3-Day Forecast</Text>
+              <Text style={styles.weatherSectionTitle}>{t("home.forecast")}</Text>
               <View style={styles.forecastCardsRow}>
                 {weather.forecast.slice(0, 3).map((day) => (
                   <View key={day.date} style={styles.forecastCard}>
@@ -555,7 +547,9 @@ export default function Index() {
                       {formatForecastDate(day.date).split(",")[1]?.trim() ?? ""}
                     </Text>
                     <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
-                    <Text style={styles.forecastCardCondition}>{formatWeatherCode(day.weatherCode)}</Text>
+                    <Text style={styles.forecastCardCondition}>
+                      {t(formatWeatherCode(day.weatherCode), { defaultValue: formatWeatherCode(day.weatherCode) })}
+                    </Text>
                     <Text style={styles.forecastCardTemp}>
                       {Math.round(day.maxTempC)}° / {Math.round(day.minTempC)}°
                     </Text>
@@ -571,18 +565,18 @@ export default function Index() {
           {/* Sunrise & Sunset */}
           {sunTimes && (
             <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>🌅 Sunrise & Sunset</Text>
+              <Text style={styles.weatherSectionTitle}>{t("home.sunriseSunset")}</Text>
               <View style={styles.sunTimesRow}>
                 <View style={styles.sunTimesItem}>
                   <Text style={styles.sunTimesEmoji}>🌅</Text>
                   <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
-                  <Text style={styles.sunTimesLabel}>Sunrise</Text>
+                  <Text style={styles.sunTimesLabel}>{t("home.sunrise")}</Text>
                 </View>
                 <View style={styles.sunTimesDivider} />
                 <View style={styles.sunTimesItem}>
                   <Text style={styles.sunTimesEmoji}>🌇</Text>
                   <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
-                  <Text style={styles.sunTimesLabel}>Sunset</Text>
+                  <Text style={styles.sunTimesLabel}>{t("home.sunset")}</Text>
                 </View>
                 <View style={styles.sunTimesDivider} />
                 <View style={styles.sunTimesItem}>
@@ -590,7 +584,7 @@ export default function Index() {
                   <Text style={styles.sunTimesValue}>
                     {formatDuration(sunTimes.daylightMinutes)}
                   </Text>
-                  <Text style={styles.sunTimesLabel}>Daylight</Text>
+                  <Text style={styles.sunTimesLabel}>{t("home.daylight")}</Text>
                 </View>
               </View>
             </View>
@@ -600,7 +594,7 @@ export default function Index() {
             style={styles.secondaryButton}
             onPress={() => Linking.openURL(weatherUrl).catch(() => null)}
           >
-            <Text style={styles.secondaryButtonText}>OPEN YR WEATHER</Text>
+            <Text style={styles.secondaryButtonText}>{t("home.openWeather")}</Text>
           </Pressable>
         </View>
       )}
@@ -608,7 +602,7 @@ export default function Index() {
 
       {lastUpdated && (
         <Text style={styles.metaText}>
-          Last updated {lastUpdated.toLocaleTimeString()}
+          {t("home.lastUpdated", { time: lastUpdated.toLocaleTimeString() })}
         </Text>
       )}
 
@@ -952,5 +946,31 @@ const styles = StyleSheet.create({
     color: "#666666",
     fontSize: 12,
     marginTop: 2,
+  },
+  languageRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 12,
+    justifyContent: "center",
+  },
+  langButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#333333",
+    backgroundColor: "#1a1a1a",
+  },
+  langButtonActive: {
+    borderColor: "#ff6600",
+    backgroundColor: "rgba(255,102,0,0.12)",
+  },
+  langButtonText: {
+    color: "#888888",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  langButtonTextActive: {
+    color: "#ff6600",
   },
 });

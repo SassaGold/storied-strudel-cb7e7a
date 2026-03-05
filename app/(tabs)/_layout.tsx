@@ -1,7 +1,9 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function TabLayout() {
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -23,7 +25,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "RIDER HQ",
+          title: t("tabs.home"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="compass" size={size} color={color} />
           ),
@@ -32,7 +34,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="restaurants"
         options={{
-          title: "FOOD",
+          title: t("tabs.food"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="restaurant" size={size} color={color} />
           ),
@@ -41,7 +43,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hotels"
         options={{
-          title: "SLEEP",
+          title: t("tabs.sleep"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="bed" size={size} color={color} />
           ),
@@ -50,7 +52,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="attractions"
         options={{
-          title: "EXPLORE",
+          title: t("tabs.explore"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="flag" size={size} color={color} />
           ),
@@ -59,7 +61,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mc"
         options={{
-          title: "GARAGE",
+          title: t("tabs.garage"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="speedometer" size={size} color={color} />
           ),
@@ -68,7 +70,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="emergency"
         options={{
-          title: "SOS",
+          title: t("tabs.sos"),
           tabBarActiveTintColor: "#ef4444",
           tabBarIcon: ({ focused, size }) => (
             <Ionicons
