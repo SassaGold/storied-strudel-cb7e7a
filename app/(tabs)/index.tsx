@@ -190,6 +190,75 @@ const buildRecommendations = (weather?: WeatherInfo) => {
   return recs;
 };
 
+// ─── Sunrise / Sunset ────────────────────────────────────────────────────────
+// Pure-JS implementation (no external API or library required).
+// Based on the USNO/NOAA simplified algorithm.
+
+type SunTimes = { sunrise: Date; sunset: Date; daylightMinutes: number } | null;
+
+function computeSunTimes(lat: number, lon: number, date: Date = new Date()): SunTimes {
+  const DEG = Math.PI / 180;
+  const zenith = 90.833; // official civil zenith for sunrise/sunset
+
+  const doy = Math.floor(
+    (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
+      Date.UTC(date.getFullYear(), 0, 0)) /
+      86400000
+  );
+  const lngHour = lon / 15;
+
+  function calcUTCHour(isRise: boolean): number | null {
+    const t = doy + ((isRise ? 6 : 18) - lngHour) / 24;
+    const M = 0.9856 * t - 3.289;
+    let L = M + 1.916 * Math.sin(M * DEG) + 0.02 * Math.sin(2 * M * DEG) + 282.634;
+    L = ((L % 360) + 360) % 360;
+    let RA = Math.atan(0.91764 * Math.tan(L * DEG)) / DEG;
+    RA = ((RA % 360) + 360) % 360;
+    const RA_norm = (RA + Math.floor(L / 90) * 90 - Math.floor(RA / 90) * 90) / 15;
+    const sinDec = 0.39782 * Math.sin(L * DEG);
+    const cosDec = Math.cos(Math.asin(sinDec));
+    const cosH =
+      (Math.cos(zenith * DEG) - sinDec * Math.sin(lat * DEG)) /
+      (cosDec * Math.cos(lat * DEG));
+    if (cosH > 1 || cosH < -1) return null; // polar day / polar night
+    const H = (isRise ? 360 - Math.acos(cosH) / DEG : Math.acos(cosH) / DEG) / 15;
+    const T = H + RA_norm - 0.06571 * t - 6.622;
+    return ((T - lngHour) % 24 + 24) % 24;
+  }
+
+  const utcRise = calcUTCHour(true);
+  const utcSet = calcUTCHour(false);
+  if (utcRise === null || utcSet === null) return null;
+
+  const toDate = (utcH: number): Date => {
+    const d = new Date(date);
+    const h = Math.floor(utcH);
+    const m = Math.round((utcH - h) * 60);
+    d.setUTCHours(h, m, 0, 0);
+    return d;
+  };
+
+  const sunrise = toDate(utcRise);
+  const sunset = toDate(utcSet);
+  const daylightMinutes = Math.round((sunset.getTime() - sunrise.getTime()) / 60000);
+  return { sunrise, sunset, daylightMinutes };
+}
+
+const formatTime = (date: Date) => {
+  try {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "--:--";
+  }
+};
+
+const formatDuration = (minutes: number) => {
+  if (minutes <= 0) return "N/A";
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const formatForecastDate = (dateStr: string) => {
   const [year, month, day] = dateStr.split("-").map(Number);
   const date = new Date(year, month - 1, day);
@@ -345,6 +414,13 @@ export default function Index() {
   const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
   const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
   const recommendations = useMemo(() => buildRecommendations(weather ?? undefined), [weather]);
+  const sunTimes = useMemo(
+    () =>
+      location
+        ? computeSunTimes(location.coords.latitude, location.coords.longitude)
+        : null,
+    [location]
+  );
   const weatherUrl = location
     ? `https://www.yr.no/en/forecast/daily-table/${location.coords.latitude.toFixed(4)},${location.coords.longitude.toFixed(4)}`
     : "https://www.yr.no";
@@ -488,6 +564,34 @@ export default function Index() {
                     </View>
                   </View>
                 ))}
+              </View>
+            </View>
+          )}
+
+          {/* Sunrise & Sunset */}
+          {sunTimes && (
+            <View style={styles.weatherSection}>
+              <Text style={styles.weatherSectionTitle}>🌅 Sunrise & Sunset</Text>
+              <View style={styles.sunTimesRow}>
+                <View style={styles.sunTimesItem}>
+                  <Text style={styles.sunTimesEmoji}>🌅</Text>
+                  <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
+                  <Text style={styles.sunTimesLabel}>Sunrise</Text>
+                </View>
+                <View style={styles.sunTimesDivider} />
+                <View style={styles.sunTimesItem}>
+                  <Text style={styles.sunTimesEmoji}>🌇</Text>
+                  <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
+                  <Text style={styles.sunTimesLabel}>Sunset</Text>
+                </View>
+                <View style={styles.sunTimesDivider} />
+                <View style={styles.sunTimesItem}>
+                  <Text style={styles.sunTimesEmoji}>☀️</Text>
+                  <Text style={styles.sunTimesValue}>
+                    {formatDuration(sunTimes.daylightMinutes)}
+                  </Text>
+                  <Text style={styles.sunTimesLabel}>Daylight</Text>
+                </View>
               </View>
             </View>
           )}
@@ -816,5 +920,37 @@ const styles = StyleSheet.create({
     color: "#ff6600",
     fontSize: 11,
     fontWeight: "600",
+  },
+  sunTimesRow: {
+    flexDirection: "row",
+    backgroundColor: "#0a0a0a",
+    borderRadius: 8,
+    paddingVertical: 12,
+    marginTop: 6,
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
+  },
+  sunTimesItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+  sunTimesDivider: {
+    width: 1,
+    backgroundColor: "#2a2a2a",
+    marginVertical: 4,
+  },
+  sunTimesEmoji: {
+    fontSize: 22,
+    marginBottom: 4,
+  },
+  sunTimesValue: {
+    color: "#ff6600",
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  sunTimesLabel: {
+    color: "#666666",
+    fontSize: 12,
+    marginTop: 2,
   },
 });
