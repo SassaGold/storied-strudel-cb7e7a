@@ -145,6 +145,11 @@ export default function EmergencyScreen() {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
 
+  const openInMaps = useCallback((place: Place) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
+    Linking.openURL(url).catch(() => null);
+  }, []);
+
   const shareLocation = useCallback(async () => {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
@@ -533,7 +538,7 @@ out center ${MAX_RESULTS};`;
                 </Text>
               ) : (
                 filtered.map((place) => (
-                  <View key={place.id} style={styles.placeRow}>
+                  <Pressable key={place.id} style={styles.placeRow} onPress={() => openInMaps(place)}>
                     <View style={styles.placeInfo}>
                       <Text style={styles.placeName} numberOfLines={1}>
                         {place.name}
@@ -563,12 +568,12 @@ out center ${MAX_RESULTS};`;
                       </Text>
                       <Pressable
                         style={styles.infoButton}
-                        onPress={() => setInfoPlace(place)}
+                        onPress={(e) => { e.stopPropagation(); setInfoPlace(place); }}
                       >
                         <Text style={styles.infoButtonText}>ⓘ</Text>
                       </Pressable>
                     </View>
-                  </View>
+                  </Pressable>
                 ))
               )
             )}
