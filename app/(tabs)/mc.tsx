@@ -280,7 +280,7 @@ out center 120;`;
   };
 
   const loadPlaces = useCallback(async () => {
-    const cacheKey = "cache_mc_" + selected;
+    const cacheKey = `cache_mc_${selected}`;
     // Load cache so user sees last-known results immediately while fetching
     try {
       const raw = await AsyncStorage.getItem(cacheKey);
