@@ -10,7 +10,14 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
+// Safely load react-native-maps: requires a custom dev/production build.
+// In Expo Go or any environment where the native module isn't compiled in,
+// MapView and Marker will be null and the map toggle is hidden automatically.
+let rnMaps: any = null;
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+try { rnMaps = require("react-native-maps"); } catch {}
+const MapView: any = rnMaps?.default;
+const Marker: any = rnMaps?.Marker;
 // Safely load AsyncStorage: the native implementation throws at module-evaluation
 // time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
 // Using require() in try/catch means the screen still loads; the existing
@@ -336,17 +343,19 @@ out center 120;`;
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>☰ List</Text>
           </Pressable>
-          <Pressable
-            style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-            onPress={() => setViewMode("map")}
-          >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
-          </Pressable>
+          {MapView && (
+            <Pressable
+              style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
+              onPress={() => setViewMode("map")}
+            >
+              <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
+            </Pressable>
+          )}
         </View>
       )}
 
       {/* Map view */}
-      {viewMode === "map" && userLocation && (
+      {viewMode === "map" && userLocation && MapView && (
         <MapView
           style={styles.mapView}
           showsUserLocation
