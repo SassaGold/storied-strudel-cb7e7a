@@ -452,8 +452,8 @@ out center ${MAX_RESULTS};`;
         </View>
       )}
 
-      {/* View mode toggle */}
-      {places.length > 0 && (
+      {/* View mode toggle — only shown when the map is available */}
+      {places.length > 0 && MapView && (
         <View style={styles.viewToggleRow}>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
@@ -461,14 +461,12 @@ out center ${MAX_RESULTS};`;
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>☰ List</Text>
           </Pressable>
-          {MapView && (
-            <Pressable
-              style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-              onPress={() => setViewMode("map")}
-            >
-              <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
-            </Pressable>
-          )}
+          <Pressable
+            style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
+            onPress={() => setViewMode("map")}
+          >
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>🗺️ Map</Text>
+          </Pressable>
         </View>
       )}
 
