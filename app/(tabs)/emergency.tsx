@@ -13,7 +13,12 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import MapView, { Marker } from "react-native-maps";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+// Safely load AsyncStorage: the native implementation throws at module-evaluation
+// time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
+// Using require() in try/catch means the screen still loads; the existing
+// try/catch wrappers inside loadPlaces already handle AsyncStorage === null.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
 type OverpassElement = {
   id: number;
