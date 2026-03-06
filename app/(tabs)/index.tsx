@@ -48,25 +48,28 @@ type RoadAlert = {
 };
 
 const CONSTRUCTION_TYPE_LABELS: Record<string, string> = {
-  footway: "Footpath",
-  steps: "Steps / Stairs",
-  rail: "Railway",
   service: "Service Road",
-  cycleway: "Cycle Path",
-  path: "Path",
-  track: "Track",
   residential: "Residential Road",
   primary: "Primary Road",
+  primary_link: "Primary Road",
   secondary: "Secondary Road",
+  secondary_link: "Secondary Road",
   tertiary: "Tertiary Road",
+  tertiary_link: "Tertiary Road",
   unclassified: "Unclassified Road",
   trunk: "Trunk Road",
+  trunk_link: "Trunk Road",
   motorway: "Motorway",
+  motorway_link: "Motorway",
+  road: "Road",
+  living_street: "Living Street",
   construction: "Road Construction",
-  building: "Building Works",
   bridge: "Bridge Works",
   tunnel: "Tunnel Works",
 };
+
+/** OSM construction/highway values that represent actual road work. */
+const ROAD_TYPES = new Set(Object.keys(CONSTRUCTION_TYPE_LABELS));
 
 function humanizeConstructionType(type: string): string {
   const normalized = type.toLowerCase().replace(/_/g, " ");
@@ -440,25 +443,28 @@ export default function Index() {
         .then((r) => r.json())
         .then((data) => {
           const elements: any[] = data.elements ?? [];
-          return elements.slice(0, 10).map((el: any): RoadAlert => {
-            const elLat: number | undefined = el.lat ?? el.center?.lat;
-            const elLon: number | undefined = el.lon ?? el.center?.lon;
-            const distance =
-              elLat != null && elLon != null
-                ? Math.round(haversineKm(lat, lon, elLat, elLon) * 10) / 10
-                : undefined;
-            return {
-              id: String(el.id),
-              name: el.tags?.name ?? el.tags?.["addr:street"] ?? "",
-              type: el.tags?.construction ?? el.tags?.highway ?? "construction",
-              description: el.tags?.description ?? el.tags?.note ?? "",
-              ref: el.tags?.ref ?? "",
-              operator: el.tags?.operator ?? "",
-              distance,
-              lat: elLat,
-              lon: elLon,
-            };
-          });
+          return elements
+            .map((el: any): RoadAlert => {
+              const elLat: number | undefined = el.lat ?? el.center?.lat;
+              const elLon: number | undefined = el.lon ?? el.center?.lon;
+              const distance =
+                elLat != null && elLon != null
+                  ? Math.round(haversineKm(lat, lon, elLat, elLon) * 10) / 10
+                  : undefined;
+              return {
+                id: String(el.id),
+                name: el.tags?.name ?? el.tags?.["addr:street"] ?? "",
+                type: el.tags?.construction ?? el.tags?.highway ?? "construction",
+                description: el.tags?.description ?? el.tags?.note ?? "",
+                ref: el.tags?.ref ?? "",
+                operator: el.tags?.operator ?? "",
+                distance,
+                lat: elLat,
+                lon: elLon,
+              };
+            })
+            .filter((a) => ROAD_TYPES.has(a.type.toLowerCase()))
+            .slice(0, 10);
         })
         .catch(() => [] as RoadAlert[]);
 
