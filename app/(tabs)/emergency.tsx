@@ -122,6 +122,39 @@ const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: stri
 
 const CACHE_KEY = "cache_emergency";
 
+// Overpass API endpoints — free OpenStreetMap data, no API key required (mirrors for reliability)
+const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+];
+
+// Slightly longer than other tabs: emergency uses [timeout:30] + 10 km radius search
+const FETCH_TIMEOUT_MS = 45000;
+
+const fetchOverpass = async (query: string) => {
+  let lastError: string | null = null;
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: `data=${encodeURIComponent(query)}`,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) { lastError = `Overpass error ${response.status}`; continue; }
+      return await response.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      lastError = err instanceof Error && err.name === "AbortError" ? "Timeout" : "Network error";
+    }
+  }
+  throw new Error(lastError ?? "Overpass request failed");
+};
+
 export default function EmergencyScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -155,7 +188,7 @@ export default function EmergencyScreen() {
         Alert.alert(t("sos.permissionAlert"), t("sos.locationPermissionMsg"));
         return;
       }
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const { latitude, longitude } = pos.coords;
       const mapsLink = `https://maps.google.com/?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
       await Share.share({
@@ -189,7 +222,7 @@ export default function EmergencyScreen() {
       }
 
       const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
+        accuracy: Location.Accuracy.Balanced,
       });
       const { latitude, longitude } = pos.coords;
       setUserLocation({ latitude, longitude });
@@ -204,12 +237,7 @@ export default function EmergencyScreen() {
 out center ${MAX_RESULTS};`;
 
       // Overpass API (OpenStreetMap) — free POI data, no API key required
-      const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-          overpassQuery
-        )}`
-      );
-      const data = await response.json();
+      const data = await fetchOverpass(overpassQuery);
 
       if (!data.elements) {
         setPlaces([]);

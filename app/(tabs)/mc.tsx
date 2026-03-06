@@ -347,7 +347,7 @@ out center 120;`;
       }
 
       const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
+        accuracy: Location.Accuracy.Balanced,
       });
 
       const { latitude, longitude } = position.coords;

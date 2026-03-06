@@ -102,6 +102,38 @@ const parseWikiTag = (tag: string) => {
 
 const CACHE_KEY = "cache_restaurants";
 
+// Overpass API endpoints — free OpenStreetMap data, no API key required (mirrors for reliability)
+const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+];
+
+const FETCH_TIMEOUT_MS = 40000;
+
+const fetchOverpass = async (query: string) => {
+  let lastError: string | null = null;
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+        body: `data=${encodeURIComponent(query)}`,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      if (!response.ok) { lastError = `Overpass error ${response.status}`; continue; }
+      return await response.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      lastError = err instanceof Error && err.name === "AbortError" ? "Timeout" : "Network error";
+    }
+  }
+  throw new Error(lastError ?? "Overpass request failed");
+};
+
 export default function RestaurantsScreen() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
@@ -137,7 +169,7 @@ export default function RestaurantsScreen() {
       }
 
       const position = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
+        accuracy: Location.Accuracy.Balanced,
       });
 
       const { latitude, longitude } = position.coords;
@@ -153,12 +185,7 @@ export default function RestaurantsScreen() {
 out center 120;`;
 
       // Overpass API (OpenStreetMap) — free place/POI data, no API key required
-      const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-          overpassQuery
-        )}`
-      );
-      const data = await response.json();
+      const data = await fetchOverpass(overpassQuery);
 
       if (!data.elements) {
         setPlaces([]);
