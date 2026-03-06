@@ -427,46 +427,6 @@ export default function Index() {
         <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
       </View>
 
-      {/* ── Quick navigation grid ── */}
-      <Text style={styles.quickNavLabel}>{t("home.quickNav")}</Text>
-      <View style={styles.quickNavGrid}>
-        <Pressable
-          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => router.navigate("/restaurants")}
-        >
-          <Text style={styles.quickNavEmoji}>🍽️</Text>
-          <Text style={styles.quickNavText}>{t("tabs.food")}</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => router.navigate("/hotels")}
-        >
-          <Text style={styles.quickNavEmoji}>🛏️</Text>
-          <Text style={styles.quickNavText}>{t("tabs.sleep")}</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => router.navigate("/attractions")}
-        >
-          <Text style={styles.quickNavEmoji}>🏁</Text>
-          <Text style={styles.quickNavText}>{t("tabs.explore")}</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => router.navigate("/mc")}
-        >
-          <Text style={styles.quickNavEmoji}>⚙️</Text>
-          <Text style={styles.quickNavText}>{t("tabs.garage")}</Text>
-        </Pressable>
-      </View>
-      <Pressable
-        style={({ pressed }) => [styles.quickNavBtnSos, pressed && styles.quickNavBtnSosPressed]}
-        onPress={() => router.navigate("/emergency")}
-      >
-        <Text style={styles.quickNavEmoji}>🆘</Text>
-        <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>
-      </Pressable>
-
       <View style={styles.languageRow}>
         {(["en", "es", "de", "fr", "is"] as const).map((lang) => (
           <Pressable
@@ -647,6 +607,46 @@ export default function Index() {
           {t("home.lastUpdated", { time: lastUpdated.toLocaleTimeString() })}
         </Text>
       )}
+
+      {/* ── Quick navigation grid ── */}
+      <Text style={styles.quickNavLabel}>{t("home.quickNav")}</Text>
+      <View style={styles.quickNavGrid}>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/restaurants")}
+        >
+          <Text style={styles.quickNavEmoji}>🍽️</Text>
+          <Text style={styles.quickNavText}>{t("tabs.food")}</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/hotels")}
+        >
+          <Text style={styles.quickNavEmoji}>🛏️</Text>
+          <Text style={styles.quickNavText}>{t("tabs.sleep")}</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/attractions")}
+        >
+          <Text style={styles.quickNavEmoji}>🏁</Text>
+          <Text style={styles.quickNavText}>{t("tabs.explore")}</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/mc")}
+        >
+          <Text style={styles.quickNavEmoji}>⚙️</Text>
+          <Text style={styles.quickNavText}>{t("tabs.garage")}</Text>
+        </Pressable>
+      </View>
+      <Pressable
+        style={({ pressed }) => [styles.quickNavBtnSos, pressed && styles.quickNavBtnSosPressed]}
+        onPress={() => router.navigate("/emergency")}
+      >
+        <Text style={styles.quickNavEmoji}>🆘</Text>
+        <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>
+      </Pressable>
 
     </ScrollView>
   );
