@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 
 type GeoAddress = {
   displayName: string;
@@ -247,6 +248,7 @@ const formatForecastDate = (dateStr: string) => {
 
 export default function Index() {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<GeoAddress | null>(null);
@@ -424,6 +426,46 @@ export default function Index() {
         <Text style={styles.title}>{t("home.title")}</Text>
         <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
       </View>
+
+      {/* ── Quick navigation grid ── */}
+      <Text style={styles.quickNavLabel}>{t("home.quickNav")}</Text>
+      <View style={styles.quickNavGrid}>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/restaurants")}
+        >
+          <Text style={styles.quickNavEmoji}>🍽️</Text>
+          <Text style={styles.quickNavText}>{t("tabs.food")}</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/hotels")}
+        >
+          <Text style={styles.quickNavEmoji}>🛏️</Text>
+          <Text style={styles.quickNavText}>{t("tabs.sleep")}</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/attractions")}
+        >
+          <Text style={styles.quickNavEmoji}>🏁</Text>
+          <Text style={styles.quickNavText}>{t("tabs.explore")}</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/mc")}
+        >
+          <Text style={styles.quickNavEmoji}>⚙️</Text>
+          <Text style={styles.quickNavText}>{t("tabs.garage")}</Text>
+        </Pressable>
+      </View>
+      <Pressable
+        style={({ pressed }) => [styles.quickNavBtnSos, pressed && styles.quickNavBtnSosPressed]}
+        onPress={() => router.navigate("/emergency")}
+      >
+        <Text style={styles.quickNavEmoji}>🆘</Text>
+        <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>
+      </Pressable>
 
       <View style={styles.languageRow}>
         {(["en", "es", "de", "fr", "is"] as const).map((lang) => (
@@ -972,5 +1014,66 @@ const styles = StyleSheet.create({
   },
   langButtonTextActive: {
     color: "#ff6600",
+  },
+  quickNavLabel: {
+    color: "#666666",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    marginBottom: 10,
+    marginTop: 4,
+  },
+  quickNavGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 10,
+  },
+  quickNavBtn: {
+    flex: 1,
+    minWidth: "45%",
+    backgroundColor: "#141414",
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
+    borderRadius: 14,
+    paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+  },
+  quickNavBtnPressed: {
+    backgroundColor: "rgba(255,102,0,0.12)",
+    borderColor: "#ff6600",
+  },
+  quickNavEmoji: {
+    fontSize: 34,
+  },
+  quickNavText: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: "800",
+    letterSpacing: 1,
+  },
+  quickNavBtnSos: {
+    flexDirection: "row",
+    backgroundColor: "rgba(239,68,68,0.12)",
+    borderWidth: 2,
+    borderColor: "#ef4444",
+    borderRadius: 14,
+    paddingVertical: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    marginBottom: 20,
+  },
+  quickNavBtnSosPressed: {
+    backgroundColor: "rgba(239,68,68,0.25)",
+  },
+  quickNavTextSos: {
+    color: "#ef4444",
+    fontSize: 20,
+    fontWeight: "900",
+    letterSpacing: 2,
   },
 });
