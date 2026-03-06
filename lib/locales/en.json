@@ -68,6 +68,11 @@
     "daylight": "Daylight",
     "openWeather": "OPEN YR WEATHER",
     "lastUpdated": "Last updated {{time}}",
+    "roadConditions": "🚧 Road Conditions",
+    "roadConditionsLoading": "Checking road conditions…",
+    "roadConditionsNone": "✅ No roadworks detected within 10 km.",
+    "roadConditionsCount": "{{count}} roadwork(s) detected within 10 km",
+    "openTrafficMap": "LIVE TRAFFIC MAP",
     "suitability": {
       "great": "GREAT",
       "good": "GOOD",

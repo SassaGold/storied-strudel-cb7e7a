@@ -68,6 +68,11 @@
     "daylight": "Luz del día",
     "openWeather": "VER PRONÓSTICO YR",
     "lastUpdated": "Actualizado {{time}}",
+    "roadConditions": "🚧 Condiciones de la carretera",
+    "roadConditionsLoading": "Comprobando condiciones de la vía…",
+    "roadConditionsNone": "✅ No se detectan obras en 10 km.",
+    "roadConditionsCount": "{{count}} obra(s) detectada(s) en 10 km",
+    "openTrafficMap": "MAPA DE TRÁFICO EN VIVO",
     "suitability": {
       "great": "EXCELENTE",
       "good": "BUENO",

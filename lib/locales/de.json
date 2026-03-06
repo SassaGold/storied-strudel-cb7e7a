@@ -68,6 +68,11 @@
     "daylight": "Tageslicht",
     "openWeather": "YR-WETTER ÖFFNEN",
     "lastUpdated": "Zuletzt aktualisiert {{time}}",
+    "roadConditions": "🚧 Straßenverhältnisse",
+    "roadConditionsLoading": "Straßenbedingungen prüfen…",
+    "roadConditionsNone": "✅ Keine Baustellen in 10 km.",
+    "roadConditionsCount": "{{count}} Baustelle(n) in 10 km erkannt",
+    "openTrafficMap": "LIVE-VERKEHRSKARTE",
     "suitability": {
       "great": "SEHR GUT",
       "good": "GUT",

@@ -68,6 +68,11 @@
     "daylight": "Dagsbirt",
     "openWeather": "OPNA VEDUR.IS",
     "lastUpdated": "Síðast uppfært {{time}}",
+    "roadConditions": "🚧 Vegaskilyrði",
+    "roadConditionsLoading": "Athuga vegaskilyrði…",
+    "roadConditionsNone": "✅ Engar vegaframkvæmdir greindar í 10 km.",
+    "roadConditionsCount": "{{count}} vegaframkvæmd(ir) greindar í 10 km",
+    "openTrafficMap": "UMFERÐARKORT",
     "suitability": {
       "great": "FRÁBÆRT",
       "good": "GOTT",

@@ -35,6 +35,14 @@ type WeatherInfo = {
   forecast?: ForecastDay[];
 };
 
+type RoadAlert = {
+  id: string;
+  name: string;
+  type: string;
+  lat?: number;
+  lon?: number;
+};
+
 const normalizeSymbol = (sym: string) =>
   sym.replace(/_(day|night|polartwilight)$/, "");
 
@@ -255,6 +263,7 @@ export default function Index() {
   const [weather, setWeather] = useState<WeatherInfo | null>(null);
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [roadAlerts, setRoadAlerts] = useState<RoadAlert[]>([]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -375,13 +384,36 @@ export default function Index() {
         })
         .catch(() => null);
 
-      const [addressResult, weatherResult] = await Promise.all([
+      // Overpass (OpenStreetMap) — free road conditions API, no API key required
+      const lat = Math.max(-90, Math.min(90, latitude));
+      const lon = Math.max(-180, Math.min(180, longitude));
+      const roadPromise = fetch("https://overpass-api.de/api/interpreter", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `data=[out:json][timeout:10];(way["highway"="construction"](around:10000,${lat},${lon});node["highway"="construction"](around:10000,${lat},${lon});way["construction"~"."](around:10000,${lat},${lon});node["construction"~"."](around:10000,${lat},${lon}););out center 20;`,
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          const elements: any[] = data.elements ?? [];
+          return elements.slice(0, 10).map((el: any): RoadAlert => ({
+            id: String(el.id),
+            name: el.tags?.name ?? el.tags?.["addr:street"] ?? "",
+            type: el.tags?.construction ?? el.tags?.highway ?? "construction",
+            lat: el.lat ?? el.center?.lat,
+            lon: el.lon ?? el.center?.lon,
+          }));
+        })
+        .catch(() => [] as RoadAlert[]);
+
+      const [addressResult, weatherResult, roadResult] = await Promise.all([
         addressPromise,
         weatherPromise,
+        roadPromise,
       ]);
 
       setAddress(addressResult);
       setWeather(weatherResult);
+      setRoadAlerts(roadResult);
       setLastUpdated(new Date());
     } catch {
       setError(t("home.dataError"));
@@ -606,6 +638,51 @@ export default function Index() {
         <Text style={styles.metaText}>
           {t("home.lastUpdated", { time: lastUpdated.toLocaleTimeString() })}
         </Text>
+      )}
+
+      {/* ── Road Conditions ── */}
+      {lastUpdated && (
+        <View style={[styles.card, roadAlerts.length > 0 && styles.roadAlertCard]}>
+          <Text style={styles.cardTitle}>{t("home.roadConditions")}</Text>
+          {loading ? (
+            <View style={styles.loadingRow}>
+              <ActivityIndicator size="small" color="#ff6600" />
+              <Text style={styles.loadingText}>{t("home.roadConditionsLoading")}</Text>
+            </View>
+          ) : roadAlerts.length === 0 ? (
+            <Text style={styles.roadConditionsAllClear}>{t("home.roadConditionsNone")}</Text>
+          ) : (
+            <>
+              <Text style={styles.roadConditionsCount}>
+                {t("home.roadConditionsCount", { count: roadAlerts.length })}
+              </Text>
+              {roadAlerts.map((alert) => (
+                <View key={alert.id} style={styles.roadAlertRow}>
+                  <Text style={styles.roadAlertEmoji}>🚧</Text>
+                  <View style={styles.roadAlertInfo}>
+                    <Text style={styles.roadAlertType}>{alert.type.replace(/_/g, " ").toUpperCase()}</Text>
+                    {alert.name ? (
+                      <Text style={styles.roadAlertName}>{alert.name}</Text>
+                    ) : null}
+                  </View>
+                </View>
+              ))}
+            </>
+          )}
+          {location && (
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={() => {
+                const { latitude, longitude } = location.coords;
+                Linking.openURL(
+                  `https://www.google.com/maps/@${latitude},${longitude},14z/data=!5m1!1e1`
+                ).catch(() => null);
+              }}
+            >
+              <Text style={styles.secondaryButtonText}>{t("home.openTrafficMap")}</Text>
+            </Pressable>
+          )}
+        </View>
       )}
 
       {/* ── Quick navigation grid ── */}
@@ -1075,5 +1152,47 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "900",
     letterSpacing: 2,
+  },
+  roadAlertCard: {
+    borderColor: "#f59e0b",
+    borderWidth: 1,
+  },
+  roadConditionsAllClear: {
+    color: "#22c55e",
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  roadConditionsCount: {
+    color: "#f59e0b",
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 10,
+  },
+  roadAlertRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    marginBottom: 8,
+    backgroundColor: "rgba(245,158,11,0.08)",
+    borderRadius: 8,
+    padding: 8,
+  },
+  roadAlertEmoji: {
+    fontSize: 20,
+    marginTop: 1,
+  },
+  roadAlertInfo: {
+    flex: 1,
+  },
+  roadAlertType: {
+    color: "#f59e0b",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  roadAlertName: {
+    color: "#c8c8c8",
+    fontSize: 13,
+    marginTop: 2,
   },
 });

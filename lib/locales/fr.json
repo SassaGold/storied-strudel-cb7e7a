@@ -68,6 +68,11 @@
     "daylight": "Lumière du jour",
     "openWeather": "OUVRIR MÉTÉO YR",
     "lastUpdated": "Mis à jour {{time}}",
+    "roadConditions": "🚧 État des routes",
+    "roadConditionsLoading": "Vérification des conditions routières…",
+    "roadConditionsNone": "✅ Aucun chantier détecté dans un rayon de 10 km.",
+    "roadConditionsCount": "{{count}} chantier(s) détecté(s) dans 10 km",
+    "openTrafficMap": "CARTE TRAFIC EN DIRECT",
     "suitability": {
       "great": "EXCELLENT",
       "good": "BON",
