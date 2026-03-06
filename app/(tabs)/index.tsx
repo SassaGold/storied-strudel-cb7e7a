@@ -713,36 +713,63 @@ export default function Index() {
               <Text style={styles.roadConditionsCount}>
                 {t("home.roadConditionsCount", { count: roadAlerts.length })}
               </Text>
-              {roadAlerts.map((alert) => (
-                <View key={alert.id} style={styles.roadAlertRow}>
-                  <Text style={styles.roadAlertEmoji}>🚧</Text>
-                  <View style={styles.roadAlertInfo}>
-                    <View style={styles.roadAlertHeader}>
-                      <Text style={styles.roadAlertType}>
-                        {humanizeConstructionType(alert.type)}
-                      </Text>
-                      {alert.distance != null && (
-                        <Text style={styles.roadAlertDistance}>
-                          {alert.distance < 1
-                            ? `${Math.round(alert.distance * 1000)} m`
-                            : `${alert.distance.toFixed(1)} km`}
+              {roadAlerts.map((alert) => {
+                const canOpen = alert.lat != null && alert.lon != null;
+                const openInMaps = () => {
+                  if (!canOpen) return;
+                  const label = encodeURIComponent(
+                    alert.name || alert.ref || humanizeConstructionType(alert.type)
+                  );
+                  Linking.openURL(
+                    `https://www.google.com/maps/search/?api=1&query=${label}@${alert.lat},${alert.lon}`
+                  ).catch(() =>
+                    Linking.openURL(
+                      `https://maps.apple.com/?q=${alert.lat},${alert.lon}`
+                    ).catch(() => null)
+                  );
+                };
+                return (
+                  <Pressable
+                    key={alert.id}
+                    style={({ pressed }) => [
+                      styles.roadAlertRow,
+                      canOpen && pressed && styles.roadAlertRowPressed,
+                    ]}
+                    onPress={openInMaps}
+                    disabled={!canOpen}
+                  >
+                    <Text style={styles.roadAlertEmoji}>🚧</Text>
+                    <View style={styles.roadAlertInfo}>
+                      <View style={styles.roadAlertHeader}>
+                        <Text style={styles.roadAlertType}>
+                          {humanizeConstructionType(alert.type)}
                         </Text>
+                        {alert.distance != null && (
+                          <Text style={styles.roadAlertDistance}>
+                            {alert.distance < 1
+                              ? `${Math.round(alert.distance * 1000)} m`
+                              : `${alert.distance.toFixed(1)} km`}
+                          </Text>
+                        )}
+                      </View>
+                      {alert.name ? (
+                        <Text style={styles.roadAlertName}>{alert.name}</Text>
+                      ) : alert.ref ? (
+                        <Text style={styles.roadAlertName}>{alert.ref}</Text>
+                      ) : null}
+                      {alert.description ? (
+                        <Text style={styles.roadAlertDesc}>{alert.description}</Text>
+                      ) : null}
+                      {alert.operator ? (
+                        <Text style={styles.roadAlertDesc}>🏗️ {alert.operator}</Text>
+                      ) : null}
+                      {canOpen && (
+                        <Text style={styles.roadAlertMapHint}>📍 Tap to open in Maps</Text>
                       )}
                     </View>
-                    {alert.name ? (
-                      <Text style={styles.roadAlertName}>{alert.name}</Text>
-                    ) : alert.ref ? (
-                      <Text style={styles.roadAlertName}>{alert.ref}</Text>
-                    ) : null}
-                    {alert.description ? (
-                      <Text style={styles.roadAlertDesc}>{alert.description}</Text>
-                    ) : null}
-                    {alert.operator ? (
-                      <Text style={styles.roadAlertDesc}>🏗️ {alert.operator}</Text>
-                    ) : null}
-                  </View>
-                </View>
-              ))}
+                  </Pressable>
+                );
+              })}
             </>
           )}
           {location && (
@@ -1253,6 +1280,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
   },
+  roadAlertRowPressed: {
+    backgroundColor: "rgba(245,158,11,0.22)",
+  },
   roadAlertEmoji: {
     fontSize: 20,
     marginTop: 1,
@@ -1289,5 +1319,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
     fontStyle: "italic",
+  },
+  roadAlertMapHint: {
+    color: "#f59e0b",
+    fontSize: 11,
+    marginTop: 4,
+    opacity: 0.75,
   },
 });
