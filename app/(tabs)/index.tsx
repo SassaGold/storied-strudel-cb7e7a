@@ -39,9 +39,54 @@ type RoadAlert = {
   id: string;
   name: string;
   type: string;
+  description?: string;
+  ref?: string;
+  operator?: string;
+  distance?: number;
   lat?: number;
   lon?: number;
 };
+
+const CONSTRUCTION_TYPE_LABELS: Record<string, string> = {
+  footway: "Footpath",
+  steps: "Steps / Stairs",
+  rail: "Railway",
+  service: "Service Road",
+  cycleway: "Cycle Path",
+  path: "Path",
+  track: "Track",
+  residential: "Residential Road",
+  primary: "Primary Road",
+  secondary: "Secondary Road",
+  tertiary: "Tertiary Road",
+  unclassified: "Unclassified Road",
+  trunk: "Trunk Road",
+  motorway: "Motorway",
+  construction: "Road Construction",
+  building: "Building Works",
+  bridge: "Bridge Works",
+  tunnel: "Tunnel Works",
+};
+
+function humanizeConstructionType(type: string): string {
+  const normalized = type.toLowerCase().replace(/_/g, " ");
+  return (
+    CONSTRUCTION_TYPE_LABELS[type.toLowerCase()] ??
+    normalized.replace(/\b\w/g, (c) => c.toUpperCase())
+  );
+}
+
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 const normalizeSymbol = (sym: string) =>
   sym.replace(/_(day|night|polartwilight)$/, "");
@@ -395,13 +440,25 @@ export default function Index() {
         .then((r) => r.json())
         .then((data) => {
           const elements: any[] = data.elements ?? [];
-          return elements.slice(0, 10).map((el: any): RoadAlert => ({
-            id: String(el.id),
-            name: el.tags?.name ?? el.tags?.["addr:street"] ?? "",
-            type: el.tags?.construction ?? el.tags?.highway ?? "construction",
-            lat: el.lat ?? el.center?.lat,
-            lon: el.lon ?? el.center?.lon,
-          }));
+          return elements.slice(0, 10).map((el: any): RoadAlert => {
+            const elLat: number | undefined = el.lat ?? el.center?.lat;
+            const elLon: number | undefined = el.lon ?? el.center?.lon;
+            const distance =
+              elLat != null && elLon != null
+                ? Math.round(haversineKm(lat, lon, elLat, elLon) * 10) / 10
+                : undefined;
+            return {
+              id: String(el.id),
+              name: el.tags?.name ?? el.tags?.["addr:street"] ?? "",
+              type: el.tags?.construction ?? el.tags?.highway ?? "construction",
+              description: el.tags?.description ?? el.tags?.note ?? "",
+              ref: el.tags?.ref ?? "",
+              operator: el.tags?.operator ?? "",
+              distance,
+              lat: elLat,
+              lon: elLon,
+            };
+          });
         })
         .catch(() => [] as RoadAlert[]);
 
@@ -660,9 +717,28 @@ export default function Index() {
                 <View key={alert.id} style={styles.roadAlertRow}>
                   <Text style={styles.roadAlertEmoji}>🚧</Text>
                   <View style={styles.roadAlertInfo}>
-                    <Text style={styles.roadAlertType}>{alert.type.replace(/_/g, " ").toUpperCase()}</Text>
+                    <View style={styles.roadAlertHeader}>
+                      <Text style={styles.roadAlertType}>
+                        {humanizeConstructionType(alert.type)}
+                      </Text>
+                      {alert.distance != null && (
+                        <Text style={styles.roadAlertDistance}>
+                          {alert.distance < 1
+                            ? `${Math.round(alert.distance * 1000)} m`
+                            : `${alert.distance.toFixed(1)} km`}
+                        </Text>
+                      )}
+                    </View>
                     {alert.name ? (
                       <Text style={styles.roadAlertName}>{alert.name}</Text>
+                    ) : alert.ref ? (
+                      <Text style={styles.roadAlertName}>{alert.ref}</Text>
+                    ) : null}
+                    {alert.description ? (
+                      <Text style={styles.roadAlertDesc}>{alert.description}</Text>
+                    ) : null}
+                    {alert.operator ? (
+                      <Text style={styles.roadAlertDesc}>🏗️ {alert.operator}</Text>
                     ) : null}
                   </View>
                 </View>
@@ -1184,15 +1260,34 @@ const styles = StyleSheet.create({
   roadAlertInfo: {
     flex: 1,
   },
+  roadAlertHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 6,
+  },
   roadAlertType: {
     color: "#f59e0b",
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 0.5,
+    flexShrink: 1,
+  },
+  roadAlertDistance: {
+    color: "#a3a3a3",
+    fontSize: 11,
+    fontWeight: "600",
+    flexShrink: 0,
   },
   roadAlertName: {
     color: "#c8c8c8",
     fontSize: 13,
     marginTop: 2,
+  },
+  roadAlertDesc: {
+    color: "#a3a3a3",
+    fontSize: 12,
+    marginTop: 2,
+    fontStyle: "italic",
   },
 });
