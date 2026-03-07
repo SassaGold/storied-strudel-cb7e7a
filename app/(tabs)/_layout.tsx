@@ -81,6 +81,10 @@ export default function TabLayout() {
         options={{ href: null }}
       />
       <Tabs.Screen
+        name="settings"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
         name="emergency"
         options={{
           title: t("tabs.sos"),

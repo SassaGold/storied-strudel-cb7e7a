@@ -321,5 +321,18 @@
     "openLink": "Abrir ↗",
     "legal": "LEGAL",
     "legalBody": "Todos los datos externos se usan de acuerdo con los términos y licencias de cada fuente. Los datos de OpenStreetMap se usan bajo la Licencia de Base de Datos Abierta (ODbL). Los datos meteorológicos de MET Norway se usan bajo NLOD / CC BY 4.0."
+  },
+  "settings": {
+    "badge": "⚙️ AJUSTES",
+    "title": "PREFERENCIAS",
+    "subtitle": "Personaliza las unidades, el radio de búsqueda y la pestaña predeterminada.",
+    "units": "UNIDADES",
+    "unitsDesc": "Elige entre métrico (km, °C) e imperial (millas, °F) para todas las distancias y temperaturas.",
+    "unit_metric": "🌍 Métrico  (km · °C)",
+    "unit_imperial": "🇺🇸 Imperial (mi · °F)",
+    "searchRadius": "RADIO DE BÚSQUEDA",
+    "searchRadiusDesc": "Radio para buscar comida, alojamiento y atracciones. Las pestañas de garage y emergencias usan sus propios radios fijos.",
+    "defaultTab": "PESTAÑA PREDETERMINADA",
+    "defaultTabDesc": "Qué pestaña se abre automáticamente al iniciar la aplicación."
   }
 }

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+import { useSettings, fmtDistShort } from "../../lib/settings";
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -116,6 +117,7 @@ const fetchOverpass = async (query: string) => {
 
 export default function AttractionsScreen() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -155,15 +157,16 @@ export default function AttractionsScreen() {
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
 
+      const radiusM = settings.searchRadiusKm * 1000;
       const overpassQuery = `
 [out:json][timeout:25];
 (
-  node(around:5000,${latitude},${longitude})[tourism~"attraction|museum|viewpoint|castle|monument|artwork|zoo|theme_park"];
-  way(around:5000,${latitude},${longitude})[tourism~"attraction|museum|viewpoint|castle|monument|artwork|zoo|theme_park"];
-  relation(around:5000,${latitude},${longitude})[tourism~"attraction|museum|viewpoint|castle|monument|artwork|zoo|theme_park"];
-  node(around:5000,${latitude},${longitude})[historic~"monument|castle|ruins|memorial"];
-  way(around:5000,${latitude},${longitude})[historic~"monument|castle|ruins|memorial"];
-  relation(around:5000,${latitude},${longitude})[historic~"monument|castle|ruins|memorial"];
+  node(around:${radiusM},${latitude},${longitude})[tourism~"attraction|museum|viewpoint|castle|monument|artwork|zoo|theme_park"];
+  way(around:${radiusM},${latitude},${longitude})[tourism~"attraction|museum|viewpoint|castle|monument|artwork|zoo|theme_park"];
+  relation(around:${radiusM},${latitude},${longitude})[tourism~"attraction|museum|viewpoint|castle|monument|artwork|zoo|theme_park"];
+  node(around:${radiusM},${latitude},${longitude})[historic~"monument|castle|ruins|memorial"];
+  way(around:${radiusM},${latitude},${longitude})[historic~"monument|castle|ruins|memorial"];
+  relation(around:${radiusM},${latitude},${longitude})[historic~"monument|castle|ruins|memorial"];
 );
 out center 120;`;
 
@@ -424,7 +427,7 @@ out center 120;`;
               </View>
               <View style={styles.placeRight}>
                 <Text style={styles.metaText}>
-                  {formatDistance(place.distanceMeters)}
+                  {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
                 </Text>
                 <Pressable
                   style={styles.infoButton}

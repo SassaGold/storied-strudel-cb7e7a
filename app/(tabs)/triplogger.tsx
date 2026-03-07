@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 
 // Safely load react-native-maps: requires a custom dev/production build.
 let rnMaps: any = null;
@@ -74,6 +75,7 @@ const formatDate = (iso: string): string => {
 
 export default function TripLoggerScreen() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
 
   // Recording state
   const [recording, setRecording] = useState(false);
@@ -285,8 +287,8 @@ export default function TripLoggerScreen() {
           <View style={styles.statsGrid}>
             <StatBox
               label={t("triplog.distance")}
-              value={distanceKm >= 0.01 ? distanceKm.toFixed(2) : "0.00"}
-              unit={t("triplog.km")}
+              value={distanceKm >= 0.01 ? (settings.unitSystem === "imperial" ? (distanceKm * 0.621371).toFixed(2) : distanceKm.toFixed(2)) : "0.00"}
+              unit={settings.unitSystem === "imperial" ? "mi" : t("triplog.km")}
             />
             <StatBox
               label={t("triplog.duration")}
@@ -295,13 +297,13 @@ export default function TripLoggerScreen() {
             />
             <StatBox
               label={t("triplog.currentSpeed")}
-              value={currentSpeedKmh != null ? currentSpeedKmh.toFixed(0) : "—"}
-              unit={t("triplog.kmh")}
+              value={currentSpeedKmh != null ? (settings.unitSystem === "imperial" ? (currentSpeedKmh * 0.621371).toFixed(0) : currentSpeedKmh.toFixed(0)) : "—"}
+              unit={settings.unitSystem === "imperial" ? "mph" : t("triplog.kmh")}
             />
             <StatBox
               label={t("triplog.avgSpeed")}
-              value={avgSpeedKmh > 0 ? avgSpeedKmh.toFixed(1) : "—"}
-              unit={t("triplog.kmh")}
+              value={avgSpeedKmh > 0 ? (settings.unitSystem === "imperial" ? (avgSpeedKmh * 0.621371).toFixed(1) : avgSpeedKmh.toFixed(1)) : "—"}
+              unit={settings.unitSystem === "imperial" ? "mph" : t("triplog.kmh")}
             />
           </View>
 
@@ -386,9 +388,9 @@ export default function TripLoggerScreen() {
                 </Text>
                 <Text style={styles.rideDate}>{formatDate(ride.date)}</Text>
                 <View style={styles.rideStats}>
-                  <Text style={styles.rideStat}>📏 {ride.distanceKm.toFixed(2)} km</Text>
+                  <Text style={styles.rideStat}>📏 {fmtDist(ride.distanceKm, settings.unitSystem)}</Text>
                   <Text style={styles.rideStat}>⏱ {formatDuration(ride.durationMs)}</Text>
-                  <Text style={styles.rideStat}>⚡ {ride.avgSpeedKmh.toFixed(1)} km/h</Text>
+                  <Text style={styles.rideStat}>⚡ {fmtSpeed(ride.avgSpeedKmh, settings.unitSystem)}</Text>
                 </View>
               </View>
               <View style={styles.rideActions}>
@@ -448,9 +450,9 @@ export default function TripLoggerScreen() {
           )}
           {mapRide && (
             <View style={styles.modalStats}>
-              <Text style={styles.modalStat}>📏 {mapRide.distanceKm.toFixed(2)} km</Text>
+              <Text style={styles.modalStat}>📏 {fmtDist(mapRide.distanceKm, settings.unitSystem)}</Text>
               <Text style={styles.modalStat}>⏱ {formatDuration(mapRide.durationMs)}</Text>
-              <Text style={styles.modalStat}>⚡ {mapRide.avgSpeedKmh.toFixed(1)} km/h</Text>
+              <Text style={styles.modalStat}>⚡ {fmtSpeed(mapRide.avgSpeedKmh, settings.unitSystem)}</Text>
             </View>
           )}
         </View>

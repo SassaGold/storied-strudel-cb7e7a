@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -11,6 +11,7 @@ import {
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
+import { useSettings, fmtTemp } from "../../lib/settings";
 
 type GeoAddress = {
   displayName: string;
@@ -305,6 +306,8 @@ const formatForecastDate = (dateStr: string) => {
 export default function Index() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const { settings } = useSettings();
+  const hasNavigated = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<GeoAddress | null>(null);
@@ -503,6 +506,14 @@ export default function Index() {
     loadData();
   }, [loadData]);
 
+  useEffect(() => {
+    if (hasNavigated.current) return;
+    if (settings.defaultTab !== "index") {
+      hasNavigated.current = true;
+      router.replace(`/${settings.defaultTab}` as any);
+    }
+  }, [settings.defaultTab, router]);
+
   const openMaps = useCallback(() => {
     if (!location) {
       return;
@@ -526,6 +537,15 @@ export default function Index() {
           hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
         >
           <Text style={styles.headerInfoBtnText}>ℹ️</Text>
+        </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.headerSettingsBtn, pressed && styles.headerInfoBtnPressed]}
+          onPress={() => router.navigate("/settings")}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.title")}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
+          <Text style={styles.headerInfoBtnText}>⚙️</Text>
         </Pressable>
         <Text style={styles.headerBadge}>{t("home.badge")}</Text>
         <Text style={styles.title}>{t("home.title")}</Text>
@@ -587,7 +607,7 @@ export default function Index() {
           <View style={styles.weatherMainRow}>
             <Text style={styles.weatherEmojiLarge}>{weatherEmoji(weather.weatherCode)}</Text>
             <View style={styles.weatherMainInfo}>
-              <Text style={styles.weatherTempText}>{weather.temperatureC?.toFixed(1)}°C</Text>
+              <Text style={styles.weatherTempText}>{weather.temperatureC != null ? fmtTemp(weather.temperatureC, settings.unitSystem) : "—"}</Text>
               <Text style={styles.weatherConditionText}>
                 {t(formatWeatherCode(weather.weatherCode), { defaultValue: formatWeatherCode(weather.weatherCode) })}
               </Text>
@@ -658,7 +678,7 @@ export default function Index() {
                       {t(formatWeatherCode(day.weatherCode), { defaultValue: formatWeatherCode(day.weatherCode) })}
                     </Text>
                     <Text style={styles.forecastCardTemp}>
-                      {Math.round(day.maxTempC)}° / {Math.round(day.minTempC)}°
+                      {fmtTemp(day.maxTempC, settings.unitSystem, true)} / {fmtTemp(day.minTempC, settings.unitSystem, true)}
                     </Text>
                     <View style={styles.forecastCardRainRow}>
                       <Text style={styles.forecastCardRain}>💧 {day.precipitationProbability}%</Text>
@@ -894,6 +914,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,102,0,0.18)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerSettingsBtn: {
+    position: "absolute",
+    top: 10,
+    right: 62,
     zIndex: 10,
     width: 44,
     height: 44,

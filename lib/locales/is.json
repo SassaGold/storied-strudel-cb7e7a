@@ -321,5 +321,18 @@
     "openLink": "Opna ↗",
     "legal": "LAGALEGT",
     "legalBody": "Öll ytri gögn eru notuð í samræmi við skilmála og leyfi hverrar heimildar. OpenStreetMap-gögn eru notuð undir Open Database License (ODbL). Veðurgögn frá MET Norway eru notuð undir NLOD / CC BY 4.0."
+  },
+  "settings": {
+    "badge": "⚙️ STILLINGAR",
+    "title": "KJÖRSTILLINGAR",
+    "subtitle": "Sérsníðu einingar, leitarradíus og sjálfgefinn flipa.",
+    "units": "EININGAR",
+    "unitsDesc": "Veldu milli mælikvarða (km, °C) og þjóðrænna (mílur, °F) fyrir allar vegalengdir og hitastig.",
+    "unit_metric": "🌍 Mælikvarðakerfi  (km · °C)",
+    "unit_imperial": "🇺🇸 Þjóðrænt (mi · °F)",
+    "searchRadius": "LEITARRADÍUS",
+    "searchRadiusDesc": "Radíus til að leita að mat, gistingu og aðdráttarstöðum. Bílskúr- og neyðarflipar nota sinn eigin fastan radíus.",
+    "defaultTab": "SJÁLFGEFINN FLIPI",
+    "defaultTabDesc": "Hvaða flipi opnast sjálfkrafa þegar forritið ræsist."
   }
 }

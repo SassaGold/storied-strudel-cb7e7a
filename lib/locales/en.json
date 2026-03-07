@@ -321,5 +321,18 @@
     "openLink": "Open ↗",
     "legal": "LEGAL",
     "legalBody": "All external data is used in accordance with the terms and licenses of each respective source. OpenStreetMap data is used under the Open Database License (ODbL). Weather data from MET Norway is used under NLOD / CC BY 4.0."
+  },
+  "settings": {
+    "badge": "⚙️ SETTINGS",
+    "title": "PREFERENCES",
+    "subtitle": "Customise units, search radius & the default tab.",
+    "units": "UNITS",
+    "unitsDesc": "Choose between metric (km, °C) and imperial (miles, °F) for all distances and temperatures.",
+    "unit_metric": "🌍 Metric  (km · °C)",
+    "unit_imperial": "🇺🇸 Imperial (mi · °F)",
+    "searchRadius": "SEARCH RADIUS",
+    "searchRadiusDesc": "Radius used when searching for food, accommodation and attractions. Garage & emergency tabs use their own fixed radii.",
+    "defaultTab": "DEFAULT TAB",
+    "defaultTabDesc": "Which tab opens automatically when the app launches."
   }
 }
