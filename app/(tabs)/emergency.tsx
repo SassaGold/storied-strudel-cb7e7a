@@ -13,6 +13,9 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+// Safely load expo-haptics: may not be available in all environments
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -167,6 +170,7 @@ export default function EmergencyScreen() {
   const [fromCache, setFromCache] = useState(false);
 
   const call = useCallback((number: string) => {
+    Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null);
     callNumber(
       number,
       t("sos.cannotCall"),
