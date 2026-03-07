@@ -6,7 +6,8 @@
     "explore": "KANNA",
     "garage": "BÍLSKÚR",
     "sos": "SOS",
-    "trip": "FERÐ"
+    "trip": "FERÐ",
+    "about": "UM"
   },
   "common": {
     "loading": "Hleður...",
@@ -289,5 +290,36 @@
     "accuracy": "GPS nákvæmni {{value}} m",
     "points": "{{count}} GPS-punktar",
     "mapUnavailable": "Kort ekki tiltækt"
+  },
+  "about": {
+    "badge": "ℹ️ UM FORRITIÐ",
+    "title": "GÖGN & FRIÐHELGI",
+    "subtitle": "Hvaðan gögnin koma og hvernig friðhelgi þín er vernduð.",
+    "dataSources": "GAGNALEGAR",
+    "osm": "OpenStreetMap",
+    "osmDesc": "Öll POI-gögn — veitingastaðir, hótel, bensínstöðvar, mótorhjólasalar, neyðarþjónustur — koma frá OpenStreetMap í gegnum Overpass API. OpenStreetMap er frír, opinn heimsgrunnur viðhaldinn af sjálfboðaliðum.",
+    "osmLicense": "© OpenStreetMap-framleggjendur · ODbL-leyfi",
+    "overpass": "Overpass API",
+    "overpassDesc": "Fyrirspurnir á OpenStreetMap-gögn eru keyrðar í gegnum Overpass API. Ókeypis, engan reikning þarf.",
+    "weather": "Yr / Met Norway",
+    "weatherDesc": "Veðurspár eru sóttar frá Yr.no API Norska veðurinstítútsins. Ókeypis, opin veðurgögn.",
+    "weatherLicense": "© Meteorologisk institutt · NLOD / CC BY 4.0",
+    "wikipedia": "Wikipedia",
+    "wikipediaDesc": "Staðarlýsingar eru sóttar frá Wikipedia REST API þegar Wikipedia-merki er tiltækt í OpenStreetMap-gögnum.",
+    "wikiLicense": "© Wikipedia-framleggjendur · CC BY-SA",
+    "maps": "Kort & Leiðsögn",
+    "mapsDesc": "Kortin í forritinu nota react-native-maps. Að ýta á 'Opna á korti' opnar sjálfgefið kortsforrit þitt.",
+    "privacy": "FRIÐHELGI",
+    "privacyTitle": "Friðhelgi þín",
+    "privacyP1": "Þetta forrit safnar ekki, sendir ekki eða deilir persónulegum gögnum. Engar greiningar, engar hrunaskýrslur, engin auglýsinga-SDK.",
+    "privacyP2": "Staðsetning þín er aðeins notuð á tækinu til að sækja POI í nágrenninu, veður og vegaskilyrði. Hún er aldrei send á neinn þjón þessa forrits.",
+    "privacyP3": "Ferðagögn skráð af Ferðaskráningunni (vegalengdir, GPS-leiðir) eru geymd aðeins á tækinu þínu og eru aldrei hlaðin upp.",
+    "privacyP4": "POI-leitarniðurstöður eru geymdar í skyndiminni á tækinu til að draga úr netbeiðnum. Skyndiminni er hreinsað þegar þú ýtir á uppfærslu.",
+    "credits": "OPINN HUGBÚNAÐAR ÞAKKLÆTI",
+    "creditsBody": "Byggt með Expo, React Native, expo-location, react-native-maps, @react-native-async-storage/async-storage, i18next og react-i18next. Allar bókasöfn undir viðeigandi opnum hugbúnaðarleyfum.",
+    "version": "Útgáfa",
+    "openLink": "Opna ↗",
+    "legal": "LAGALEGT",
+    "legalBody": "Öll ytri gögn eru notuð í samræmi við skilmála og leyfi hverrar heimildar. OpenStreetMap-gögn eru notuð undir Open Database License (ODbL). Veðurgögn frá MET Norway eru notuð undir NLOD / CC BY 4.0."
   }
 }

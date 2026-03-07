@@ -6,7 +6,8 @@
     "explore": "EXPLORAR",
     "garage": "GARAJE",
     "sos": "SOS",
-    "trip": "VIAJE"
+    "trip": "VIAJE",
+    "about": "INFO"
   },
   "common": {
     "loading": "Cargando...",
@@ -289,5 +290,36 @@
     "accuracy": "Precisión GPS {{value}} m",
     "points": "{{count}} puntos GPS",
     "mapUnavailable": "Mapa no disponible"
+  },
+  "about": {
+    "badge": "ℹ️ ACERCA DE",
+    "title": "DATOS Y PRIVACIDAD",
+    "subtitle": "De dónde provienen los datos y cómo se protege tu privacidad.",
+    "dataSources": "FUENTES DE DATOS",
+    "osm": "OpenStreetMap",
+    "osmDesc": "Todos los datos POI — restaurantes, hoteles, gasolineras, concesionarios de motos, servicios de emergencia — provienen de OpenStreetMap a través de la API Overpass. OpenStreetMap es una base de datos mundial libre y abierta mantenida por voluntarios.",
+    "osmLicense": "© Colaboradores de OpenStreetMap · Licencia ODbL",
+    "overpass": "API Overpass",
+    "overpassDesc": "Las consultas a los datos de OpenStreetMap se realizan mediante la API Overpass. Gratuita, sin cuenta requerida.",
+    "weather": "Yr / Met Norway",
+    "weatherDesc": "Los pronósticos meteorológicos se obtienen de la API de Yr.no, operada por el Instituto Meteorológico Noruego. Datos meteorológicos abiertos y gratuitos.",
+    "weatherLicense": "© Meteorologisk institutt · NLOD / CC BY 4.0",
+    "wikipedia": "Wikipedia",
+    "wikipediaDesc": "Las descripciones de lugares se obtienen de la API REST de Wikipedia cuando hay una etiqueta de Wikipedia disponible en los datos de OpenStreetMap.",
+    "wikiLicense": "© Colaboradores de Wikipedia · CC BY-SA",
+    "maps": "Mapas y Navegación",
+    "mapsDesc": "El mapa en la aplicación usa react-native-maps. Al tocar 'Abrir en Mapas' se abre tu aplicación de mapas predeterminada.",
+    "privacy": "PRIVACIDAD",
+    "privacyTitle": "Tu Privacidad",
+    "privacyP1": "Esta aplicación no recopila, transmite ni comparte ningún dato personal. No hay análisis, ni informes de fallos, ni SDK publicitarios.",
+    "privacyP2": "Tu ubicación se usa solo en el dispositivo para obtener POIs cercanos, clima y condiciones de la carretera. Nunca se envía a ningún servidor de esta aplicación.",
+    "privacyP3": "Los datos de viaje del Registrador de Viajes (distancias, rutas GPS) se almacenan solo en tu dispositivo y nunca se suben.",
+    "privacyP4": "Los resultados de búsqueda de POI se almacenan en caché localmente en tu dispositivo para reducir solicitudes de red. La caché se borra al tocar actualizar.",
+    "credits": "CRÉDITOS OPEN-SOURCE",
+    "creditsBody": "Desarrollado con Expo, React Native, expo-location, react-native-maps, @react-native-async-storage/async-storage, i18next y react-i18next. Todas las librerías bajo sus respectivas licencias open-source.",
+    "version": "Versión",
+    "openLink": "Abrir ↗",
+    "legal": "LEGAL",
+    "legalBody": "Todos los datos externos se usan de acuerdo con los términos y licencias de cada fuente. Los datos de OpenStreetMap se usan bajo la Licencia de Base de Datos Abierta (ODbL). Los datos meteorológicos de MET Norway se usan bajo NLOD / CC BY 4.0."
   }
 }

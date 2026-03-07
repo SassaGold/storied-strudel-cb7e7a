@@ -6,7 +6,8 @@
     "explore": "EXPLORE",
     "garage": "GARAGE",
     "sos": "SOS",
-    "trip": "TRIP"
+    "trip": "TRIP",
+    "about": "ABOUT"
   },
   "common": {
     "loading": "Loading...",
@@ -289,5 +290,36 @@
     "accuracy": "GPS accuracy {{value}} m",
     "points": "{{count}} GPS points",
     "mapUnavailable": "Map not available"
+  },
+  "about": {
+    "badge": "ℹ️ ABOUT",
+    "title": "DATA & PRIVACY",
+    "subtitle": "Where data comes from and how your privacy is protected.",
+    "dataSources": "DATA SOURCES",
+    "osm": "OpenStreetMap",
+    "osmDesc": "All POI data — restaurants, hotels, fuel stations, MC dealers, emergency services — comes from OpenStreetMap via the Overpass API. OpenStreetMap is a free, open database of the world maintained by volunteers worldwide. No API key required.",
+    "osmLicense": "© OpenStreetMap contributors · ODbL License",
+    "overpass": "Overpass API",
+    "overpassDesc": "Queries to OpenStreetMap data are run through the Overpass API (overpass-api.de and mirror endpoints). Free to use, no account required.",
+    "weather": "Yr / Met Norway",
+    "weatherDesc": "Weather forecasts and conditions are fetched from the Yr.no API operated by the Norwegian Meteorological Institute (MET Norway). Free, open weather data. No API key required.",
+    "weatherLicense": "© Meteorologisk institutt · NLOD / CC BY 4.0",
+    "wikipedia": "Wikipedia",
+    "wikipediaDesc": "Place descriptions are fetched from the Wikipedia REST API where a Wikipedia tag is available in OpenStreetMap data. Wikipedia content is licensed under Creative Commons Attribution-ShareAlike.",
+    "wikiLicense": "© Wikipedia contributors · CC BY-SA",
+    "maps": "Maps & Navigation",
+    "mapsDesc": "The in-app map uses react-native-maps (Apple Maps on iOS, Google Maps on Android). Tapping 'Open in Maps' deeplinks to your default maps app. No Google Maps API key is required for deeplinks.",
+    "privacy": "PRIVACY",
+    "privacyTitle": "Your Privacy",
+    "privacyP1": "This app does not collect, transmit, or share any personal data. There are no analytics, no crash reporters, and no advertising SDKs.",
+    "privacyP2": "Your location is used only on-device to fetch nearby POIs, weather, and road conditions. It is never sent to any server operated by this app.",
+    "privacyP3": "Ride data recorded by the Trip Logger (distances, GPS routes) is stored only on your device using local storage and is never uploaded.",
+    "privacyP4": "POI search results are cached locally on your device to reduce repeated network requests. The cache is cleared when you tap the refresh button.",
+    "credits": "OPEN-SOURCE CREDITS",
+    "creditsBody": "Built with Expo, React Native, expo-location, react-native-maps, @react-native-async-storage/async-storage, i18next, and react-i18next. All libraries used under their respective open-source licenses.",
+    "version": "App Version",
+    "openLink": "Open ↗",
+    "legal": "LEGAL",
+    "legalBody": "All external data is used in accordance with the terms and licenses of each respective source. OpenStreetMap data is used under the Open Database License (ODbL). Weather data from MET Norway is used under NLOD / CC BY 4.0."
   }
 }

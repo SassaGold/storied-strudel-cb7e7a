@@ -830,6 +830,15 @@ export default function Index() {
           <Text style={styles.quickNavText}>{t("tabs.trip")}</Text>
         </Pressable>
       </View>
+      <View style={styles.quickNavGrid}>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/about")}
+        >
+          <Text style={styles.quickNavEmoji}>ℹ️</Text>
+          <Text style={styles.quickNavText}>{t("tabs.about")}</Text>
+        </Pressable>
+      </View>
       <Pressable
         style={({ pressed }) => [styles.quickNavBtnSos, pressed && styles.quickNavBtnSosPressed]}
         onPress={() => router.navigate("/emergency")}

@@ -1,0 +1,302 @@
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Constants from "expo-constants";
+import { useTranslation } from "react-i18next";
+
+const APP_VERSION: string =
+  (Constants.expoConfig?.version ?? "1.0.0") as string;
+
+type LinkRowProps = { label: string; url: string; openLabel: string };
+
+function LinkRow({ label, url, openLabel }: LinkRowProps) {
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.linkRow, pressed && styles.linkRowPressed]}
+      onPress={() => Linking.openURL(url)}
+      accessibilityRole="link"
+      accessibilityLabel={label}
+    >
+      <Text style={styles.linkLabel}>{label}</Text>
+      <Text style={styles.linkAction}>{openLabel}</Text>
+    </Pressable>
+  );
+}
+
+type SectionProps = { title: string; children: React.ReactNode };
+
+function Section({ title, children }: SectionProps) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {children}
+    </View>
+  );
+}
+
+export default function AboutScreen() {
+  const { t } = useTranslation();
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.badge}>{t("about.badge")}</Text>
+        <Text style={styles.title}>{t("about.title")}</Text>
+        <Text style={styles.subtitle}>{t("about.subtitle")}</Text>
+      </View>
+
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+
+        {/* Data Sources */}
+        <Section title={t("about.dataSources")}>
+
+          {/* OpenStreetMap */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>🗺️ {t("about.osm")}</Text>
+            <Text style={styles.cardBody}>{t("about.osmDesc")}</Text>
+            <Text style={styles.licenseText}>{t("about.osmLicense")}</Text>
+            <LinkRow
+              label="openstreetmap.org"
+              url="https://www.openstreetmap.org"
+              openLabel={t("about.openLink")}
+            />
+          </View>
+
+          {/* Overpass API */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>🔍 {t("about.overpass")}</Text>
+            <Text style={styles.cardBody}>{t("about.overpassDesc")}</Text>
+            <LinkRow
+              label="overpass-api.de"
+              url="https://overpass-api.de"
+              openLabel={t("about.openLink")}
+            />
+          </View>
+
+          {/* yr.no */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>⛅ {t("about.weather")}</Text>
+            <Text style={styles.cardBody}>{t("about.weatherDesc")}</Text>
+            <Text style={styles.licenseText}>{t("about.weatherLicense")}</Text>
+            <LinkRow
+              label="yr.no"
+              url="https://www.yr.no"
+              openLabel={t("about.openLink")}
+            />
+            <LinkRow
+              label="api.met.no"
+              url="https://api.met.no"
+              openLabel={t("about.openLink")}
+            />
+          </View>
+
+          {/* Wikipedia */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>📖 {t("about.wikipedia")}</Text>
+            <Text style={styles.cardBody}>{t("about.wikipediaDesc")}</Text>
+            <Text style={styles.licenseText}>{t("about.wikiLicense")}</Text>
+            <LinkRow
+              label="wikipedia.org"
+              url="https://www.wikipedia.org"
+              openLabel={t("about.openLink")}
+            />
+          </View>
+
+          {/* Maps */}
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>📍 {t("about.maps")}</Text>
+            <Text style={styles.cardBody}>{t("about.mapsDesc")}</Text>
+          </View>
+        </Section>
+
+        {/* Privacy */}
+        <Section title={t("about.privacy")}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>🔒 {t("about.privacyTitle")}</Text>
+            <Text style={styles.cardBody}>{t("about.privacyP1")}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.cardBody}>{t("about.privacyP2")}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.cardBody}>{t("about.privacyP3")}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.cardBody}>{t("about.privacyP4")}</Text>
+          </View>
+        </Section>
+
+        {/* Open-source credits */}
+        <Section title={t("about.credits")}>
+          <View style={styles.card}>
+            <Text style={styles.cardBody}>{t("about.creditsBody")}</Text>
+            <View style={styles.chipsRow}>
+              {[
+                "Expo",
+                "React Native",
+                "expo-location",
+                "react-native-maps",
+                "AsyncStorage",
+                "i18next",
+              ].map((lib) => (
+                <View key={lib} style={styles.chip}>
+                  <Text style={styles.chipText}>{lib}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </Section>
+
+        {/* Legal */}
+        <Section title={t("about.legal")}>
+          <View style={styles.card}>
+            <Text style={styles.cardBody}>{t("about.legalBody")}</Text>
+          </View>
+        </Section>
+
+        {/* Version */}
+        <View style={styles.versionRow}>
+          <Text style={styles.versionLabel}>{t("about.version")}</Text>
+          <Text style={styles.versionValue}>{APP_VERSION}</Text>
+        </View>
+
+        <View style={styles.bottomPad} />
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#0a0a0a" },
+
+  header: {
+    paddingTop: 56,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    backgroundColor: "#111",
+    borderBottomWidth: 2,
+    borderBottomColor: "#ff6600",
+  },
+  badge: {
+    fontSize: 11,
+    fontWeight: "800",
+    letterSpacing: 2,
+    color: "#ff6600",
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#fff",
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: "#888",
+    marginTop: 4,
+  },
+
+  scroll: { flex: 1 },
+  scrollContent: { padding: 16, paddingBottom: 40 },
+
+  section: { marginBottom: 20 },
+  sectionTitle: {
+    color: "#ff6600",
+    fontWeight: "900",
+    fontSize: 12,
+    letterSpacing: 2,
+    marginBottom: 10,
+    marginTop: 4,
+  },
+
+  card: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
+    padding: 14,
+    marginBottom: 10,
+  },
+  cardTitle: {
+    color: "#fff",
+    fontWeight: "800",
+    fontSize: 15,
+    marginBottom: 8,
+  },
+  cardBody: {
+    color: "#aaa",
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  licenseText: {
+    color: "#555",
+    fontSize: 11,
+    marginTop: 8,
+    fontStyle: "italic",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#2a2a2a",
+    marginVertical: 10,
+  },
+
+  linkRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#2a2a2a",
+  },
+  linkRowPressed: { opacity: 0.6 },
+  linkLabel: {
+    color: "#888",
+    fontSize: 12,
+    fontFamily: "monospace" as const,
+  },
+  linkAction: {
+    color: "#ff6600",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  chipsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 12,
+  },
+  chip: {
+    backgroundColor: "#2a2a2a",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  chipText: {
+    color: "#aaa",
+    fontSize: 11,
+    fontWeight: "600",
+  },
+
+  versionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 4,
+    borderTopWidth: 1,
+    borderTopColor: "#1a1a1a",
+  },
+  versionLabel: {
+    color: "#555",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  versionValue: {
+    color: "#ff6600",
+    fontSize: 12,
+    fontWeight: "700",
+    fontFamily: "monospace" as const,
+  },
+
+  bottomPad: { height: 20 },
+});
