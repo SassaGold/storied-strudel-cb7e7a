@@ -6,9 +6,12 @@ import es from "./locales/es.json";
 import de from "./locales/de.json";
 import fr from "./locales/fr.json";
 import is from "./locales/is.json";
+import no from "./locales/no.json";
+import sv from "./locales/sv.json";
+import da from "./locales/da.json";
 
 const deviceLang = Localization.getLocales()[0]?.languageCode ?? "en";
-const supportedLangs = ["en", "es", "de", "fr", "is"];
+const supportedLangs = ["en", "es", "de", "fr", "is", "no", "sv", "da"];
 const lng = supportedLangs.includes(deviceLang) ? deviceLang : "en";
 
 i18n
@@ -23,6 +26,9 @@ i18n
       de: { translation: de },
       fr: { translation: fr },
       is: { translation: is },
+      no: { translation: no },
+      sv: { translation: sv },
+      da: { translation: da },
     },
     interpolation: { escapeValue: false },
   });

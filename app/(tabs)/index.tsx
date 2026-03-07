@@ -555,7 +555,7 @@ export default function Index() {
       </View>
 
       <View style={styles.languageRow}>
-        {(["en", "es", "de", "fr", "is"] as const).map((lang) => (
+        {(["en", "es", "de", "fr", "is", "no", "sv", "da"] as const).map((lang) => (
           <Pressable
             key={lang}
             style={[styles.langButton, i18n.language === lang && styles.langButtonActive]}

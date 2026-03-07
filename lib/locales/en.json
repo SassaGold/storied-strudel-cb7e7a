@@ -43,7 +43,10 @@
     "es": "🇪🇸 ES",
     "de": "🇩🇪 DE",
     "fr": "🇫🇷 FR",
-    "is": "🇮🇸 IS"
+    "is": "🇮🇸 IS",
+    "no": "🇳🇴 NO",
+    "sv": "🇸🇪 SV",
+    "da": "🇩🇰 DA"
   },
   "home": {
     "quickNav": "QUICK NAVIGATE",
