@@ -5,7 +5,8 @@
     "sleep": "SLEEP",
     "explore": "EXPLORE",
     "garage": "GARAGE",
-    "sos": "SOS"
+    "sos": "SOS",
+    "trip": "TRIP"
   },
   "common": {
     "loading": "Loading...",
@@ -257,5 +258,36 @@
       "doctors": "👨‍⚕️ Doctor",
       "ambulance_station": "🚑 Ambulance"
     }
+  },
+  "triplog": {
+    "badge": "🏍️ TRIP LOGGER",
+    "title": "ODOMETER",
+    "subtitle": "Record your ride — distance, route & duration.",
+    "start": "START RIDE",
+    "stop": "STOP RIDE",
+    "distance": "Distance",
+    "duration": "Duration",
+    "avgSpeed": "Avg Speed",
+    "currentSpeed": "Speed",
+    "km": "km",
+    "kmh": "km/h",
+    "noGps": "Waiting for GPS…",
+    "tracking": "TRACKING",
+    "locationPermRequired": "Location permission is required to track your ride.",
+    "history": "RIDE HISTORY",
+    "noRides": "No rides recorded yet. Tap START RIDE to begin!",
+    "clearAll": "Clear All",
+    "confirmClear": "Clear all rides?",
+    "confirmClearMsg": "This will permanently delete all recorded rides.",
+    "cancel": "Cancel",
+    "confirm": "Delete All",
+    "deleteRide": "Delete",
+    "rideLabel": "Ride {{n}}",
+    "viewMap": "Route",
+    "closeMap": "Close",
+    "mapTitle": "Ride Route",
+    "accuracy": "GPS accuracy {{value}} m",
+    "points": "{{count}} GPS points",
+    "mapUnavailable": "Map not available"
   }
 }

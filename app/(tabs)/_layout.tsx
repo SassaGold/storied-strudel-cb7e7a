@@ -68,6 +68,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="triplogger"
+        options={{
+          title: t("tabs.trip"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="navigate" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="emergency"
         options={{
           title: t("tabs.sos"),

@@ -5,7 +5,8 @@
     "sleep": "DORMIR",
     "explore": "EXPLORAR",
     "garage": "GARAJE",
-    "sos": "SOS"
+    "sos": "SOS",
+    "trip": "VIAJE"
   },
   "common": {
     "loading": "Cargando...",
@@ -257,5 +258,36 @@
       "doctors": "👨‍⚕️ Médico",
       "ambulance_station": "🚑 Ambulancia"
     }
+  },
+  "triplog": {
+    "badge": "🏍️ VIAJE",
+    "title": "ODÓMETRO",
+    "subtitle": "Registra tu ruta — distancia, trazado y duración.",
+    "start": "INICIAR VIAJE",
+    "stop": "DETENER VIAJE",
+    "distance": "Distancia",
+    "duration": "Duración",
+    "avgSpeed": "Vel. Media",
+    "currentSpeed": "Velocidad",
+    "km": "km",
+    "kmh": "km/h",
+    "noGps": "Esperando GPS…",
+    "tracking": "REGISTRANDO",
+    "locationPermRequired": "Se requiere permiso de ubicación para registrar el viaje.",
+    "history": "HISTORIAL DE VIAJES",
+    "noRides": "Aún no hay viajes registrados. ¡Pulsa INICIAR VIAJE!",
+    "clearAll": "Borrar todo",
+    "confirmClear": "¿Borrar todos los viajes?",
+    "confirmClearMsg": "Se eliminarán permanentemente todos los viajes registrados.",
+    "cancel": "Cancelar",
+    "confirm": "Eliminar todo",
+    "deleteRide": "Eliminar",
+    "rideLabel": "Viaje {{n}}",
+    "viewMap": "Ruta",
+    "closeMap": "Cerrar",
+    "mapTitle": "Ruta del viaje",
+    "accuracy": "Precisión GPS {{value}} m",
+    "points": "{{count}} puntos GPS",
+    "mapUnavailable": "Mapa no disponible"
   }
 }

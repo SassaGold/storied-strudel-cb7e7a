@@ -5,7 +5,8 @@
     "sleep": "SVEFN",
     "explore": "KANNA",
     "garage": "BÍLSKÚR",
-    "sos": "SOS"
+    "sos": "SOS",
+    "trip": "FERÐ"
   },
   "common": {
     "loading": "Hleður...",
@@ -257,5 +258,36 @@
       "doctors": "👨‍⚕️ Læknir",
       "ambulance_station": "🚑 Sjúkrabíll"
     }
+  },
+  "triplog": {
+    "badge": "🏍️ FERÐASKRÁ",
+    "title": "KÍLÓMETRAMÆLIR",
+    "subtitle": "Skráðu ferðina — vegalengd, leið og tímalengd.",
+    "start": "BYRJA FERÐ",
+    "stop": "STÖÐVA FERÐ",
+    "distance": "Vegalengd",
+    "duration": "Tímalengd",
+    "avgSpeed": "Meðalhraði",
+    "currentSpeed": "Hraði",
+    "km": "km",
+    "kmh": "km/klst",
+    "noGps": "Bíð eftir GPS…",
+    "tracking": "MÆL",
+    "locationPermRequired": "Staðsetningarleyfi þarf til að rekja ferðina.",
+    "history": "FERÐASAGA",
+    "noRides": "Engar ferðir skráðar enn. Ýttu á BYRJA FERÐ!",
+    "clearAll": "Eyða öllu",
+    "confirmClear": "Eyða öllum ferðum?",
+    "confirmClearMsg": "Þetta mun eyða öllum skráðum ferðum varanlega.",
+    "cancel": "Hætta við",
+    "confirm": "Eyða öllu",
+    "deleteRide": "Eyða",
+    "rideLabel": "Ferð {{n}}",
+    "viewMap": "Leið",
+    "closeMap": "Loka",
+    "mapTitle": "Ferðaleið",
+    "accuracy": "GPS nákvæmni {{value}} m",
+    "points": "{{count}} GPS-punktar",
+    "mapUnavailable": "Kort ekki tiltækt"
   }
 }

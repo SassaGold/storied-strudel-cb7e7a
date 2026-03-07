@@ -5,7 +5,8 @@
     "sleep": "DORMIR",
     "explore": "EXPLORER",
     "garage": "GARAGE",
-    "sos": "SOS"
+    "sos": "SOS",
+    "trip": "TRAJET"
   },
   "common": {
     "loading": "Chargement...",
@@ -257,5 +258,36 @@
       "doctors": "👨‍⚕️ Médecin",
       "ambulance_station": "🚑 SAMU"
     }
+  },
+  "triplog": {
+    "badge": "🏍️ TRAJET",
+    "title": "ODOMÈTRE",
+    "subtitle": "Enregistre ton trajet — distance, route et durée.",
+    "start": "DÉMARRER",
+    "stop": "ARRÊTER",
+    "distance": "Distance",
+    "duration": "Durée",
+    "avgSpeed": "Vit. Moy.",
+    "currentSpeed": "Vitesse",
+    "km": "km",
+    "kmh": "km/h",
+    "noGps": "En attente du GPS…",
+    "tracking": "ENREGISTREMENT",
+    "locationPermRequired": "La permission de localisation est requise pour enregistrer le trajet.",
+    "history": "HISTORIQUE",
+    "noRides": "Aucun trajet enregistré. Appuie sur DÉMARRER !",
+    "clearAll": "Tout effacer",
+    "confirmClear": "Effacer tous les trajets ?",
+    "confirmClearMsg": "Tous les trajets enregistrés seront définitivement supprimés.",
+    "cancel": "Annuler",
+    "confirm": "Tout supprimer",
+    "deleteRide": "Supprimer",
+    "rideLabel": "Trajet {{n}}",
+    "viewMap": "Route",
+    "closeMap": "Fermer",
+    "mapTitle": "Route du trajet",
+    "accuracy": "Précision GPS {{value}} m",
+    "points": "{{count}} points GPS",
+    "mapUnavailable": "Carte non disponible"
   }
 }

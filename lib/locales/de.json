@@ -5,7 +5,8 @@
     "sleep": "SCHLAFEN",
     "explore": "ERKUNDEN",
     "garage": "GARAGE",
-    "sos": "SOS"
+    "sos": "SOS",
+    "trip": "TOUR"
   },
   "common": {
     "loading": "Laden...",
@@ -257,5 +258,36 @@
       "doctors": "👨‍⚕️ Arzt",
       "ambulance_station": "🚑 Rettungswache"
     }
+  },
+  "triplog": {
+    "badge": "🏍️ TOUR",
+    "title": "TACHOMETER",
+    "subtitle": "Zeichne deine Tour auf — Strecke, Route & Dauer.",
+    "start": "TOUR STARTEN",
+    "stop": "TOUR STOPPEN",
+    "distance": "Strecke",
+    "duration": "Dauer",
+    "avgSpeed": "Ø Tempo",
+    "currentSpeed": "Tempo",
+    "km": "km",
+    "kmh": "km/h",
+    "noGps": "Warte auf GPS…",
+    "tracking": "AUFNAHME",
+    "locationPermRequired": "Standortberechtigung erforderlich, um die Tour aufzuzeichnen.",
+    "history": "TOURENVERLAUF",
+    "noRides": "Noch keine Touren aufgezeichnet. Tippe TOUR STARTEN!",
+    "clearAll": "Alles löschen",
+    "confirmClear": "Alle Touren löschen?",
+    "confirmClearMsg": "Alle aufgezeichneten Touren werden dauerhaft gelöscht.",
+    "cancel": "Abbrechen",
+    "confirm": "Alle löschen",
+    "deleteRide": "Löschen",
+    "rideLabel": "Tour {{n}}",
+    "viewMap": "Route",
+    "closeMap": "Schließen",
+    "mapTitle": "Tourenroute",
+    "accuracy": "GPS-Genauigkeit {{value}} m",
+    "points": "{{count}} GPS-Punkte",
+    "mapUnavailable": "Karte nicht verfügbar"
   }
 }

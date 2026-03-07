@@ -822,6 +822,13 @@ export default function Index() {
           <Text style={styles.quickNavEmoji}>⚙️</Text>
           <Text style={styles.quickNavText}>{t("tabs.garage")}</Text>
         </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
+          onPress={() => router.navigate("/triplogger")}
+        >
+          <Text style={styles.quickNavEmoji}>📏</Text>
+          <Text style={styles.quickNavText}>{t("tabs.trip")}</Text>
+        </Pressable>
       </View>
       <Pressable
         style={({ pressed }) => [styles.quickNavBtnSos, pressed && styles.quickNavBtnSosPressed]}

@@ -11,15 +11,21 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you."
-      }
+        "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked.",
+        "NSLocationAlwaysUsageDescription": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked."
+      },
+      "backgroundModes": [
+        "location"
+      ]
     },
     "android": {
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
       ],
       "config": {
         "googleMaps": {
