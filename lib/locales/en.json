@@ -11,6 +11,7 @@
   },
   "common": {
     "loading": "Loading...",
+    "back": "← Back",
     "searching": "Searching...",
     "close": "Close",
     "openInMaps": "OPEN IN MAPS",

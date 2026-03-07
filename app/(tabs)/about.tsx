@@ -1,6 +1,7 @@
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 
 const APP_VERSION: string =
   (Constants.expoConfig?.version ?? "1.0.0") as string;
@@ -34,11 +35,21 @@ function Section({ title, children }: SectionProps) {
 
 export default function AboutScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
+        <Pressable
+          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back")}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={styles.backBtnText}>{t("common.back")}</Text>
+        </Pressable>
         <Text style={styles.badge}>{t("about.badge")}</Text>
         <Text style={styles.title}>{t("about.title")}</Text>
         <Text style={styles.subtitle}>{t("about.subtitle")}</Text>
@@ -172,6 +183,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#111",
     borderBottomWidth: 2,
     borderBottomColor: "#ff6600",
+  },
+  backBtn: {
+    alignSelf: "flex-start",
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,102,0,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.4)",
+  },
+  backBtnPressed: {
+    backgroundColor: "rgba(255,102,0,0.35)",
+  },
+  backBtnText: {
+    color: "#ff6600",
+    fontSize: 16,
+    fontWeight: "700",
   },
   badge: {
     fontSize: 11,

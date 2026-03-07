@@ -11,6 +11,7 @@
   },
   "common": {
     "loading": "Hleður...",
+    "back": "← Til baka",
     "searching": "Leitar...",
     "close": "Loka",
     "openInMaps": "OPNA Á KORTI",

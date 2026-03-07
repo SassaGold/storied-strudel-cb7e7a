@@ -1,5 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "expo-router";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
 
@@ -18,12 +19,22 @@ const DEFAULT_TAB_OPTIONS: { key: DefaultTab; emoji: string; labelKey: string }[
 export default function SettingsScreen() {
   const { t } = useTranslation();
   const { settings, setSetting } = useSettings();
+  const router = useRouter();
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
+        <Pressable
+          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back")}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={styles.backBtnText}>{t("common.back")}</Text>
+        </Pressable>
         <Text style={styles.headerBadge}>{t("settings.badge")}</Text>
         <Text style={styles.title}>{t("settings.title")}</Text>
         <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
@@ -158,6 +169,24 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 8,
     letterSpacing: 0.4,
+  },
+  backBtn: {
+    alignSelf: "flex-start",
+    marginBottom: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,102,0,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.4)",
+  },
+  backBtnPressed: {
+    backgroundColor: "rgba(255,102,0,0.35)",
+  },
+  backBtnText: {
+    color: "#ff6600",
+    fontSize: 16,
+    fontWeight: "700",
   },
   title: {
     color: "#ffffff",

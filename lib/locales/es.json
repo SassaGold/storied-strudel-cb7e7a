@@ -11,6 +11,7 @@
   },
   "common": {
     "loading": "Cargando...",
+    "back": "← Volver",
     "searching": "Buscando...",
     "close": "Cerrar",
     "openInMaps": "ABRIR EN MAPAS",
