@@ -723,11 +723,8 @@ export default function Index() {
                 const canOpen = alert.lat != null && alert.lon != null;
                 const openInMaps = () => {
                   if (!canOpen) return;
-                  const label = encodeURIComponent(
-                    alert.name || alert.ref || humanizeConstructionType(alert.type)
-                  );
                   Linking.openURL(
-                    `https://www.google.com/maps/search/?api=1&query=${label}@${alert.lat},${alert.lon}`
+                    `https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lon}`
                   ).catch(() =>
                     Linking.openURL(
                       `https://maps.apple.com/?q=${alert.lat},${alert.lon}`
