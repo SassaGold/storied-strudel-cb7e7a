@@ -517,6 +517,16 @@ export default function Index() {
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
+        <Pressable
+          style={({ pressed }) => [styles.headerInfoBtn, pressed && styles.headerInfoBtnPressed]}
+          onPress={() => router.navigate("/about")}
+          accessibilityRole="button"
+          accessibilityLabel={t("tabs.about")}
+          accessibilityHint={t("about.badge")}
+          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        >
+          <Text style={styles.headerInfoBtnText}>ℹ️</Text>
+        </Pressable>
         <Text style={styles.headerBadge}>{t("home.badge")}</Text>
         <Text style={styles.title}>{t("home.title")}</Text>
         <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
@@ -830,15 +840,6 @@ export default function Index() {
           <Text style={styles.quickNavText}>{t("tabs.trip")}</Text>
         </Pressable>
       </View>
-      <View style={styles.quickNavGrid}>
-        <Pressable
-          style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => router.navigate("/about")}
-        >
-          <Text style={styles.quickNavEmoji}>ℹ️</Text>
-          <Text style={styles.quickNavText}>{t("tabs.about")}</Text>
-        </Pressable>
-      </View>
       <Pressable
         style={({ pressed }) => [styles.quickNavBtnSos, pressed && styles.quickNavBtnSosPressed]}
         onPress={() => router.navigate("/emergency")}
@@ -888,6 +889,24 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(180,60,0,0.40)",
     bottom: -60,
     left: -20,
+  },
+  headerInfoBtn: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,102,0,0.18)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerInfoBtnPressed: {
+    backgroundColor: "rgba(255,102,0,0.40)",
+  },
+  headerInfoBtnText: {
+    fontSize: 18,
   },
   headerBadge: {
     alignSelf: "flex-start",
