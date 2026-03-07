@@ -72,7 +72,7 @@ export default function SettingsScreen() {
               accessibilityState={{ selected: settings.searchRadiusKm === r }}
             >
               <Text style={[styles.chipText, settings.searchRadiusKm === r && styles.chipTextActive]}>
-                {r} km
+                {settings.unitSystem === "imperial" ? `${(r * 0.621371).toFixed(1)} mi` : `${r} km`}
               </Text>
             </Pressable>
           ))}

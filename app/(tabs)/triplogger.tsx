@@ -261,6 +261,13 @@ export default function TripLoggerScreen() {
     ? distanceKm / (elapsedMs / 3_600_000)
     : 0;
 
+  const isImperial = settings.unitSystem === "imperial";
+  const distUnit = isImperial ? "mi" : t("triplog.km");
+  const speedUnit = isImperial ? "mph" : t("triplog.kmh");
+  const displayDistVal = distanceKm >= 0.01 ? fmtDist(distanceKm, settings.unitSystem).split(" ")[0] : "0.00";
+  const displayCurSpeedVal = currentSpeedKmh != null ? fmtSpeed(currentSpeedKmh, settings.unitSystem).split(" ")[0] : "—";
+  const displayAvgSpeedVal = avgSpeedKmh > 0 ? fmtSpeed(avgSpeedKmh, settings.unitSystem).split(" ")[0] : "—";
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -287,8 +294,8 @@ export default function TripLoggerScreen() {
           <View style={styles.statsGrid}>
             <StatBox
               label={t("triplog.distance")}
-              value={distanceKm >= 0.01 ? (settings.unitSystem === "imperial" ? (distanceKm * 0.621371).toFixed(2) : distanceKm.toFixed(2)) : "0.00"}
-              unit={settings.unitSystem === "imperial" ? "mi" : t("triplog.km")}
+              value={displayDistVal}
+              unit={distUnit}
             />
             <StatBox
               label={t("triplog.duration")}
@@ -297,13 +304,13 @@ export default function TripLoggerScreen() {
             />
             <StatBox
               label={t("triplog.currentSpeed")}
-              value={currentSpeedKmh != null ? (settings.unitSystem === "imperial" ? (currentSpeedKmh * 0.621371).toFixed(0) : currentSpeedKmh.toFixed(0)) : "—"}
-              unit={settings.unitSystem === "imperial" ? "mph" : t("triplog.kmh")}
+              value={displayCurSpeedVal}
+              unit={speedUnit}
             />
             <StatBox
               label={t("triplog.avgSpeed")}
-              value={avgSpeedKmh > 0 ? (settings.unitSystem === "imperial" ? (avgSpeedKmh * 0.621371).toFixed(1) : avgSpeedKmh.toFixed(1)) : "—"}
-              unit={settings.unitSystem === "imperial" ? "mph" : t("triplog.kmh")}
+              value={displayAvgSpeedVal}
+              unit={speedUnit}
             />
           </View>
 
