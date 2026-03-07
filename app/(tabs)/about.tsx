@@ -2,6 +2,7 @@ import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-na
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const APP_VERSION: string =
   (Constants.expoConfig?.version ?? "1.0.0") as string;
@@ -36,11 +37,12 @@ function Section({ title, children }: SectionProps) {
 export default function AboutScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Pressable
           style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
           onPress={() => router.back()}
@@ -177,7 +179,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0a0a0a" },
 
   header: {
-    paddingTop: 56,
+    paddingTop: 16,
     paddingHorizontal: 20,
     paddingBottom: 16,
     backgroundColor: "#111",

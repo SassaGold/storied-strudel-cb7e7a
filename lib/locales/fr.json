@@ -290,7 +290,9 @@
     "mapTitle": "Route du trajet",
     "accuracy": "Précision GPS {{value}} m",
     "points": "{{count}} points GPS",
-    "mapUnavailable": "Carte non disponible"
+    "mapUnavailable": "Carte non disponible",
+    "tooShortTitle": "Trajet Non Enregistré",
+    "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré."
   },
   "about": {
     "badge": "ℹ️ À PROPOS",

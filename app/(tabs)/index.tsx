@@ -12,6 +12,8 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { useSettings, fmtTemp } from "../../lib/settings";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
 type GeoAddress = {
   displayName: string;
@@ -557,7 +559,10 @@ export default function Index() {
           <Pressable
             key={lang}
             style={[styles.langButton, i18n.language === lang && styles.langButtonActive]}
-            onPress={() => i18n.changeLanguage(lang)}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); i18n.changeLanguage(lang); }}
+            accessibilityRole="button"
+            accessibilityLabel={t(`language.${lang}`)}
+            accessibilityState={{ selected: i18n.language === lang }}
           >
             <Text style={[styles.langButtonText, i18n.language === lang && styles.langButtonTextActive]}>
               {t(`language.${lang}`)}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Animated,
   Modal,
   Pressable,
   ScrollView,
@@ -10,7 +11,11 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
+import { haversineMeters } from "../../lib/overpass";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
 // Safely load react-native-maps: requires a custom dev/production build.
 let rnMaps: any = null;
@@ -36,23 +41,6 @@ type SavedRide = {
   route: GpsPoint[];
 };
 
-// Haversine distance in metres between two coordinate pairs
-const haversineMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number => {
-  const toRad = (v: number) => (v * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-};
-
 const formatDuration = (ms: number): string => {
   const totalSec = Math.floor(ms / 1000);
   const h = Math.floor(totalSec / 3600);
@@ -76,6 +64,7 @@ const formatDate = (iso: string): string => {
 export default function TripLoggerScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
+  const insets = useSafeAreaInsets();
 
   // Recording state
   const [recording, setRecording] = useState(false);
@@ -96,6 +85,7 @@ export default function TripLoggerScreen() {
   const routeRef = useRef<GpsPoint[]>([]);
   const distRef = useRef(0);
   const startTimeRef = useRef<number | null>(null);
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   // Load saved rides on mount
   useEffect(() => {
@@ -129,6 +119,22 @@ export default function TripLoggerScreen() {
     };
   }, [recording, startTime]);
 
+  // Recording pulse animation
+  useEffect(() => {
+    if (recording) {
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 0.25, duration: 600, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
+        ])
+      );
+      pulse.start();
+      return () => { pulse.stop(); pulseAnim.setValue(1); };
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [recording, pulseAnim]);
+
   const startRecording = useCallback(async () => {
     setPermError(false);
 
@@ -137,6 +143,8 @@ export default function TripLoggerScreen() {
       setPermError(true);
       return;
     }
+
+    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
 
     // Reset state
     routeRef.current = [];
@@ -202,6 +210,7 @@ export default function TripLoggerScreen() {
     setCurrentSpeedKmh(null);
 
     if (distKm > 0.01) {
+      Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => null);
       const ride: SavedRide = {
         id: String(Date.now()),
         date: new Date().toISOString(),
@@ -213,8 +222,10 @@ export default function TripLoggerScreen() {
       const updated = [ride, ...rides];
       setRides(updated);
       await saveRides(updated);
+    } else {
+      Alert.alert(t("triplog.tooShortTitle"), t("triplog.tooShortMsg"));
     }
-  }, [rides, saveRides]);
+  }, [rides, saveRides, t]);
 
   const deleteRide = useCallback(async (id: string) => {
     const updated = rides.filter((r) => r.id !== id);
@@ -271,7 +282,7 @@ export default function TripLoggerScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <Text style={styles.badge}>{t("triplog.badge")}</Text>
         <Text style={styles.title}>{t("triplog.title")}</Text>
         <Text style={styles.subtitle}>{t("triplog.subtitle")}</Text>
@@ -286,7 +297,7 @@ export default function TripLoggerScreen() {
 
           {recording && (
             <View style={styles.trackingBadge}>
-              <View style={styles.recDot} />
+              <Animated.View style={[styles.recDot, { opacity: pulseAnim }]} />
               <Text style={styles.trackingText}>{t("triplog.tracking")}</Text>
             </View>
           )}
@@ -378,7 +389,7 @@ export default function TripLoggerScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t("triplog.history")}</Text>
           {rides.length > 0 && (
-            <Pressable onPress={confirmClearAll}>
+            <Pressable onPress={confirmClearAll} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("triplog.clearAll")}>
               <Text style={styles.clearAllText}>{t("triplog.clearAll")}</Text>
             </Pressable>
           )}
@@ -412,6 +423,9 @@ export default function TripLoggerScreen() {
                 <Pressable
                   style={[styles.rideBtn, styles.deleteBtn]}
                   onPress={() => deleteRide(ride.id)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("triplog.deleteRide")}
                 >
                   <Text style={styles.rideBtnText}>{t("triplog.deleteRide")}</Text>
                 </Pressable>
@@ -430,7 +444,7 @@ export default function TripLoggerScreen() {
         onRequestClose={() => setMapRide(null)}
       >
         <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
+          <View style={[styles.modalHeader, { paddingTop: insets.top + 12 }]}>
             <Text style={styles.modalTitle}>{t("triplog.mapTitle")}</Text>
             <Pressable onPress={() => setMapRide(null)}>
               <Text style={styles.modalClose}>{t("triplog.closeMap")}</Text>
@@ -489,7 +503,7 @@ function StatBox({
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0a0a0a" },
   header: {
-    paddingTop: 56,
+    paddingTop: 16,
     paddingHorizontal: 20,
     paddingBottom: 16,
     backgroundColor: "#111",
@@ -696,7 +710,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 56,
+    paddingTop: 12,
     paddingHorizontal: 20,
     paddingBottom: 12,
     backgroundColor: "#111",

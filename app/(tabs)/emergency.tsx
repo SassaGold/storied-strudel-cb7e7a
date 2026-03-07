@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -53,25 +54,6 @@ type Place = {
   phone?: string;
   address?: string;
   openingHours?: string;
-};
-
-const haversineMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) => {
-  const toRad = (v: number) => (v * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
 const AMENITY_TYPES =
@@ -123,40 +105,7 @@ const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: stri
     });
 };
 
-const CACHE_KEY = "cache_emergency";
-
-// Overpass API endpoints — free OpenStreetMap data, no API key required (mirrors for reliability)
-const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
-];
-
-// Slightly longer than other tabs: emergency uses [timeout:30] + 10 km radius search
-const FETCH_TIMEOUT_MS = 45000;
-
-const fetchOverpass = async (query: string) => {
-  let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      if (!response.ok) { lastError = `Overpass error ${response.status}`; continue; }
-      return await response.json();
-    } catch (err) {
-      clearTimeout(timeoutId);
-      lastError = err instanceof Error && err.name === "AbortError" ? "Timeout" : "Network error";
-    }
-  }
-  throw new Error(lastError ?? "Overpass request failed");
-};
+const CACHE_KEY = "cache_emergency_v2";
 
 export default function EmergencyScreen() {
   const { t } = useTranslation();
@@ -206,12 +155,11 @@ export default function EmergencyScreen() {
   const loadPlaces = useCallback(async () => {
     // Load cache so user sees last-known results immediately while fetching
     try {
-      const cacheKey = CACHE_KEY;
-      const raw = await AsyncStorage.getItem(cacheKey);
+      const raw = await AsyncStorage.getItem(CACHE_KEY);
       if (raw) {
-        const cached: Place[] = JSON.parse(raw);
-        if (cached.length > 0) {
-          setPlaces(cached);
+        const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
+        if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
+          setPlaces(data);
           setFromCache(true);
         }
       }
@@ -290,7 +238,7 @@ out center ${MAX_RESULTS};`;
         .slice(0, 40);
       setPlaces(sorted);
       setFromCache(false);
-      try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(sorted)); } catch {}
+      try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
     } catch (err) {
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
       setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
@@ -454,6 +402,8 @@ out center ${MAX_RESULTS};`;
         style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
         onPress={loadPlaces}
         disabled={loading}
+        accessibilityRole="button"
+        accessibilityLabel={t("sos.findButton")}
       >
         <Text style={styles.primaryButtonText}>
           {loading ? t("common.searching") : t("sos.findButton")}
@@ -559,7 +509,13 @@ out center ${MAX_RESULTS};`;
                 </Text>
               ) : (
                 filtered.map((place) => (
-                  <Pressable key={place.id} style={styles.placeRow} onPress={() => openInMaps(place)}>
+                  <Pressable
+                    key={place.id}
+                    style={styles.placeRow}
+                    onPress={() => openInMaps(place)}
+                    accessibilityRole="button"
+                    accessibilityLabel={place.name}
+                  >
                     <View style={styles.placeInfo}>
                       <Text style={styles.placeName} numberOfLines={1}>
                         {place.name}
@@ -590,6 +546,9 @@ out center ${MAX_RESULTS};`;
                       <Pressable
                         style={styles.infoButton}
                         onPress={(e) => { e.stopPropagation(); setInfoPlace(place); }}
+                        hitSlop={8}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Info: ${place.name}`}
                       >
                         <Text style={styles.infoButtonText}>ⓘ</Text>
                       </Pressable>

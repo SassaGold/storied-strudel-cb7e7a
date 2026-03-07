@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
 const RADIUS_OPTIONS = [2, 5, 10, 15, 20] as const;
 
@@ -53,7 +55,7 @@ export default function SettingsScreen() {
                 settings.unitSystem === u && styles.chipActive,
                 pressed && styles.chipPressed,
               ]}
-              onPress={() => setSetting("unitSystem", u)}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSetting("unitSystem", u); }}
               accessibilityRole="button"
               accessibilityState={{ selected: settings.unitSystem === u }}
             >
@@ -78,7 +80,7 @@ export default function SettingsScreen() {
                 settings.searchRadiusKm === r && styles.chipActive,
                 pressed && styles.chipPressed,
               ]}
-              onPress={() => setSetting("searchRadiusKm", r)}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSetting("searchRadiusKm", r); }}
               accessibilityRole="button"
               accessibilityState={{ selected: settings.searchRadiusKm === r }}
             >
@@ -104,7 +106,7 @@ export default function SettingsScreen() {
                 settings.defaultTab === key && styles.chipActive,
                 pressed && styles.chipPressed,
               ]}
-              onPress={() => setSetting("defaultTab", key)}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSetting("defaultTab", key); }}
               accessibilityRole="button"
               accessibilityState={{ selected: settings.defaultTab === key }}
             >

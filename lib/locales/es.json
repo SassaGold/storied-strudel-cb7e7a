@@ -290,7 +290,9 @@
     "mapTitle": "Ruta del viaje",
     "accuracy": "Precisión GPS {{value}} m",
     "points": "{{count}} puntos GPS",
-    "mapUnavailable": "Mapa no disponible"
+    "mapUnavailable": "Mapa no disponible",
+    "tooShortTitle": "Viaje No Guardado",
+    "tooShortMsg": "El viaje fue inferior a 10 m — no guardado."
   },
   "about": {
     "badge": "ℹ️ ACERCA DE",

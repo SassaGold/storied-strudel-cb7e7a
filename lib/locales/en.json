@@ -290,7 +290,9 @@
     "mapTitle": "Ride Route",
     "accuracy": "GPS accuracy {{value}} m",
     "points": "{{count}} GPS points",
-    "mapUnavailable": "Map not available"
+    "mapUnavailable": "Map not available",
+    "tooShortTitle": "Ride Not Saved",
+    "tooShortMsg": "Ride was under 10 m — not saved."
   },
   "about": {
     "badge": "ℹ️ ABOUT",

@@ -290,7 +290,9 @@
     "mapTitle": "Ferðaleið",
     "accuracy": "GPS nákvæmni {{value}} m",
     "points": "{{count}} GPS-punktar",
-    "mapUnavailable": "Kort ekki tiltækt"
+    "mapUnavailable": "Kort ekki tiltækt",
+    "tooShortTitle": "Ferð Ekki Vistuð",
+    "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð."
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

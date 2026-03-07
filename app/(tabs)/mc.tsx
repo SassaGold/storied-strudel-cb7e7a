@@ -12,6 +12,7 @@ import {
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSettings, fmtDistShort } from "../../lib/settings";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -42,51 +43,6 @@ type Place = {
   openingHours?: string;
   wikipedia?: string;
   fuelTypes?: string[];
-};
-
-// Overpass API endpoints — free OpenStreetMap data, no API key required (mirrors for reliability)
-const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
-];
-
-const haversineMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) => {
-  const toRad = (value: number) => (value * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
-const formatDistance = (distance?: number) => {
-  if (distance === undefined) {
-    return "";
-  }
-  if (distance < 1000) {
-    return `${Math.round(distance)} m`;
-  }
-  return `${(distance / 1000).toFixed(1)} km`;
-};
-
-const parseWikiTag = (tag: string) => {
-  const colonIdx = tag.indexOf(":");
-  return {
-    lang: colonIdx > 0 ? tag.slice(0, colonIdx) : "en",
-    title: (colonIdx > 0 ? tag.slice(colonIdx + 1) : tag).replace(/ /g, "_"),
-  };
 };
 
 // OSM tags that indicate which fuel types a station carries
@@ -151,41 +107,6 @@ const CATEGORY_FETCH_TIMEOUT_MS: Record<string, number> = {
   parking: 40000,      // Overpass [timeout:25] + 15 s buffer
   clubs_tracks: 45000, // Overpass [timeout:30] + 15 s buffer
   atm_bank: 40000,     // Overpass [timeout:25] + 15 s buffer
-};
-const DEFAULT_FETCH_TIMEOUT_MS = 45000;
-
-const fetchOverpass = async (query: string, timeoutMs: number = DEFAULT_FETCH_TIMEOUT_MS) => {
-  let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        lastError = `Overpass error ${response.status}`;
-        continue;
-      }
-
-      return await response.json();
-    } catch (err) {
-      clearTimeout(timeoutId);
-      lastError =
-        err instanceof Error && err.name === "AbortError"
-          ? "Timeout"
-          : "Network error";
-    }
-  }
-
-  throw new Error(lastError ?? "Overpass request failed");
 };
 
 type Category = "services" | "fuel" | "parking" | "clubs_tracks" | "atm_bank";
@@ -327,14 +248,14 @@ out center 120;`;
   };
 
   const loadPlaces = useCallback(async () => {
-    const cacheKey = `cache_mc_${selected}`;
+    const cacheKey = `cache_mc_v2_${selected}`;
     // Load cache so user sees last-known results immediately while fetching
     try {
       const raw = await AsyncStorage.getItem(cacheKey);
       if (raw) {
-        const cached: Place[] = JSON.parse(raw);
-        if (cached.length > 0) {
-          setPlaces(cached);
+        const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
+        if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
+          setPlaces(data);
           setFromCache(true);
         }
       }
@@ -355,7 +276,7 @@ out center 120;`;
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
       const query = buildQuery(selected, latitude, longitude);
-      const data = await fetchOverpass(query, CATEGORY_FETCH_TIMEOUT_MS[selected] ?? DEFAULT_FETCH_TIMEOUT_MS);
+      const data = await fetchOverpass(query, CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000);
       const results = data.elements
         ? mapElements(
             data.elements,
@@ -370,7 +291,7 @@ out center 120;`;
         .slice(0, 20);
       setPlaces(sorted);
       setFromCache(false);
-      try { await AsyncStorage.setItem(cacheKey, JSON.stringify(sorted)); } catch {}
+      try { await AsyncStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
     } catch (err) {
       const message =
         err instanceof Error && err.message
@@ -576,6 +497,8 @@ out center 120;`;
         style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
         onPress={loadPlaces}
         disabled={loading}
+        accessibilityRole="button"
+        accessibilityLabel={t("garage.findButton", { title: sectionTitle })}
       >
         <Text style={styles.primaryButtonText}>
           {loading ? t("common.loading") : t("garage.findButton", { title: sectionTitle })}
@@ -651,6 +574,8 @@ out center 120;`;
                 key={place.id}
                 style={styles.placeRow}
                 onPress={() => openInMaps(place)}
+                accessibilityRole="button"
+                accessibilityLabel={place.name}
               >
                 <View style={styles.placeInfo}>
                   <Text style={styles.bodyText}>{place.name}</Text>
@@ -678,6 +603,8 @@ out center 120;`;
                     style={styles.infoButton}
                     onPress={(e) => { e.stopPropagation(); openInfo(place); }}
                     hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Info: ${place.name}`}
                   >
                     <Text style={styles.infoButtonText}>ⓘ</Text>
                   </Pressable>

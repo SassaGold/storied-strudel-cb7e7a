@@ -290,7 +290,9 @@
     "mapTitle": "Tourenroute",
     "accuracy": "GPS-Genauigkeit {{value}} m",
     "points": "{{count}} GPS-Punkte",
-    "mapUnavailable": "Karte nicht verfügbar"
+    "mapUnavailable": "Karte nicht verfügbar",
+    "tooShortTitle": "Fahrt Nicht Gespeichert",
+    "tooShortMsg": "Fahrt war unter 10 m — nicht gespeichert."
   },
   "about": {
     "badge": "ℹ️ ÜBER",
