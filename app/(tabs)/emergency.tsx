@@ -359,7 +359,7 @@ out center ${MAX_RESULTS};`;
             </View>
             <Pressable
               style={styles.modalClose}
-              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}
             >
               <Text style={styles.modalCloseText}>{t("common.close")}</Text>
             </Pressable>
@@ -431,13 +431,13 @@ out center ${MAX_RESULTS};`;
         <View style={styles.viewToggleRow}>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
-            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}
           >
             <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
           </Pressable>
@@ -478,7 +478,7 @@ out center ${MAX_RESULTS};`;
                   styles.segmentButton,
                   selected === key && styles.segmentButtonActive,
                 ]}
-                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSelected(key); }}}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSelected(key); }}
               >
                 <Text
                   style={[
@@ -512,7 +512,7 @@ out center ${MAX_RESULTS};`;
                   <Pressable
                     key={place.id}
                     style={styles.placeRow}
-                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}}
+                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}
                     accessibilityRole="button"
                     accessibilityLabel={place.name}
                   >
@@ -545,7 +545,7 @@ out center ${MAX_RESULTS};`;
                       </Text>
                       <Pressable
                         style={styles.infoButton}
-                        onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(place); }}}
+                        onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(place); }}
                         hitSlop={8}
                         accessibilityRole="button"
                         accessibilityLabel={`Info: ${place.name}`}

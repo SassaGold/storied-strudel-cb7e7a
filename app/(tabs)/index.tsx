@@ -532,7 +532,7 @@ export default function Index() {
         <View style={styles.headerGlowSecondary} />
         <Pressable
           style={({ pressed }) => [styles.headerInfoBtn, pressed && styles.headerInfoBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/about"); }}}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/about"); }}
           accessibilityRole="button"
           accessibilityLabel={t("tabs.about")}
           accessibilityHint={t("about.badge")}
@@ -542,7 +542,7 @@ export default function Index() {
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.headerSettingsBtn, pressed && styles.headerInfoBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/settings"); }}}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/settings"); }}
           accessibilityRole="button"
           accessibilityLabel={t("settings.title")}
           hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
@@ -724,7 +724,7 @@ export default function Index() {
 
           <Pressable
             style={styles.secondaryButton}
-            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(weatherUrl).catch(() => null); }}}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(weatherUrl).catch(() => null); }}
           >
             <Text style={styles.secondaryButtonText}>{t("home.openWeather")}</Text>
           </Pressable>
@@ -832,35 +832,35 @@ export default function Index() {
       <View style={styles.quickNavGrid}>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/restaurants"); }}}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/restaurants"); }}
         >
           <Text style={styles.quickNavEmoji}>🍽️</Text>
           <Text style={styles.quickNavText}>{t("tabs.food")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/hotels"); }}}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/hotels"); }}
         >
           <Text style={styles.quickNavEmoji}>🛏️</Text>
           <Text style={styles.quickNavText}>{t("tabs.sleep")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/attractions"); }}}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/attractions"); }}
         >
           <Text style={styles.quickNavEmoji}>🏁</Text>
           <Text style={styles.quickNavText}>{t("tabs.explore")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/mc"); }}}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/mc"); }}
         >
           <Text style={styles.quickNavEmoji}>⚙️</Text>
           <Text style={styles.quickNavText}>{t("tabs.garage")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/triplogger"); }}}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/triplogger"); }}
         >
           <Text style={styles.quickNavEmoji}>📏</Text>
           <Text style={styles.quickNavText}>{t("tabs.trip")}</Text>
@@ -868,7 +868,7 @@ export default function Index() {
       </View>
       <Pressable
         style={({ pressed }) => [styles.quickNavBtnSos, pressed && styles.quickNavBtnSosPressed]}
-        onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); router.navigate("/emergency"); }}}
+        onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); router.navigate("/emergency"); }}
       >
         <Text style={styles.quickNavEmoji}>🆘</Text>
         <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>

@@ -415,14 +415,14 @@ export default function TripLoggerScreen() {
                 {ride.route.length > 1 && MapView && (
                   <Pressable
                     style={styles.rideBtn}
-                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(ride); }}}
+                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(ride); }}
                   >
                     <Text style={styles.rideBtnText}>{t("triplog.viewMap")}</Text>
                   </Pressable>
                 )}
                 <Pressable
                   style={[styles.rideBtn, styles.deleteBtn]}
-                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); deleteRide(ride.id); }}}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); deleteRide(ride.id); }}
                   hitSlop={8}
                   accessibilityRole="button"
                   accessibilityLabel={t("triplog.deleteRide")}
