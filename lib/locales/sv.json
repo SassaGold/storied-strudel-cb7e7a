@@ -209,7 +209,7 @@
     },
     "descriptions": {
       "services": "Söker inom 30 km efter MC-återförsäljare, reparationsverkstäder, delar och tillbehörsbutiker samt uthyrningsbutiker.",
-      "fuel": "Söker inom 20 km efter alla bensin-/bränsle­stationer. Bränsletyper visas där tillgängligt från OpenStreetMap.",
+      "fuel": "Söker inom 20 km efter alla bensin-/bränsle­stationer. Bränsletyper visas där tillgängligt från OpenStreetMap. Tryck ⛽ Kontrollera bränslepriser för att öppna stationen direkt i Google Maps — priser visas där i länder där Google har dessa uppgifter.",
       "parking": "Söker inom 5 km efter allmän parkering och inom 10 km efter dedikerad MC-parkering.",
       "clubs_tracks": "Söker inom 50 km efter MC-klubbar och tävlings-/körbanor.",
       "atm_bank": "Söker inom 5 km efter bankomater och bankkontor — praktiskt på långturer när kontanter behövs."

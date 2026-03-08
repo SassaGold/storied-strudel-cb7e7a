@@ -209,7 +209,7 @@
     },
     "descriptions": {
       "services": "Leitar í 30 km að mótorhjólasölustaðum, viðgerðarverkstæðum, hlutaverslunum og leigum.",
-      "fuel": "Leitar í 20 km að öllum bensínstöðvum. Eldsneytistegundir frá OpenStreetMap. Ýttu ⓘ til að opna Google Maps-síðu stöðvarinnar — eldsneytisverð birtist þar í löndum þar sem Google hefur þessi gögn.",
+      "fuel": "Leitar í 20 km að öllum bensínstöðvum. Eldsneytistegundir frá OpenStreetMap. Ýttu ⛽ Athuga eldsneytisverð til að opna stöðina beint í Google Maps — eldsneytisverð birtist þar í löndum þar sem Google hefur þessi gögn.",
       "parking": "Leitar í 5 km að almennum bílastæðum og í 10 km að sérstökum mótorhjólabílastæðum.",
       "clubs_tracks": "Leitar í 50 km að mótorhjólaklúbbum og kappakstursbrautum.",
       "atm_bank": "Leitar í 5 km að hraðbönkum og bankageirum — hentugt á löngum ferðum."

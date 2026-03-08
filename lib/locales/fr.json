@@ -209,7 +209,7 @@
     },
     "descriptions": {
       "services": "Recherche dans 30 km concessionnaires, ateliers, pièces et location de motos.",
-      "fuel": "Recherche dans 20 km toutes les stations-service. Types de carburant d'OpenStreetMap. Appuyez ⓘ pour ouvrir la fiche Google Maps de la station — les prix du carburant y sont affichés dans les pays où Google dispose de ces données.",
+      "fuel": "Recherche dans 20 km toutes les stations-service. Types de carburant d'OpenStreetMap. Appuyez ⛽ Vérifier les prix du carburant pour ouvrir la station directement dans Google Maps — les prix du carburant y sont affichés dans les pays où Google dispose de ces données.",
       "parking": "Recherche dans 5 km de parkings généraux et dans 10 km de parkings motos.",
       "clubs_tracks": "Recherche dans 50 km de clubs moto et circuits.",
       "atm_bank": "Recherche dans 5 km de distributeurs automatiques et agences bancaires — pratique lors de longues randonnées."

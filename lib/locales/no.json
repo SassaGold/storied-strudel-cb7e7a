@@ -209,7 +209,7 @@
     },
     "descriptions": {
       "services": "Søker innen 30 km etter motorsykkelforhandlere, verksteder, deler og tilbehørbutikker samt utleiebutikker.",
-      "fuel": "Søker innen 20 km etter alle bensin-/drivstoffstasjoner. Drivstofftyper vises der tilgjengelig fra OpenStreetMap.",
+      "fuel": "Søker innen 20 km etter alle bensin-/drivstoffstasjoner. Drivstofftyper vises der tilgjengelig fra OpenStreetMap. Trykk ⛽ Sjekk drivstoffpriser for å åpne stasjonen direkte i Google Maps — priser vises der i land der Google har disse dataene.",
       "parking": "Søker innen 5 km etter generell parkering og innen 10 km etter dedikert motorsykkelparking.",
       "clubs_tracks": "Søker innen 50 km etter motorsykkelklubber og race-/kjørebaner.",
       "atm_bank": "Søker innen 5 km etter minibanker og bankfilialer — nyttig på langtur når kontanter trengs."

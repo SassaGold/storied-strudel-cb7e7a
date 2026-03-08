@@ -430,12 +430,10 @@ out center 120;`;
                     const _name = infoPlace?.name;
                     const _lat = infoPlace?.latitude;
                     const _lon = infoPlace?.longitude;
-                    const parts: string[] = [];
-                    if (_name) parts.push(_name);
-                    parts.push("fuel prices");
-                    if (_lat != null && _lon != null) parts.push(`near ${_lat},${_lon}`);
+                    if (_lat == null || _lon == null) return;
+                    const query = encodeURIComponent(_name ?? "fuel station");
                     Linking.openURL(
-                      `https://www.google.com/search?q=${encodeURIComponent(parts.join(" "))}`
+                      `https://www.google.com/maps/search/?api=1&query=${query}&location=${_lat},${_lon}`
                     ).catch(() => null);
                   }}
                 >
