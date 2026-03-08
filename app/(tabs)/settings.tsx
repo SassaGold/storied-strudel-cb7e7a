@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -28,6 +29,9 @@ export default function SettingsScreen() {
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
+        <Text style={styles.headerBadge}>{t("settings.badge")}</Text>
+        <Text style={styles.title}>{t("settings.title")}</Text>
+        <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
         <Pressable
           style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
           onPress={() => router.back()}
@@ -35,11 +39,8 @@ export default function SettingsScreen() {
           accessibilityLabel={t("common.back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.backBtnText}>{t("common.back")}</Text>
+          <Ionicons name="arrow-back" size={20} color="#ff6600" />
         </Pressable>
-        <Text style={styles.headerBadge}>{t("settings.badge")}</Text>
-        <Text style={styles.title}>{t("settings.title")}</Text>
-        <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
       </View>
 
       {/* ── Units ── */}
@@ -173,22 +174,19 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   backBtn: {
-    alignSelf: "flex-start",
-    marginBottom: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    alignSelf: "flex-end",
+    marginTop: 10,
+    width: 40,
+    height: 40,
     borderRadius: 20,
     backgroundColor: "rgba(255,102,0,0.15)",
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.4)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   backBtnPressed: {
     backgroundColor: "rgba(255,102,0,0.35)",
-  },
-  backBtnText: {
-    color: "#ff6600",
-    fontSize: 16,
-    fontWeight: "700",
   },
   title: {
     color: "#ffffff",
