@@ -422,22 +422,6 @@ out center 120;`;
               </View>
             )}
             <View style={styles.modalActions}>
-              {selected === "fuel" && (
-                <Pressable
-                  style={[styles.modalActionButton, styles.modalActionButtonFuel]}
-                  onPress={() => {
-                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                    const _lat = infoPlace?.latitude;
-                    const _lon = infoPlace?.longitude;
-                    if (_lat == null || _lon == null) return;
-                    Linking.openURL(
-                      `https://www.google.com/maps/@${_lat},${_lon},17z`
-                    ).catch(() => null);
-                  }}
-                >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextFuel]}>{t("common.checkFuelPrices")}</Text>
-                </Pressable>
-              )}
               <Pressable
                 style={styles.modalActionButton}
                 onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); const _name = infoPlace?.name ?? ""; const _lat = infoPlace?.latitude; const _lon = infoPlace?.longitude; const _nearParam = (_lat != null && _lon != null) ? `&near=${encodeURIComponent(`${_lat},${_lon}`)}` : ""; Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(_name)}${_nearParam}`).catch(() => null); }}
@@ -918,10 +902,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(250,204,21,0.1)",
     borderColor: "rgba(250,204,21,0.3)",
   },
-  modalActionButtonFuel: {
-    backgroundColor: "rgba(34,197,94,0.12)",
-    borderColor: "rgba(34,197,94,0.4)",
-  },
   modalActionButtonText: {
     color: "#ff6600",
     fontSize: 14,
@@ -929,9 +909,6 @@ const styles = StyleSheet.create({
   },
   modalActionButtonTextWiki: {
     color: "#fbbf24",
-  },
-  modalActionButtonTextFuel: {
-    color: "#22c55e",
   },
   fuelTypesRow: {
     flexDirection: "row",

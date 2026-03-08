@@ -501,7 +501,7 @@ export default function Index() {
     [location]
   );
   const weatherUrl = location
-    ? `https://www.yr.no/en/forecast/daily-table/${location.coords.latitude.toFixed(4)},${location.coords.longitude.toFixed(4)}`
+    ? `https://www.yr.no/en/forecast/daily-table/${encodeURIComponent(`${location.coords.latitude.toFixed(4)},${location.coords.longitude.toFixed(4)}`)}`
     : "https://www.yr.no";
 
   useEffect(() => {
