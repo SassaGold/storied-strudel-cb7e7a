@@ -427,8 +427,10 @@ out center 120;`;
                   style={[styles.modalActionButton, styles.modalActionButtonFuel]}
                   onPress={() => {
                     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                    const nameQuery = infoPlace?.name?.trim() || t("garage.titles.fuel");
+                    const locQuery = `${infoPlace?.latitude},${infoPlace?.longitude}`;
                     Linking.openURL(
-                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${infoPlace?.latitude},${infoPlace?.longitude}`)}`
+                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nameQuery)}&near=${encodeURIComponent(locQuery)}`
                     ).catch(() => null);
                   }}
                 >

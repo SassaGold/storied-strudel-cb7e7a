@@ -209,7 +209,7 @@
     },
     "descriptions": {
       "services": "Sucht im Umkreis von 30 km nach Motorradhändlern, Werkstätten, Teile- und Zubehörshops sowie Verleih.",
-      "fuel": "Sucht im Umkreis von 20 km nach Tankstellen. Kraftstoffarten aus OpenStreetMap. ⓘ für Preise via Google Maps.",
+      "fuel": "Sucht im Umkreis von 20 km nach Tankstellen. Kraftstoffarten aus OpenStreetMap. ⓘ öffnet die Google-Maps-Seite der Tankstelle — Kraftstoffpreise werden dort angezeigt, wo Google diese Daten hat.",
       "parking": "Sucht im Umkreis von 5 km nach allgemeinen Parkplätzen und 10 km nach Motorradparkplätzen.",
       "clubs_tracks": "Sucht im Umkreis von 50 km nach Motorradclubs und Rennstrecken.",
       "atm_bank": "Sucht im Umkreis von 5 km nach Geldautomaten und Bankfilialen — praktisch auf Langstreckentouren."
