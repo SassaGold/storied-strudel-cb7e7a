@@ -282,7 +282,7 @@ function computeSunTimes(lat: number, lon: number, date: Date = new Date()): Sun
 
 const formatTime = (date: Date) => {
   try {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
   } catch {
     return "--:--";
   }
