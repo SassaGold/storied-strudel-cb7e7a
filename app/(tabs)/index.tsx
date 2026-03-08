@@ -1246,6 +1246,7 @@ const styles = StyleSheet.create({
   },
   languageRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: 12,
     justifyContent: "center",
