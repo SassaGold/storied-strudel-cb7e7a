@@ -427,11 +427,15 @@ out center 120;`;
                   style={[styles.modalActionButton, styles.modalActionButtonFuel]}
                   onPress={() => {
                     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                    const lat = infoPlace?.latitude;
-                    const lon = infoPlace?.longitude;
-                    if (lat == null || lon == null) return;
+                    const _name = infoPlace?.name;
+                    const _lat = infoPlace?.latitude;
+                    const _lon = infoPlace?.longitude;
+                    const parts: string[] = [];
+                    if (_name) parts.push(_name);
+                    parts.push("fuel prices");
+                    if (_lat != null && _lon != null) parts.push(`near ${_lat},${_lon}`);
                     Linking.openURL(
-                      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lon}`)}`
+                      `https://www.google.com/search?q=${encodeURIComponent(parts.join(" "))}`
                     ).catch(() => null);
                   }}
                 >
