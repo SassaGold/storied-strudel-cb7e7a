@@ -34,7 +34,7 @@ export default function SettingsScreen() {
         <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
         <Pressable
           style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
-          onPress={() => router.back()}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.back(); }}
           accessibilityRole="button"
           accessibilityLabel={t("common.back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}

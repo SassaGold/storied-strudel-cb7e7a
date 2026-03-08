@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
 const APP_VERSION: string =
   (Constants.expoConfig?.version ?? "1.0.0") as string;
@@ -14,7 +16,7 @@ function LinkRow({ label, url, openLabel }: LinkRowProps) {
   return (
     <Pressable
       style={({ pressed }) => [styles.linkRow, pressed && styles.linkRowPressed]}
-      onPress={() => Linking.openURL(url)}
+      onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(url); }}
       accessibilityRole="link"
       accessibilityLabel={label}
     >
@@ -49,7 +51,7 @@ export default function AboutScreen() {
         <Text style={styles.subtitle}>{t("about.subtitle")}</Text>
         <Pressable
           style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
-          onPress={() => router.back()}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.back(); }}
           accessibilityRole="button"
           accessibilityLabel={t("common.back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}

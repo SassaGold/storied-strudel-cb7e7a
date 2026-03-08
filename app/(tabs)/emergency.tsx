@@ -266,7 +266,7 @@ out center ${MAX_RESULTS};`;
       >
         <Pressable
           style={styles.modalOverlay}
-          onPress={() => setInfoPlace(null)}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}
         >
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
@@ -314,7 +314,7 @@ out center ${MAX_RESULTS};`;
                   style={styles.modalLink}
                   numberOfLines={1}
                   onPress={() =>
-                    Linking.openURL(infoPlace.website!).catch(() => null)
+                    { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(infoPlace.website!).catch(() => null); }
                   }
                 >
                   {infoPlace.website.replace(/^https?:\/\/(www\.)?/, "")}
@@ -347,9 +347,9 @@ out center ${MAX_RESULTS};`;
               <Pressable
                 style={styles.modalActionButton}
                 onPress={() =>
-                  Linking.openURL(
+                  { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(
                     `https://www.google.com/maps/search/?api=1&query=${infoPlace?.latitude},${infoPlace?.longitude}`
-                  ).catch(() => null)
+                  ).catch(() => null); }
                 }
               >
                 <Text style={styles.modalActionButtonText}>
@@ -359,7 +359,7 @@ out center ${MAX_RESULTS};`;
             </View>
             <Pressable
               style={styles.modalClose}
-              onPress={() => setInfoPlace(null)}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}}
             >
               <Text style={styles.modalCloseText}>{t("common.close")}</Text>
             </Pressable>
@@ -394,13 +394,13 @@ out center ${MAX_RESULTS};`;
             </Pressable>
           ))}
         </View>
-        <Pressable style={styles.shareButton} onPress={shareLocation}>
+        <Pressable style={styles.shareButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); shareLocation(); }}>
           <Text style={styles.shareButtonText}>{t("sos.shareLocation")}</Text>
         </Pressable>
       </View>
       <Pressable
         style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
-        onPress={loadPlaces}
+        onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadPlaces(); }}
         disabled={loading}
         accessibilityRole="button"
         accessibilityLabel={t("sos.findButton")}
@@ -431,13 +431,13 @@ out center ${MAX_RESULTS};`;
         <View style={styles.viewToggleRow}>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
-            onPress={() => setViewMode("list")}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}}
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-            onPress={() => setViewMode("map")}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}}
           >
             <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
           </Pressable>
@@ -461,7 +461,7 @@ out center ${MAX_RESULTS};`;
               key={place.id}
               coordinate={{ latitude: place.latitude, longitude: place.longitude }}
               title={place.name}
-              onPress={() => setInfoPlace(place)}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(place); }}
             />
           ))}
         </MapView>
@@ -478,7 +478,7 @@ out center ${MAX_RESULTS};`;
                   styles.segmentButton,
                   selected === key && styles.segmentButtonActive,
                 ]}
-                onPress={() => setSelected(key)}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSelected(key); }}}
               >
                 <Text
                   style={[
@@ -512,7 +512,7 @@ out center ${MAX_RESULTS};`;
                   <Pressable
                     key={place.id}
                     style={styles.placeRow}
-                    onPress={() => openInMaps(place)}
+                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}}
                     accessibilityRole="button"
                     accessibilityLabel={place.name}
                   >
@@ -545,7 +545,7 @@ out center ${MAX_RESULTS};`;
                       </Text>
                       <Pressable
                         style={styles.infoButton}
-                        onPress={(e) => { e.stopPropagation(); setInfoPlace(place); }}
+                        onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(place); }}}
                         hitSlop={8}
                         accessibilityRole="button"
                         accessibilityLabel={`Info: ${place.name}`}

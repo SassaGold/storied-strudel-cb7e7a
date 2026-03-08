@@ -389,7 +389,7 @@ export default function TripLoggerScreen() {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>{t("triplog.history")}</Text>
           {rides.length > 0 && (
-            <Pressable onPress={confirmClearAll} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("triplog.clearAll")}>
+            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); confirmClearAll(); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("triplog.clearAll")}>
               <Text style={styles.clearAllText}>{t("triplog.clearAll")}</Text>
             </Pressable>
           )}
@@ -415,14 +415,14 @@ export default function TripLoggerScreen() {
                 {ride.route.length > 1 && MapView && (
                   <Pressable
                     style={styles.rideBtn}
-                    onPress={() => setMapRide(ride)}
+                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(ride); }}}
                   >
                     <Text style={styles.rideBtnText}>{t("triplog.viewMap")}</Text>
                   </Pressable>
                 )}
                 <Pressable
                   style={[styles.rideBtn, styles.deleteBtn]}
-                  onPress={() => deleteRide(ride.id)}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); deleteRide(ride.id); }}}
                   hitSlop={8}
                   accessibilityRole="button"
                   accessibilityLabel={t("triplog.deleteRide")}
@@ -446,7 +446,7 @@ export default function TripLoggerScreen() {
         <View style={styles.modalContainer}>
           <View style={[styles.modalHeader, { paddingTop: insets.top + 12 }]}>
             <Text style={styles.modalTitle}>{t("triplog.mapTitle")}</Text>
-            <Pressable onPress={() => setMapRide(null)}>
+            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(null); }}>
               <Text style={styles.modalClose}>{t("triplog.closeMap")}</Text>
             </Pressable>
           </View>

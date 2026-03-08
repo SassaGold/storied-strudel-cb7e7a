@@ -27,6 +27,8 @@ const Marker: any = rnMaps?.Marker;
 // try/catch wrappers inside loadPlaces already handle AsyncStorage === null.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
 type Place = {
   id: string;
@@ -335,7 +337,7 @@ out center 120;`;
         animationType="fade"
         onRequestClose={() => { setInfoPlace(null); setWikiExtract(null); }}
       >
-        <Pressable style={styles.modalOverlay} onPress={() => { setInfoPlace(null); setWikiExtract(null); }}>
+        <Pressable style={styles.modalOverlay} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); setWikiExtract(null); }}>
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
@@ -353,7 +355,7 @@ out center 120;`;
                 <Text style={styles.modalLabel}>{t("common.phone")}</Text>
                 <Text
                   style={styles.modalLink}
-                  onPress={() => Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null)}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null); }}
                 >
                   {infoPlace.phone}
                 </Text>
@@ -364,7 +366,7 @@ out center 120;`;
                 <Text style={styles.modalLabel}>{t("common.email")}</Text>
                 <Text
                   style={styles.modalLink}
-                  onPress={() => Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null)}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null); }}
                   numberOfLines={1}
                 >
                   {infoPlace.email}
@@ -382,7 +384,7 @@ out center 120;`;
                 <Text style={styles.modalLabel}>{t("common.website")}</Text>
                 <Text
                   style={styles.modalLink}
-                  onPress={() => Linking.openURL(infoPlace.website!).catch(() => null)}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(infoPlace.website!).catch(() => null); }}
                   numberOfLines={1}
                 >
                   {infoPlace.website.replace(/^https?:\/\/(www\.)?/, "")}
@@ -423,18 +425,19 @@ out center 120;`;
               {selected === "fuel" && (
                 <Pressable
                   style={[styles.modalActionButton, styles.modalActionButtonFuel]}
-                  onPress={() =>
+                  onPress={() => {
+                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                     Linking.openURL(
                       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${infoPlace?.latitude},${infoPlace?.longitude}`)}`
-                    ).catch(() => null)
-                  }
+                    ).catch(() => null);
+                  }}
                 >
                   <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextFuel]}>{t("common.checkFuelPrices")}</Text>
                 </Pressable>
               )}
               <Pressable
                 style={styles.modalActionButton}
-                onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null)}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null); }}
               >
                 <Text style={styles.modalActionButtonText}>{t("common.reviewsGoogle")}</Text>
               </Pressable>
@@ -442,6 +445,7 @@ out center 120;`;
                 <Pressable
                   style={[styles.modalActionButton, styles.modalActionButtonWiki]}
                   onPress={() => {
+                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                     const { lang, title } = parseWikiTag(infoPlace.wikipedia!);
                     Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
                   }}
@@ -450,7 +454,7 @@ out center 120;`;
                 </Pressable>
               )}
             </View>
-            <Pressable style={styles.modalClose} onPress={() => { setInfoPlace(null); setWikiExtract(null); }}>
+            <Pressable style={styles.modalClose} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); setWikiExtract(null); }}>
               <Text style={styles.modalCloseText}>{t("common.close")}</Text>
             </Pressable>
           </Pressable>
@@ -476,6 +480,7 @@ out center 120;`;
               selected === key && styles.segmentButtonActive,
             ]}
             onPress={() => {
+              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
               setSelected(key);
               setPlaces([]);
               setError(null);
@@ -495,7 +500,7 @@ out center 120;`;
 
       <Pressable
         style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
-        onPress={loadPlaces}
+        onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadPlaces(); }}
         disabled={loading}
         accessibilityRole="button"
         accessibilityLabel={t("garage.findButton", { title: sectionTitle })}
@@ -526,13 +531,13 @@ out center 120;`;
         <View style={styles.viewToggleRow}>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
-            onPress={() => setViewMode("list")}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}}
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-            onPress={() => setViewMode("map")}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}}
           >
             <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
           </Pressable>
@@ -556,7 +561,7 @@ out center 120;`;
               key={place.id}
               coordinate={{ latitude: place.latitude, longitude: place.longitude }}
               title={place.name}
-              onPress={() => setInfoPlace(place)}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(place); }}
             />
           ))}
         </MapView>
@@ -573,7 +578,7 @@ out center 120;`;
               <Pressable
                 key={place.id}
                 style={styles.placeRow}
-                onPress={() => openInMaps(place)}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}}
                 accessibilityRole="button"
                 accessibilityLabel={place.name}
               >
@@ -601,7 +606,7 @@ out center 120;`;
                   </Text>
                   <Pressable
                     style={styles.infoButton}
-                    onPress={(e) => { e.stopPropagation(); openInfo(place); }}
+                    onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInfo(place); }}
                     hitSlop={8}
                     accessibilityRole="button"
                     accessibilityLabel={`Info: ${place.name}`}
