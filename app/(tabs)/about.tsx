@@ -54,9 +54,9 @@ export default function AboutScreen() {
           accessibilityLabel={t("common.back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Ionicons name="arrow-back" size={20} color="#ff6600" />
+          <Ionicons name="arrow-back" size={18} color="#ff6600" />
+          <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
         </Pressable>
-        <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -191,24 +191,23 @@ const styles = StyleSheet.create({
   backBtn: {
     alignSelf: "flex-end",
     marginTop: 10,
-    width: 40,
-    height: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: "rgba(255,102,0,0.15)",
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.4)",
-    alignItems: "center",
-    justifyContent: "center",
   },
   backBtnPressed: {
     backgroundColor: "rgba(255,102,0,0.35)",
   },
   backBtnLabel: {
-    alignSelf: "flex-end",
     color: "#ff6600",
-    fontSize: 10,
+    fontSize: 13,
     fontWeight: "600",
-    marginTop: 4,
     letterSpacing: 0.5,
   },
   badge: {

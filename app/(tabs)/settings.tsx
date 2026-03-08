@@ -32,18 +32,16 @@ export default function SettingsScreen() {
         <Text style={styles.headerBadge}>{t("settings.badge")}</Text>
         <Text style={styles.title}>{t("settings.title")}</Text>
         <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
-        <View style={styles.backBtnWrapper}>
-          <Pressable
-            style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
-            onPress={() => router.back()}
-            accessibilityRole="button"
-            accessibilityLabel={t("common.back")}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="arrow-back" size={20} color="#ff6600" />
-          </Pressable>
+        <Pressable
+          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.back")}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="arrow-back" size={18} color="#ff6600" />
           <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
-        </View>
+        </Pressable>
       </View>
 
       {/* ── Units ── */}
@@ -176,29 +174,26 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     letterSpacing: 0.4,
   },
-  backBtnWrapper: {
+  backBtn: {
     alignSelf: "flex-end",
     marginTop: 10,
+    flexDirection: "row",
     alignItems: "center",
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: "rgba(255,102,0,0.15)",
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.4)",
-    alignItems: "center",
-    justifyContent: "center",
   },
   backBtnPressed: {
     backgroundColor: "rgba(255,102,0,0.35)",
   },
   backBtnLabel: {
     color: "#ff6600",
-    fontSize: 10,
+    fontSize: 13,
     fontWeight: "600",
-    marginTop: 4,
     letterSpacing: 0.5,
   },
   title: {
