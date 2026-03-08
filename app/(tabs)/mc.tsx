@@ -427,13 +427,11 @@ out center 120;`;
                   style={[styles.modalActionButton, styles.modalActionButtonFuel]}
                   onPress={() => {
                     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                    const _name = infoPlace?.name;
                     const _lat = infoPlace?.latitude;
                     const _lon = infoPlace?.longitude;
                     if (_lat == null || _lon == null) return;
-                    const query = encodeURIComponent(_name ?? "fuel station");
                     Linking.openURL(
-                      `https://www.google.com/maps/search/?api=1&query=${query}&location=${_lat},${_lon}`
+                      `https://www.google.com/maps/@${_lat},${_lon},17z`
                     ).catch(() => null);
                   }}
                 >
