@@ -424,7 +424,7 @@ out center 120;`;
             <View style={styles.modalActions}>
               <Pressable
                 style={styles.modalActionButton}
-                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); if (infoPlace) openInMaps(infoPlace); }}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null); }}
               >
                 <Text style={styles.modalActionButtonText}>{t("common.checkFuelPrices")}</Text>
               </Pressable>
