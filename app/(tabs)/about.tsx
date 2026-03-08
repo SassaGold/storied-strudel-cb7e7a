@@ -56,6 +56,7 @@ export default function AboutScreen() {
         >
           <Ionicons name="arrow-back" size={20} color="#ff6600" />
         </Pressable>
+        <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -201,6 +202,14 @@ const styles = StyleSheet.create({
   },
   backBtnPressed: {
     backgroundColor: "rgba(255,102,0,0.35)",
+  },
+  backBtnLabel: {
+    alignSelf: "flex-end",
+    color: "#ff6600",
+    fontSize: 10,
+    fontWeight: "600",
+    marginTop: 4,
+    letterSpacing: 0.5,
   },
   badge: {
     fontSize: 11,

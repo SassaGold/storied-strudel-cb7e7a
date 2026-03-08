@@ -32,15 +32,18 @@ export default function SettingsScreen() {
         <Text style={styles.headerBadge}>{t("settings.badge")}</Text>
         <Text style={styles.title}>{t("settings.title")}</Text>
         <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
-        <Pressable
-          style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel={t("common.back")}
-          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-        >
-          <Ionicons name="arrow-back" size={20} color="#ff6600" />
-        </Pressable>
+        <View style={styles.backBtnWrapper}>
+          <Pressable
+            style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
+            onPress={() => router.back()}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.back")}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Ionicons name="arrow-back" size={20} color="#ff6600" />
+          </Pressable>
+          <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
+        </View>
       </View>
 
       {/* ── Units ── */}
@@ -173,9 +176,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     letterSpacing: 0.4,
   },
-  backBtn: {
+  backBtnWrapper: {
     alignSelf: "flex-end",
     marginTop: 10,
+    alignItems: "center",
+  },
+  backBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -187,6 +193,13 @@ const styles = StyleSheet.create({
   },
   backBtnPressed: {
     backgroundColor: "rgba(255,102,0,0.35)",
+  },
+  backBtnLabel: {
+    color: "#ff6600",
+    fontSize: 10,
+    fontWeight: "600",
+    marginTop: 4,
+    letterSpacing: 0.5,
   },
   title: {
     color: "#ffffff",
