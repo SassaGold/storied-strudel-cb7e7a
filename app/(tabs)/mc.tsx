@@ -424,9 +424,9 @@ out center 120;`;
             <View style={styles.modalActions}>
               <Pressable
                 style={styles.modalActionButton}
-                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); const _name = infoPlace?.name ?? ""; const _lat = infoPlace?.latitude; const _lon = infoPlace?.longitude; const _nearParam = (_lat != null && _lon != null) ? `&near=${encodeURIComponent(`${_lat},${_lon}`)}` : ""; Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(_name)}${_nearParam}`).catch(() => null); }}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); if (infoPlace) openInMaps(infoPlace); }}
               >
-                <Text style={styles.modalActionButtonText}>{t("common.reviewsGoogle")}</Text>
+                <Text style={styles.modalActionButtonText}>{t("common.checkFuelPrices")}</Text>
               </Pressable>
               {infoPlace?.wikipedia && (
                 <Pressable

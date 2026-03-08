@@ -32,6 +32,7 @@
     "wikiLoading": "Loading from Wikipedia…",
     "wikiLabel": "📖 From Wikipedia",
     "reviewsGoogle": "⭐ Reviews on Google Maps",
+    "checkFuelPrices": "⛽ Check Fuel Prices",
     "readWikipedia": "📖 Read on Wikipedia",
     "cachedResults": "📡 Showing cached results — tap refresh for latest",
     "fuelTypes": "⛽ Fuel Types"
@@ -208,7 +209,7 @@
     },
     "descriptions": {
       "services": "Searches within 30 km for motorcycle dealers, repair workshops, parts & accessories shops, and rental shops.",
-      "fuel": "Searches within 20 km for all fuel/petrol stations. Fuel types shown where available from OpenStreetMap. Press ⛽ Check Fuel Prices to open the station directly on the map at its exact location — fuel prices are shown there in countries where Google has that data. Press ⭐ Reviews on Google Maps to search for the station by name and read reviews.",
+      "fuel": "Searches within 20 km for all fuel/petrol stations. Fuel types shown where available from OpenStreetMap. Press ⛽ Check Fuel Prices to open the station directly on the map at its exact location — fuel prices are shown there in countries where Google has that data.",
       "parking": "Searches within 5 km for general parking and within 10 km for dedicated motorcycle parking.",
       "clubs_tracks": "Searches within 50 km for motorcycle clubs and racing/riding tracks.",
       "atm_bank": "Searches within 5 km for ATM machines and bank branches — handy on long-distance rides when cash is needed."
