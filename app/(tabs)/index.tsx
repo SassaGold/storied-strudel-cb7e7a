@@ -98,6 +98,46 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
 const normalizeSymbol = (sym: string) =>
   sym.replace(/_(day|night|polartwilight)$/, "");
 
+/**
+ * Map WMO weather interpretation codes (used by Open-Meteo) to the
+ * MET Norway symbol-code strings that the rest of the UI already understands.
+ * Reference: https://open-meteo.com/en/docs#weathervariables
+ */
+const WMO_TO_SYMBOL: Record<number, string> = {
+  0:  "clearsky_day",
+  1:  "fair_day",
+  2:  "partlycloudy_day",
+  3:  "cloudy",
+  45: "fog",
+  48: "fog",
+  51: "lightrain",
+  53: "rain",
+  55: "heavyrain",
+  56: "lightsleet",
+  57: "heavysleet",
+  61: "lightrain",
+  63: "rain",
+  65: "heavyrain",
+  66: "lightsleet",
+  67: "heavysleet",
+  71: "lightsnow",
+  73: "snow",
+  75: "heavysnow",
+  77: "lightsnow",
+  80: "lightrainshowers_day",
+  81: "rainshowers_day",
+  82: "heavyrainshowers_day",
+  85: "lightsnowshowers_day",
+  86: "heavysnowshowers_day",
+  95: "rainandthunder",
+  96: "heavyrainandthunder",
+  99: "heavyrainandthunder",
+};
+
+function wmoToSymbol(code: number): string {
+  return WMO_TO_SYMBOL[code] ?? "cloudy";
+}
+
 const formatWeatherCode = (sym?: string) => {
   if (!sym) return "";
   const s = normalizeSymbol(sym);
@@ -354,83 +394,50 @@ export default function Index() {
         }))
         .catch(() => null);
 
-      // MET Norway (api.met.no) — free public weather API, no API key required
+      // Open-Meteo — free, browser-friendly weather API (no API key, no User-Agent required)
+      // Using Open-Meteo instead of api.met.no because browsers disallow setting the
+      // User-Agent header in fetch(), which api.met.no requires for identification.
       const weatherPromise = fetch(
-        `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${latitude.toFixed(4)}&lon=${longitude.toFixed(4)}`,
-        { headers: { "User-Agent": "leander/1.0 com.sassagold.leander" } }
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(4)}&longitude=${longitude.toFixed(4)}` +
+        `&current=temperature_2m,wind_speed_10m,precipitation,weather_code,precipitation_probability` +
+        `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
+        `&forecast_days=4&timezone=auto`
       )
         .then((response) => response.json())
         .then((data) => {
-          const timeseries: any[] = data.properties?.timeseries ?? [];
-          if (timeseries.length === 0) return null;
+          const current = data.current ?? {};
+          if (current.temperature_2m === undefined) return null;
 
-          // Current conditions from first entry
-          const current = timeseries[0];
-          const instant = current.data?.instant?.details ?? {};
-          const next1h = current.data?.next_1_hours ?? current.data?.next_6_hours ?? {};
-          const symbol: string = next1h.summary?.symbol_code ?? "";
-          const precipProbability: number = next1h.details?.probability_of_precipitation ?? 0;
-          const precipitation: number = next1h.details?.precipitation_amount ?? 0;
+          const symbol = wmoToSymbol(current.weather_code as number);
+          const precipitation: number = current.precipitation ?? 0;
+          const precipProbability: number = current.precipitation_probability ?? 0;
 
-          // Build 3-day forecast grouped by date
-          const dayMap = new Map<string, any[]>();
-          for (const entry of timeseries) {
-            const dateKey: string = entry.time.slice(0, 10);
-            if (!dayMap.has(dateKey)) dayMap.set(dateKey, []);
-            dayMap.get(dateKey)!.push(entry);
-          }
+          // Build 3-day forecast from daily arrays (index 0 = today, skip it)
+          const daily = data.daily ?? {};
+          const times: string[] = daily.time ?? [];
+          const dailyCodes: number[] = daily.weather_code ?? [];
+          const maxTemps: number[] = daily.temperature_2m_max ?? [];
+          const minTemps: number[] = daily.temperature_2m_min ?? [];
+          const rainProbs: number[] = daily.precipitation_probability_max ?? [];
 
-          // yr.no API returns all timestamps in UTC; .toISOString() is consistently UTC
           const today = new Date().toISOString().slice(0, 10);
           const forecast: ForecastDay[] = [];
-          for (const [date, entries] of dayMap.entries()) {
-            if (date <= today) continue;
+          for (let i = 0; i < times.length; i++) {
+            if (times[i] <= today) continue;
             if (forecast.length >= 3) break;
-            // Pick entry closest to noon UTC (yr.no times are always UTC)
-            const noonEntry = entries.reduce((best: any, e: any) => {
-              const hour = parseInt(e.time.slice(11, 13), 10);
-              const bestHour = parseInt(best.time.slice(11, 13), 10);
-              return Math.abs(hour - 12) < Math.abs(bestHour - 12) ? e : best;
-            });
-            const n6h = noonEntry.data?.next_6_hours ?? noonEntry.data?.next_12_hours ?? {};
-            const daySymbol: string =
-              n6h.summary?.symbol_code ??
-              noonEntry.data?.next_1_hours?.summary?.symbol_code ??
-              "";
-            const rainProb: number = n6h.details?.probability_of_precipitation ?? 0;
-            // Scan all entries for the day to find max/min temps (not every entry has them)
-            let maxTempC: number | undefined;
-            let minTempC: number | undefined;
-            for (const e of entries) {
-              const block = e.data?.next_6_hours ?? e.data?.next_12_hours ?? {};
-              const mx: number | undefined = block.details?.air_temperature_max;
-              const mn: number | undefined = block.details?.air_temperature_min;
-              if (mx !== undefined) maxTempC = maxTempC === undefined ? mx : Math.max(maxTempC, mx);
-              if (mn !== undefined) minTempC = minTempC === undefined ? mn : Math.min(minTempC, mn);
-            }
-            // Fall back to instant temperatures if no 6h/12h blocks had them
-            if (maxTempC === undefined || minTempC === undefined) {
-              const temps: number[] = entries
-                .map((e: any) => e.data?.instant?.details?.air_temperature as number | undefined)
-                .filter((t): t is number => t !== undefined);
-              if (temps.length > 0) {
-                if (maxTempC === undefined) maxTempC = Math.max(...temps);
-                if (minTempC === undefined) minTempC = Math.min(...temps);
-              }
-            }
-            if (maxTempC === undefined || minTempC === undefined) continue;
+            if (maxTemps[i] === undefined || minTemps[i] === undefined) continue;
             forecast.push({
-              date,
-              weatherCode: daySymbol,
-              maxTempC,
-              minTempC,
-              precipitationProbability: Math.round(rainProb),
+              date: times[i],
+              weatherCode: wmoToSymbol(dailyCodes[i] as number),
+              maxTempC: maxTemps[i],
+              minTempC: minTemps[i],
+              precipitationProbability: Math.round(rainProbs[i] ?? 0),
             });
           }
 
           return {
-            temperatureC: instant.air_temperature,
-            windSpeed: instant.wind_speed,
+            temperatureC: current.temperature_2m,
+            windSpeed: current.wind_speed_10m,
             precipitation,
             precipitationProbability: Math.round(precipProbability),
             weatherCode: symbol,

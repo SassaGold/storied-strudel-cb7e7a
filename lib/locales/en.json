@@ -307,9 +307,9 @@
     "osmLicense": "© OpenStreetMap contributors · ODbL License",
     "overpass": "Overpass API",
     "overpassDesc": "Queries to OpenStreetMap data are run through the Overpass API (overpass-api.de and mirror endpoints). Free to use, no account required.",
-    "weather": "Yr / Met Norway",
-    "weatherDesc": "Weather forecasts and conditions are fetched from the Yr.no API operated by the Norwegian Meteorological Institute (MET Norway). Free, open weather data. No API key required.",
-    "weatherLicense": "© Meteorologisk institutt · NLOD / CC BY 4.0",
+    "weather": "Open-Meteo",
+    "weatherDesc": "Weather forecasts and conditions are fetched from the Open-Meteo API. Free, open-source weather data. No API key required. Works in all browsers.",
+    "weatherLicense": "© Open-Meteo contributors · CC BY 4.0",
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Place descriptions are fetched from the Wikipedia REST API where a Wikipedia tag is available in OpenStreetMap data. Wikipedia content is licensed under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia contributors · CC BY-SA",
@@ -326,7 +326,7 @@
     "version": "App Version",
     "openLink": "Open ↗",
     "legal": "LEGAL",
-    "legalBody": "All external data is used in accordance with the terms and licenses of each respective source. OpenStreetMap data is used under the Open Database License (ODbL). Weather data from MET Norway is used under NLOD / CC BY 4.0."
+    "legalBody": "All external data is used in accordance with the terms and licenses of each respective source. OpenStreetMap data is used under the Open Database License (ODbL). Weather data from Open-Meteo is used under CC BY 4.0."
   },
   "settings": {
     "badge": "⚙️ SETTINGS",

@@ -307,9 +307,9 @@
     "osmLicense": "© OpenStreetMap-framleggjendur · ODbL-leyfi",
     "overpass": "Overpass API",
     "overpassDesc": "Fyrirspurnir á OpenStreetMap-gögn eru keyrðar í gegnum Overpass API. Ókeypis, engan reikning þarf.",
-    "weather": "Yr / Met Norway",
-    "weatherDesc": "Veðurspár eru sóttar frá Yr.no API Norska veðurinstítútsins. Ókeypis, opin veðurgögn.",
-    "weatherLicense": "© Meteorologisk institutt · NLOD / CC BY 4.0",
+    "weather": "Open-Meteo",
+    "weatherDesc": "Veðurspár eru sóttar frá Open-Meteo API. Ókeypis, opinn uppspretta veðurgögn. Engin API-lykill krafist. Virkar í öllum vöfrum.",
+    "weatherLicense": "© Open-Meteo contributors · CC BY 4.0",
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Staðarlýsingar eru sóttar frá Wikipedia REST API þegar Wikipedia-merki er tiltækt í OpenStreetMap-gögnum.",
     "wikiLicense": "© Wikipedia-framleggjendur · CC BY-SA",
@@ -326,7 +326,7 @@
     "version": "Útgáfa",
     "openLink": "Opna ↗",
     "legal": "LAGALEGT",
-    "legalBody": "Öll ytri gögn eru notuð í samræmi við skilmála og leyfi hverrar heimildar. OpenStreetMap-gögn eru notuð undir Open Database License (ODbL). Veðurgögn frá MET Norway eru notuð undir NLOD / CC BY 4.0."
+    "legalBody": "Öll ytri gögn eru notuð í samræmi við skilmála og leyfi hverrar heimildar. OpenStreetMap-gögn eru notuð undir Open Database License (ODbL). Veðurgögn frá Open-Meteo eru notuð undir CC BY 4.0."
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",

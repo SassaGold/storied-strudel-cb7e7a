@@ -89,19 +89,14 @@ export default function AboutScreen() {
             />
           </View>
 
-          {/* yr.no */}
+          {/* Open-Meteo */}
           <View style={styles.card}>
             <Text style={styles.cardTitle}>⛅ {t("about.weather")}</Text>
             <Text style={styles.cardBody}>{t("about.weatherDesc")}</Text>
             <Text style={styles.licenseText}>{t("about.weatherLicense")}</Text>
             <LinkRow
-              label="yr.no"
-              url="https://www.yr.no"
-              openLabel={t("about.openLink")}
-            />
-            <LinkRow
-              label="api.met.no"
-              url="https://api.met.no"
+              label="open-meteo.com"
+              url="https://open-meteo.com"
               openLabel={t("about.openLink")}
             />
           </View>
