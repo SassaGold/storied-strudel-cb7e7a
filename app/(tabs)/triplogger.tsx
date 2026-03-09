@@ -3,6 +3,7 @@ import {
   Alert,
   Animated,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -23,6 +24,7 @@ let rnMaps: any = null;
 try { rnMaps = require("react-native-maps"); } catch {}
 const MapView: any = rnMaps?.default;
 const Polyline: any = rnMaps?.Polyline;
+const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
 
 // Safely load AsyncStorage
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -342,6 +344,7 @@ export default function TripLoggerScreen() {
             <View style={styles.inlineMap}>
               <MapView
                 style={StyleSheet.absoluteFill}
+                provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
                 region={(() => {
                   const lats = route.map((p) => p.latitude);
                   const lons = route.map((p) => p.longitude);
@@ -453,6 +456,7 @@ export default function TripLoggerScreen() {
           {mapRide && mapRegion && MapView ? (
             <MapView
               style={styles.fullMap}
+              provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
               initialRegion={mapRegion}
               mapType="standard"
             >

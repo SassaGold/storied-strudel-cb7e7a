@@ -4,6 +4,7 @@ import {
   Alert,
   Linking,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Share,
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -25,6 +27,7 @@ let rnMaps: any = null;
 try { rnMaps = require("react-native-maps"); } catch {}
 const MapView: any = rnMaps?.default;
 const Marker: any = rnMaps?.Marker;
+const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
 // Safely load AsyncStorage: the native implementation throws at module-evaluation
 // time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
 // Using require() in try/catch means the screen still loads; the existing
@@ -109,6 +112,7 @@ const CACHE_KEY = "cache_emergency_v2";
 
 export default function EmergencyScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -255,7 +259,7 @@ out center ${MAX_RESULTS};`;
   return (
     <ScrollView
       style={styles.scrollView}
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
     >
       {/* Info Modal */}
       <Modal
@@ -448,6 +452,7 @@ out center ${MAX_RESULTS};`;
       {viewMode === "map" && userLocation && MapView && (
         <MapView
           style={styles.mapView}
+          provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
           showsUserLocation
           initialRegion={{
             latitude: userLocation.latitude,

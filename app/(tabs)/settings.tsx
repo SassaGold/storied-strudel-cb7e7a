@@ -2,6 +2,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -23,9 +24,10 @@ export default function SettingsScreen() {
   const { t } = useTranslation();
   const { settings, setSetting } = useSettings();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />

@@ -11,6 +11,7 @@ import {
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtTemp } from "../../lib/settings";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -309,6 +310,7 @@ export default function Index() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const { settings } = useSettings();
+  const insets = useSafeAreaInsets();
   const hasNavigated = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -526,7 +528,7 @@ export default function Index() {
   }, [location]);
 
   return (
-    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />

@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Linking,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
 // Safely load react-native-maps: requires a custom dev/production build.
@@ -21,6 +23,7 @@ let rnMaps: any = null;
 try { rnMaps = require("react-native-maps"); } catch {}
 const MapView: any = rnMaps?.default;
 const Marker: any = rnMaps?.Marker;
+const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
 // Safely load AsyncStorage: the native implementation throws at module-evaluation
 // time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
 // Using require() in try/catch means the screen still loads; the existing
@@ -51,6 +54,7 @@ const CACHE_KEY = "cache_hotels_v2";
 export default function HotelsScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -171,7 +175,7 @@ out center 120;`;
   }, []);
 
   return (
-    <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <Modal
         visible={infoPlace !== null}
         transparent
@@ -328,6 +332,7 @@ out center 120;`;
       {viewMode === "map" && userLocation && MapView && (
         <MapView
           style={styles.mapView}
+          provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
           showsUserLocation
           initialRegion={{
             latitude: userLocation.latitude,
