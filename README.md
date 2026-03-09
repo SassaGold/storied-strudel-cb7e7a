@@ -25,6 +25,59 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Testing on iPhone Simulator
+
+> **macOS only** — The iPhone Simulator is built into Xcode and runs exclusively on macOS.  
+> It cannot run on Windows or Linux PCs. If you are on Windows/Linux, see the
+> [EAS cloud build option](#eas-cloud-build-for-simulator) below.
+
+This app uses native modules (`react-native-maps`, `expo-location`, background location)
+that are **not** supported in the standard Expo Go sandbox.
+You must use a **development build** to test on the simulator.
+
+### Option A — local build (macOS + Xcode required)
+
+1. Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store and open it once to accept the licence.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Build and launch the app directly on the iOS Simulator:
+   ```bash
+   npm run ios
+   # or
+   npx expo run:ios
+   ```
+   Expo will compile a debug build, install it in the simulator, and open it automatically.
+
+4. **Simulating GPS location** — The simulator has no real GPS.  
+   Set a simulated location from the Xcode menu:  
+   `Simulator → Features → Location → Custom Location…`  
+   (or choose one of the preset cities such as *Apple* or *San Francisco*).  
+   All location-dependent features (restaurant search, trip logger, etc.) will then work normally.
+
+### Option B — EAS cloud build for simulator
+
+If you are on macOS but prefer not to install Xcode locally, or if you just want a
+pre-built `.app` you can share with other Mac users:
+
+```bash
+npx eas build --profile development-simulator --platform ios
+```
+
+Once the build finishes, EAS will give you a download link for a `.tar.gz` containing
+the `.app` bundle. Unzip it, then drag the `.app` file onto an open Simulator window
+(or use `xcrun simctl install booted <path-to.app>`).
+
+> **Windows / Linux users** — The iPhone Simulator cannot run on your operating system.
+> Your options are:
+> - Test on a **physical iPhone** using a development build distributed via EAS
+>   (`npx eas build --profile development --platform ios`).
+> - Test using the **Android emulator** (`npm run android`) — see the
+>   [Android Studio emulator guide](https://docs.expo.dev/workflow/android-studio-emulator/).
+> - Test in a **web browser** (`npm run web`) — most UI and logic works, but native
+>   maps and GPS features are limited.
+
 ## Get a fresh project
 
 When you're ready, run:
