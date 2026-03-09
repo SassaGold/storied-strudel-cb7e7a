@@ -11,13 +11,13 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you."
-      }
+        "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "We use your location to show where you are and what’s around you."
+      },
+      "bundleIdentifier": "com.sassagold.leander"
     },
     "android": {
       "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
       ],
