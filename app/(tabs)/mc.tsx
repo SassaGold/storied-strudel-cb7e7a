@@ -328,6 +328,9 @@ out center 120;`;
   const sectionTitle = t(`garage.titles.${selected}`);
   const sectionDescription = t(`garage.descriptions.${selected}`);
   const emptyText = t(`garage.empty.${selected}`);
+  const mapsButtonLabel = (selected === "parking" || selected === "clubs_tracks" || selected === "atm_bank")
+    ? t("common.reviewsGoogle")
+    : t("common.checkFuelPrices");
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
@@ -426,7 +429,7 @@ out center 120;`;
                 style={styles.modalActionButton}
                 onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null); }}
               >
-                <Text style={styles.modalActionButtonText}>{t("common.checkFuelPrices")}</Text>
+                <Text style={styles.modalActionButtonText}>{mapsButtonLabel}</Text>
               </Pressable>
               {infoPlace?.wikipedia && (
                 <Pressable
