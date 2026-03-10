@@ -365,7 +365,10 @@ export default function Index() {
     setError(null);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
-      if (permission.status !== "granted") {
+      // On web (iOS Safari), the Permissions API returns 'prompt' for first-time visitors,
+      // which expo-location maps to 'undetermined'. Only bail out if explicitly denied;
+      // otherwise proceed to getCurrentPositionAsync() which triggers the browser dialog.
+      if (permission.status === "denied") {
         setError(t("home.locationError"));
         return;
       }
