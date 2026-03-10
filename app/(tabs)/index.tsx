@@ -1,5 +1,3 @@
-const Haptics: any = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -15,6 +13,8 @@ import { Image as ExpoImage } from "expo-image";
 import * as Location from "expo-location";
 import Constants from "expo-constants";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const Haptics: any = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
 let NativeMapView: any = null;
 let NativeMarker: any = null;

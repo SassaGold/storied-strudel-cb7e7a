@@ -1,8 +1,3 @@
-const Haptics: any = (() => {
-  try { return require("expo-haptics"); }
-  catch { return null; }
-})();
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Pressable,
@@ -14,6 +9,11 @@ import {
 import * as Location from "expo-location";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { haversineMeters } from "../../lib/overpass";
+
+const Haptics: any = (() => {
+  try { return require("expo-haptics"); }
+  catch { return null; }
+})();
 
 type TripRecord = {
   date: string;

@@ -1,14 +1,3 @@
-const AsyncStorage: any = (() => {
-  try { return require("@react-native-async-storage/async-storage").default; }
-  catch { return null; }
-})();
-
-const rnMaps: any = (() => {
-  try { return require("react-native-maps"); }
-  catch { return null; }
-})();
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -22,6 +11,17 @@ import {
 import * as Location from "expo-location";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS, formatDistance } from "../../lib/overpass";
+
+const AsyncStorage: any = (() => {
+  try { return require("@react-native-async-storage/async-storage").default; }
+  catch { return null; }
+})();
+
+const rnMaps: any = (() => {
+  try { return require("react-native-maps"); }
+  catch { return null; }
+})();
+const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
 
 const CACHE_KEY = "cache_emergency_v2";
 
@@ -58,16 +58,18 @@ export default function EmergencyScreen() {
 
       const { latitude, longitude } = position.coords;
 
-      const raw = await AsyncStorage?.getItem(CACHE_KEY);
-      if (raw) {
-        const { ts, data } = JSON.parse(raw);
-        if (Date.now() - ts < CACHE_TTL_MS) {
-          setHospitals(data.hospitals);
-          setPharmacies(data.pharmacies);
-          setPoliceAndFire(data.policeAndFire);
-          return;
+      try {
+        const raw = await AsyncStorage?.getItem(CACHE_KEY);
+        if (raw) {
+          const { ts, data } = JSON.parse(raw);
+          if (Date.now() - ts < CACHE_TTL_MS) {
+            setHospitals(data.hospitals);
+            setPharmacies(data.pharmacies);
+            setPoliceAndFire(data.policeAndFire);
+            return;
+          }
         }
-      }
+      } catch { /* ignore corrupted cache */ }
 
       const overpassQuery = `
 [out:json][timeout:25];

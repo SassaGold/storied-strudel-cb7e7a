@@ -13,7 +13,7 @@ i18n
   .init({
     compatibilityJSON: "v3",
     resources: { en: { translation: en }, es: { translation: es }, de: { translation: de }, fr: { translation: fr }, is: { translation: is } },
-    lng: (Localization.getLocales()?.[0]?.languageCode ?? "en").toLowerCase(),
+    lng: ((Localization.getLocales() ?? [])[0]?.languageCode ?? "en").toLowerCase(),
     fallbackLng: "en",
     interpolation: { escapeValue: false },
   });

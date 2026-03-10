@@ -1,11 +1,11 @@
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSettings } from "../../lib/settings";
+
 const Haptics: any = (() => {
   try { return require("expo-haptics"); }
   catch { return null; }
 })();
-
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSettings } from "../../lib/settings";
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
