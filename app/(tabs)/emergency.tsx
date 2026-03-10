@@ -178,6 +178,7 @@ out center 100;`;
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
+      {!hasResults && !loading && (
         <Text style={styles.bodyText}>
           No emergency services found yet. Try updating your location.
         </Text>

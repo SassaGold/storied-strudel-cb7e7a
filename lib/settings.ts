@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useMemo, useState } from "react";
 
 type UnitSystem = "metric" | "imperial";
 
@@ -24,8 +24,12 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   const [unitSystem, setUnitSystem] = useState<UnitSystem>("metric");
   const [searchRadiusKm, setSearchRadiusKm] = useState(5);
   const [defaultTab, setDefaultTab] = useState("index");
+  const value = useMemo(
+    () => ({ unitSystem, setUnitSystem, searchRadiusKm, setSearchRadiusKm, defaultTab, setDefaultTab }),
+    [unitSystem, searchRadiusKm, defaultTab]
+  );
   return (
-    <SettingsContext.Provider value={{ unitSystem, setUnitSystem, searchRadiusKm, setSearchRadiusKm, defaultTab, setDefaultTab }}>
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   );
