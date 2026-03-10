@@ -14,7 +14,7 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, parseWikiTag } from "../../lib/overpass";
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -151,7 +151,7 @@ out center 120;`;
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, settings.searchRadiusKm]);
 
   const openInMaps = useCallback((place: Place) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;

@@ -67,3 +67,15 @@ export async function fetchOverpass(
 
 /** POI result cache TTL: 30 minutes. */
 export const CACHE_TTL_MS = 30 * 60 * 1_000;
+
+/**
+ * Parse an OpenStreetMap `wikipedia` tag (e.g. "en:Eiffel_Tower" or just "Paris")
+ * into a { lang, title } pair suitable for the Wikipedia REST API.
+ */
+export function parseWikiTag(tag: string): { lang: string; title: string } {
+  const colonIdx = tag.indexOf(":");
+  return {
+    lang: colonIdx > 0 ? tag.slice(0, colonIdx) : "en",
+    title: (colonIdx > 0 ? tag.slice(colonIdx + 1) : tag).replace(/ /g, "_"),
+  };
+}
