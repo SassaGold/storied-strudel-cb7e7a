@@ -9,6 +9,21 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, formatDistance } from "../../lib/overpass";
+
+const AsyncStorage: any = (() => {
+  try { return require("@react-native-async-storage/async-storage").default; }
+  catch { return null; }
+})();
+
+const rnMaps: any = (() => {
+  try { return require("react-native-maps"); }
+  catch { return null; }
+})();
+const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
+
+const CACHE_KEY = "cache_restaurants_v2";
 
 type Place = {
   id: string;
@@ -19,37 +34,8 @@ type Place = {
   longitude: number;
 };
 
-const haversineMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) => {
-  const toRad = (value: number) => (value * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
-const formatDistance = (distance?: number) => {
-  if (distance === undefined) {
-    return "";
-  }
-  if (distance < 1000) {
-    return `${Math.round(distance)} m`;
-  }
-  return `${(distance / 1000).toFixed(1)} km`;
-};
-
 export default function RestaurantsScreen() {
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -59,7 +45,7 @@ export default function RestaurantsScreen() {
     setError(null);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
-      if (permission.status !== "granted") {
+      if (permission.status === "denied") {
         setError("Location permission is required to find restaurants.");
         return;
       }
@@ -70,6 +56,14 @@ export default function RestaurantsScreen() {
 
       const { latitude, longitude } = position.coords;
 
+      try {
+        const raw = await AsyncStorage?.getItem(CACHE_KEY);
+        if (raw) {
+          const { ts, data } = JSON.parse(raw);
+          if (Date.now() - ts < CACHE_TTL_MS) { setPlaces(data); return; }
+        }
+      } catch { /* ignore corrupted cache */ }
+
       const overpassQuery = `
 [out:json][timeout:25];
 (
@@ -79,12 +73,7 @@ export default function RestaurantsScreen() {
 );
 out center 120;`;
 
-      const response = await fetch(
-        `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-          overpassQuery
-        )}`
-      );
-      const data = await response.json();
+      const data = await fetchOverpass(overpassQuery);
 
       if (!data.elements) {
         setPlaces([]);
@@ -111,11 +100,11 @@ out center 120;`;
         })
         .filter(Boolean) as Place[];
 
-      setPlaces(
-        mapped
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
+      const sorted = mapped
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .slice(0, 20);
+      setPlaces(sorted);
+      await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted }));
     } catch (err) {
       setError("Unable to load restaurants. Please try again.");
     } finally {
@@ -129,7 +118,7 @@ out center 120;`;
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
