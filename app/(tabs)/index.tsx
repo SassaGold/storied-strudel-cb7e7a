@@ -1,3 +1,5 @@
+const Haptics: any = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,6 +14,7 @@ import {
 import { Image as ExpoImage } from "expo-image";
 import * as Location from "expo-location";
 import Constants from "expo-constants";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 let NativeMapView: any = null;
 let NativeMarker: any = null;
@@ -156,6 +159,7 @@ const buildAlerts = (weather?: WeatherInfo) => {
 };
 
 export default function Index() {
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<GeoAddress | null>(null);
@@ -174,7 +178,7 @@ export default function Index() {
     setError(null);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
-      if (permission.status !== "granted") {
+      if (permission.status === "denied") {
         setError("Location permission is required to show nearby info.");
         return;
       }
@@ -391,7 +395,7 @@ out center 60;`;
   }, [location]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
@@ -499,7 +503,7 @@ out center 60;`;
         )}
       </View>
 
-      <Pressable style={styles.primaryButton} onPress={loadData}>
+      <Pressable style={styles.primaryButton} onPress={() => { Haptics?.impactAsync(Haptics?.ImpactFeedbackStyle?.Light); loadData(); }}>
         <Text style={styles.primaryButtonText}>
           {loading ? "Loading..." : "Update my location"}
         </Text>

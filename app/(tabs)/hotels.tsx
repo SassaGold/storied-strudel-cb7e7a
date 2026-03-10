@@ -1,3 +1,14 @@
+const AsyncStorage: any = (() => {
+  try { return require("@react-native-async-storage/async-storage").default; }
+  catch { return null; }
+})();
+
+const rnMaps: any = (() => {
+  try { return require("react-native-maps"); }
+  catch { return null; }
+})();
+const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
+
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,6 +20,10 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, formatDistance } from "../../lib/overpass";
+
+const CACHE_KEY = "cache_hotels_v2";
 
 type Place = {
   id: string;
@@ -20,66 +35,8 @@ type Place = {
   stars?: string;
 };
 
-const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://overpass.nchc.org.tw/api/interpreter",
-];
-
-const haversineMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) => {
-  const toRad = (value: number) => (value * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
-const formatDistance = (distance?: number) => {
-  if (distance === undefined) {
-    return "";
-  }
-  if (distance < 1000) {
-    return `${Math.round(distance)} m`;
-  }
-  return `${(distance / 1000).toFixed(1)} km`;
-};
-
-const fetchOverpass = async (query: string) => {
-  let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        },
-        body: `data=${encodeURIComponent(query)}`,
-      });
-      if (!response.ok) {
-        lastError = `Overpass error ${response.status}`;
-        continue;
-      }
-      return await response.json();
-    } catch (err) {
-      lastError = "Network error";
-    }
-  }
-  throw new Error(lastError ?? "Overpass request failed");
-};
-
 export default function HotelsScreen() {
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -89,7 +46,7 @@ export default function HotelsScreen() {
     setError(null);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
-      if (permission.status !== "granted") {
+      if (permission.status === "denied") {
         setError("Location permission is required to find hotels.");
         return;
       }
@@ -99,6 +56,12 @@ export default function HotelsScreen() {
       });
 
       const { latitude, longitude } = position.coords;
+
+      const raw = await AsyncStorage?.getItem(CACHE_KEY);
+      if (raw) {
+        const { ts, data } = JSON.parse(raw);
+        if (Date.now() - ts < CACHE_TTL_MS) { setPlaces(data); return; }
+      }
 
       const overpassQuery = `
 [out:json][timeout:25];
@@ -138,11 +101,11 @@ out center 120;`;
         })
         .filter(Boolean) as Place[];
 
-      setPlaces(
-        mapped
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
+      const sorted = mapped
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .slice(0, 20);
+      setPlaces(sorted);
+      await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted }));
     } catch (err) {
       setError("Unable to load hotels. Please try again.");
     } finally {
@@ -156,7 +119,7 @@ out center 120;`;
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />

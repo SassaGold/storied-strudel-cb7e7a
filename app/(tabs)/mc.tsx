@@ -1,3 +1,14 @@
+const AsyncStorage: any = (() => {
+  try { return require("@react-native-async-storage/async-storage").default; }
+  catch { return null; }
+})();
+
+const rnMaps: any = (() => {
+  try { return require("react-native-maps"); }
+  catch { return null; }
+})();
+const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
+
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,6 +20,10 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, formatDistance } from "../../lib/overpass";
+
+const CACHE_KEY = "cache_mc_v2";
 
 type Place = {
   id: string;
@@ -18,42 +33,6 @@ type Place = {
   latitude: number;
   longitude: number;
   note?: string;
-};
-
-const OVERPASS_ENDPOINTS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://overpass.nchc.org.tw/api/interpreter",
-];
-
-const haversineMeters = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-) => {
-  const toRad = (value: number) => (value * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
-const formatDistance = (distance?: number) => {
-  if (distance === undefined) {
-    return "";
-  }
-  if (distance < 1000) {
-    return `${Math.round(distance)} m`;
-  }
-  return `${(distance / 1000).toFixed(1)} km`;
 };
 
 const mapElements = (
@@ -86,33 +65,8 @@ const mapElements = (
     })
     .filter(Boolean) as Place[];
 
-const fetchOverpass = async (query: string) => {
-  let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-        },
-        body: `data=${encodeURIComponent(query)}`,
-      });
-
-      if (!response.ok) {
-        lastError = `Overpass error ${response.status}`;
-        continue;
-      }
-
-      return await response.json();
-    } catch (err) {
-      lastError = "Network error";
-    }
-  }
-
-  throw new Error(lastError ?? "Overpass request failed");
-};
-
 export default function McScreen() {
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [parking, setParking] = useState<Place[]>([]);
@@ -124,7 +78,7 @@ export default function McScreen() {
     setError(null);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
-      if (permission.status !== "granted") {
+      if (permission.status === "denied") {
         setError("Location permission is required to find nearby places.");
         return;
       }
@@ -134,6 +88,17 @@ export default function McScreen() {
       });
 
       const { latitude, longitude } = position.coords;
+
+      const raw = await AsyncStorage?.getItem(CACHE_KEY);
+      if (raw) {
+        const { ts, data } = JSON.parse(raw);
+        if (Date.now() - ts < CACHE_TTL_MS) {
+          setParking(data.parking);
+          setFuelStations(data.fuelStations);
+          setWorkshops(data.workshops);
+          return;
+        }
+      }
 
       const parkingQuery = `
 [out:json][timeout:25];
@@ -191,21 +156,24 @@ out center 120;`;
           )
         : [];
 
-      setParking(
-        parkingResults
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
-      setFuelStations(
-        fuelResults
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
-      setWorkshops(
-        workshopResults
-          .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-          .slice(0, 20)
-      );
+      const sortedParking = parkingResults
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .slice(0, 20);
+      const sortedFuel = fuelResults
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .slice(0, 20);
+      const sortedWorkshops = workshopResults
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .slice(0, 20);
+
+      setParking(sortedParking);
+      setFuelStations(sortedFuel);
+      setWorkshops(sortedWorkshops);
+
+      await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({
+        ts: Date.now(),
+        data: { parking: sortedParking, fuelStations: sortedFuel, workshops: sortedWorkshops }
+      }));
     } catch (err) {
       const message =
         err instanceof Error && err.message
@@ -223,7 +191,7 @@ out center 120;`;
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />

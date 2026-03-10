@@ -23,7 +23,7 @@ import * as Location from "expo-location";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS, formatDistance } from "../../lib/overpass";
 
-const CACHE_KEY = "cache_restaurants_v2";
+const CACHE_KEY = "cache_emergency_v2";
 
 type Place = {
   id: string;
@@ -34,11 +34,13 @@ type Place = {
   longitude: number;
 };
 
-export default function RestaurantsScreen() {
+export default function EmergencyScreen() {
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [places, setPlaces] = useState<Place[]>([]);
+  const [hospitals, setHospitals] = useState<Place[]>([]);
+  const [pharmacies, setPharmacies] = useState<Place[]>([]);
+  const [policeAndFire, setPoliceAndFire] = useState<Place[]>([]);
 
   const loadPlaces = useCallback(async () => {
     setLoading(true);
@@ -46,7 +48,7 @@ export default function RestaurantsScreen() {
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status === "denied") {
-        setError("Location permission is required to find restaurants.");
+        setError("Location permission is required to find emergency services.");
         return;
       }
 
@@ -59,52 +61,68 @@ export default function RestaurantsScreen() {
       const raw = await AsyncStorage?.getItem(CACHE_KEY);
       if (raw) {
         const { ts, data } = JSON.parse(raw);
-        if (Date.now() - ts < CACHE_TTL_MS) { setPlaces(data); return; }
+        if (Date.now() - ts < CACHE_TTL_MS) {
+          setHospitals(data.hospitals);
+          setPharmacies(data.pharmacies);
+          setPoliceAndFire(data.policeAndFire);
+          return;
+        }
       }
 
       const overpassQuery = `
 [out:json][timeout:25];
 (
-  node(around:5000,${latitude},${longitude})[amenity~"restaurant|cafe"];
-  way(around:5000,${latitude},${longitude})[amenity~"restaurant|cafe"];
-  relation(around:5000,${latitude},${longitude})[amenity~"restaurant|cafe"];
+  node(around:5000,${latitude},${longitude})[amenity~"hospital|doctors|clinic"];
+  way(around:5000,${latitude},${longitude})[amenity~"hospital|doctors|clinic"];
+  node(around:5000,${latitude},${longitude})[amenity=pharmacy];
+  way(around:5000,${latitude},${longitude})[amenity=pharmacy];
+  node(around:5000,${latitude},${longitude})[amenity~"police|fire_station"];
+  way(around:5000,${latitude},${longitude})[amenity~"police|fire_station"];
 );
-out center 120;`;
+out center 100;`;
 
       const data = await fetchOverpass(overpassQuery);
 
       if (!data.elements) {
-        setPlaces([]);
+        setHospitals([]);
+        setPharmacies([]);
+        setPoliceAndFire([]);
         return;
       }
 
-      const mapped = (data.elements as any[])
-        .map((element) => {
-          const lat = element.lat ?? element.center?.lat;
-          const lon = element.lon ?? element.center?.lon;
-          if (lat === undefined || lon === undefined) {
-            return null;
-          }
-          const tags = element.tags ?? {};
-          const name = tags.name || tags.amenity || "Restaurant";
-          return {
-            id: String(element.id),
-            name,
-            category: tags.amenity || "restaurant",
-            latitude: lat,
-            longitude: lon,
-            distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-          } as Place;
-        })
-        .filter(Boolean) as Place[];
+      const mapElement = (element: any): Place | null => {
+        const lat = element.lat ?? element.center?.lat;
+        const lon = element.lon ?? element.center?.lon;
+        if (lat === undefined || lon === undefined) return null;
+        const tags = element.tags ?? {};
+        const name = tags.name || tags.amenity || "Place";
+        return {
+          id: String(element.id),
+          name,
+          category: tags.amenity || "service",
+          latitude: lat,
+          longitude: lon,
+          distanceMeters: haversineMeters(latitude, longitude, lat, lon),
+        };
+      };
 
-      const sorted = mapped
-        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-        .slice(0, 20);
-      setPlaces(sorted);
-      await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted }));
+      const all = (data.elements as any[]).map(mapElement).filter(Boolean) as Place[];
+      const sorted = all.sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
+
+      const hospList = sorted.filter(p => ["hospital","doctors","clinic"].includes(p.category)).slice(0, 10);
+      const pharmList = sorted.filter(p => p.category === "pharmacy").slice(0, 10);
+      const pfList = sorted.filter(p => ["police","fire_station"].includes(p.category)).slice(0, 10);
+
+      setHospitals(hospList);
+      setPharmacies(pharmList);
+      setPoliceAndFire(pfList);
+
+      await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({
+        ts: Date.now(),
+        data: { hospitals: hospList, pharmacies: pharmList, policeAndFire: pfList }
+      }));
     } catch (err) {
-      setError("Unable to load restaurants. Please try again.");
+      setError("Unable to load emergency services. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -115,19 +133,39 @@ out center 120;`;
     Linking.openURL(url).catch(() => null);
   }, []);
 
+  const renderSection = (title: string, items: Place[]) => {
+    if (items.length === 0) return null;
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        {items.map((place) => (
+          <Pressable key={place.id} style={styles.placeRow} onPress={() => openInMaps(place)}>
+            <View style={styles.placeInfo}>
+              <Text style={styles.bodyText}>{place.name}</Text>
+              <Text style={styles.metaText}>{place.category}</Text>
+            </View>
+            <Text style={styles.metaText}>{formatDistance(place.distanceMeters)}</Text>
+          </Pressable>
+        ))}
+      </View>
+    );
+  };
+
+  const hasResults = hospitals.length > 0 || pharmacies.length > 0 || policeAndFire.length > 0;
+
   return (
     <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>Eat nearby</Text>
-        <Text style={styles.title}>Restaurants Near You</Text>
-        <Text style={styles.subtitle}>Discover places to eat nearby.</Text>
+        <Text style={styles.headerBadge}>Emergency</Text>
+        <Text style={styles.title}>Emergency Services</Text>
+        <Text style={styles.subtitle}>Find hospitals, pharmacies, police & fire nearby.</Text>
       </View>
 
       <Pressable style={styles.primaryButton} onPress={loadPlaces}>
         <Text style={styles.primaryButtonText}>
-          {loading ? "Loading..." : "Find restaurants near me"}
+          {loading ? "Loading..." : "Find emergency services near me"}
         </Text>
       </Pressable>
 
@@ -140,27 +178,14 @@ out center 120;`;
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {places.length === 0 && !loading ? (
         <Text style={styles.bodyText}>
-          No restaurants found yet. Try updating your location.
+          No emergency services found yet. Try updating your location.
         </Text>
-      ) : (
-        places.map((place) => (
-          <Pressable
-            key={place.id}
-            style={styles.placeRow}
-            onPress={() => openInMaps(place)}
-          >
-            <View style={styles.placeInfo}>
-              <Text style={styles.bodyText}>{place.name}</Text>
-              <View style={styles.tagRow}>
-                <Text style={styles.metaText}>{place.category}</Text>
-              </View>
-            </View>
-            <Text style={styles.metaText}>{formatDistance(place.distanceMeters)}</Text>
-          </Pressable>
-        ))
       )}
+
+      {renderSection("Hospitals & Clinics", hospitals)}
+      {renderSection("Pharmacies", pharmacies)}
+      {renderSection("Police & Fire", policeAndFire)}
     </ScrollView>
   );
 }
@@ -172,21 +197,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#0f0a1a",
   },
   header: {
-    marginTop: 18,
     marginBottom: 20,
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.12)",
     overflow: "hidden",
-    backgroundColor: "#7c2d12",
+    backgroundColor: "#7f1d1d",
   },
   headerGlow: {
     position: "absolute",
     width: 180,
     height: 180,
     borderRadius: 90,
-    backgroundColor: "rgba(249,115,22,0.55)",
+    backgroundColor: "rgba(239,68,68,0.55)",
     top: -80,
     right: -40,
   },
@@ -195,7 +219,7 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: "rgba(244,63,94,0.45)",
+    backgroundColor: "rgba(220,38,38,0.45)",
     bottom: -60,
     left: -20,
   },
@@ -218,24 +242,24 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   subtitle: {
-    color: "#c4b5fd",
+    color: "#fca5a5",
     marginTop: 6,
     fontSize: 15,
   },
   primaryButton: {
-    backgroundColor: "#f59e0b",
+    backgroundColor: "#ef4444",
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#f59e0b",
+    shadowColor: "#ef4444",
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
   },
   primaryButtonText: {
-    color: "#2b0a3d",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "600",
   },
@@ -251,6 +275,15 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#f87171",
     marginBottom: 12,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    color: "#f8fafc",
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 10,
   },
   bodyText: {
     color: "#e2e8f0",
@@ -280,10 +313,5 @@ const styles = StyleSheet.create({
   placeInfo: {
     flex: 1,
     marginRight: 12,
-  },
-  tagRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
   },
 });
