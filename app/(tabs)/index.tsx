@@ -443,9 +443,6 @@ out center 60;`;
               Map preview is unavailable right now. Tap “Update my location” to
               retry.
             </Text>
-            <Text style={styles.metaText}>
-              Debug: map URL not generated.
-            </Text>
           </View>
         )}
         {mapUrl && !mapError && mapImageSource && (!useNativeMaps || isWeb) && (
