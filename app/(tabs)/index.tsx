@@ -30,13 +30,24 @@ type ForecastDay = {
   precipitationProbability: number;
 };
 
+type HourlyForecast = {
+  time: string;
+  temperatureC: number;
+  weatherCode: string;
+  precipitationProbability: number;
+};
+
 type WeatherInfo = {
   temperatureC?: number;
+  feelsLikeC?: number;
   windSpeed?: number;
+  windDirection?: number;
+  humidity?: number;
   precipitation?: number;
   precipitationProbability?: number;
   weatherCode?: string;
   forecast?: ForecastDay[];
+  hourly?: HourlyForecast[];
 };
 
 type RoadAlert = {
@@ -97,6 +108,18 @@ function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): nu
 
 const normalizeSymbol = (sym: string) =>
   sym.replace(/_(day|night|polartwilight)$/, "");
+
+const windDegToCompass = (deg: number): string => {
+  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  return dirs[((Math.round(deg / 45) % 8) + 8) % 8];
+};
+
+const formatHourlyTime = (isoTime: string): string => {
+  // isoTime is like "2024-03-10T14:00" — extract the HH:MM portion
+  const tIdx = isoTime.indexOf("T");
+  if (tIdx === -1) return isoTime;
+  return isoTime.slice(tIdx + 1, tIdx + 6);
+};
 
 /**
  * Map WMO weather interpretation codes (used by Open-Meteo) to the
@@ -402,7 +425,8 @@ export default function Index() {
       // User-Agent header in fetch(), which api.met.no requires for identification.
       const weatherPromise = fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(4)}&longitude=${longitude.toFixed(4)}` +
-        `&current=temperature_2m,wind_speed_10m,precipitation,weather_code,precipitation_probability` +
+        `&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,relative_humidity_2m,precipitation,weather_code,precipitation_probability` +
+        `&hourly=temperature_2m,weather_code,precipitation_probability` +
         `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
         `&forecast_days=4&timezone=auto`
       )
@@ -438,13 +462,40 @@ export default function Index() {
             });
           }
 
+          // Build next-6-hours hourly forecast
+          const hourlyData = data.hourly ?? {};
+          const hourlyTimes: string[] = hourlyData.time ?? [];
+          const hourlyTemps: number[] = hourlyData.temperature_2m ?? [];
+          const hourlyCodes: number[] = hourlyData.weather_code ?? [];
+          const hourlyRainProbs: number[] = hourlyData.precipitation_probability ?? [];
+          const nowMs = Date.now();
+          const hourly: HourlyForecast[] = [];
+          for (let i = 0; i < hourlyTimes.length && hourly.length < 6; i++) {
+            if (
+              new Date(hourlyTimes[i]).getTime() > nowMs &&
+              hourlyTemps[i] !== undefined &&
+              hourlyCodes[i] !== undefined
+            ) {
+              hourly.push({
+                time: hourlyTimes[i],
+                temperatureC: hourlyTemps[i],
+                weatherCode: wmoToSymbol(hourlyCodes[i] as number),
+                precipitationProbability: Math.round(hourlyRainProbs[i] ?? 0),
+              });
+            }
+          }
+
           return {
             temperatureC: current.temperature_2m,
+            feelsLikeC: current.apparent_temperature,
             windSpeed: current.wind_speed_10m,
+            windDirection: current.wind_direction_10m,
+            humidity: current.relative_humidity_2m,
             precipitation,
             precipitationProbability: Math.round(precipProbability),
             weatherCode: symbol,
             forecast,
+            hourly,
           } as WeatherInfo;
         })
         .catch(() => null);
@@ -625,27 +676,43 @@ export default function Index() {
             <Text style={styles.weatherEmojiLarge}>{weatherEmoji(weather.weatherCode)}</Text>
             <View style={styles.weatherMainInfo}>
               <Text style={styles.weatherTempText}>{weather.temperatureC != null ? fmtTemp(weather.temperatureC, settings.unitSystem) : "—"}</Text>
+              {weather.feelsLikeC != null && (
+                <Text style={styles.weatherFeelsLike}>
+                  {t("home.feelsLike")}: {fmtTemp(weather.feelsLikeC, settings.unitSystem)}
+                </Text>
+              )}
               <Text style={styles.weatherConditionText}>
                 {t(formatWeatherCode(weather.weatherCode), { defaultValue: formatWeatherCode(weather.weatherCode) })}
               </Text>
             </View>
           </View>
 
-          {/* Stats grid */}
+          {/* Stats grid — 2×2 */}
           <View style={styles.weatherStatsGrid}>
-            <View style={styles.weatherStatItem}>
-              <Text style={styles.weatherStatValue}>{weather.windSpeed?.toFixed(1) ?? "0"}</Text>
-              <Text style={styles.weatherStatLabel}>{t("home.wind")}</Text>
+            <View style={styles.weatherStatsRow}>
+              <View style={styles.weatherStatItem}>
+                <Text style={styles.weatherStatValue}>
+                  {weather.windSpeed?.toFixed(1) ?? "0"}{weather.windDirection != null ? ` ${windDegToCompass(weather.windDirection)}` : ""}
+                </Text>
+                <Text style={styles.weatherStatLabel}>{t("home.wind")}</Text>
+              </View>
+              <View style={styles.weatherStatDivider} />
+              <View style={styles.weatherStatItem}>
+                <Text style={styles.weatherStatValue}>{weather.precipitationProbability ?? 0}%</Text>
+                <Text style={styles.weatherStatLabel}>{t("home.rainChance")}</Text>
+              </View>
             </View>
-            <View style={styles.weatherStatDivider} />
-            <View style={styles.weatherStatItem}>
-              <Text style={styles.weatherStatValue}>{weather.precipitation ?? 0}</Text>
-              <Text style={styles.weatherStatLabel}>{t("home.precip")}</Text>
-            </View>
-            <View style={styles.weatherStatDivider} />
-            <View style={styles.weatherStatItem}>
-              <Text style={styles.weatherStatValue}>{weather.precipitationProbability ?? 0}%</Text>
-              <Text style={styles.weatherStatLabel}>{t("home.rainChance")}</Text>
+            <View style={styles.weatherStatsRowDivider} />
+            <View style={styles.weatherStatsRow}>
+              <View style={styles.weatherStatItem}>
+                <Text style={styles.weatherStatValue}>{weather.humidity != null ? `${weather.humidity}%` : "—"}</Text>
+                <Text style={styles.weatherStatLabel}>{t("home.humidity")}</Text>
+              </View>
+              <View style={styles.weatherStatDivider} />
+              <View style={styles.weatherStatItem}>
+                <Text style={styles.weatherStatValue}>{weather.precipitation ?? 0}</Text>
+                <Text style={styles.weatherStatLabel}>{t("home.precip")}</Text>
+              </View>
             </View>
           </View>
 
@@ -677,9 +744,27 @@ export default function Index() {
             </View>
           )}
 
-          {/* 3-Day Forecast */}
-          {weather.forecast && weather.forecast.length > 0 && (
+          {/* Next 6 Hours */}
+          {weather.hourly && weather.hourly.length > 0 && (
             <View style={styles.weatherSection}>
+              <Text style={styles.weatherSectionTitle}>{t("home.hourlyForecast")}</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} nestedScrollEnabled>
+                <View style={styles.hourlyCardsRow}>
+                  {weather.hourly.map((hour) => (
+                    <View key={hour.time} style={styles.hourlyCard}>
+                      <Text style={styles.hourlyCardTime}>{formatHourlyTime(hour.time)}</Text>
+                      <Text style={styles.hourlyCardEmoji}>{weatherEmoji(hour.weatherCode)}</Text>
+                      <Text style={styles.hourlyCardTemp}>{fmtTemp(hour.temperatureC, settings.unitSystem, true)}</Text>
+                      <Text style={styles.hourlyCardRain}>💧 {hour.precipitationProbability}%</Text>
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          )}
+
+          {/* 3-Day Forecast */}
+          {weather.forecast && weather.forecast.length > 0 && (            <View style={styles.weatherSection}>
               <Text style={styles.weatherSectionTitle}>{t("home.forecast")}</Text>
               <View style={styles.forecastCardsRow}>
                 {weather.forecast.slice(0, 3).map((day) => (
@@ -1101,14 +1186,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 2,
   },
+  weatherFeelsLike: {
+    color: "#888888",
+    fontSize: 13,
+    marginTop: 2,
+  },
   weatherStatsGrid: {
-    flexDirection: "row",
     backgroundColor: "#0a0a0a",
     borderRadius: 8,
-    paddingVertical: 12,
     marginBottom: 14,
     borderWidth: 1,
     borderColor: "#2a2a2a",
+    overflow: "hidden",
+  },
+  weatherStatsRow: {
+    flexDirection: "row",
+    paddingVertical: 12,
+  },
+  weatherStatsRowDivider: {
+    height: 1,
+    backgroundColor: "#2a2a2a",
   },
   weatherStatItem: {
     flex: 1,
@@ -1224,6 +1321,41 @@ const styles = StyleSheet.create({
     color: "#ff6600",
     fontSize: 11,
     fontWeight: "600",
+  },
+  hourlyCardsRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingVertical: 4,
+  },
+  hourlyCard: {
+    backgroundColor: "#0a0a0a",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    minWidth: 68,
+  },
+  hourlyCardTime: {
+    color: "#ffffff",
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+  hourlyCardEmoji: {
+    fontSize: 22,
+    marginBottom: 4,
+  },
+  hourlyCardTemp: {
+    color: "#ff6600",
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  hourlyCardRain: {
+    color: "#888888",
+    fontSize: 11,
   },
   sunTimesRow: {
     flexDirection: "row",
