@@ -107,7 +107,7 @@ export default function TripLoggerScreen() {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (!active || status === "denied") return;
       liveSpeedWatchRef.current = await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.Balanced, timeInterval: 1500, distanceInterval: 3 },
+        { accuracy: Location.Accuracy.Balanced, timeInterval: 1500 },
         (loc) => {
           if (recordingRef.current) return; // recording watcher handles speed during active trip
           const { latitude, longitude, speed } = loc.coords;
@@ -117,9 +117,11 @@ export default function TripLoggerScreen() {
           } else if (prevSpeedPointRef.current) {
             const distM = haversineMeters(prevSpeedPointRef.current.latitude, prevSpeedPointRef.current.longitude, latitude, longitude);
             const dtSec = (ts - prevSpeedPointRef.current.timestamp) / 1000;
-            if (dtSec > 0.5 && distM > 0) {
-              setCurrentSpeedKmh((distM / dtSec) * 3.6);
+            if (dtSec > 0.5) {
+              setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
             }
+          } else {
+            setCurrentSpeedKmh(0);
           }
           prevSpeedPointRef.current = { latitude, longitude, timestamp: ts };
         }
@@ -216,8 +218,8 @@ export default function TripLoggerScreen() {
         } else if (prev) {
           const distM = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
           const dtSec = (ts - prev.timestamp) / 1000;
-          if (dtSec > 0.5 && distM > 0) {
-            setCurrentSpeedKmh((distM / dtSec) * 3.6);
+          if (dtSec > 0.5) {
+            setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
           }
         }
         setAccuracy(acc ?? null);
