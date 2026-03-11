@@ -211,7 +211,7 @@
       "atm_bank": "Minibanker og banker"
     },
     "descriptions": {
-      "services": "Søker innen 30 km etter motorsykkelforhandlere, verksteder, deler og tilbehørbutikker samt utleiebutikker. Data fra OpenStreetMap — gratis, samfunnsvedlikeholdte kartdata. Skriv inn et navn for å søke direkte i Google Maps (gratis).",
+      "services": "Søker innen 30 km etter motorsykkelforhandlere, verksteder, deler og tilbehørbutikker samt utleiebutikker. Skriv inn et navn for å søke direkte i Google Maps.",
       "fuel": "Søker innen 20 km etter alle bensin-/drivstoffstasjoner. Drivstofftyper vises der tilgjengelig fra OpenStreetMap. Trykk ⛽ Sjekk drivstoffpriser for å åpne stasjonen direkte i Google Maps — priser vises der i land der Google har disse dataene.",
       "parking": "Søker innen 5 km etter generell parkering og innen 10 km etter dedikert motorsykkelparking.",
       "clubs_tracks": "Søker innen 50 km etter motorsykkelklubber og race-/kjørebaner.",

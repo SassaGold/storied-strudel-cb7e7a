@@ -211,7 +211,7 @@
       "atm_bank": "Hæveautomater og banker"
     },
     "descriptions": {
-      "services": "Søger inden for 30 km efter motorcykelforhandlere, reparationsværksteder, dele og tilbehørsbutikker samt udlejningsbutikker. Data fra OpenStreetMap — gratis, fællesskabsvedligeholdte kortdata. Skriv et navn for at søge direkte i Google Maps (gratis).",
+      "services": "Søger inden for 30 km efter motorcykelforhandlere, reparationsværksteder, dele og tilbehørsbutikker samt udlejningsbutikker. Skriv et navn for at søge direkte i Google Maps.",
       "fuel": "Søger inden for 20 km efter alle benzin-/brændstofstationer. Brændstoftyper vises, hvor tilgængeligt fra OpenStreetMap. Tryk ⛽ Tjek brændstofpriser for at åbne stationen direkte i Google Maps — priser vises der i lande, hvor Google har disse data.",
       "parking": "Søger inden for 5 km efter generel parkering og inden for 10 km efter dedikeret motorcykelparkering.",
       "clubs_tracks": "Søger inden for 50 km efter motorcykelklubber og race-/kørebaner.",

@@ -211,7 +211,7 @@
       "atm_bank": "Cajeros y Bancos"
     },
     "descriptions": {
-      "services": "Busca en 30 km talleres, concesionarios, tiendas y alquiler de motos. Datos de OpenStreetMap — datos de mapa gratuitos mantenidos por la comunidad. Escribe un nombre en el buscador para buscar directamente en Google Maps (gratis).",
+      "services": "Busca en 30 km talleres, concesionarios, tiendas y alquiler de motos. Escribe un nombre en el buscador para buscar directamente en Google Maps.",
       "fuel": "Busca en 20 km todas las gasolineras. Tipos de combustible de OpenStreetMap. Pulsa ⛽ Ver precios de combustible para abrir la gasolinera directamente en Google Maps — los precios del combustible se muestran allí en los países donde Google tiene esos datos.",
       "parking": "Busca en 5 km aparcamientos generales y en 10 km aparcamientos para motos.",
       "clubs_tracks": "Busca en 50 km clubes de motos y circuitos.",

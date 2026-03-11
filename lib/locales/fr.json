@@ -211,7 +211,7 @@
       "atm_bank": "Distributeurs & Banques"
     },
     "descriptions": {
-      "services": "Recherche dans 30 km concessionnaires, ateliers, pièces et location de motos. Données issues d'OpenStreetMap — données cartographiques gratuites et maintenues par la communauté. Saisissez un nom pour rechercher directement dans Google Maps (gratuit).",
+      "services": "Recherche dans 30 km concessionnaires, ateliers, pièces et location de motos. Saisissez un nom pour rechercher directement dans Google Maps.",
       "fuel": "Recherche dans 20 km toutes les stations-service. Types de carburant d'OpenStreetMap. Appuyez ⛽ Vérifier les prix du carburant pour ouvrir la station directement dans Google Maps — les prix du carburant y sont affichés dans les pays où Google dispose de ces données.",
       "parking": "Recherche dans 5 km de parkings généraux et dans 10 km de parkings motos.",
       "clubs_tracks": "Recherche dans 50 km de clubs moto et circuits.",

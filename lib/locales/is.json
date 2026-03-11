@@ -211,7 +211,7 @@
       "atm_bank": "Hraðbankar og bankar"
     },
     "descriptions": {
-      "services": "Leitar í 30 km að mótorhjalasölustöðum, viðgerðarverkstæðum, hlutaverslunum og leigum. Gögn frá OpenStreetMap — ókeypis kortaupplýsingar sem samfélagið heldur við. Sláðu inn nafn til að leita beint á Google Maps (ókeypis).",
+      "services": "Leitar í 30 km að mótorhjalasölustöðum, viðgerðarverkstæðum, hlutaverslunum og leigum. Sláðu inn nafn til að leita beint á Google Maps.",
       "fuel": "Leitar í 20 km að öllum bensínstöðvum. Eldsneytistegundir frá OpenStreetMap. Ýttu ⛽ Athuga eldsneytisverð til að opna stöðina beint í Google Maps — eldsneytisverð birtist þar í löndum þar sem Google hefur þessi gögn.",
       "parking": "Leitar í 5 km að almennum bílastæðum og í 10 km að sérstökum mótorhjólabílastæðum.",
       "clubs_tracks": "Leitar í 50 km að mótorhjólaklúbbum og kappakstursbrautum.",

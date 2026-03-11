@@ -211,7 +211,7 @@
       "atm_bank": "ATMs & Banks"
     },
     "descriptions": {
-      "services": "Searches within 30 km for motorcycle dealers, repair workshops, parts & accessories shops, and rental shops. Data sourced from OpenStreetMap — free, community-maintained map data. Type a name in the search box to search Google Maps directly.",
+      "services": "Searches within 30 km for motorcycle dealers, repair workshops, parts & accessories shops, and rental shops. Type a name in the search box to search Google Maps directly.",
       "fuel": "Searches within 20 km for all fuel/petrol stations. Fuel types shown where available from OpenStreetMap. Press ⛽ Check Fuel Prices to open the station directly on the map at its exact location — fuel prices are shown there in countries where Google has that data.",
       "parking": "Searches within 5 km for general parking and within 10 km for dedicated motorcycle parking.",
       "clubs_tracks": "Searches within 50 km for motorcycle clubs and racing/riding tracks.",
