@@ -573,16 +573,31 @@ out center 120;`;
         <Text style={styles.cardTitle}>{sectionTitle}</Text>
         <Text style={styles.cardDescription}>{sectionDescription}</Text>
         {places.length > 0 && (
-          <TextInput
-            style={styles.searchInput}
-            value={nameSearch}
-            onChangeText={setNameSearch}
-            placeholder={t("garage.searchPlaceholder")}
-            placeholderTextColor="#555555"
-            clearButtonMode="while-editing"
-            returnKeyType="search"
-            accessibilityLabel={t("garage.searchPlaceholder")}
-          />
+          <>
+            <TextInput
+              style={styles.searchInput}
+              value={nameSearch}
+              onChangeText={setNameSearch}
+              placeholder={t("garage.searchPlaceholder")}
+              placeholderTextColor="#555555"
+              clearButtonMode="while-editing"
+              returnKeyType="search"
+              accessibilityLabel={t("garage.searchPlaceholder")}
+            />
+            {nameSearch.trim() ? (
+              <Pressable
+                style={styles.googleMapsSearchButton}
+                onPress={() => {
+                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                  Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nameSearch.trim())}`).catch(() => null);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("garage.searchGoogleMaps")}
+              >
+                <Text style={styles.googleMapsSearchButtonText}>{t("garage.searchGoogleMaps")}</Text>
+              </Pressable>
+            ) : null}
+          </>
         )}
         {viewMode === "list" && (
           filteredPlaces.length === 0 && !loading ? (
@@ -1027,5 +1042,19 @@ const styles = StyleSheet.create({
     color: "#f59e0b",
     fontSize: 13,
     fontWeight: "500",
+  },
+  googleMapsSearchButton: {
+    backgroundColor: "rgba(66,133,244,0.12)",
+    borderRadius: 8,
+    paddingVertical: 9,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(66,133,244,0.4)",
+    marginBottom: 12,
+  },
+  googleMapsSearchButtonText: {
+    color: "#4285F4",
+    fontSize: 14,
+    fontWeight: "600",
   },
 });

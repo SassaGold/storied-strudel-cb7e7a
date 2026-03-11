@@ -225,7 +225,8 @@
             "atm_bank": "No ATMs or banks found nearby. Try updating your location."
         },
         "searchPlaceholder": "🔍 Search by name…",
-        "noSearchResults": "No results match your search."
+        "noSearchResults": "No results match your search.",
+        "searchGoogleMaps": "🗺️ Search on Google Maps"
     },
     "sos": {
         "badge": "🆘 EMERGENCY",

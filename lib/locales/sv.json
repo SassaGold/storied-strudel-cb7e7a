@@ -225,7 +225,8 @@
             "atm_bank": "Inga bankomater eller banker hittades i närheten. Försök uppdatera din plats."
         },
         "searchPlaceholder": "🔍 Sök efter namn…",
-        "noSearchResults": "Inga resultat matchar din sökning."
+        "noSearchResults": "Inga resultat matchar din sökning.",
+        "searchGoogleMaps": "🗺️ Sök på Google Maps"
     },
     "sos": {
         "badge": "🆘 NÖDSITUATION",

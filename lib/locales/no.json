@@ -225,7 +225,8 @@
             "atm_bank": "Ingen minibanker eller banker funnet i nærheten. Prøv å oppdatere plasseringen din."
         },
         "searchPlaceholder": "🔍 Søk etter navn…",
-        "noSearchResults": "Ingen resultater samsvarer med søket ditt."
+        "noSearchResults": "Ingen resultater samsvarer med søket ditt.",
+        "searchGoogleMaps": "🗺️ Søk på Google Maps"
     },
     "sos": {
         "badge": "🆘 NØDSITUASJON",

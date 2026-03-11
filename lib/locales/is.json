@@ -225,7 +225,8 @@
             "atm_bank": "Engir hraðbankar eða bankar fundust nálægt. Uppfærðu staðsetningu þína."
         },
         "searchPlaceholder": "🔍 Leita eftir nafni…",
-        "noSearchResults": "Engar niðurstöður passa við leit þína."
+        "noSearchResults": "Engar niðurstöður passa við leit þína.",
+        "searchGoogleMaps": "🗺️ Leita á Google Maps"
     },
     "sos": {
         "badge": "🆘 NEYÐARMÁL",

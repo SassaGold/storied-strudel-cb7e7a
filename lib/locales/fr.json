@@ -225,7 +225,8 @@
             "atm_bank": "Aucun distributeur ou banque trouvé. Mettez à jour votre position."
         },
         "searchPlaceholder": "🔍 Rechercher par nom…",
-        "noSearchResults": "Aucun résultat ne correspond à votre recherche."
+        "noSearchResults": "Aucun résultat ne correspond à votre recherche.",
+        "searchGoogleMaps": "🗺️ Rechercher sur Google Maps"
     },
     "sos": {
         "badge": "🆘 URGENCE",

@@ -225,7 +225,8 @@
             "atm_bank": "No se encontraron cajeros ni bancos. Actualiza tu ubicación."
         },
         "searchPlaceholder": "🔍 Buscar por nombre…",
-        "noSearchResults": "No hay resultados para su búsqueda."
+        "noSearchResults": "No hay resultados para su búsqueda.",
+        "searchGoogleMaps": "🗺️ Buscar en Google Maps"
     },
     "sos": {
         "badge": "🆘 EMERGENCIA",

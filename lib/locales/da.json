@@ -225,7 +225,8 @@
             "atm_bank": "Ingen hæveautomater eller banker fundet i nærheden. Prøv at opdatere din placering."
         },
         "searchPlaceholder": "🔍 Søg efter navn…",
-        "noSearchResults": "Ingen resultater matcher din søgning."
+        "noSearchResults": "Ingen resultater matcher din søgning.",
+        "searchGoogleMaps": "🗺️ Søg på Google Maps"
     },
     "sos": {
         "badge": "🆘 NØDSITUATION",

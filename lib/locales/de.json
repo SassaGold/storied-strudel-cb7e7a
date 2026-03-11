@@ -225,7 +225,8 @@
             "atm_bank": "Keine Geldautomaten oder Banken gefunden. Standort aktualisieren."
         },
         "searchPlaceholder": "🔍 Nach Name suchen…",
-        "noSearchResults": "Keine Ergebnisse für Ihre Suche."
+        "noSearchResults": "Keine Ergebnisse für Ihre Suche.",
+        "searchGoogleMaps": "🗺️ Auf Google Maps suchen"
     },
     "sos": {
         "badge": "🆘 NOTFALL",
