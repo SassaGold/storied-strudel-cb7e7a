@@ -8,6 +8,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import * as Location from "expo-location";
@@ -141,6 +142,7 @@ export default function McScreen() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  const [nameSearch, setNameSearch] = useState("");
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
     if (category === "services") {
@@ -336,6 +338,10 @@ out center 120;`;
     ? t("common.checkFuelPrices")
     : t("common.reviewsGoogle");
 
+  const filteredPlaces = nameSearch.trim()
+    ? places.filter((p) => p.name.toLowerCase().includes(nameSearch.trim().toLowerCase()))
+    : places;
+
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <Modal
@@ -478,6 +484,7 @@ out center 120;`;
               setSelected(key);
               setPlaces([]);
               setError(null);
+              setNameSearch("");
             }}
           >
             <Text
@@ -551,7 +558,7 @@ out center 120;`;
             longitudeDelta: 0.06,
           }}
         >
-          {places.map((place) => (
+          {filteredPlaces.map((place) => (
             <Marker
               key={place.id}
               coordinate={{ latitude: place.latitude, longitude: place.longitude }}
@@ -565,11 +572,25 @@ out center 120;`;
       <View style={styles.sectionCard}>
         <Text style={styles.cardTitle}>{sectionTitle}</Text>
         <Text style={styles.cardDescription}>{sectionDescription}</Text>
+        {places.length > 0 && (
+          <TextInput
+            style={styles.searchInput}
+            value={nameSearch}
+            onChangeText={setNameSearch}
+            placeholder={t("garage.searchPlaceholder")}
+            placeholderTextColor="#555555"
+            clearButtonMode="while-editing"
+            returnKeyType="search"
+            accessibilityLabel={t("garage.searchPlaceholder")}
+          />
+        )}
         {viewMode === "list" && (
-          places.length === 0 && !loading ? (
-            <Text style={styles.bodyText}>{emptyText}</Text>
+          filteredPlaces.length === 0 && !loading ? (
+            <Text style={styles.bodyText}>
+              {nameSearch.trim() && places.length > 0 ? t("garage.noSearchResults") : emptyText}
+            </Text>
           ) : (
-            places.map((place) => (
+            filteredPlaces.map((place) => (
               <Pressable
                 key={place.id}
                 style={styles.placeRow}
@@ -767,6 +788,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 14,
     lineHeight: 18,
+  },
+  searchInput: {
+    backgroundColor: "#1e1e1e",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.35)",
+    color: "#ffffff",
+    fontSize: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    marginBottom: 12,
   },
   bodyText: {
     color: "#c8c8c8",
