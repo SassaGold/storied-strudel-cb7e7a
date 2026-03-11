@@ -83,15 +83,54 @@ export default function TripLoggerScreen() {
   const [mapRide, setMapRide] = useState<SavedRide | null>(null);
 
   const watchRef = useRef<Location.LocationSubscription | null>(null);
+  const liveSpeedWatchRef = useRef<Location.LocationSubscription | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const routeRef = useRef<GpsPoint[]>([]);
   const distRef = useRef(0);
   const startTimeRef = useRef<number | null>(null);
+  const recordingRef = useRef(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const prevSpeedPointRef = useRef<{ latitude: number; longitude: number; timestamp: number } | null>(null);
+
+  // Keep recordingRef in sync so the live speed watcher can check it without stale closure
+  useEffect(() => { recordingRef.current = recording; }, [recording]);
 
   // Load saved rides on mount
   useEffect(() => {
     loadRides();
+  }, []);
+
+  // Always-on live speed watcher so the speedometer shows current speed even when not recording
+  useEffect(() => {
+    let active = true;
+    const startLiveWatch = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (!active || status === "denied") return;
+      liveSpeedWatchRef.current = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.Balanced, timeInterval: 1500, distanceInterval: 3 },
+        (loc) => {
+          if (recordingRef.current) return; // recording watcher handles speed during active trip
+          const { latitude, longitude, speed } = loc.coords;
+          const ts = loc.timestamp;
+          if (speed != null && speed >= 0) {
+            setCurrentSpeedKmh(speed * 3.6);
+          } else if (prevSpeedPointRef.current) {
+            const distM = haversineMeters(prevSpeedPointRef.current.latitude, prevSpeedPointRef.current.longitude, latitude, longitude);
+            const dtSec = (ts - prevSpeedPointRef.current.timestamp) / 1000;
+            if (dtSec > 0.5 && distM > 0) {
+              setCurrentSpeedKmh((distM / dtSec) * 3.6);
+            }
+          }
+          prevSpeedPointRef.current = { latitude, longitude, timestamp: ts };
+        }
+      );
+    };
+    startLiveWatch();
+    return () => {
+      active = false;
+      liveSpeedWatchRef.current?.remove();
+      liveSpeedWatchRef.current = null;
+    };
   }, []);
 
   const loadRides = async () => {
@@ -170,11 +209,19 @@ export default function TripLoggerScreen() {
         const { latitude, longitude, speed, accuracy: acc } = loc.coords;
         const ts = loc.timestamp;
 
-        // Update speed
-        setCurrentSpeedKmh(speed != null && speed >= 0 ? speed * 3.6 : null);
+        // Update speed — use native GPS speed if available, otherwise calculate from GPS delta
+        const prev = routeRef.current[routeRef.current.length - 1];
+        if (speed != null && speed >= 0) {
+          setCurrentSpeedKmh(speed * 3.6);
+        } else if (prev) {
+          const distM = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
+          const dtSec = (ts - prev.timestamp) / 1000;
+          if (dtSec > 0.5 && distM > 0) {
+            setCurrentSpeedKmh((distM / dtSec) * 3.6);
+          }
+        }
         setAccuracy(acc ?? null);
 
-        const prev = routeRef.current[routeRef.current.length - 1];
         const newPoint: GpsPoint = { latitude, longitude, timestamp: ts };
 
         if (prev) {
@@ -209,7 +256,7 @@ export default function TripLoggerScreen() {
     const avgSpeed = durationMs > 0 ? distKm / (durationMs / 3_600_000) : 0;
 
     setRecording(false);
-    setCurrentSpeedKmh(null);
+    // Don't clear speed — live watcher will continue updating it after recording stops
 
     if (distKm > 0.01) {
       Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => null);
