@@ -1,103 +1,119 @@
-# Welcome to your Expo app 👋
+# Rider HQ — Biker Companion App 🏍️
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, emergency services), log your trips, and more. Supports English, Spanish, German, French, and Icelandic.
 
-## Get started
+---
 
-1. Install dependencies
+## Running this project on your own computer
 
+### Prerequisites
+
+Before you begin, make sure you have the following installed:
+
+| Tool | Minimum version | Download |
+|------|----------------|----------|
+| **Git** | any | https://git-scm.com |
+| **Node.js** | 18 LTS or newer | https://nodejs.org |
+| **npm** | included with Node.js | — |
+
+Verify your versions:
+```bash
+node --version   # should print v18 or higher
+npm --version
+git --version
+```
+
+### 1 — Clone the repository
+
+```bash
+git clone https://github.com/SassaGold/storied-strudel-cb7e7a.git
+cd storied-strudel-cb7e7a
+```
+
+### 2 — Install dependencies
+
+```bash
+npm install
+```
+
+### 3 — Choose how to run the app
+
+#### Option A — Web browser (quickest, no extra setup)
+
+```bash
+npm run web
+# or
+npx expo start --web
+```
+
+Open http://localhost:8081 in your browser. Most UI and logic works; native map tiles and GPS are limited in the browser.
+
+#### Option B — Android emulator
+
+1. Install [Android Studio](https://developer.android.com/studio) and create an Android Virtual Device (AVD).
+2. Start your AVD from the Device Manager in Android Studio.
+3. In the project folder, run:
    ```bash
-   npm install
+   npm run android
+   # or
+   npx expo run:android
    ```
+   Expo will build a debug APK, install it on the emulator, and launch it automatically.
 
-2. Start the app
+#### Option C — iOS Simulator (macOS only)
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Testing on iPhone Simulator
-
-> **macOS only** — The iPhone Simulator is built into Xcode and runs exclusively on macOS.  
-> It cannot run on Windows or Linux PCs. If you are on Windows/Linux, see the
-> [EAS cloud build option](#eas-cloud-build-for-simulator) below.
-
-This app uses native modules (`react-native-maps`, `expo-location`, background location)
-that are **not** supported in the standard Expo Go sandbox.
-You must use a **development build** to test on the simulator.
-
-### Option A — local build (macOS + Xcode required)
+> The iPhone Simulator requires **macOS** and **Xcode**. It cannot run on Windows or Linux.
 
 1. Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store and open it once to accept the licence.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Build and launch the app directly on the iOS Simulator:
+2. Run:
    ```bash
    npm run ios
    # or
    npx expo run:ios
    ```
-   Expo will compile a debug build, install it in the simulator, and open it automatically.
 
-4. **Simulating GPS location** — The simulator has no real GPS.  
-   Set a simulated location from the Xcode menu:  
-   `Simulator → Features → Location → Custom Location…`  
-   (or choose one of the preset cities such as *Apple* or *San Francisco*).  
-   All location-dependent features (restaurant search, trip logger, etc.) will then work normally.
+> **Simulating GPS** — the simulator has no real GPS. Set a fake location from the Xcode menu:  
+> `Simulator → Features → Location → Custom Location…`
 
-### Option B — EAS cloud build for simulator
+#### Option D — Physical device via EAS cloud build
 
-If you are on macOS but prefer not to install Xcode locally, or if you just want a
-pre-built `.app` you can share with other Mac users:
+If you don't want to install Android Studio or Xcode, you can use [EAS Build](https://expo.dev/eas) (free tier available) to build in the cloud and install on a real device:
 
 ```bash
-npx eas build --profile development-simulator --platform ios
+# install the EAS CLI
+npm install -g eas-cli
+
+# build for Android (generates an APK/AAB you can sideload)
+npx eas build --profile development --platform android
+
+# build for iOS (requires an Apple Developer account)
+npx eas build --profile development --platform ios
 ```
 
-Once the build finishes, EAS will give you a download link for a `.tar.gz` containing
-the `.app` bundle. Unzip it, then drag the `.app` file onto an open Simulator window
-(or use `xcrun simctl install booted <path-to.app>`).
+---
 
-> **Windows / Linux users** — The iPhone Simulator cannot run on your operating system.
-> Your options are:
-> - Test on a **physical iPhone** using a development build distributed via EAS
->   (`npx eas build --profile development --platform ios`).
-> - Test using the **Android emulator** (`npm run android`) — see the
->   [Android Studio emulator guide](https://docs.expo.dev/workflow/android-studio-emulator/).
-> - Test in a **web browser** (`npm run web`) — most UI and logic works, but native
->   maps and GPS features are limited.
+## Development
 
-## Get a fresh project
+### Available scripts
 
-When you're ready, run:
+| Command | What it does |
+|---------|-------------|
+| `npm run web` | Start the app in a web browser |
+| `npm run android` | Build and run on an Android emulator / device |
+| `npm run ios` | Build and run on iOS Simulator (macOS only) |
+| `npm run start` | Start the Expo dev server (note: Expo Go has limited native module support — see below) |
+| `npm run lint` | Run the ESLint linter |
 
-```bash
-npm run reset-project
-```
+### Note on native modules
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+This app uses native modules (`react-native-maps`, `expo-location`) that are **not** supported in the standard Expo Go sandbox. To test the full app you need a development build (`npm run android` / `npm run ios`) or a physical device build via EAS.
+
+---
 
 ## Learn more
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [Expo documentation](https://docs.expo.dev/)
+- [Android Studio emulator guide](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS Simulator guide](https://docs.expo.dev/workflow/ios-simulator/)
+- [EAS Build](https://docs.expo.dev/build/introduction/)
+- [Discord community](https://chat.expo.dev)
