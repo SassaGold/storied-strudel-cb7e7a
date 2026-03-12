@@ -408,7 +408,7 @@ export default function Index() {
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
         {
           headers: {
-            "User-Agent": "leander-location-app",
+            "User-Agent": "roamly-app",
           },
         }
       )

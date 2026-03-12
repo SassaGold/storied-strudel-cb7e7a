@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "leander",
-    "slug": "leander",
+    "name": "Roamly",
+    "slug": "roamly",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "leander",
+    "scheme": "roamly",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sassagold.leander",
+      "bundleIdentifier": "com.sassagold.roamly",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked.",
@@ -41,7 +41,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.sassagold.leander"
+      "package": "com.sassagold.roamly"
     },
     "web": {
       "output": "static",
