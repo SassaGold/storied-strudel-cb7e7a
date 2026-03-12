@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "Roamly",
+    "home": "RIDER HQ",
     "food": "FOOD",
     "sleep": "SLEEP",
     "explore": "EXPLORE",
@@ -50,7 +50,7 @@
   },
   "home": {
     "quickNav": "QUICK NAVIGATE",
-    "badge": "🏍️ Roamly",
+    "badge": "🏍️ RIDER HQ",
     "title": "WHERE AM I?",
     "subtitle": "Your location & riding conditions.",
     "updateLocation": "UPDATE LOCATION",

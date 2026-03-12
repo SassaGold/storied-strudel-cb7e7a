@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "Roamly",
+    "home": "RIDER HQ",
     "food": "MAT",
     "sleep": "SÖMN",
     "explore": "UTFORSKA",
@@ -50,7 +50,7 @@
   },
   "home": {
     "quickNav": "SNABBNAVIGERING",
-    "badge": "🏍️ Roamly",
+    "badge": "🏍️ RIDER HQ",
     "title": "VAR ÄR JAG?",
     "subtitle": "Din plats och körförhållanden.",
     "updateLocation": "UPPDATERA PLATS",

@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "Roamly",
+    "home": "RIDER HQ",
     "food": "MAD",
     "sleep": "SØVN",
     "explore": "UDFORSK",
@@ -50,7 +50,7 @@
   },
   "home": {
     "quickNav": "HURTIG NAVIGATION",
-    "badge": "🏍️ Roamly",
+    "badge": "🏍️ RIDER HQ",
     "title": "HVOR ER JEG?",
     "subtitle": "Din placering og køreforhold.",
     "updateLocation": "OPDATER PLACERING",
