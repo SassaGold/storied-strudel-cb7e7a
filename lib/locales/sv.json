@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "RYTTAR HQ",
+    "home": "Roamly",
     "food": "MAT",
     "sleep": "SÖMN",
     "explore": "UTFORSKA",
@@ -50,7 +50,7 @@
   },
   "home": {
     "quickNav": "SNABBNAVIGERING",
-    "badge": "🏍️ RYTTAR HQ",
+    "badge": "🏍️ Roamly",
     "title": "VAR ÄR JAG?",
     "subtitle": "Din plats och körförhållanden.",
     "updateLocation": "UPPDATERA PLATS",

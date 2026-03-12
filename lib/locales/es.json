@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "BASE",
+    "home": "Roamly",
     "food": "COMIDA",
     "sleep": "DORMIR",
     "explore": "EXPLORAR",
@@ -50,7 +50,7 @@
   },
   "home": {
     "quickNav": "NAVEGAR",
-    "badge": "🏍️ BASE RIDER",
+    "badge": "🏍️ Roamly",
     "title": "¿DÓNDE ESTOY?",
     "subtitle": "Tu ubicación y condiciones de conducción.",
     "updateLocation": "ACTUALIZAR UBICACIÓN",

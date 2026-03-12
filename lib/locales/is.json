@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "MÓTORHJÓLARI",
+    "home": "Roamly",
     "food": "MATUR",
     "sleep": "SVEFN",
     "explore": "KANNA",
@@ -50,7 +50,7 @@
   },
   "home": {
     "quickNav": "FLJÓTLEGAR LEIÐIR",
-    "badge": "🏍️ MÓTORHJÓLARI",
+    "badge": "🏍️ Roamly",
     "title": "HVAR ER ÉG?",
     "subtitle": "Staðsetning þín og akstursskilyrði.",
     "updateLocation": "UPPFÆRA STAÐSETNINGU",
