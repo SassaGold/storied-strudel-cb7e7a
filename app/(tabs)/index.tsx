@@ -778,13 +778,13 @@ export default function Index() {
 
       {/* ── Riding Suitability Card ── */}
       {weather && (
-        <View style={[styles.card, { borderColor: suitability.color }]}>
+        <View style={[styles.card, styles.suitabilityCard, { borderColor: suitability.color }]}>
           <Text style={styles.cardTitle}>{t("home.ridingSuitability", { score: suitability.score })}</Text>
-          <View style={[styles.suitabilityBadge, { backgroundColor: suitability.color, alignSelf: "flex-start" }]}>
+          <View style={[styles.suitabilityBadge, styles.suitabilityBadgeSelf, { backgroundColor: suitability.color }]}>
             <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
           </View>
           {sunTimes && (
-            <View style={[styles.sunTimesRow, { marginTop: 14 }]}>
+            <View style={styles.sunTimesRowSpaced}>
               <View style={styles.sunTimesItem}>
                 <Text style={styles.sunTimesEmoji}>🌅</Text>
                 <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
@@ -1259,6 +1259,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 14,
   },
+  suitabilityCard: {
+    borderWidth: 1,
+  },
+  suitabilityBadgeSelf: {
+    alignSelf: "flex-start",
+    marginBottom: 4,
+  },
   suitabilityLabel: {
     color: "#c8c8c8",
     fontSize: 15,
@@ -1390,6 +1397,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 12,
     marginTop: 6,
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
+  },
+  sunTimesRowSpaced: {
+    flexDirection: "row",
+    backgroundColor: "#0a0a0a",
+    borderRadius: 8,
+    paddingVertical: 12,
+    marginTop: 14,
     borderWidth: 1,
     borderColor: "#2a2a2a",
   },
