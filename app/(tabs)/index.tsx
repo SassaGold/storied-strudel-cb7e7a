@@ -291,7 +291,27 @@ const buildRecommendations = (weather?: WeatherInfo) => {
   return recs;
 };
 
-// ─── Sunrise / Sunset ────────────────────────────────────────────────────────
+const ALERT_ICONS: Record<string, string> = {
+  "home.alerts.veryCold":   "❄️",
+  "home.alerts.cold":       "🌡️",
+  "home.alerts.extremeHeat":"🔥",
+  "home.alerts.highHeat":   "☀️",
+  "home.alerts.strongWinds":"🌬️",
+  "home.alerts.gustyWinds": "💨",
+  "home.alerts.rainExpected":"🌧️",
+};
+const DEFAULT_ALERT_ICON = "⚠️";
+
+const REC_ICONS: Record<string, string> = {
+  "home.recs.thermalGear":  "🧥",
+  "home.recs.layerUp":      "🧤",
+  "home.recs.lightGear":    "👕",
+  "home.recs.secureLuggage":"🎒",
+  "home.recs.rainGear":     "☂️",
+};
+const DEFAULT_REC_ICON = "💡";
+
+
 // Pure-JS implementation (no external API or library required).
 // Based on the USNO/NOAA simplified algorithm.
 
@@ -605,7 +625,7 @@ export default function Index() {
           >
             <Text style={styles.headerIconBtnText}>ℹ️</Text>
           </Pressable>
-          <Text style={styles.headerBadge}>{t("home.badge")}</Text>
+          <Text style={styles.headerTitle}>{t("home.badge")}</Text>
           <View style={styles.headerTopRowRight}>
             <Pressable
               style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
@@ -627,8 +647,6 @@ export default function Index() {
             </Pressable>
           </View>
         </View>
-        <Text style={styles.title}>{t("home.title")}</Text>
-        <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
       </View>
 
       <Modal
@@ -761,7 +779,7 @@ export default function Index() {
             <View style={styles.weatherSection}>
               <Text style={styles.weatherSectionTitle}>{t("home.ridingAlerts")}</Text>
               {alerts.map((key) => (
-                <Text key={key} style={styles.weatherBullet}>• {t(key)}</Text>
+                <Text key={key} style={styles.weatherBullet}>{ALERT_ICONS[key] ?? DEFAULT_ALERT_ICON} {t(key)}</Text>
               ))}
             </View>
           )}
@@ -771,7 +789,7 @@ export default function Index() {
             <View style={styles.weatherSection}>
               <Text style={styles.weatherSectionTitle}>{t("home.recommendations")}</Text>
               {recommendations.map((key) => (
-                <Text key={key} style={styles.weatherBullet}>• {t(key)}</Text>
+                <Text key={key} style={styles.weatherBullet}>{REC_ICONS[key] ?? DEFAULT_REC_ICON} {t(key)}</Text>
               ))}
             </View>
           )}
@@ -1020,7 +1038,8 @@ const styles = StyleSheet.create({
   header: {
     marginTop: 18,
     marginBottom: 20,
-    padding: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.4)",
@@ -1049,7 +1068,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
   },
   headerTopRowRight: {
     flexDirection: "row",
@@ -1070,25 +1088,13 @@ const styles = StyleSheet.create({
   headerIconBtnText: {
     fontSize: 18,
   },
-  headerBadge: {
+  headerTitle: {
     flex: 1,
     textAlign: "center",
-    backgroundColor: "transparent",
     color: "#ff6600",
-    fontSize: 15,
-    fontWeight: "700",
-    letterSpacing: 0.6,
-  },
-  title: {
-    color: "#ffffff",
-    fontSize: 30,
+    fontSize: 17,
     fontWeight: "800",
-    letterSpacing: 2,
-  },
-  subtitle: {
-    color: "#c8c8c8",
-    marginTop: 6,
-    fontSize: 15,
+    letterSpacing: 0.8,
   },
   primaryButton: {
     backgroundColor: "#ff6600",
@@ -1138,8 +1144,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#141414",
     padding: 16,
-    borderRadius: 10,
-    marginBottom: 16,
+    borderRadius: 12,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: "#2a2a2a",
     shadowColor: "#000000",
@@ -1194,16 +1200,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   weatherEmojiLarge: {
-    fontSize: 52,
+    fontSize: 64,
   },
   weatherMainInfo: {
     flex: 1,
   },
   weatherTempText: {
     color: "#ff6600",
-    fontSize: 32,
+    fontSize: 42,
     fontWeight: "800",
-    lineHeight: 36,
+    lineHeight: 46,
   },
   weatherConditionText: {
     color: "#c8c8c8",
@@ -1594,11 +1600,6 @@ const styles = StyleSheet.create({
   },
 
   // ── Merged styles from RiderHQ design template ──
-  headerTitle: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "700",
-  },
   dangerCard: {
     borderLeftWidth: 4,
     borderLeftColor: "#ff4444",
