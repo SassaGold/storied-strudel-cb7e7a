@@ -717,6 +717,7 @@ export default function Index() {
         </View>
       )}
 
+      {/* ── Weather Card ── */}
       {weather && (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t("home.localWeather")}</Text>
@@ -766,115 +767,111 @@ export default function Index() {
             </View>
           </View>
 
-          {/* Riding Suitability */}
-          <View style={styles.suitabilityRow}>
-            <Text style={styles.suitabilityLabel}>{t("home.ridingSuitability", { score: suitability.score })}</Text>
-            <View style={[styles.suitabilityBadge, { backgroundColor: suitability.color }]}>
-              <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
-            </View>
-          </View>
-
-          {/* Riding Alerts */}
-          {alerts.length > 0 && (
-            <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>{t("home.ridingAlerts")}</Text>
-              {alerts.map((key) => (
-                <Text key={key} style={styles.weatherBullet}>{ALERT_ICONS[key] ?? DEFAULT_ALERT_ICON} {t(key)}</Text>
-              ))}
-            </View>
-          )}
-
-          {/* Recommendations */}
-          {recommendations.length > 0 && (
-            <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>{t("home.recommendations")}</Text>
-              {recommendations.map((key) => (
-                <Text key={key} style={styles.weatherBullet}>{REC_ICONS[key] ?? DEFAULT_REC_ICON} {t(key)}</Text>
-              ))}
-            </View>
-          )}
-
-          {/* Next 6 Hours */}
-          {weather.hourly && weather.hourly.length > 0 && (
-            <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>{t("home.hourlyForecast")}</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} nestedScrollEnabled>
-                <View style={styles.hourlyCardsRow}>
-                  {weather.hourly.map((hour) => (
-                    <View key={hour.time} style={styles.hourlyCard}>
-                      <Text style={styles.hourlyCardTime}>{formatHourlyTime(hour.time)}</Text>
-                      <Text style={styles.hourlyCardEmoji}>{weatherEmoji(hour.weatherCode)}</Text>
-                      <Text style={styles.hourlyCardTemp}>{fmtTemp(hour.temperatureC, settings.unitSystem, true)}</Text>
-                      <Text style={styles.hourlyCardRain}>💧 {hour.precipitationProbability}%</Text>
-                    </View>
-                  ))}
-                </View>
-              </ScrollView>
-            </View>
-          )}
-
-          {/* 3-Day Forecast */}
-          {weather.forecast && weather.forecast.length > 0 && (            <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>{t("home.forecast")}</Text>
-              <View style={styles.forecastCardsRow}>
-                {weather.forecast.slice(0, 3).map((day) => (
-                  <View key={day.date} style={styles.forecastCard}>
-                    <Text style={styles.forecastCardDay}>
-                      {formatForecastDate(day.date).split(",")[0]}
-                    </Text>
-                    <Text style={styles.forecastCardDate}>
-                      {formatForecastDate(day.date).split(",")[1]?.trim() ?? ""}
-                    </Text>
-                    <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
-                    <Text style={styles.forecastCardCondition}>
-                      {t(formatWeatherCode(day.weatherCode), { defaultValue: formatWeatherCode(day.weatherCode) })}
-                    </Text>
-                    <Text style={styles.forecastCardTemp}>
-                      {fmtTemp(day.maxTempC, settings.unitSystem, true)} / {fmtTemp(day.minTempC, settings.unitSystem, true)}
-                    </Text>
-                    <View style={styles.forecastCardRainRow}>
-                      <Text style={styles.forecastCardRain}>💧 {day.precipitationProbability}%</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {/* Sunrise & Sunset */}
-          {sunTimes && (
-            <View style={styles.weatherSection}>
-              <Text style={styles.weatherSectionTitle}>{t("home.sunriseSunset")}</Text>
-              <View style={styles.sunTimesRow}>
-                <View style={styles.sunTimesItem}>
-                  <Text style={styles.sunTimesEmoji}>🌅</Text>
-                  <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
-                  <Text style={styles.sunTimesLabel}>{t("home.sunrise")}</Text>
-                </View>
-                <View style={styles.sunTimesDivider} />
-                <View style={styles.sunTimesItem}>
-                  <Text style={styles.sunTimesEmoji}>🌇</Text>
-                  <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
-                  <Text style={styles.sunTimesLabel}>{t("home.sunset")}</Text>
-                </View>
-                <View style={styles.sunTimesDivider} />
-                <View style={styles.sunTimesItem}>
-                  <Text style={styles.sunTimesEmoji}>☀️</Text>
-                  <Text style={styles.sunTimesValue}>
-                    {formatDuration(sunTimes.daylightMinutes)}
-                  </Text>
-                  <Text style={styles.sunTimesLabel}>{t("home.daylight")}</Text>
-                </View>
-              </View>
-            </View>
-          )}
-
           <Pressable
             style={styles.secondaryButton}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(weatherUrl).catch(() => null); }}
           >
             <Text style={styles.secondaryButtonText}>{t("home.openWeather")}</Text>
           </Pressable>
+        </View>
+      )}
+
+      {/* ── Riding Suitability Card ── */}
+      {weather && (
+        <View style={[styles.card, { borderColor: suitability.color }]}>
+          <Text style={styles.cardTitle}>{t("home.ridingSuitability", { score: suitability.score })}</Text>
+          <View style={[styles.suitabilityBadge, { backgroundColor: suitability.color, alignSelf: "flex-start" }]}>
+            <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
+          </View>
+          {sunTimes && (
+            <View style={[styles.sunTimesRow, { marginTop: 14 }]}>
+              <View style={styles.sunTimesItem}>
+                <Text style={styles.sunTimesEmoji}>🌅</Text>
+                <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
+                <Text style={styles.sunTimesLabel}>{t("home.sunrise")}</Text>
+              </View>
+              <View style={styles.sunTimesDivider} />
+              <View style={styles.sunTimesItem}>
+                <Text style={styles.sunTimesEmoji}>🌇</Text>
+                <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
+                <Text style={styles.sunTimesLabel}>{t("home.sunset")}</Text>
+              </View>
+              <View style={styles.sunTimesDivider} />
+              <View style={styles.sunTimesItem}>
+                <Text style={styles.sunTimesEmoji}>☀️</Text>
+                <Text style={styles.sunTimesValue}>{formatDuration(sunTimes.daylightMinutes)}</Text>
+                <Text style={styles.sunTimesLabel}>{t("home.daylight")}</Text>
+              </View>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* ── Alerts Card ── */}
+      {weather && alerts.length > 0 && (
+        <View style={[styles.card, styles.alertCard]}>
+          <Text style={styles.cardTitle}>{t("home.ridingAlerts")}</Text>
+          {alerts.map((key) => (
+            <Text key={key} style={styles.weatherBullet}>{ALERT_ICONS[key] ?? DEFAULT_ALERT_ICON} {t(key)}</Text>
+          ))}
+        </View>
+      )}
+
+      {/* ── Recommendations Card ── */}
+      {weather && recommendations.length > 0 && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>{t("home.recommendations")}</Text>
+          {recommendations.map((key) => (
+            <Text key={key} style={styles.weatherBullet}>{REC_ICONS[key] ?? DEFAULT_REC_ICON} {t(key)}</Text>
+          ))}
+        </View>
+      )}
+
+      {/* ── Hourly Forecast Card ── */}
+      {weather?.hourly && weather.hourly.length > 0 && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>{t("home.hourlyForecast")}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} nestedScrollEnabled>
+            <View style={styles.hourlyCardsRow}>
+              {weather.hourly.map((hour) => (
+                <View key={hour.time} style={styles.hourlyCard}>
+                  <Text style={styles.hourlyCardTime}>{formatHourlyTime(hour.time)}</Text>
+                  <Text style={styles.hourlyCardEmoji}>{weatherEmoji(hour.weatherCode)}</Text>
+                  <Text style={styles.hourlyCardTemp}>{fmtTemp(hour.temperatureC, settings.unitSystem, true)}</Text>
+                  <Text style={styles.hourlyCardRain}>💧 {hour.precipitationProbability}%</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+      )}
+
+      {/* ── 3-Day Forecast Card ── */}
+      {weather?.forecast && weather.forecast.length > 0 && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>{t("home.forecast")}</Text>
+          <View style={styles.forecastCardsRow}>
+            {weather.forecast.slice(0, 3).map((day) => (
+              <View key={day.date} style={styles.forecastCard}>
+                <Text style={styles.forecastCardDay}>
+                  {formatForecastDate(day.date).split(",")[0]}
+                </Text>
+                <Text style={styles.forecastCardDate}>
+                  {formatForecastDate(day.date).split(",")[1]?.trim() ?? ""}
+                </Text>
+                <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
+                <Text style={styles.forecastCardCondition}>
+                  {t(formatWeatherCode(day.weatherCode), { defaultValue: formatWeatherCode(day.weatherCode) })}
+                </Text>
+                <Text style={styles.forecastCardTemp}>
+                  {fmtTemp(day.maxTempC, settings.unitSystem, true)} / {fmtTemp(day.minTempC, settings.unitSystem, true)}
+                </Text>
+                <View style={styles.forecastCardRainRow}>
+                  <Text style={styles.forecastCardRain}>💧 {day.precipitationProbability}%</Text>
+                </View>
+              </View>
+            ))}
+          </View>
         </View>
       )}
 
@@ -1145,7 +1142,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#141414",
     padding: 16,
     borderRadius: 12,
-    marginBottom: 20,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: "#2a2a2a",
     shadowColor: "#000000",
