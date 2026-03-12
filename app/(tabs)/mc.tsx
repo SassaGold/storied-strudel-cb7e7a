@@ -572,29 +572,33 @@ out center 120;`;
       <View style={styles.sectionCard}>
         <Text style={styles.cardTitle}>{sectionTitle}</Text>
         <Text style={styles.cardDescription}>{sectionDescription}</Text>
-        <TextInput
-          style={styles.searchInput}
-          value={nameSearch}
-          onChangeText={setNameSearch}
-          placeholder={t("garage.searchPlaceholder")}
-          placeholderTextColor="#555555"
-          clearButtonMode="while-editing"
-          returnKeyType="search"
-          accessibilityLabel={t("garage.searchPlaceholder")}
-        />
-        {nameSearch.trim() ? (
-          <Pressable
-            style={styles.googleMapsSearchButton}
-            onPress={() => {
-              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-              Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nameSearch.trim())}`).catch(() => null);
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={t("garage.searchGoogleMaps")}
-          >
-            <Text style={styles.googleMapsSearchButtonText}>{t("garage.searchGoogleMaps")}</Text>
-          </Pressable>
-        ) : null}
+        {selected === "services" && (
+          <>
+            <TextInput
+              style={styles.searchInput}
+              value={nameSearch}
+              onChangeText={setNameSearch}
+              placeholder={t("garage.searchPlaceholder")}
+              placeholderTextColor="#555555"
+              clearButtonMode="while-editing"
+              returnKeyType="search"
+              accessibilityLabel={t("garage.searchPlaceholder")}
+            />
+            {nameSearch.trim() ? (
+              <Pressable
+                style={styles.googleMapsSearchButton}
+                onPress={() => {
+                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                  Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nameSearch.trim())}`).catch(() => null);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("garage.searchGoogleMaps")}
+              >
+                <Text style={styles.googleMapsSearchButtonText}>{t("garage.searchGoogleMaps")}</Text>
+              </Pressable>
+            ) : null}
+          </>
+        )}
         {viewMode === "list" && (
           filteredPlaces.length === 0 && !loading ? (
             <Text style={styles.bodyText}>
