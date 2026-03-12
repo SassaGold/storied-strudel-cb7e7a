@@ -1547,4 +1547,58 @@ const styles = StyleSheet.create({
     marginTop: 4,
     opacity: 0.75,
   },
+
+  // ── Merged styles from RiderHQ design template ──
+  headerTitle: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  dangerCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#ff4444",
+  },
+  text: { color: "#ccc", fontSize: 15 },
+  subText: { color: "#888", fontSize: 13, marginTop: 2 },
+  bigTemp: {
+    color: "#fff",
+    fontSize: 42,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
+  metric: { alignItems: "center" },
+  metricLabel: { color: "#aaa", fontSize: 13 },
+  metricValue: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  suitability: {
+    color: "#ff4444",
+    fontSize: 20,
+    fontWeight: "700",
+    marginTop: 4,
+  },
+  listItem: { color: "#ccc", fontSize: 15, marginTop: 4 },
+  hourBlock: {
+    backgroundColor: "#222",
+    padding: 12,
+    borderRadius: 10,
+    marginRight: 10,
+    alignItems: "center",
+    width: 70,
+  },
+  hourText: { color: "#fff", fontSize: 14 },
+  hourIcon: { fontSize: 22 },
+  hourTemp: { color: "#fff", marginTop: 4 },
+  hourRain: { color: "#aaa", fontSize: 12 },
+  button: {
+    backgroundColor: "#007aff",
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  buttonText: { color: "#fff", fontWeight: "600" },
 });
