@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -382,6 +383,7 @@ export default function Index() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [roadAlerts, setRoadAlerts] = useState<RoadAlert[]>([]);
+  const [langModalVisible, setLangModalVisible] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -593,46 +595,76 @@ export default function Index() {
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Pressable
-          style={({ pressed }) => [styles.headerInfoBtn, pressed && styles.headerInfoBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/about"); }}
-          accessibilityRole="button"
-          accessibilityLabel={t("tabs.about")}
-          accessibilityHint={t("about.badge")}
-          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-        >
-          <Text style={styles.headerInfoBtnText}>ℹ️</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [styles.headerSettingsBtn, pressed && styles.headerInfoBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/settings"); }}
-          accessibilityRole="button"
-          accessibilityLabel={t("settings.title")}
-          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-        >
-          <Text style={styles.headerInfoBtnText}>⚙️</Text>
-        </Pressable>
-        <Text style={styles.headerBadge}>{t("home.badge")}</Text>
+        <View style={styles.headerTopRow}>
+          <Pressable
+            style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/about"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("tabs.about")}
+            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+          >
+            <Text style={styles.headerIconBtnText}>ℹ️</Text>
+          </Pressable>
+          <Text style={styles.headerBadge}>{t("home.badge")}</Text>
+          <View style={styles.headerTopRowRight}>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setLangModalVisible(true); }}
+              accessibilityRole="button"
+              accessibilityLabel={t("language.label")}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Text style={styles.headerIconBtnText}>🌐</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
+              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/settings"); }}
+              accessibilityRole="button"
+              accessibilityLabel={t("settings.title")}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Text style={styles.headerIconBtnText}>⚙️</Text>
+            </Pressable>
+          </View>
+        </View>
         <Text style={styles.title}>{t("home.title")}</Text>
         <Text style={styles.subtitle}>{t("home.subtitle")}</Text>
       </View>
 
-      <View style={styles.languageRow}>
-        {(["en", "es", "de", "fr", "is", "no", "sv", "da"] as const).map((lang) => (
-          <Pressable
-            key={lang}
-            style={[styles.langButton, i18n.language === lang && styles.langButtonActive]}
-            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); i18n.changeLanguage(lang); }}
-            accessibilityRole="button"
-            accessibilityLabel={t(`language.${lang}`)}
-            accessibilityState={{ selected: i18n.language === lang }}
-          >
-            <Text style={[styles.langButtonText, i18n.language === lang && styles.langButtonTextActive]}>
-              {t(`language.${lang}`)}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+      <Modal
+        visible={langModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLangModalVisible(false)}
+      >
+        <Pressable style={styles.langModalOverlay} onPress={() => setLangModalVisible(false)}>
+          <View style={styles.langModalContent} onStartShouldSetResponder={() => true}>
+            <Text style={styles.langModalTitle}>{t("language.label")}</Text>
+            {(["en", "es", "de", "fr", "is", "no", "sv", "da"] as const).map((lang) => (
+              <Pressable
+                key={lang}
+                style={({ pressed }) => [
+                  styles.langModalOption,
+                  i18n.language === lang && styles.langModalOptionActive,
+                  pressed && styles.langModalOptionPressed,
+                ]}
+                onPress={() => {
+                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                  i18n.changeLanguage(lang);
+                  setLangModalVisible(false);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t(`language.${lang}`)}
+                accessibilityState={{ selected: i18n.language === lang }}
+              >
+                <Text style={[styles.langModalOptionText, i18n.language === lang && styles.langModalOptionTextActive]}>
+                  {t(`language.${lang}`)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
 
       <Pressable style={styles.primaryButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadData(); }}>
         <Text style={styles.primaryButtonText}>
@@ -1013,47 +1045,39 @@ const styles = StyleSheet.create({
     bottom: -60,
     left: -20,
   },
-  headerInfoBtn: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    zIndex: 10,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  headerTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  headerTopRowRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  headerIconBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: "rgba(255,102,0,0.18)",
     alignItems: "center",
     justifyContent: "center",
   },
-  headerSettingsBtn: {
-    position: "absolute",
-    top: 10,
-    right: 62,
-    zIndex: 10,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: "rgba(255,102,0,0.18)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerInfoBtnPressed: {
+  headerIconBtnPressed: {
     backgroundColor: "rgba(255,102,0,0.40)",
   },
-  headerInfoBtnText: {
+  headerIconBtnText: {
     fontSize: 18,
   },
   headerBadge: {
-    alignSelf: "flex-start",
-    backgroundColor: "rgba(255,102,0,0.18)",
+    flex: 1,
+    textAlign: "center",
+    backgroundColor: "transparent",
     color: "#ff6600",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: "600",
-    marginBottom: 8,
-    letterSpacing: 0.4,
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.6,
   },
   title: {
     color: "#ffffff",
@@ -1389,31 +1413,52 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
   },
-  languageRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 12,
+  langModalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.65)",
     justifyContent: "center",
+    alignItems: "center",
   },
-  langButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
+  langModalContent: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.4)",
+    padding: 20,
+    width: 260,
+  },
+  langModalTitle: {
+    color: "#ff6600",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 14,
+    textAlign: "center",
+  },
+  langModalOption: {
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: "#333333",
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#111111",
+    marginBottom: 8,
   },
-  langButtonActive: {
+  langModalOptionActive: {
     borderColor: "#ff6600",
     backgroundColor: "rgba(255,102,0,0.12)",
   },
-  langButtonText: {
-    color: "#888888",
-    fontSize: 13,
-    fontWeight: "600",
+  langModalOptionPressed: {
+    backgroundColor: "rgba(255,102,0,0.22)",
   },
-  langButtonTextActive: {
+  langModalOptionText: {
+    color: "#888888",
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  langModalOptionTextActive: {
     color: "#ff6600",
   },
   quickNavLabel: {
