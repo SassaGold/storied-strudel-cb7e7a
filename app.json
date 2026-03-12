@@ -30,7 +30,7 @@
       ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCulGSMoPj_Zfe_0szO82pTOmL9sVZdagE"
+          "apiKey": ""
         }
       },
       "adaptiveIcon": {
@@ -69,7 +69,7 @@
     },
     "extra": {
       "router": {},
-      "googleMapsStaticKey": "AIzaSyCulGSMoPj_Zfe_0szO82pTOmL9sVZdagE",
+      "googleMapsStaticKey": "",
       "eas": {
         "projectId": "625b8a7c-5d22-4ebc-a8a6-d0a47451870e"
       }
