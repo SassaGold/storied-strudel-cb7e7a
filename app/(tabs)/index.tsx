@@ -12,6 +12,7 @@ import {
 import { Image as ExpoImage } from "expo-image";
 import * as Location from "expo-location";
 import Constants from "expo-constants";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 let NativeMapView: any = null;
 let NativeMarker: any = null;
@@ -156,6 +157,7 @@ const buildAlerts = (weather?: WeatherInfo) => {
 };
 
 export default function Index() {
+  const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [address, setAddress] = useState<GeoAddress | null>(null);
@@ -391,13 +393,13 @@ out center 60;`;
   }, [location]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>Live nearby</Text>
-        <Text style={styles.title}>Where Am I?</Text>
-        <Text style={styles.subtitle}>Your location and what’s around you.</Text>
+        <Text style={styles.headerBadge}>RIDER HQ</Text>
+        <Text style={styles.title}>🏍️ RIDER HQ</Text>
+        <Text style={styles.subtitle}>📍 WHERE AM I?</Text>
       </View>
 
       <View style={styles.card}>
