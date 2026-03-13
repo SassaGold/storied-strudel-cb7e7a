@@ -1,5 +1,51 @@
 # Changelog
 
+## v2.0.0 — Version 2 (2026-03-13)
+
+Second major release of **Roamly**. Expanded to 9 tabs and added Trip Logger, SOS/Emergency, Settings, and About screens, plus multilingual support for 8 languages.
+
+### New in v2
+
+#### 🆘 SOS / Emergency tab (new)
+- Big red SOS button — calls 112
+- Quick-action grid: Call 112 · Share Location · Torch Screen · Instructions
+- White-screen torch overlay
+- Instructions bottom-sheet modal
+
+#### 📍 Trip Logger tab (new)
+- Live SpeedGauge (28-tick, 240° sweep, green→red gradient)
+- Real-time distance / duration / avg-speed stats
+- START/STOP button with haptic feedback
+- Ride history cards with orange accent strip and stat chips
+- Metric / Imperial unit support
+
+#### ⚙️ Settings tab (new)
+- Unit system toggle: Metric / Imperial
+- Search radius: 2 – 20 km
+- Default tab selector
+- Haptic feedback on chip selection
+
+#### ℹ️ About tab (new)
+- App name, version, description, and credits
+
+#### i18n expanded to 8 languages
+- English, Spanish, German, French, Dutch, Norwegian, Swedish, Danish
+
+#### Header / UI polish
+- All POI tabs use safe-area insets
+- Orange active-indicator glow on the tab bar
+- Translucent "📍 WHERE AM I?" subtitle on RIDER HQ
+
+### Technical Highlights (v2)
+- Shared `lib/overpass.ts`: haversine distance, Overpass fetch, 30-min TTL cache
+- Shared `lib/settings.ts`: SettingsContext / useSettings
+- `lib/i18n.ts` + 8 locale JSON files under `lib/locales/`
+- AsyncStorage caching keys: `cache_{screen}_v2`
+- IIFE require pattern for optional native modules (maps, haptics)
+- EAS Build configured for development, preview, and production profiles
+
+---
+
 ## v1.0.0 — Version 1 (2026-03-13)
 
 Initial complete release of **Roamly** — the biker companion app.

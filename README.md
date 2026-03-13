@@ -1,6 +1,159 @@
-# Rider HQ — Biker Companion App 🏍️
+# Roamly — Biker Companion App 🏍️
 
-A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, emergency services), log your trips, and more. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, and Danish.
+A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, emergency services), log your trips, and more. Supports English, Spanish, German, French, Dutch, Norwegian, Swedish, and Danish.
+
+> **Current version: 2.0.0** — live on Netlify and saved permanently in this GitHub repository.
+
+---
+
+## How your build is already saved (and how to keep it safe)
+
+**Your code is your build.** Every time a change is pushed to GitHub, it is permanently saved in this repository. The Netlify site is built automatically from this same code.
+
+### What "saved" means in practice
+
+| Where | What it contains | How to restore |
+|-------|-----------------|----------------|
+| **GitHub repository** | All source code, every version ever committed | Clone the repo again |
+| **Git tags** | Named snapshots (e.g. `v2.0.0`) | `git checkout v2.0.0` |
+| **Netlify** | The compiled web build (HTML/JS/CSS) | Redeploy from GitHub at any time |
+
+### How to download a full copy to your own computer right now
+
+1. Install [Git](https://git-scm.com) and [Node.js 18+](https://nodejs.org) if you haven't already.
+2. Open a terminal (Command Prompt / Terminal) and run:
+   ```bash
+   git clone https://github.com/SassaGold/storied-strudel-cb7e7a.git
+   cd storied-strudel-cb7e7a
+   npm install
+   ```
+3. That's it — you now have a complete copy on your computer. Run `npm run web` to see it working locally.
+
+### How to make an extra offline backup (optional)
+
+```bash
+# After cloning, zip the whole folder:
+# Windows — right-click the folder → "Send to" → "Compressed (zipped) folder"
+# Mac     — right-click → "Compress"
+# Linux   — zip -r roamly-backup.zip storied-strudel-cb7e7a/
+```
+
+Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra safety.
+
+---
+
+## Publishing to Google Play Store
+
+### Is the app ready?
+
+**Yes — the technical foundation is ready.** The app already has:
+
+- ✅ Android package name: `com.sassagold.roamly`
+- ✅ Adaptive icon set (foreground, background, monochrome)
+- ✅ Required permissions declared (location, background location)
+- ✅ EAS Build configured (`eas.json`) with a production profile
+- ✅ EAS project ID linked (`625b8a7c-5d22-4ebc-a8a6-d0a47451870e`)
+
+**What you still need to do** (none of this is code — it's account setup):
+
+| Step | What | Cost |
+|------|------|------|
+| 1 | Google Play Developer account | US $25 one-time |
+| 2 | Expo account (free) | Free |
+| 3 | Google Maps Android API key | Free quota / pay-as-you-go |
+| 4 | App store listing (screenshots, description, privacy policy) | Free |
+
+---
+
+### Step-by-step: publish to Google Play
+
+#### Step 1 — Create an Expo account
+
+1. Go to [expo.dev](https://expo.dev) and create a free account.
+2. In your terminal, log in:
+   ```bash
+   npm install -g eas-cli
+   eas login
+   ```
+
+#### Step 2 — Add a Google Maps API key for Android
+
+The map on Android works best with a Google Maps API key.
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com).
+2. Create a project → enable **Maps SDK for Android**.
+3. Create an API key → restrict it to your Android package `com.sassagold.roamly`.
+4. Open `app.json` and replace the empty string:
+   ```json
+   "android": {
+     "config": {
+       "googleMaps": {
+         "apiKey": "YOUR_ANDROID_MAPS_KEY_HERE"
+       }
+     }
+   }
+   ```
+5. Save and push the change to GitHub.
+
+#### Step 3 — Build the production Android AAB (App Bundle)
+
+An AAB is the file Google Play requires (it's like a ZIP of your app).
+
+```bash
+# In the project folder on your computer:
+eas build --profile production --platform android
+```
+
+- EAS builds in the cloud — you don't need Android Studio installed.
+- The build takes about 10–15 minutes.
+- When done, EAS gives you a download link for the `.aab` file.
+
+#### Step 4 — Create a Google Play Developer account
+
+1. Go to [play.google.com/console](https://play.google.com/console).
+2. Pay the one-time **US $25** registration fee.
+3. Complete your developer profile.
+
+#### Step 5 — Create a new app in Play Console
+
+1. Click **"Create app"**.
+2. Fill in:
+   - App name: `Roamly`
+   - Default language: English
+   - App or game: **App**
+   - Free or paid: **Free**
+3. Accept the declarations and click **"Create app"**.
+
+#### Step 6 — Upload your AAB and fill in the store listing
+
+1. Go to **Production → Releases → Create new release**.
+2. Upload the `.aab` file you downloaded from EAS.
+3. Fill in the **Store listing**:
+   - Short description (80 chars): *"Biker companion: find POIs, log rides, SOS emergency tools"*
+   - Full description: describe all 9 tabs
+   - Screenshots: take at least 2 phone screenshots (required)
+   - Feature graphic: 1024×500 px banner image (required)
+4. Fill in **App content** (privacy policy URL required — you can use a free generator at [privacypolicytemplate.net](https://privacypolicytemplate.net)).
+5. Set **Content rating** by answering the questionnaire.
+
+#### Step 7 — Submit for review
+
+1. Click **"Review release"** → **"Start rollout to Production"**.
+2. Google reviews the app — typically **1–3 days** for a first submission.
+3. Once approved, your app is live on the Play Store! 🎉
+
+---
+
+### Updating the app after it's published
+
+Every time you want to release a new version:
+
+1. Increment the version in `app.json` (e.g. `"version": "2.1.0"`).
+2. Push to GitHub.
+3. Run `eas build --profile production --platform android` again.
+4. Upload the new AAB in Play Console → create a new release.
+
+The `"autoIncrement": true` in `eas.json` handles the Android `versionCode` automatically.
 
 ---
 
