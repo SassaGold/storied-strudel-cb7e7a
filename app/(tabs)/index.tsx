@@ -776,16 +776,6 @@ export default function Index() {
         </View>
       )}
 
-      {/* ── Riding Suitability Card ── */}
-      {weather && (
-        <View style={[styles.card, styles.suitabilityCard, { borderColor: suitability.color }]}>
-          <Text style={styles.cardTitle}>{t("home.ridingSuitability", { score: suitability.score })}</Text>
-          <View style={[styles.suitabilityBadge, styles.suitabilityBadgeSelf, { backgroundColor: suitability.color }]}>
-            <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
-          </View>
-        </View>
-      )}
-
       {/* ── Sunrise / Sunset Card ── */}
       {sunTimes && (
         <View style={styles.card}>
@@ -808,6 +798,16 @@ export default function Index() {
               <Text style={styles.sunTimesValue}>{formatDuration(sunTimes.daylightMinutes)}</Text>
               <Text style={styles.sunTimesLabel}>{t("home.daylight")}</Text>
             </View>
+          </View>
+        </View>
+      )}
+
+      {/* ── Riding Suitability Card ── */}
+      {weather && (
+        <View style={[styles.card, styles.suitabilityCard, { borderColor: suitability.color }]}>
+          <Text style={styles.cardTitle}>{t("home.ridingSuitability", { score: suitability.score })}</Text>
+          <View style={[styles.suitabilityBadge, styles.suitabilityBadgeSelf, { backgroundColor: suitability.color }]}>
+            <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
           </View>
         </View>
       )}
