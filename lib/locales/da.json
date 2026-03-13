@@ -218,7 +218,7 @@
       "atm_bank": "Søger inden for 5 km efter hæveautomater og bankfilialer — nyttigt på langture, når kontanter er nødvendige."
     },
     "empty": {
-      "services": "Ingen MC-forhandlere, værksteder, butikker eller udlejning fundet endnu. Prøv at opdatere din placering.",
+      "services": "Ingen motorcykeltjenester fundet i nærheden.\nPrøv at opdatere din placering eller udvide din søgeradius.",
       "fuel": "Ingen tankstationer fundet endnu. Prøv at opdatere din placering.",
       "parking": "Ingen parkering fundet endnu. Prøv at opdatere din placering.",
       "clubs_tracks": "Ingen MC-klubber eller baner fundet inden for 50 km. Prøv at opdatere din placering.",

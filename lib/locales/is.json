@@ -218,7 +218,7 @@
       "atm_bank": "Leitar í 5 km að hraðbönkum og bankageirum — hentugt á löngum ferðum."
     },
     "empty": {
-      "services": "Engin mótorhjólaþjónusta fundust. Uppfærðu staðsetningu þína.",
+      "services": "Engin mótorhjólaþjónusta fundust í nágrenninu.\nReyndu að uppfæra staðsetningu þína eða stækka leitarradíus.",
       "fuel": "Engar bensínstöðvar fundust. Uppfærðu staðsetningu þína.",
       "parking": "Engin bílastæði fundust. Uppfærðu staðsetningu þína.",
       "clubs_tracks": "Engir klúbbar eða brautir fundust í 50 km. Uppfærðu staðsetningu þína.",

@@ -218,7 +218,7 @@
       "atm_bank": "Recherche dans 5 km de distributeurs automatiques et agences bancaires — pratique lors de longues randonnées."
     },
     "empty": {
-      "services": "Aucun service moto trouvé. Mettez à jour votre position.",
+      "services": "Aucun service moto trouvé à proximité.\nEssayez de mettre à jour votre position ou d'élargir votre rayon de recherche.",
       "fuel": "Aucune station-service trouvée. Mettez à jour votre position.",
       "parking": "Aucun parking trouvé. Mettez à jour votre position.",
       "clubs_tracks": "Aucun club ou circuit dans 50 km. Mettez à jour votre position.",

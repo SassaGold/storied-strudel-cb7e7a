@@ -218,7 +218,7 @@
       "atm_bank": "Söker inom 5 km efter bankomater och bankkontor — praktiskt på långturer när kontanter behövs."
     },
     "empty": {
-      "services": "Inga MC-återförsäljare, verkstäder, butiker eller uthyrning hittades ännu. Försök uppdatera din plats.",
+      "services": "Inga motorcykeltjänster hittades i närheten.\nFörsök uppdatera din plats eller utöka sökradien.",
       "fuel": "Inga bensinstationer hittades ännu. Försök uppdatera din plats.",
       "parking": "Ingen parkering hittades ännu. Försök uppdatera din plats.",
       "clubs_tracks": "Inga MC-klubbar eller banor hittades inom 50 km. Försök uppdatera din plats.",

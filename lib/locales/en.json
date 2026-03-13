@@ -218,7 +218,7 @@
       "atm_bank": "Searches within 5 km for ATM machines and bank branches — handy on long-distance rides when cash is needed."
     },
     "empty": {
-      "services": "No MC dealers, workshops, shops, or rentals found yet. Try updating your location.",
+      "services": "No motorcycle services found nearby.\nTry updating your location or expanding your search radius.",
       "fuel": "No fuel stations found yet. Try updating your location.",
       "parking": "No parking found yet. Try updating your location.",
       "clubs_tracks": "No MC clubs or tracks found within 50 km. Try updating your location.",

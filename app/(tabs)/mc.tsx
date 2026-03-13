@@ -128,6 +128,39 @@ const CATEGORY_RADIUS_M = {
 
 const CATEGORY_KEYS: Category[] = ["services", "fuel", "parking", "clubs_tracks", "atm_bank"];
 
+const CATEGORY_COLORS: Record<Category, string> = {
+  services: "#ff6600",
+  fuel:     "#22c55e",
+  parking:  "#3b82f6",
+  clubs_tracks: "#ef4444",
+  atm_bank: "#a855f7",
+};
+
+// Pre-computed inactive border and active background colours (27% / 10% opacity)
+const CATEGORY_BORDER_INACTIVE: Record<Category, string> = {
+  services:     "rgba(255,102,0,0.27)",
+  fuel:         "rgba(34,197,94,0.27)",
+  parking:      "rgba(59,130,246,0.27)",
+  clubs_tracks: "rgba(239,68,68,0.27)",
+  atm_bank:     "rgba(168,85,247,0.27)",
+};
+
+const CATEGORY_BG_ACTIVE: Record<Category, string> = {
+  services:     "rgba(255,102,0,0.10)",
+  fuel:         "rgba(34,197,94,0.10)",
+  parking:      "rgba(59,130,246,0.10)",
+  clubs_tracks: "rgba(239,68,68,0.10)",
+  atm_bank:     "rgba(168,85,247,0.10)",
+};
+
+const CATEGORY_ICONS: Record<Category, string> = {
+  services:     "🏍️",
+  fuel:         "⛽",
+  parking:      "🅿️",
+  clubs_tracks: "🏁",
+  atm_bank:     "🏧",
+};
+
 export default function McScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
@@ -470,33 +503,36 @@ out center 120;`;
         </Text>
       </View>
 
-      {/* Category selector */}
+      {/* Category selector — 2×3 icon tile grid */}
       <View style={styles.segmentRow}>
-        {CATEGORY_KEYS.map((key) => (
-          <Pressable
-            key={key}
-            style={[
-              styles.segmentButton,
-              selected === key && styles.segmentButtonActive,
-            ]}
-            onPress={() => {
-              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-              setSelected(key);
-              setPlaces([]);
-              setError(null);
-              setNameSearch("");
-            }}
-          >
-            <Text
+        {CATEGORY_KEYS.map((key) => {
+          const color = CATEGORY_COLORS[key];
+          const isActive = selected === key;
+          return (
+            <Pressable
+              key={key}
               style={[
-                styles.segmentText,
-                selected === key && styles.segmentTextActive,
+                styles.segmentTile,
+                { borderColor: isActive ? color : CATEGORY_BORDER_INACTIVE[key] },
+                isActive && { backgroundColor: CATEGORY_BG_ACTIVE[key] },
               ]}
+              onPress={() => {
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                setSelected(key);
+                setPlaces([]);
+                setError(null);
+                setNameSearch("");
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t(`garage.titles.${key}`)}
             >
-              {t(`garage.categories.${key}`)}
-            </Text>
-          </Pressable>
-        ))}
+              <Text style={styles.segmentTileIcon}>{CATEGORY_ICONS[key]}</Text>
+              <Text style={[styles.segmentTileText, isActive && { color }]}>
+                {t(`garage.titles.${key}`)}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       <Pressable
@@ -608,7 +644,7 @@ out center 120;`;
             filteredPlaces.map((place) => (
               <Pressable
                 key={place.id}
-                style={styles.placeRow}
+                style={[styles.placeRow, { borderLeftColor: CATEGORY_COLORS[selected] }]}
                 onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}
                 accessibilityRole="button"
                 accessibilityLabel={place.name}
@@ -741,29 +777,28 @@ const styles = StyleSheet.create({
   segmentRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 10,
     marginBottom: 14,
   },
-  segmentButton: {
-    paddingVertical: 10,
+  segmentTile: {
+    width: "47%",
+    paddingVertical: 14,
     paddingHorizontal: 10,
-    borderRadius: 6,
+    borderRadius: 12,
     alignItems: "center",
     backgroundColor: "#141414",
-    borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.25)",
+    borderWidth: 1.5,
+    borderColor: "#2a2a2a",
   },
-  segmentButtonActive: {
-    backgroundColor: "#ff6600",
-    borderColor: "#ff6600",
+  segmentTileIcon: {
+    fontSize: 28,
+    marginBottom: 6,
   },
-  segmentText: {
+  segmentTileText: {
     color: "#666666",
     fontSize: 13,
     fontWeight: "700",
-  },
-  segmentTextActive: {
-    color: "#000000",
+    textAlign: "center",
   },
   loadingRow: {
     flexDirection: "row",

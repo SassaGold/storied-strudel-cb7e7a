@@ -218,7 +218,7 @@
       "atm_bank": "Busca en 5 km cajeros automáticos y sucursales bancarias — útil en rutas largas."
     },
     "empty": {
-      "services": "No se encontraron talleres ni tiendas. Actualiza tu ubicación.",
+      "services": "No se encontraron servicios de motocicleta cerca.\nIntenta actualizar tu ubicación o ampliar el radio de búsqueda.",
       "fuel": "No se encontraron gasolineras. Actualiza tu ubicación.",
       "parking": "No se encontró aparcamiento. Actualiza tu ubicación.",
       "clubs_tracks": "No se encontraron clubes o circuitos en 50 km. Actualiza tu ubicación.",

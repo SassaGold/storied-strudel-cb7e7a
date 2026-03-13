@@ -218,7 +218,7 @@
       "atm_bank": "Sucht im Umkreis von 5 km nach Geldautomaten und Bankfilialen — praktisch auf Langstreckentouren."
     },
     "empty": {
-      "services": "Keine Werkstätten oder Shops gefunden. Standort aktualisieren.",
+      "services": "Keine Motorradservices in der Nähe gefunden.\nVersuche, deinen Standort zu aktualisieren oder den Suchradius zu vergrößern.",
       "fuel": "Keine Tankstellen gefunden. Standort aktualisieren.",
       "parking": "Keine Parkplätze gefunden. Standort aktualisieren.",
       "clubs_tracks": "Keine Clubs oder Strecken in 50 km gefunden. Standort aktualisieren.",
