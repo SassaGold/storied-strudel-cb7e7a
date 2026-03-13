@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+
+const METERS_PER_KM = 1000;
+const SECONDS_PER_HOUR = 3600;
+const MAX_RIDE_HISTORY = 20;
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Location from "expo-location";
 import { haversineMeters, formatDistance } from "../../lib/overpass";
@@ -180,15 +183,15 @@ export default function TripLoggerScreen() {
     const dur = durationSec;
     const dist = distanceMRef.current;
     if (dist > 10 || dur > 5) {
-      const avgKmh = dur > 0 ? (dist / 1000) / (dur / 3600) : 0;
+      const avgKmh = calcAvgSpeedKmh(dist, dur);
       const rec: RideRecord = {
         id: String(Date.now()),
         date: new Date().toLocaleDateString(),
-        distanceKm: dist / 1000,
+        distanceKm: dist / METERS_PER_KM,
         durationSec: dur,
         avgSpeedKmh: avgKmh,
       };
-      setRides((prev) => [rec, ...prev].slice(0, 20));
+      setRides((prev) => [rec, ...prev].slice(0, MAX_RIDE_HISTORY));
     }
   }, [durationSec]);
 
@@ -200,14 +203,17 @@ export default function TripLoggerScreen() {
   }, []);
 
   const formatDuration = (sec: number) => {
-    const h = Math.floor(sec / 3600);
-    const m = Math.floor((sec % 3600) / 60);
+    const h = Math.floor(sec / SECONDS_PER_HOUR);
+    const m = Math.floor((sec % SECONDS_PER_HOUR) / 60);
     const s = sec % 60;
     if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
     return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   };
 
-  const avgSpeedKmh = durationSec > 0 ? (distanceM / 1000) / (durationSec / 3600) : 0;
+  const calcAvgSpeedKmh = (distM: number, durSec: number) =>
+    durSec > 0 ? (distM / METERS_PER_KM) / (durSec / SECONDS_PER_HOUR) : 0;
+
+  const avgSpeedKmh = calcAvgSpeedKmh(distanceM, durationSec);
 
   return (
     <ScrollView contentContainerStyle={[styles.container, { paddingTop: insets.top + 16 }]}>

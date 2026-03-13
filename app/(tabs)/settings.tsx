@@ -12,15 +12,15 @@ const Haptics = (() => {
   try { return require("expo-haptics"); } catch { return null; }
 })();
 
-type Language = "EN" | "DE" | "FR" | "ES" | "NL";
+type Language = "en" | "de" | "fr" | "es" | "nl";
 type Units = "metric" | "imperial";
 
 const LANGUAGES: { code: Language; label: string; flag: string }[] = [
-  { code: "EN", label: "English", flag: "🇬🇧" },
-  { code: "DE", label: "Deutsch", flag: "🇩🇪" },
-  { code: "FR", label: "Français", flag: "🇫🇷" },
-  { code: "ES", label: "Español", flag: "🇪🇸" },
-  { code: "NL", label: "Nederlands", flag: "🇳🇱" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "nl", label: "Nederlands", flag: "🇳🇱" },
 ];
 
 const RADII = [
@@ -32,7 +32,7 @@ const RADII = [
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
-  const [language, setLanguage] = useState<Language>("EN");
+  const [language, setLanguage] = useState<Language>("en");
   const [units, setUnits] = useState<Units>("metric");
   const [radius, setRadius] = useState(5000);
 
@@ -73,7 +73,7 @@ export default function SettingsScreen() {
             >
               <Text style={styles.chipFlag}>{l.flag}</Text>
               <Text style={[styles.chipText, language === l.code && styles.chipTextActive]}>
-                {l.code}
+                {l.code.toUpperCase()}
               </Text>
             </Pressable>
           ))}

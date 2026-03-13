@@ -47,7 +47,6 @@ export const fetchOverpass = async (query: string, timeoutMs = 25000): Promise<a
           body: `data=${encodeURIComponent(query)}`,
           signal: controller.signal,
         });
-        clearTimeout(timer);
         if (!response.ok) {
           lastError = `Overpass error ${response.status}`;
           continue;

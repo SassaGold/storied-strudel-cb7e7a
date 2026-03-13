@@ -13,7 +13,7 @@ function TabIcon({ name, color, size, focused }: TabIconProps) {
   return (
     <View style={tabIconStyles.wrapper}>
       {focused && <View style={tabIconStyles.indicator} />}
-      <Ionicons name={name} size={26} color={color} />
+      <Ionicons name={name} size={size} color={color} />
     </View>
   );
 }
