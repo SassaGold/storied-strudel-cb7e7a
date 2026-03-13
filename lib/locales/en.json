@@ -75,7 +75,7 @@
     "sunrise": "Sunrise",
     "sunset": "Sunset",
     "daylight": "Daylight",
-    "openWeather": "OPEN YR WEATHER",
+    "openWeather": "OPEN WEATHER",
     "lastUpdated": "Last updated {{time}}",
     "roadConditions": "🚧 Road Conditions",
     "roadConditionsLoading": "Checking road conditions…",
