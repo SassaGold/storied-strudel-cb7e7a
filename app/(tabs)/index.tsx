@@ -783,27 +783,32 @@ export default function Index() {
           <View style={[styles.suitabilityBadge, styles.suitabilityBadgeSelf, { backgroundColor: suitability.color }]}>
             <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
           </View>
-          {sunTimes && (
-            <View style={styles.sunTimesRowSpaced}>
-              <View style={styles.sunTimesItem}>
-                <Text style={styles.sunTimesEmoji}>🌅</Text>
-                <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
-                <Text style={styles.sunTimesLabel}>{t("home.sunrise")}</Text>
-              </View>
-              <View style={styles.sunTimesDivider} />
-              <View style={styles.sunTimesItem}>
-                <Text style={styles.sunTimesEmoji}>🌇</Text>
-                <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
-                <Text style={styles.sunTimesLabel}>{t("home.sunset")}</Text>
-              </View>
-              <View style={styles.sunTimesDivider} />
-              <View style={styles.sunTimesItem}>
-                <Text style={styles.sunTimesEmoji}>☀️</Text>
-                <Text style={styles.sunTimesValue}>{formatDuration(sunTimes.daylightMinutes)}</Text>
-                <Text style={styles.sunTimesLabel}>{t("home.daylight")}</Text>
-              </View>
+        </View>
+      )}
+
+      {/* ── Sunrise / Sunset Card ── */}
+      {sunTimes && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>{t("home.sunriseSunset")}</Text>
+          <View style={styles.sunTimesRowSpaced}>
+            <View style={styles.sunTimesItem}>
+              <Text style={styles.sunTimesEmoji}>🌅</Text>
+              <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
+              <Text style={styles.sunTimesLabel}>{t("home.sunrise")}</Text>
             </View>
-          )}
+            <View style={styles.sunTimesDivider} />
+            <View style={styles.sunTimesItem}>
+              <Text style={styles.sunTimesEmoji}>🌇</Text>
+              <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
+              <Text style={styles.sunTimesLabel}>{t("home.sunset")}</Text>
+            </View>
+            <View style={styles.sunTimesDivider} />
+            <View style={styles.sunTimesItem}>
+              <Text style={styles.sunTimesEmoji}>☀️</Text>
+              <Text style={styles.sunTimesValue}>{formatDuration(sunTimes.daylightMinutes)}</Text>
+              <Text style={styles.sunTimesLabel}>{t("home.daylight")}</Text>
+            </View>
+          </View>
         </View>
       )}
 
