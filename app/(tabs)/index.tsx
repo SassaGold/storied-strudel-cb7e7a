@@ -655,6 +655,8 @@ export default function Index() {
             </Pressable>
           </View>
         </View>
+        {/* WHERE AM I? subtitle */}
+        <Text style={styles.logoSubtitle}>📍 WHERE AM I?</Text>
       </View>
 
       <Modal
@@ -1120,6 +1122,15 @@ const styles = StyleSheet.create({
     textShadowColor: "rgba(255,102,0,0.50)",
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 8,
+  },
+  logoSubtitle: {
+    color: "rgba(255,255,255,0.55)",
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 2.5,
+    textAlign: "center",
+    marginTop: 4,
+    fontFamily: LOGO_FONT,
   },
   primaryButton: {
     backgroundColor: "#ff6600",
