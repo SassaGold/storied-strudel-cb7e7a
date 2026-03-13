@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Linking,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,6 +17,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtTemp } from "../../lib/settings";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+
+/** Modern sans-serif font family: SF Pro on iOS, Roboto Black on Android, Inter on web */
+const LOGO_FONT = Platform.select({ ios: "-apple-system", android: "sans-serif-black", web: "Inter, -apple-system, system-ui, sans-serif" });
 
 type GeoAddress = {
   displayName: string;
@@ -625,7 +629,11 @@ export default function Index() {
           >
             <Text style={styles.headerIconBtnText}>ℹ️</Text>
           </Pressable>
-          <Text style={styles.headerTitle}>{t("home.badge")}</Text>
+          {/* WHERE AM I? custom logo wordmark */}
+          <View style={styles.logoWrapper}>
+            <Text style={styles.logoMoto}>🏍️</Text>
+            <Text style={styles.logoTitle}>WHERE AM I?</Text>
+          </View>
           <View style={styles.headerTopRowRight}>
             <Pressable
               style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
@@ -1090,13 +1098,26 @@ const styles = StyleSheet.create({
   headerIconBtnText: {
     fontSize: 18,
   },
-  headerTitle: {
+  logoWrapper: {
     flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logoMoto: {
+    fontSize: 13,
+    lineHeight: 16,
     textAlign: "center",
+  },
+  logoTitle: {
     color: "#ff6600",
-    fontSize: 17,
-    fontWeight: "800",
-    letterSpacing: 0.8,
+    fontSize: 16,
+    fontWeight: "900",
+    letterSpacing: 1.8,
+    textAlign: "center",
+    fontFamily: LOGO_FONT,
+    textShadowColor: "rgba(255,102,0,0.50)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
   primaryButton: {
     backgroundColor: "#ff6600",
