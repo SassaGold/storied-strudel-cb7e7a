@@ -629,10 +629,10 @@ export default function Index() {
           >
             <Text style={styles.headerIconBtnText}>ℹ️</Text>
           </Pressable>
-          {/* WHERE AM I? custom logo wordmark */}
+          {/* RIDER HQ logo wordmark */}
           <View style={styles.logoWrapper}>
             <Text style={styles.logoMoto}>🏍️</Text>
-            <Text style={styles.logoTitle}>WHERE AM I?</Text>
+            <Text style={styles.logoTitle}>RIDER HQ</Text>
           </View>
           <View style={styles.headerTopRowRight}>
             <Pressable
@@ -1100,13 +1100,15 @@ const styles = StyleSheet.create({
   },
   logoWrapper: {
     flex: 1,
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
   },
   logoMoto: {
-    fontSize: 13,
-    lineHeight: 16,
+    fontSize: 16,
+    lineHeight: 20,
     textAlign: "center",
+    marginRight: 6,
   },
   logoTitle: {
     color: "#ff6600",
