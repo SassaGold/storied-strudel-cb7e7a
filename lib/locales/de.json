@@ -276,7 +276,10 @@
     "emergencyInstructions": "📋 Anweisungen",
     "instructionsTitle": "Notfallanweisungen",
     "instructionsClose": "Schließen",
-    "instructionsBody": "1. RUHE BEWAHREN — Lage einschätzen.\n\n2. SOFORT 112 ANRUFEN.\n\n3. STANDORT — genau angeben, wo du bist.\n\n4. HELM — nur entfernen wenn Atemweg blockiert.\n\n5. BLUTUNG — festen direkten Druck anwenden.\n\n6. VERLETZTEN NICHT BEWEGEN außer bei unmittelbarer Gefahr.\n\n7. WARM HALTEN — Kleidung oder Rettungsdecke nutzen.\n\n8. VERBINDUNG HALTEN — nicht auflegen bis Hilfe kommt."
+    "instructionsBody": "1. RUHE BEWAHREN — Lage einschätzen.\n\n2. SOFORT 112 ANRUFEN.\n\n3. STANDORT — genau angeben, wo du bist.\n\n4. HELM — nur entfernen wenn Atemweg blockiert.\n\n5. BLUTUNG — festen direkten Druck anwenden.\n\n6. VERLETZTEN NICHT BEWEGEN außer bei unmittelbarer Gefahr.\n\n7. WARM HALTEN — Kleidung oder Rettungsdecke nutzen.\n\n8. VERBINDUNG HALTEN — nicht auflegen bis Hilfe kommt.",
+    "quickActionCall": "112 anrufen",
+    "quickActionTorch": "Licht",
+    "quickActionInstructions": "Anweisungen"
   },
   "triplog": {
     "badge": "🏍️ TOUR",
@@ -310,7 +313,8 @@
     "mapUnavailable": "Karte nicht verfügbar",
     "tooShortTitle": "Fahrt Nicht Gespeichert",
     "tooShortMsg": "Fahrt war unter 10 m — nicht gespeichert.",
-    "viewMapShort": "Route"
+    "viewMapShort": "Route",
+    "speedLabel": "TEMPO"
   },
   "about": {
     "badge": "ℹ️ ÜBER",

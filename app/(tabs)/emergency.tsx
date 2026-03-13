@@ -430,7 +430,7 @@ out center ${MAX_RESULTS};`;
             onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
           >
             <Text style={styles.quickActionEmoji}>📞</Text>
-            <Text style={styles.quickActionLabel}>Call 112</Text>
+            <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")}</Text>
           </Pressable>
           {/* Share Location */}
           <Pressable
@@ -446,7 +446,7 @@ out center ${MAX_RESULTS};`;
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(true); }}
           >
             <Text style={styles.quickActionEmoji}>🔦</Text>
-            <Text style={styles.quickActionLabel}>Torch</Text>
+            <Text style={styles.quickActionLabel}>{t("sos.quickActionTorch")}</Text>
           </Pressable>
           {/* Emergency Instructions */}
           <Pressable
@@ -454,7 +454,7 @@ out center ${MAX_RESULTS};`;
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(true); }}
           >
             <Text style={styles.quickActionEmoji}>📋</Text>
-            <Text style={styles.quickActionLabel}>Instructions</Text>
+            <Text style={styles.quickActionLabel}>{t("sos.quickActionInstructions")}</Text>
           </Pressable>
         </View>
       </View>

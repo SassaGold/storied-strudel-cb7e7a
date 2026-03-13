@@ -276,7 +276,10 @@
     "emergencyInstructions": "📋 Leiðbeiningar",
     "instructionsTitle": "Neyðarleiðbeiningar",
     "instructionsClose": "Loka",
-    "instructionsBody": "1. HALTU RÓ — mettu ástandið.\n\n2. HRINGDU Í 112 strax.\n\n3. STAÐSETNING — segðu nákvæmlega hvar þú ert.\n\n4. HJÁLMUR — fjarlægðu hann ekki nema loftvegi sé stíflaður.\n\n5. BLÆÐING — beitu þrýstingi beint á sárið.\n\n6. EKKI FÆRA meiddur nema yfirvofandi hætta sé.\n\n7. GEYMDU HLÝJA — notaðu föt eða björgunarfiltu.\n\n8. HALTU LÍNUNNI — leggðu ekki niður þar til hjálp kemur."
+    "instructionsBody": "1. HALTU RÓ — mettu ástandið.\n\n2. HRINGDU Í 112 strax.\n\n3. STAÐSETNING — segðu nákvæmlega hvar þú ert.\n\n4. HJÁLMUR — fjarlægðu hann ekki nema loftvegi sé stíflaður.\n\n5. BLÆÐING — beitu þrýstingi beint á sárið.\n\n6. EKKI FÆRA meiddur nema yfirvofandi hætta sé.\n\n7. GEYMDU HLÝJA — notaðu föt eða björgunarfiltu.\n\n8. HALTU LÍNUNNI — leggðu ekki niður þar til hjálp kemur.",
+    "quickActionCall": "Hringja 112",
+    "quickActionTorch": "Ljós",
+    "quickActionInstructions": "Leiðbeiningar"
   },
   "triplog": {
     "badge": "🏍️ FERÐASKRÁ",
@@ -310,7 +313,8 @@
     "mapUnavailable": "Kort ekki tiltækt",
     "tooShortTitle": "Ferð Ekki Vistuð",
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
-    "viewMapShort": "Leið"
+    "viewMapShort": "Leið",
+    "speedLabel": "HRAÐI"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

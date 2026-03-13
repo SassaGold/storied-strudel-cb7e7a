@@ -358,6 +358,7 @@ export default function TripLoggerScreen() {
               speedKmh={currentSpeedKmh}
               maxKmh={isImperial ? 100 : 160}
               unit={speedUnit}
+              label={t("triplog.speedLabel")}
               size={190}
             />
           </View>
@@ -475,15 +476,15 @@ export default function TripLoggerScreen() {
               <View style={styles.rideStatChips}>
                 <View style={styles.rideStatChip}>
                   <Text style={styles.rideStatChipValue}>{fmtDist(ride.distanceKm, settings.unitSystem)}</Text>
-                  <Text style={styles.rideStatChipLabel}>📏 Distance</Text>
+                  <Text style={styles.rideStatChipLabel}>📏 {t("triplog.distance")}</Text>
                 </View>
                 <View style={styles.rideStatChip}>
                   <Text style={styles.rideStatChipValue}>{formatDuration(ride.durationMs)}</Text>
-                  <Text style={styles.rideStatChipLabel}>⏱ Duration</Text>
+                  <Text style={styles.rideStatChipLabel}>⏱ {t("triplog.duration")}</Text>
                 </View>
                 <View style={styles.rideStatChip}>
                   <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.avgSpeedKmh, settings.unitSystem)}</Text>
-                  <Text style={styles.rideStatChipLabel}>⚡ Avg Speed</Text>
+                  <Text style={styles.rideStatChipLabel}>⚡ {t("triplog.avgSpeed")}</Text>
                 </View>
               </View>
               {/* Action buttons */}
@@ -563,11 +564,13 @@ function SpeedGauge({
   speedKmh,
   maxKmh = 160,
   unit,
+  label,
   size = 190,
 }: {
   speedKmh: number | null;
   maxKmh?: number;
   unit: string;
+  label: string;
   size?: number;
 }) {
   const pct = speedKmh != null ? Math.min(speedKmh / maxKmh, 1) : 0;
@@ -638,7 +641,7 @@ function SpeedGauge({
           {speedKmh != null ? Math.round(speedKmh) : "—"}
         </Text>
         <Text style={{ fontSize: 12, color: "#777", fontWeight: "600" }}>{unit}</Text>
-        <Text style={{ fontSize: 9, color: "#444", letterSpacing: 1.5, marginTop: 2 }}>SPEED</Text>
+        <Text style={{ fontSize: 9, color: "#444", letterSpacing: 1.5, marginTop: 2 }}>{label}</Text>
       </View>
     </View>
   );

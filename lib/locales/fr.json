@@ -276,7 +276,10 @@
     "emergencyInstructions": "📋 Instructions",
     "instructionsTitle": "Instructions d'Urgence",
     "instructionsClose": "Fermer",
-    "instructionsBody": "1. RESTEZ CALME — évaluez la situation.\n\n2. APPELEZ LE 112 immédiatement.\n\n3. LOCALISATION — indiquez exactement où vous êtes.\n\n4. CASQUE — ne le retirez pas sauf obstruction des voies respiratoires.\n\n5. SAIGNEMENT — appliquez une pression directe ferme.\n\n6. NE BOUGEZ PAS le blessé sauf danger immédiat.\n\n7. GARDEZ-LE AU CHAUD — utilisez vêtements ou couverture de survie.\n\n8. RESTEZ EN LIGNE — ne raccrochez pas avant larrivée des secours."
+    "instructionsBody": "1. RESTEZ CALME — évaluez la situation.\n\n2. APPELEZ LE 112 immédiatement.\n\n3. LOCALISATION — indiquez exactement où vous êtes.\n\n4. CASQUE — ne le retirez pas sauf obstruction des voies respiratoires.\n\n5. SAIGNEMENT — appliquez une pression directe ferme.\n\n6. NE BOUGEZ PAS le blessé sauf danger immédiat.\n\n7. GARDEZ-LE AU CHAUD — utilisez vêtements ou couverture de survie.\n\n8. RESTEZ EN LIGNE — ne raccrochez pas avant l'arrivée des secours.",
+    "quickActionCall": "Appeler 112",
+    "quickActionTorch": "Torche",
+    "quickActionInstructions": "Instructions"
   },
   "triplog": {
     "badge": "🏍️ TRAJET",
@@ -310,7 +313,8 @@
     "mapUnavailable": "Carte non disponible",
     "tooShortTitle": "Trajet Non Enregistré",
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
-    "viewMapShort": "Itinéraire"
+    "viewMapShort": "Itinéraire",
+    "speedLabel": "VITESSE"
   },
   "about": {
     "badge": "ℹ️ À PROPOS",
