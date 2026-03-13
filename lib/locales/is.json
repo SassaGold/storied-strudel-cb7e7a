@@ -268,7 +268,15 @@
       "clinic": "🏨 Heilsugæsla",
       "doctors": "👨‍⚕️ Læknir",
       "ambulance_station": "🚑 Sjúkrabíll"
-    }
+    },
+    "callSos": "HRINGJA SOS (112)",
+    "quickActions": "SKJÓTAR AÐGERÐIR",
+    "torchScreen": "🔦 Vasaljós",
+    "torchScreenOff": "🔦 Slökkva",
+    "emergencyInstructions": "📋 Leiðbeiningar",
+    "instructionsTitle": "Neyðarleiðbeiningar",
+    "instructionsClose": "Loka",
+    "instructionsBody": "1. HALTU RÓ — mettu ástandið.\n\n2. HRINGDU Í 112 strax.\n\n3. STAÐSETNING — segðu nákvæmlega hvar þú ert.\n\n4. HJÁLMUR — fjarlægðu hann ekki nema loftvegi sé stíflaður.\n\n5. BLÆÐING — beitu þrýstingi beint á sárið.\n\n6. EKKI FÆRA meiddur nema yfirvofandi hætta sé.\n\n7. GEYMDU HLÝJA — notaðu föt eða björgunarfiltu.\n\n8. HALTU LÍNUNNI — leggðu ekki niður þar til hjálp kemur."
   },
   "triplog": {
     "badge": "🏍️ FERÐASKRÁ",
@@ -294,14 +302,15 @@
     "confirm": "Eyða öllu",
     "deleteRide": "Eyða",
     "rideLabel": "Ferð {{n}}",
-    "viewMap": "Leið",
+    "viewMap": "Sýna leið",
     "closeMap": "Loka",
     "mapTitle": "Ferðaleið",
     "accuracy": "GPS nákvæmni {{value}} m",
     "points": "{{count}} GPS-punktar",
     "mapUnavailable": "Kort ekki tiltækt",
     "tooShortTitle": "Ferð Ekki Vistuð",
-    "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð."
+    "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
+    "viewMapShort": "Leið"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

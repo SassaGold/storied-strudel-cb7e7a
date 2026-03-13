@@ -327,7 +327,6 @@ export default function TripLoggerScreen() {
   const distUnit = isImperial ? "mi" : t("triplog.km");
   const speedUnit = isImperial ? "mph" : t("triplog.kmh");
   const displayDistVal = distanceKm >= 0.01 ? fmtDist(distanceKm, settings.unitSystem).split(" ")[0] : "0.00";
-  const displayCurSpeedVal = currentSpeedKmh != null ? fmtSpeed(currentSpeedKmh, settings.unitSystem).split(" ")[0] : "—";
   const displayAvgSpeedVal = avgSpeedKmh > 0 ? fmtSpeed(avgSpeedKmh, settings.unitSystem).split(" ")[0] : "—";
 
   return (
@@ -353,7 +352,18 @@ export default function TripLoggerScreen() {
             </View>
           )}
 
-          <View style={styles.statsGrid}>
+          {/* Circular speedometer */}
+          <View style={styles.gaugeRow}>
+            <SpeedGauge
+              speedKmh={currentSpeedKmh}
+              maxKmh={isImperial ? 100 : 160}
+              unit={speedUnit}
+              size={190}
+            />
+          </View>
+
+          {/* 3-stat row: distance / duration / avg speed */}
+          <View style={styles.statsRow}>
             <StatBox
               label={t("triplog.distance")}
               value={displayDistVal}
@@ -363,11 +373,6 @@ export default function TripLoggerScreen() {
               label={t("triplog.duration")}
               value={formatDuration(elapsedMs)}
               unit=""
-            />
-            <StatBox
-              label={t("triplog.currentSpeed")}
-              value={displayCurSpeedVal}
-              unit={speedUnit}
             />
             <StatBox
               label={t("triplog.avgSpeed")}
@@ -388,8 +393,13 @@ export default function TripLoggerScreen() {
             </Text>
           )}
 
-          {/* Inline map while recording */}
-          {recording && route.length > 1 && MapView && (
+          {/* Inline map while recording — shows from first GPS point */}
+          {recording && MapView && route.length === 0 && (
+            <View style={styles.inlineMapPlaceholder}>
+              <Text style={styles.mapWaitText}>📍 Waiting for GPS…</Text>
+            </View>
+          )}
+          {recording && route.length >= 1 && MapView && (
             <View style={styles.inlineMap}>
               <MapView
                 style={StyleSheet.absoluteFill}
@@ -403,15 +413,15 @@ export default function TripLoggerScreen() {
                   return {
                     latitude: (minLat + maxLat) / 2,
                     longitude: (minLon + maxLon) / 2,
-                    latitudeDelta: Math.max(maxLat - minLat + pad, 0.003),
-                    longitudeDelta: Math.max(maxLon - minLon + pad, 0.003),
+                    latitudeDelta: Math.max(maxLat - minLat + pad, 0.004),
+                    longitudeDelta: Math.max(maxLon - minLon + pad, 0.004),
                   };
                 })()}
                 scrollEnabled={false}
                 zoomEnabled={false}
                 mapType="standard"
               >
-                {Polyline && (
+                {Polyline && route.length > 1 && (
                   <Polyline
                     coordinates={route}
                     strokeColor="#ff6600"
@@ -422,7 +432,7 @@ export default function TripLoggerScreen() {
             </View>
           )}
 
-          {/* Start / Stop button */}
+          {/* Start / Stop button — large, rounded, bold color */}
           <Pressable
             style={({ pressed }) => [
               styles.mainBtn,
@@ -432,7 +442,7 @@ export default function TripLoggerScreen() {
             onPress={recording ? stopRecording : startRecording}
           >
             <Text style={styles.mainBtnText}>
-              {recording ? t("triplog.stop") : t("triplog.start")}
+              {recording ? `⏹  ${t("triplog.stop")}` : `▶  ${t("triplog.start")}`}
             </Text>
           </Pressable>
         </View>
@@ -452,24 +462,38 @@ export default function TripLoggerScreen() {
         ) : (
           rides.map((ride, idx) => (
             <View key={ride.id} style={styles.rideCard}>
-              <View style={styles.rideInfo}>
+              {/* Orange accent top strip */}
+              <View style={styles.rideCardAccent} />
+              {/* Card header: title + date */}
+              <View style={styles.rideCardHeader}>
                 <Text style={styles.rideTitle}>
-                  {t("triplog.rideLabel", { n: rides.length - idx })}
+                  🏍️ {t("triplog.rideLabel", { n: rides.length - idx })}
                 </Text>
                 <Text style={styles.rideDate}>{formatDate(ride.date)}</Text>
-                <View style={styles.rideStats}>
-                  <Text style={styles.rideStat}>📏 {fmtDist(ride.distanceKm, settings.unitSystem)}</Text>
-                  <Text style={styles.rideStat}>⏱ {formatDuration(ride.durationMs)}</Text>
-                  <Text style={styles.rideStat}>⚡ {fmtSpeed(ride.avgSpeedKmh, settings.unitSystem)}</Text>
+              </View>
+              {/* Stat chips */}
+              <View style={styles.rideStatChips}>
+                <View style={styles.rideStatChip}>
+                  <Text style={styles.rideStatChipValue}>{fmtDist(ride.distanceKm, settings.unitSystem)}</Text>
+                  <Text style={styles.rideStatChipLabel}>📏 Distance</Text>
+                </View>
+                <View style={styles.rideStatChip}>
+                  <Text style={styles.rideStatChipValue}>{formatDuration(ride.durationMs)}</Text>
+                  <Text style={styles.rideStatChipLabel}>⏱ Duration</Text>
+                </View>
+                <View style={styles.rideStatChip}>
+                  <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.avgSpeedKmh, settings.unitSystem)}</Text>
+                  <Text style={styles.rideStatChipLabel}>⚡ Avg Speed</Text>
                 </View>
               </View>
+              {/* Action buttons */}
               <View style={styles.rideActions}>
                 {ride.route.length > 1 && MapView && (
                   <Pressable
-                    style={styles.rideBtn}
+                    style={[styles.rideBtn, styles.viewRouteBtn]}
                     onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(ride); }}
                   >
-                    <Text style={styles.rideBtnText}>{t("triplog.viewMap")}</Text>
+                    <Text style={styles.rideBtnText}>🗺  {t("triplog.viewMap")}</Text>
                   </Pressable>
                 )}
                 <Pressable
@@ -479,7 +503,7 @@ export default function TripLoggerScreen() {
                   accessibilityRole="button"
                   accessibilityLabel={t("triplog.deleteRide")}
                 >
-                  <Text style={styles.rideBtnText}>{t("triplog.deleteRide")}</Text>
+                  <Text style={[styles.rideBtnText, styles.deleteBtnText]}>{t("triplog.deleteRide")}</Text>
                 </Pressable>
               </View>
             </View>
@@ -531,6 +555,91 @@ export default function TripLoggerScreen() {
           )}
         </View>
       </Modal>
+    </View>
+  );
+}
+
+function SpeedGauge({
+  speedKmh,
+  maxKmh = 160,
+  unit,
+  size = 190,
+}: {
+  speedKmh: number | null;
+  maxKmh?: number;
+  unit: string;
+  size?: number;
+}) {
+  const pct = speedKmh != null ? Math.min(speedKmh / maxKmh, 1) : 0;
+  const TICKS = 28;
+  const SWEEP = 240;
+  const START = -120; // degrees from 12-o'clock
+
+  // Color: green → yellow → orange → red
+  const gaugeColor =
+    pct > 0.85 ? "#ef4444" :
+    pct > 0.6  ? "#f97316" :
+    pct > 0.3  ? "#fbbf24" : "#22c55e";
+
+  return (
+    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
+      {/* Tick marks around the gauge */}
+      {Array.from({ length: TICKS }).map((_, i) => {
+        const frac = i / (TICKS - 1);
+        const angle = START + frac * SWEEP;
+        const isMajor = i % 7 === 0;
+        const isActive = speedKmh != null && frac <= pct;
+        return (
+          <View
+            key={i}
+            style={{
+              position: "absolute",
+              width: size,
+              height: size,
+              alignItems: "center",
+              justifyContent: "flex-start",
+              transform: [{ rotate: `${angle}deg` }],
+            }}
+          >
+            <View
+              style={{
+                width: isMajor ? 4 : 2.5,
+                height: isMajor ? 14 : 9,
+                borderRadius: 2,
+                backgroundColor: isActive ? gaugeColor : "#252525",
+                marginTop: 4,
+              }}
+            />
+          </View>
+        );
+      })}
+      {/* Center circle with speed value */}
+      <View
+        style={{
+          width: size * 0.62,
+          height: size * 0.62,
+          borderRadius: size * 0.31,
+          backgroundColor: "#111",
+          alignItems: "center",
+          justifyContent: "center",
+          borderWidth: 1,
+          borderColor: "#2a2a2a",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: Math.round(size * 0.25),
+            fontWeight: "900",
+            color: speedKmh != null ? gaugeColor : "#444",
+            fontVariant: ["tabular-nums"],
+            lineHeight: Math.round(size * 0.27),
+          }}
+        >
+          {speedKmh != null ? Math.round(speedKmh) : "—"}
+        </Text>
+        <Text style={{ fontSize: 12, color: "#777", fontWeight: "600" }}>{unit}</Text>
+        <Text style={{ fontSize: 9, color: "#444", letterSpacing: 1.5, marginTop: 2 }}>SPEED</Text>
+      </View>
     </View>
   );
 }
@@ -587,16 +696,18 @@ const styles = StyleSheet.create({
   // Stats card
   card: {
     backgroundColor: "#1a1a1a",
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: "#2a2a2a",
     padding: 20,
     marginBottom: 20,
+    alignItems: "center",
   },
   trackingBadge: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 12,
+    alignSelf: "flex-start",
   },
   recDot: {
     width: 10,
@@ -611,38 +722,43 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 2,
   },
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+  // Gauge layout
+  gaugeRow: {
+    alignItems: "center",
     marginBottom: 12,
+  },
+  // 3-stat row below gauge
+  statsRow: {
+    flexDirection: "row",
+    width: "100%",
     gap: 8,
+    marginBottom: 10,
   },
   statBox: {
     flex: 1,
-    minWidth: "44%",
     backgroundColor: "#111",
-    borderRadius: 8,
-    padding: 14,
+    borderRadius: 10,
+    padding: 12,
     alignItems: "center",
   },
   statValue: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: "900",
     color: "#ff6600",
     fontVariant: ["tabular-nums"],
   },
   statUnit: {
-    fontSize: 11,
+    fontSize: 10,
     color: "#888",
     fontWeight: "600",
-    marginTop: 2,
+    marginTop: 1,
   },
   statLabel: {
-    fontSize: 10,
+    fontSize: 9,
     color: "#555",
     fontWeight: "700",
     letterSpacing: 1,
-    marginTop: 4,
+    marginTop: 3,
     textTransform: "uppercase",
   },
   accuracyText: {
@@ -651,26 +767,54 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 4,
   },
+  // Inline map while recording
+  inlineMapPlaceholder: {
+    width: "100%",
+    height: 60,
+    borderRadius: 10,
+    backgroundColor: "#111",
+    alignItems: "center",
+    justifyContent: "center",
+    marginVertical: 10,
+  },
+  mapWaitText: {
+    color: "#555",
+    fontSize: 13,
+    fontStyle: "italic",
+  },
   inlineMap: {
-    height: 160,
-    borderRadius: 8,
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
     overflow: "hidden",
     marginVertical: 12,
     backgroundColor: "#222",
   },
+  // Start / Stop button — large, bold, rounded
   mainBtn: {
-    borderRadius: 10,
-    paddingVertical: 16,
+    width: "100%",
+    borderRadius: 32,
+    paddingVertical: 22,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 14,
+    elevation: 10,
   },
-  startBtn: { backgroundColor: "#ff6600" },
-  stopBtn: { backgroundColor: "#ef4444" },
-  mainBtnPressed: { opacity: 0.75 },
+  startBtn: {
+    backgroundColor: "#22c55e",
+    shadowColor: "#22c55e",
+  },
+  stopBtn: {
+    backgroundColor: "#ef4444",
+    shadowColor: "#ef4444",
+  },
+  mainBtnPressed: { opacity: 0.8 },
   mainBtnText: {
     color: "#fff",
     fontWeight: "900",
-    fontSize: 16,
+    fontSize: 20,
     letterSpacing: 2,
   },
   errorText: {
@@ -707,54 +851,96 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 
-  // Ride cards
+  // Ride cards — vertical card layout
   rideCard: {
     backgroundColor: "#1a1a1a",
-    borderRadius: 10,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: "#2a2a2a",
-    padding: 14,
-    marginBottom: 10,
-    flexDirection: "row",
-    alignItems: "flex-start",
+    marginBottom: 14,
+    overflow: "hidden",
   },
-  rideInfo: { flex: 1 },
+  rideCardAccent: {
+    height: 3,
+    backgroundColor: "#ff6600",
+    width: "100%",
+  },
+  rideCardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
   rideTitle: {
     color: "#fff",
     fontWeight: "800",
     fontSize: 14,
-    marginBottom: 2,
   },
   rideDate: {
-    color: "#888",
+    color: "#666",
     fontSize: 11,
-    marginBottom: 8,
   },
-  rideStats: {
+  // Stat chips grid
+  rideStatChips: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    paddingHorizontal: 14,
+    gap: 8,
+    marginBottom: 12,
+  },
+  rideStatChip: {
+    flex: 1,
+    backgroundColor: "#111",
+    borderRadius: 8,
+    padding: 10,
+    alignItems: "center",
+  },
+  rideStatChipValue: {
+    color: "#ff6600",
+    fontWeight: "800",
+    fontSize: 14,
+    fontVariant: ["tabular-nums"],
+  },
+  rideStatChipLabel: {
+    color: "#555",
+    fontSize: 10,
+    marginTop: 3,
+    textAlign: "center",
+  },
+  // Action buttons row
+  rideActions: {
+    flexDirection: "row",
+    paddingHorizontal: 14,
+    paddingBottom: 14,
     gap: 8,
   },
-  rideStat: {
-    color: "#aaa",
-    fontSize: 12,
-  },
-  rideActions: {
-    flexDirection: "column",
-    gap: 6,
-    marginLeft: 10,
-  },
   rideBtn: {
-    backgroundColor: "#ff6600",
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    flex: 1,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: "center",
   },
-  deleteBtn: { backgroundColor: "#333" },
+  viewRouteBtn: {
+    backgroundColor: "#1e3a2a",
+    borderWidth: 1,
+    borderColor: "#22c55e",
+  },
+  deleteBtn: {
+    backgroundColor: "#1a1a1a",
+    borderWidth: 1,
+    borderColor: "#333",
+    flex: 0,
+    paddingHorizontal: 16,
+  },
   rideBtnText: {
-    color: "#fff",
-    fontSize: 11,
+    color: "#22c55e",
+    fontSize: 12,
     fontWeight: "700",
+  },
+  deleteBtnText: {
+    color: "#666",
   },
 
   // Modal

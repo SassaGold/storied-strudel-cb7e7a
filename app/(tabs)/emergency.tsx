@@ -121,6 +121,9 @@ export default function EmergencyScreen() {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  // Quick action state
+  const [torchOn, setTorchOn] = useState(false);
+  const [instructionsVisible, setInstructionsVisible] = useState(false);
 
   const call = useCallback((number: string) => {
     Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null);
@@ -261,6 +264,30 @@ out center ${MAX_RESULTS};`;
       style={styles.scrollView}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
     >
+      {/* ── Torch Screen Overlay ─────────────────────────────────── */}
+      <Modal visible={torchOn} transparent animationType="fade" onRequestClose={() => setTorchOn(false)}>
+        <Pressable style={styles.torchOverlay} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(false); }}>
+          <Text style={styles.torchOffText}>{t("sos.torchScreenOff")}</Text>
+        </Pressable>
+      </Modal>
+
+      {/* ── Emergency Instructions Modal ─────────────────────────── */}
+      <Modal visible={instructionsVisible} transparent animationType="slide" onRequestClose={() => setInstructionsVisible(false)}>
+        <View style={styles.instructionsOverlay}>
+          <View style={styles.instructionsCard}>
+            <View style={styles.instructionsHeader}>
+              <Text style={styles.instructionsTitle}>{t("sos.instructionsTitle")}</Text>
+              <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(false); }} hitSlop={12}>
+                <Text style={styles.instructionsClose}>{t("sos.instructionsClose")} ✕</Text>
+              </Pressable>
+            </View>
+            <ScrollView style={styles.instructionsBody} showsVerticalScrollIndicator={false}>
+              <Text style={styles.instructionsText}>{t("sos.instructionsBody")}</Text>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Info Modal */}
       <Modal
         visible={infoPlace !== null}
@@ -380,6 +407,56 @@ out center ${MAX_RESULTS};`;
         <Text style={styles.subtitle}>
           {t("sos.subtitle")}
         </Text>
+      </View>
+
+      {/* ── Large SOS Button ─────────────────────────────────────── */}
+      <Pressable
+        style={({ pressed }) => [styles.bigSosButton, pressed && { opacity: 0.85 }]}
+        onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+        accessibilityRole="button"
+        accessibilityLabel={t("sos.callSos")}
+      >
+        <Text style={styles.bigSosEmoji}>🆘</Text>
+        <Text style={styles.bigSosText}>{t("sos.callSos")}</Text>
+      </Pressable>
+
+      {/* ── Quick Actions ─────────────────────────────────────────── */}
+      <View style={styles.quickActionsCard}>
+        <Text style={styles.quickActionsTitle}>{t("sos.quickActions")}</Text>
+        <View style={styles.quickActionsGrid}>
+          {/* Call 112 */}
+          <Pressable
+            style={styles.quickActionBtn}
+            onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+          >
+            <Text style={styles.quickActionEmoji}>📞</Text>
+            <Text style={styles.quickActionLabel}>Call 112</Text>
+          </Pressable>
+          {/* Share Location */}
+          <Pressable
+            style={styles.quickActionBtn}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); shareLocation(); }}
+          >
+            <Text style={styles.quickActionEmoji}>📍</Text>
+            <Text style={styles.quickActionLabel}>{t("sos.shareLocation").replace("📍 ", "")}</Text>
+          </Pressable>
+          {/* Torch Screen */}
+          <Pressable
+            style={[styles.quickActionBtn, torchOn && styles.quickActionBtnActive]}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(true); }}
+          >
+            <Text style={styles.quickActionEmoji}>🔦</Text>
+            <Text style={styles.quickActionLabel}>Torch</Text>
+          </Pressable>
+          {/* Emergency Instructions */}
+          <Pressable
+            style={styles.quickActionBtn}
+            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(true); }}
+          >
+            <Text style={styles.quickActionEmoji}>📋</Text>
+            <Text style={styles.quickActionLabel}>Instructions</Text>
+          </Pressable>
+        </View>
       </View>
 
       {/* Universal emergency numbers */}
@@ -995,5 +1072,131 @@ const styles = StyleSheet.create({
     color: "#ef4444",
     fontSize: 14,
     fontWeight: "700",
+  },
+  // ── Large SOS button ─────────────────────────────────────────────
+  bigSosButton: {
+    backgroundColor: "#ef4444",
+    borderRadius: 20,
+    paddingVertical: 20,
+    alignItems: "center",
+    marginBottom: 14,
+    shadowColor: "#ef4444",
+    shadowOpacity: 0.55,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 14,
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+  },
+  bigSosEmoji: {
+    fontSize: 28,
+  },
+  bigSosText: {
+    color: "#fff",
+    fontWeight: "900",
+    fontSize: 22,
+    letterSpacing: 2,
+  },
+  // ── Quick actions card ───────────────────────────────────────────
+  quickActionsCard: {
+    backgroundColor: "#1a0000",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.35)",
+    padding: 14,
+    marginBottom: 16,
+  },
+  quickActionsTitle: {
+    color: "#ef4444",
+    fontSize: 12,
+    fontWeight: "800",
+    letterSpacing: 1.5,
+    marginBottom: 12,
+  },
+  quickActionsGrid: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  quickActionBtn: {
+    flex: 1,
+    backgroundColor: "rgba(239,68,68,0.10)",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.3)",
+    paddingVertical: 12,
+    alignItems: "center",
+    gap: 4,
+  },
+  quickActionBtnActive: {
+    backgroundColor: "rgba(239,68,68,0.25)",
+    borderColor: "#ef4444",
+  },
+  quickActionEmoji: {
+    fontSize: 22,
+  },
+  quickActionLabel: {
+    color: "#cc4444",
+    fontSize: 10,
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  // ── Torch overlay ────────────────────────────────────────────────
+  torchOverlay: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    paddingBottom: 80,
+  },
+  torchOffText: {
+    color: "#333",
+    fontSize: 18,
+    fontWeight: "700",
+    backgroundColor: "rgba(0,0,0,0.12)",
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+    borderRadius: 30,
+  },
+  // ── Instructions modal ───────────────────────────────────────────
+  instructionsOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.85)",
+    justifyContent: "flex-end",
+  },
+  instructionsCard: {
+    backgroundColor: "#111",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: "80%",
+    borderTopWidth: 2,
+    borderColor: "#ef4444",
+  },
+  instructionsHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#2a2a2a",
+  },
+  instructionsTitle: {
+    color: "#fff",
+    fontWeight: "900",
+    fontSize: 18,
+    letterSpacing: 0.5,
+  },
+  instructionsClose: {
+    color: "#ef4444",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  instructionsBody: {
+    padding: 20,
+  },
+  instructionsText: {
+    color: "#ccc",
+    fontSize: 15,
+    lineHeight: 24,
   },
 });

@@ -268,7 +268,15 @@
       "clinic": "🏨 Clínica",
       "doctors": "👨‍⚕️ Médico",
       "ambulance_station": "🚑 Ambulancia"
-    }
+    },
+    "callSos": "LLAMAR SOS (112)",
+    "quickActions": "ACCIONES RÁPIDAS",
+    "torchScreen": "🔦 Linterna",
+    "torchScreenOff": "🔦 Apagar",
+    "emergencyInstructions": "📋 Instrucciones",
+    "instructionsTitle": "Instrucciones de Emergencia",
+    "instructionsClose": "Cerrar",
+    "instructionsBody": "1. MANTÉN LA CALMA — evalúa la situación.\n\n2. LLAMA AL 112 inmediatamente.\n\n3. UBICACIÓN — indica exactamente dónde estás.\n\n4. CASCO — no lo retires a menos que la vía aérea esté bloqueada.\n\n5. HEMORRAGIA — aplica presión directa firme.\n\n6. NO MUEVAS al herido salvo peligro inmediato.\n\n7. MANTÉN LO CALIENTE — usa ropa o manta de rescate.\n\n8. NO CUELGUES — quédate en línea hasta que llegue la ayuda."
   },
   "triplog": {
     "badge": "🏍️ VIAJE",
@@ -294,14 +302,15 @@
     "confirm": "Eliminar todo",
     "deleteRide": "Eliminar",
     "rideLabel": "Viaje {{n}}",
-    "viewMap": "Ruta",
+    "viewMap": "Ver Ruta",
     "closeMap": "Cerrar",
     "mapTitle": "Ruta del viaje",
     "accuracy": "Precisión GPS {{value}} m",
     "points": "{{count}} puntos GPS",
     "mapUnavailable": "Mapa no disponible",
     "tooShortTitle": "Viaje No Guardado",
-    "tooShortMsg": "El viaje fue inferior a 10 m — no guardado."
+    "tooShortMsg": "El viaje fue inferior a 10 m — no guardado.",
+    "viewMapShort": "Ruta"
   },
   "about": {
     "badge": "ℹ️ ACERCA DE",

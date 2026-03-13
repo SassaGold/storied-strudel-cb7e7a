@@ -1,6 +1,40 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { View } from "react-native";
 import { useTranslation } from "react-i18next";
+
+/** Wraps each tab icon to add a coloured top-bar indicator when focused */
+function TabIcon({
+  name,
+  color,
+  focused,
+}: {
+  name: React.ComponentProps<typeof Ionicons>["name"];
+  color: string;
+  focused: boolean;
+}) {
+  return (
+    <View style={{ alignItems: "center", justifyContent: "center", paddingTop: 2 }}>
+      {focused && (
+        <View
+          style={{
+            position: "absolute",
+            top: -10,
+            width: 26,
+            height: 3,
+            borderRadius: 2,
+            backgroundColor: color,
+            shadowColor: color,
+            shadowOpacity: 0.9,
+            shadowRadius: 6,
+            elevation: 6,
+          }}
+        />
+      )}
+      <Ionicons name={name} size={26} color={color} />
+    </View>
+  );
+}
 
 export default function TabLayout() {
   const { t } = useTranslation();
@@ -14,6 +48,9 @@ export default function TabLayout() {
           backgroundColor: "#0a0a0a",
           borderTopColor: "#ff6600",
           borderTopWidth: 2,
+          height: 64,
+          paddingBottom: 8,
+          paddingTop: 4,
         },
         tabBarLabelStyle: {
           fontSize: 11,
@@ -26,8 +63,8 @@ export default function TabLayout() {
         name="index"
         options={{
           title: t("tabs.home"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="compass" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="compass" color={color} focused={focused} />
           ),
         }}
       />
@@ -35,8 +72,8 @@ export default function TabLayout() {
         name="restaurants"
         options={{
           title: t("tabs.food"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="restaurant" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="restaurant" color={color} focused={focused} />
           ),
         }}
       />
@@ -44,8 +81,8 @@ export default function TabLayout() {
         name="hotels"
         options={{
           title: t("tabs.sleep"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="bed" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="bed" color={color} focused={focused} />
           ),
         }}
       />
@@ -53,8 +90,8 @@ export default function TabLayout() {
         name="attractions"
         options={{
           title: t("tabs.explore"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="flag" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="flag" color={color} focused={focused} />
           ),
         }}
       />
@@ -62,8 +99,8 @@ export default function TabLayout() {
         name="mc"
         options={{
           title: t("tabs.garage"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="speedometer" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="speedometer" color={color} focused={focused} />
           ),
         }}
       />
@@ -71,8 +108,8 @@ export default function TabLayout() {
         name="triplogger"
         options={{
           title: t("tabs.trip"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="navigate" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon name="navigate" color={color} focused={focused} />
           ),
         }}
       />
@@ -89,11 +126,11 @@ export default function TabLayout() {
         options={{
           title: t("tabs.sos"),
           tabBarActiveTintColor: "#ef4444",
-          tabBarIcon: ({ focused, size }) => (
-            <Ionicons
+          tabBarIcon: ({ focused }) => (
+            <TabIcon
               name="alert-circle"
-              size={size}
               color={focused ? "#ef4444" : "#555555"}
+              focused={focused}
             />
           ),
         }}
