@@ -1,6 +1,29 @@
 // ── Shared Overpass / geo utilities ──────────────────────────────────────────
 // Used by restaurants, hotels, attractions, mc, and emergency tabs.
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+/** A single element returned by the Overpass API (node, way, or relation). */
+export interface OverpassElement {
+  id: number;
+  type: "node" | "way" | "relation";
+  /** Coordinates for nodes; ways and relations use center instead. */
+  lat?: number;
+  lon?: number;
+  /** Bounding-box centre for ways and relations. */
+  center?: { lat: number; lon: number };
+  tags?: Record<string, string>;
+}
+
+/** Top-level response shape for Overpass API JSON output. */
+export interface OverpassResponse {
+  version?: number;
+  generator?: string;
+  elements: OverpassElement[];
+}
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+
 /** Haversine formula: returns the great-circle distance in metres. */
 export function haversineMeters(
   lat1: number,
@@ -29,16 +52,42 @@ export const OVERPASS_ENDPOINTS = [
 ];
 
 const DEFAULT_TIMEOUT_MS = 40_000;
+/** Base delay for exponential backoff between endpoint retries (ms). */
+const BACKOFF_BASE_MS = 500;
 
-/** POST a query to the Overpass API, cycling through mirrors on failure. */
+/**
+ * POST a query to the Overpass API, cycling through mirrors on failure.
+ * Respects HTTP 429 `Retry-After` headers and applies exponential backoff
+ * with jitter between retries so bursts of requests don't all hammer the
+ * same endpoint at once.
+ *
+ * @param signal  Optional AbortSignal so callers can cancel in-flight requests.
+ */
 export async function fetchOverpass(
   query: string,
-  timeoutMs: number = DEFAULT_TIMEOUT_MS
-): Promise<any> {
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
+  signal?: AbortSignal
+): Promise<OverpassResponse> {
   let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
+
+  for (let i = 0; i < OVERPASS_ENDPOINTS.length; i++) {
+    const endpoint = OVERPASS_ENDPOINTS[i];
+
+    // Apply exponential backoff between retries (not before the first attempt)
+    if (i > 0) {
+      const backoffMs = BACKOFF_BASE_MS * 2 ** (i - 1) + Math.random() * 200;
+      await new Promise((resolve) => setTimeout(resolve, backoffMs));
+    }
+
+    // Bail early if the caller cancelled the request
+    if (signal?.aborted) throw new Error("Cancelled");
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    // Forward the caller's AbortSignal to the inner controller
+    const onCallerAbort = () => controller.abort();
+    signal?.addEventListener("abort", onCallerAbort);
+
     try {
       const response = await fetch(endpoint, {
         method: "POST",
@@ -49,17 +98,36 @@ export async function fetchOverpass(
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
-      if (!response.ok) {
-        lastError = `Overpass error ${response.status}`;
+      signal?.removeEventListener("abort", onCallerAbort);
+
+      if (response.status === 429) {
+        // Rate-limited: respect Retry-After if present, then continue to next endpoint
+        const retryAfter = response.headers.get("Retry-After");
+        const waitMs = retryAfter ? Math.min(parseFloat(retryAfter) * 1000, 10_000) : 2_000;
+        await new Promise((resolve) => setTimeout(resolve, waitMs));
+        lastError = "Rate limited (429)";
         continue;
       }
-      return await response.json();
+
+      if (!response.ok) {
+        lastError = `Overpass HTTP ${response.status}`;
+        continue;
+      }
+
+      const json = await response.json() as OverpassResponse;
+      // Validate that the response has the expected shape (#3: API response validation)
+      if (!Array.isArray(json.elements)) {
+        lastError = "Overpass response missing elements array";
+        continue;
+      }
+      return json;
     } catch (err) {
       clearTimeout(timeoutId);
-      lastError =
-        err instanceof Error && err.name === "AbortError"
-          ? "Timeout"
-          : "Network error";
+      signal?.removeEventListener("abort", onCallerAbort);
+      if (err instanceof Error && (err.name === "AbortError" || err.message === "Cancelled")) {
+        throw err; // Propagate cancellation immediately
+      }
+      lastError = err instanceof Error ? err.message : "Network error";
     }
   }
   throw new Error(lastError ?? "Overpass request failed");

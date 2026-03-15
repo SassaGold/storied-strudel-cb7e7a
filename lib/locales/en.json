@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Check Fuel Prices",
     "readWikipedia": "📖 Read on Wikipedia",
     "cachedResults": "📡 Showing cached results — tap refresh for latest",
-    "fuelTypes": "⛽ Fuel Types"
+    "fuelTypes": "⛽ Fuel Types",
+    "showingOf": "Showing {{shown}} of {{total}} results",
+    "loadMore": "Load More",
+    "loadMoreHint": "Show more results",
+    "openInMapsHint": "Opens location in maps app",
+    "openInfoHint": "Opens details panel",
+    "infoFor": "Info for"
   },
   "language": {
     "label": "🌍 Language",
@@ -314,7 +320,9 @@
     "mapUnavailable": "Map not available",
     "tooShortTitle": "Ride Not Saved",
     "tooShortMsg": "Ride was under 10 m — not saved.",
-    "speedLabel": "SPEED"
+    "speedLabel": "SPEED",
+    "startHint": "Begins recording your ride",
+    "stopHint": "Stops recording and saves the ride"
   },
   "about": {
     "badge": "ℹ️ ABOUT",

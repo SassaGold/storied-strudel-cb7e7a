@@ -59,6 +59,7 @@ export default function AttractionsScreen() {
     <POIScreen
       {...poi}
       onLoad={poi.loadPlaces}
+      onLoadMore={poi.loadMore}
       onOpenInMaps={poi.openInMaps}
       onOpenInfo={poi.openInfo}
       onCloseInfo={poi.closeInfo}

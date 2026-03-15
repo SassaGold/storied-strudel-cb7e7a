@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Vérifier les prix du carburant",
     "readWikipedia": "📖 Lire sur Wikipédia",
     "cachedResults": "📡 Résultats en cache — actualiser pour les derniers",
-    "fuelTypes": "⛽ Types de carburant"
+    "fuelTypes": "⛽ Types de carburant",
+    "showingOf": "{{shown}} sur {{total}} résultats",
+    "loadMore": "Charger plus",
+    "loadMoreHint": "Afficher plus de résultats",
+    "openInMapsHint": "Ouvre l'emplacement dans l'application de cartes",
+    "openInfoHint": "Ouvre le panneau de détails",
+    "infoFor": "Infos sur"
   },
   "language": {
     "label": "🌍 Langue",
@@ -314,7 +320,9 @@
     "tooShortTitle": "Trajet Non Enregistré",
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
     "viewMapShort": "Itinéraire",
-    "speedLabel": "VITESSE"
+    "speedLabel": "VITESSE",
+    "startHint": "Commence à enregistrer votre trajet",
+    "stopHint": "Arrête l'enregistrement et sauvegarde le trajet"
   },
   "about": {
     "badge": "ℹ️ À PROPOS",

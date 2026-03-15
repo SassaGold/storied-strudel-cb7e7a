@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Kontrollera bränslepriser",
     "readWikipedia": "📖 Läs på Wikipedia",
     "cachedResults": "📡 Visar cachade resultat — tryck uppdatera för senaste",
-    "fuelTypes": "⛽ Bränsletyper"
+    "fuelTypes": "⛽ Bränsletyper",
+    "showingOf": "Visar {{shown}} av {{total}} resultat",
+    "loadMore": "Ladda mer",
+    "loadMoreHint": "Visa fler resultat",
+    "openInMapsHint": "Öppnar platsen i kartan",
+    "openInfoHint": "Öppnar detaljpanelen",
+    "infoFor": "Info om"
   },
   "language": {
     "label": "🌍 Språk",
@@ -301,7 +307,9 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Karta ej tillgänglig",
     "tooShortTitle": "Tur inte sparad",
-    "tooShortMsg": "Turen var under 10 m — inte sparad."
+    "tooShortMsg": "Turen var under 10 m — inte sparad.",
+    "startHint": "Börjar spela in din resa",
+    "stopHint": "Stoppar inspelning och sparar resan"
   },
   "about": {
     "badge": "ℹ️ OM",

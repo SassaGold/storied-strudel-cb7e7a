@@ -60,6 +60,7 @@ export default function HotelsScreen() {
     <POIScreen
       {...poi}
       onLoad={poi.loadPlaces}
+      onLoadMore={poi.loadMore}
       onOpenInMaps={poi.openInMaps}
       onOpenInfo={poi.openInfo}
       onCloseInfo={poi.closeInfo}

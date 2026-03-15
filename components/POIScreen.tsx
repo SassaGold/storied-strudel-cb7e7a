@@ -39,6 +39,8 @@ const Haptics: typeof import("expo-haptics") | null = (() => { try { return requ
 export interface POIScreenProps {
   // Data & handlers from usePOIFetch
   places: Place[];
+  /** Total number of results fetched (for "Showing X of Y" pagination label). */
+  totalFound: number;
   loading: boolean;
   error: string | null;
   fromCache: boolean;
@@ -47,6 +49,8 @@ export interface POIScreenProps {
   wikiExtract: string | null;
   wikiLoading: boolean;
   onLoad: () => void;
+  /** Load the next page of already-fetched results. */
+  onLoadMore: () => void;
   onOpenInMaps: (place: Place) => void;
   onOpenInfo: (place: Place) => void;
   onCloseInfo: () => void;
@@ -68,6 +72,7 @@ export interface POIScreenProps {
 
 export default function POIScreen({
   places,
+  totalFound,
   loading,
   error,
   fromCache,
@@ -76,6 +81,7 @@ export default function POIScreen({
   wikiExtract,
   wikiLoading,
   onLoad,
+  onLoadMore,
   onOpenInMaps,
   onOpenInfo,
   onCloseInfo,
@@ -278,6 +284,9 @@ export default function POIScreen({
               Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
               setViewMode("list");
             }}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.viewList")}
+            accessibilityState={{ selected: viewMode === "list" }}
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>
               {t("common.viewList")}
@@ -289,6 +298,9 @@ export default function POIScreen({
               Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
               setViewMode("map");
             }}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.viewMap")}
+            accessibilityState={{ selected: viewMode === "map" }}
           >
             <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>
               {t("common.viewMap")}
@@ -309,12 +321,14 @@ export default function POIScreen({
             latitudeDelta: 0.06,
             longitudeDelta: 0.06,
           }}
+          accessibilityLabel={t(`${i18nPrefix}.title`)}
         >
           {places.map((place) => (
             <Marker
               key={place.id}
               coordinate={{ latitude: place.latitude, longitude: place.longitude }}
               title={place.name}
+              description={fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
               onPress={() => {
                 Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                 onOpenInfo(place);
@@ -329,46 +343,71 @@ export default function POIScreen({
         places.length === 0 && !loading ? (
           <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
         ) : (
-          places.map((place) => (
-            <Pressable
-              key={place.id}
-              style={styles.placeRow}
-              onPress={() => {
-                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                onOpenInMaps(place);
-              }}
-              accessibilityRole="button"
-              accessibilityLabel={place.name}
-            >
-              <View style={styles.placeInfo}>
-                <Text style={styles.bodyText}>{place.name}</Text>
-                <View style={styles.tagRow}>
-                  <Text style={styles.metaText}>{fmtCategory(place.category)}</Text>
-                  {place.stars && (
-                    <Text style={styles.starsTag}>{place.stars}★</Text>
-                  )}
+          <>
+            {/* Pagination summary: "Showing 20 of 47 results" */}
+            {totalFound > places.length && (
+              <Text style={styles.paginationSummary}>
+                {t("common.showingOf", { shown: places.length, total: totalFound })}
+              </Text>
+            )}
+            {places.map((place) => (
+              <Pressable
+                key={place.id}
+                style={styles.placeRow}
+                onPress={() => {
+                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                  onOpenInMaps(place);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={place.name}
+                accessibilityHint={t("common.openInMapsHint")}
+              >
+                <View style={styles.placeInfo}>
+                  <Text style={styles.bodyText}>{place.name}</Text>
+                  <View style={styles.tagRow}>
+                    <Text style={styles.metaText}>{fmtCategory(place.category)}</Text>
+                    {place.stars && (
+                      <Text style={styles.starsTag}>{place.stars}★</Text>
+                    )}
+                  </View>
                 </View>
-              </View>
-              <View style={styles.placeRight}>
-                <Text style={styles.metaText}>
-                  {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
-                </Text>
-                <Pressable
-                  style={styles.infoButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                    onOpenInfo(place);
-                  }}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Info: ${place.name}`}
-                >
-                  <Text style={styles.infoButtonText}>ⓘ</Text>
-                </Pressable>
-              </View>
-            </Pressable>
-          ))
+                <View style={styles.placeRight}>
+                  <Text style={styles.metaText}>
+                    {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
+                  </Text>
+                  <Pressable
+                    style={styles.infoButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                      onOpenInfo(place);
+                    }}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${t("common.infoFor")} ${place.name}`}
+                    accessibilityHint={t("common.openInfoHint")}
+                  >
+                    <Text style={styles.infoButtonText}>ⓘ</Text>
+                  </Pressable>
+                </View>
+              </Pressable>
+            ))}
+            {/* Load More button — only shown when more results are available */}
+            {totalFound > places.length && (
+              <Pressable
+                style={styles.loadMoreButton}
+                onPress={() => {
+                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                  onLoadMore();
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={t("common.loadMore")}
+                accessibilityHint={t("common.loadMoreHint")}
+              >
+                <Text style={styles.loadMoreText}>{t("common.loadMore")}</Text>
+              </Pressable>
+            )}
+          </>
         )
       )}
     </ScrollView>
@@ -677,5 +716,24 @@ const styles = StyleSheet.create({
     color: "#f59e0b",
     fontSize: 13,
     fontWeight: "500",
+  },
+  paginationSummary: {
+    color: "#888888",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  loadMoreButton: {
+    marginTop: 12,
+    paddingVertical: 11,
+    borderRadius: 6,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.5)",
+  },
+  loadMoreText: {
+    color: "#ff6600",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });

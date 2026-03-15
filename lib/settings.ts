@@ -58,7 +58,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (raw) {
           setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(raw) });
         }
-      } catch {}
+      } catch (e) {
+        console.warn("[Settings] load error:", e);
+      }
     })();
   }, []);
 
@@ -67,7 +69,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       const next = { ...prev, [key]: val };
       try {
         AsyncStorage?.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {}
+      } catch (e) {
+        console.warn("[Settings] save error:", e);
+      }
       return next;
     });
   };

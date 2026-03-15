@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Athuga eldsneytisverð",
     "readWikipedia": "📖 Lesa á Wikipediu",
     "cachedResults": "📡 Sýni geymd niðurstöður — uppfærðu til að fá nýjustu",
-    "fuelTypes": "⛽ Eldsneytistegundir"
+    "fuelTypes": "⛽ Eldsneytistegundir",
+    "showingOf": "Sýnir {{shown}} af {{total}} niðurstöðum",
+    "loadMore": "Sækja fleiri",
+    "loadMoreHint": "Sýna fleiri niðurstöður",
+    "openInMapsHint": "Opnar staðsetningu í kortaforritinu",
+    "openInfoHint": "Opnar upplýsingaglugga",
+    "infoFor": "Upplýsingar um"
   },
   "language": {
     "label": "🌍 Tungumál",
@@ -314,7 +320,9 @@
     "tooShortTitle": "Ferð Ekki Vistuð",
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
     "viewMapShort": "Leið",
-    "speedLabel": "HRAÐI"
+    "speedLabel": "HRAÐI",
+    "startHint": "Byrjar að skrá ferðina þína",
+    "stopHint": "Stoppar skráningu og vistar ferðina"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

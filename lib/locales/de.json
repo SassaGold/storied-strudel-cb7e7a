@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Kraftstoffpreise prüfen",
     "readWikipedia": "📖 Auf Wikipedia lesen",
     "cachedResults": "📡 Zwischengespeicherte Ergebnisse — aktualisieren für neueste",
-    "fuelTypes": "⛽ Kraftstoffarten"
+    "fuelTypes": "⛽ Kraftstoffarten",
+    "showingOf": "{{shown}} von {{total}} Ergebnissen",
+    "loadMore": "Mehr laden",
+    "loadMoreHint": "Mehr Ergebnisse anzeigen",
+    "openInMapsHint": "Öffnet den Standort in der Karten-App",
+    "openInfoHint": "Öffnet das Detailfeld",
+    "infoFor": "Info zu"
   },
   "language": {
     "label": "🌍 Sprache",
@@ -314,7 +320,9 @@
     "tooShortTitle": "Fahrt Nicht Gespeichert",
     "tooShortMsg": "Fahrt war unter 10 m — nicht gespeichert.",
     "viewMapShort": "Route",
-    "speedLabel": "TEMPO"
+    "speedLabel": "TEMPO",
+    "startHint": "Startet die Aufzeichnung Ihrer Fahrt",
+    "stopHint": "Stoppt die Aufzeichnung und speichert die Fahrt"
   },
   "about": {
     "badge": "ℹ️ ÜBER",

@@ -83,7 +83,7 @@ export function useRiderHQ(): RiderHQState {
           city: data.address?.city || data.address?.town || data.address?.village,
           country: data.address?.country,
         }))
-        .catch(() => null);
+        .catch((e: unknown) => { console.warn("[useRiderHQ] address error:", e); return null; });
 
       // Open-Meteo — free, browser-friendly weather API (no API key required)
       const weatherPromise = fetch(
@@ -160,7 +160,7 @@ export function useRiderHQ(): RiderHQState {
             hourly,
           };
         })
-        .catch(() => null);
+        .catch((e: unknown) => { console.warn("[useRiderHQ] weather error:", e); return null; });
 
       // Overpass (OpenStreetMap) — free road conditions, no API key required
       const lat = Math.max(-90, Math.min(90, latitude));
@@ -196,7 +196,7 @@ export function useRiderHQ(): RiderHQState {
             .filter((a) => ROAD_TYPES.has(a.type.toLowerCase()))
             .slice(0, 10);
         })
-        .catch(() => [] as RoadAlert[]);
+        .catch((e: unknown) => { console.warn("[useRiderHQ] road alerts error:", e); return [] as RoadAlert[]; });
 
       const [addressResult, weatherResult, roadResult] = await Promise.all([
         addressPromise,
@@ -208,7 +208,8 @@ export function useRiderHQ(): RiderHQState {
       setWeather(weatherResult);
       setRoadAlerts(roadResult);
       setLastUpdated(new Date());
-    } catch {
+    } catch (e) {
+      console.warn("[useRiderHQ] data fetch error:", e);
       setError(t("home.dataError"));
     } finally {
       setLoading(false);
@@ -233,7 +234,7 @@ export function useRiderHQ(): RiderHQState {
     if (!location) return;
     const { latitude, longitude } = location.coords;
     const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-    Linking.openURL(url).catch(() => null);
+    Linking.openURL(url).catch((e) => console.warn("[useRiderHQ] openMaps error:", e));
   }, [location]);
 
   return {

@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Ver precios de combustible",
     "readWikipedia": "📖 Leer en Wikipedia",
     "cachedResults": "📡 Resultados en caché — actualizar para ver los últimos",
-    "fuelTypes": "⛽ Tipos de combustible"
+    "fuelTypes": "⛽ Tipos de combustible",
+    "showingOf": "Mostrando {{shown}} de {{total}} resultados",
+    "loadMore": "Cargar más",
+    "loadMoreHint": "Mostrar más resultados",
+    "openInMapsHint": "Abre la ubicación en la aplicación de mapas",
+    "openInfoHint": "Abre el panel de detalles",
+    "infoFor": "Info de"
   },
   "language": {
     "label": "🌍 Idioma",
@@ -314,7 +320,9 @@
     "tooShortTitle": "Viaje No Guardado",
     "tooShortMsg": "El viaje fue inferior a 10 m — no guardado.",
     "viewMapShort": "Ruta",
-    "speedLabel": "VELOCIDAD"
+    "speedLabel": "VELOCIDAD",
+    "startHint": "Inicia la grabación de tu ruta",
+    "stopHint": "Detiene la grabación y guarda la ruta"
   },
   "about": {
     "badge": "ℹ️ ACERCA DE",

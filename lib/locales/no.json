@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Sjekk drivstoffpriser",
     "readWikipedia": "📖 Les på Wikipedia",
     "cachedResults": "📡 Viser bufrede resultater — trykk oppdater for siste",
-    "fuelTypes": "⛽ Drivstofftyper"
+    "fuelTypes": "⛽ Drivstofftyper",
+    "showingOf": "Viser {{shown}} av {{total}} resultater",
+    "loadMore": "Last inn mer",
+    "loadMoreHint": "Vis flere resultater",
+    "openInMapsHint": "Åpner stedet i kart-appen",
+    "openInfoHint": "Åpner detaljpanelet",
+    "infoFor": "Info om"
   },
   "language": {
     "label": "🌍 Språk",
@@ -301,7 +307,9 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Kart ikke tilgjengelig",
     "tooShortTitle": "Tur ikke lagret",
-    "tooShortMsg": "Turen var under 10 m — ikke lagret."
+    "tooShortMsg": "Turen var under 10 m — ikke lagret.",
+    "startHint": "Begynner å registrere turen din",
+    "stopHint": "Stopper registrering og lagrer turen"
   },
   "about": {
     "badge": "ℹ️ OM",

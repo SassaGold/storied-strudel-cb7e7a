@@ -82,8 +82,10 @@ export default function TripLoggerScreen() {
   const [rides, setRides] = useState<SavedRide[]>([]);
   const [mapRide, setMapRide] = useState<SavedRide | null>(null);
 
+  // Single watcher ref — only one GPS stream runs at a time.
+  // In "idle" mode it uses Balanced accuracy for the live speedometer.
+  // In "recording" mode it switches to BestForNavigation accuracy.
   const watchRef = useRef<Location.LocationSubscription | null>(null);
-  const liveSpeedWatchRef = useRef<Location.LocationSubscription | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const routeRef = useRef<GpsPoint[]>([]);
   const distRef = useRef(0);
@@ -92,7 +94,7 @@ export default function TripLoggerScreen() {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const prevSpeedPointRef = useRef<{ latitude: number; longitude: number; timestamp: number } | null>(null);
 
-  // Keep recordingRef in sync so the live speed watcher can check it without stale closure
+  // Keep recordingRef in sync so the idle watcher can check it without stale closure
   useEffect(() => { recordingRef.current = recording; }, [recording]);
 
   // Load saved rides on mount
@@ -100,54 +102,66 @@ export default function TripLoggerScreen() {
     loadRides();
   }, []);
 
-  // Always-on live speed watcher so the speedometer shows current speed even when not recording
+  /** Start the "idle" watcher (Balanced accuracy, for live speedometer only). */
+  const startIdleWatch = useCallback(async () => {
+    watchRef.current?.remove();
+    watchRef.current = null;
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === "denied") return;
+    watchRef.current = await Location.watchPositionAsync(
+      { accuracy: Location.Accuracy.Balanced, timeInterval: 1500 },
+      (loc) => {
+        const { latitude, longitude, speed } = loc.coords;
+        const ts = loc.timestamp;
+        if (speed != null && speed >= 0) {
+          setCurrentSpeedKmh(speed * 3.6);
+        } else if (prevSpeedPointRef.current) {
+          const distM = haversineMeters(prevSpeedPointRef.current.latitude, prevSpeedPointRef.current.longitude, latitude, longitude);
+          const dtSec = (ts - prevSpeedPointRef.current.timestamp) / 1000;
+          if (dtSec > 0.5) {
+            setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
+          }
+        } else {
+          setCurrentSpeedKmh(0);
+        }
+        prevSpeedPointRef.current = { latitude, longitude, timestamp: ts };
+      }
+    );
+  }, []);
+
+  // Start idle watcher on mount; clean up on unmount.
   useEffect(() => {
     let active = true;
-    const startLiveWatch = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (!active || status === "denied") return;
-      liveSpeedWatchRef.current = await Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.Balanced, timeInterval: 1500 },
-        (loc) => {
-          if (recordingRef.current) return; // recording watcher handles speed during active trip
-          const { latitude, longitude, speed } = loc.coords;
-          const ts = loc.timestamp;
-          if (speed != null && speed >= 0) {
-            setCurrentSpeedKmh(speed * 3.6);
-          } else if (prevSpeedPointRef.current) {
-            const distM = haversineMeters(prevSpeedPointRef.current.latitude, prevSpeedPointRef.current.longitude, latitude, longitude);
-            const dtSec = (ts - prevSpeedPointRef.current.timestamp) / 1000;
-            if (dtSec > 0.5) {
-              setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
-            }
-          } else {
-            setCurrentSpeedKmh(0);
-          }
-          prevSpeedPointRef.current = { latitude, longitude, timestamp: ts };
-        }
-      );
-    };
-    startLiveWatch();
+    startIdleWatch().then(() => {
+      if (!active) {
+        watchRef.current?.remove();
+        watchRef.current = null;
+      }
+    });
     return () => {
       active = false;
-      liveSpeedWatchRef.current?.remove();
-      liveSpeedWatchRef.current = null;
+      watchRef.current?.remove();
+      watchRef.current = null;
     };
-  }, []);
+  }, [startIdleWatch]);
 
   const loadRides = async () => {
     if (!AsyncStorage) return;
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       if (raw) setRides(JSON.parse(raw));
-    } catch {}
+    } catch (e) {
+      console.warn("[TripLogger] loadRides error:", e);
+    }
   };
 
   const saveRides = useCallback(async (updated: SavedRide[]) => {
     if (!AsyncStorage) return;
     try {
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
+    } catch (e) {
+      console.warn("[TripLogger] saveRides error:", e);
+    }
   }, []);
 
   // Timer tick
@@ -188,6 +202,10 @@ export default function TripLoggerScreen() {
     }
 
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
+
+    // Stop the idle watcher — a high-accuracy recording watcher takes over.
+    watchRef.current?.remove();
+    watchRef.current = null;
 
     // Reset state
     routeRef.current = [];
@@ -244,10 +262,9 @@ export default function TripLoggerScreen() {
   }, []);
 
   const stopRecording = useCallback(async () => {
-    if (watchRef.current) {
-      watchRef.current.remove();
-      watchRef.current = null;
-    }
+    // Stop the recording watcher and immediately restart the idle watcher.
+    watchRef.current?.remove();
+    watchRef.current = null;
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
@@ -258,7 +275,9 @@ export default function TripLoggerScreen() {
     const avgSpeed = durationMs > 0 ? distKm / (durationMs / 3_600_000) : 0;
 
     setRecording(false);
-    // Don't clear speed — live watcher will continue updating it after recording stops
+
+    // Restart the idle watcher so the speedometer keeps updating after the ride.
+    startIdleWatch().catch((e) => console.warn("[TripLogger] idle watch restart error:", e));
 
     if (distKm > 0.01) {
       Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => null);
@@ -276,7 +295,7 @@ export default function TripLoggerScreen() {
     } else {
       Alert.alert(t("triplog.tooShortTitle"), t("triplog.tooShortMsg"));
     }
-  }, [rides, saveRides, t]);
+  }, [rides, saveRides, t, startIdleWatch]);
 
   const deleteRide = useCallback(async (id: string) => {
     const updated = rides.filter((r) => r.id !== id);
@@ -441,6 +460,9 @@ export default function TripLoggerScreen() {
               pressed && styles.mainBtnPressed,
             ]}
             onPress={recording ? stopRecording : startRecording}
+            accessibilityRole="button"
+            accessibilityLabel={recording ? t("triplog.stop") : t("triplog.start")}
+            accessibilityHint={recording ? t("triplog.stopHint") : t("triplog.startHint")}
           >
             <Text style={styles.mainBtnText}>
               {recording ? `⏹  ${t("triplog.stop")}` : `▶  ${t("triplog.start")}`}
@@ -585,7 +607,11 @@ function SpeedGauge({
     pct > 0.3  ? "#fbbf24" : "#22c55e";
 
   return (
-    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
+    <View
+      style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}
+      accessibilityRole="text"
+      accessibilityLabel={`${label}: ${speedKmh != null ? Math.round(speedKmh) : 0} ${unit}`}
+    >
       {/* Tick marks around the gauge */}
       {Array.from({ length: TICKS }).map((_, i) => {
         const frac = i / (TICKS - 1);

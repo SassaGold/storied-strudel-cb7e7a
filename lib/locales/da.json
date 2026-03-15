@@ -35,7 +35,13 @@
     "checkFuelPrices": "⛽ Tjek brændstofpriser",
     "readWikipedia": "📖 Læs på Wikipedia",
     "cachedResults": "📡 Viser cachelagrede resultater — tryk opdater for seneste",
-    "fuelTypes": "⛽ Brændstoftyper"
+    "fuelTypes": "⛽ Brændstoftyper",
+    "showingOf": "Viser {{shown}} af {{total}} resultater",
+    "loadMore": "Indlæs mere",
+    "loadMoreHint": "Vis flere resultater",
+    "openInMapsHint": "Åbner stedet i kortappen",
+    "openInfoHint": "Åbner detaljer",
+    "infoFor": "Info om"
   },
   "language": {
     "label": "🌍 Sprog",
@@ -301,7 +307,9 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Kort ikke tilgængeligt",
     "tooShortTitle": "Tur ikke gemt",
-    "tooShortMsg": "Turen var under 10 m — ikke gemt."
+    "tooShortMsg": "Turen var under 10 m — ikke gemt.",
+    "startHint": "Begynder at optage din tur",
+    "stopHint": "Stopper optagelse og gemmer turen"
   },
   "about": {
     "badge": "ℹ️ OM",

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -15,7 +15,7 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS, parseWikiTag } from "../../lib/overpass";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, parseWikiTag, OverpassElement } from "../../lib/overpass";
 // Safely load react-native-maps: requires a custom dev/production build.
 // In Expo Go or any environment where the native module isn't compiled in,
 // MapView and Marker will be null and the map toggle is hidden automatically.
@@ -65,12 +65,12 @@ const FUEL_TYPE_TAGS: [string, string][] = [
 ];
 
 const mapElements = (
-  elements: any[],
+  elements: OverpassElement[],
   latitude: number,
   longitude: number,
   fallbackCategory: string
 ) =>
-  (elements as any[])
+  elements
     .map((element) => {
       const lat = element.lat ?? element.center?.lat;
       const lon = element.lon ?? element.center?.lon;
@@ -168,7 +168,10 @@ export default function McScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Category>("services");
-  const [places, setPlaces] = useState<Place[]>([]);
+  // All fetched results sorted by distance
+  const [allPlaces, setAllPlaces] = useState<Place[]>([]);
+  // Number of results visible in the list (pagination)
+  const [visibleCount, setVisibleCount] = useState(20);
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
   const [wikiExtract, setWikiExtract] = useState<string | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
@@ -176,6 +179,8 @@ export default function McScreen() {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
   const [nameSearch, setNameSearch] = useState("");
+  // AbortController ref for request deduplication (#6)
+  const abortRef = useRef<AbortController | null>(null);
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
     if (category === "services") {
@@ -289,6 +294,11 @@ out center 120;`;
   };
 
   const loadPlaces = useCallback(async () => {
+    // Cancel any in-flight request before starting a fresh one (#6)
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     const cacheKey = `cache_mc_v2_${selected}`;
     // Load cache so user sees last-known results immediately while fetching
     try {
@@ -296,11 +306,14 @@ out center 120;`;
       if (raw) {
         const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
         if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
-          setPlaces(data);
+          setAllPlaces(data);
+          setVisibleCount(20);
           setFromCache(true);
         }
       }
-    } catch {}
+    } catch (e) {
+      console.warn("[MC] cache read error:", e);
+    }
     setLoading(true);
     setError(null);
     try {
@@ -317,23 +330,29 @@ out center 120;`;
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
       const query = buildQuery(selected, latitude, longitude);
-      const data = await fetchOverpass(query, CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000);
-      const results = data.elements
-        ? mapElements(
-            data.elements,
-            latitude,
-            longitude,
-            fallbackLabel(selected)
-          )
-        : [];
+      const data = await fetchOverpass(query, CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000, controller.signal);
+      const results = mapElements(
+        data.elements,
+        latitude,
+        longitude,
+        fallbackLabel(selected)
+      );
 
       const sorted = results
-        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-        .slice(0, 20);
-      setPlaces(sorted);
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
+      setAllPlaces(sorted);
+      setVisibleCount(20);
       setFromCache(false);
-      try { await AsyncStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
+      try {
+        await AsyncStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted }));
+      } catch (e) {
+        console.warn("[MC] cache write error:", e);
+      }
     } catch (err) {
+      if (err instanceof Error && (err.name === "AbortError" || err.message === "Cancelled")) {
+        return; // Silently ignore cancellation
+      }
+      console.warn("[MC] loadPlaces error:", err);
       const message =
         err instanceof Error && err.message
           ? `${t("garage.loadError")} (${err.message})`
@@ -346,7 +365,7 @@ out center 120;`;
 
   const openInMaps = useCallback((place: Place) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
-    Linking.openURL(url).catch(() => null);
+    Linking.openURL(url).catch((e) => console.warn("[MC] openInMaps error:", e));
   }, []);
 
   const openInfo = useCallback((place: Place) => {
@@ -358,8 +377,8 @@ out center 120;`;
       // Wikipedia REST API — free, no API key required
       fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
         .then((r) => r.json())
-        .then((data) => setWikiExtract((data.extract || "").trim() || null))
-        .catch(() => setWikiExtract(null))
+        .then((data: { extract?: string }) => setWikiExtract((data.extract || "").trim() || null))
+        .catch((e) => { console.warn("[MC] wikipedia error:", e); setWikiExtract(null); })
         .finally(() => setWikiLoading(false));
     }
   }, []);
@@ -371,9 +390,12 @@ out center 120;`;
     ? t("common.checkFuelPrices")
     : t("common.reviewsGoogle");
 
+  // Paginated and optionally name-filtered visible places
+  const visiblePlaces = allPlaces.slice(0, visibleCount);
   const filteredPlaces = nameSearch.trim()
-    ? places.filter((p) => p.name.toLowerCase().includes(nameSearch.trim().toLowerCase()))
-    : places;
+    ? visiblePlaces.filter((p) => p.name.toLowerCase().includes(nameSearch.trim().toLowerCase()))
+    : visiblePlaces;
+  const totalFound = allPlaces.length;
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
@@ -519,7 +541,8 @@ out center 120;`;
               onPress={() => {
                 Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                 setSelected(key);
-                setPlaces([]);
+                setAllPlaces([]);
+                setVisibleCount(20);
                 setError(null);
                 setNameSearch("");
               }}
@@ -557,24 +580,30 @@ out center 120;`;
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       {/* Cache banner */}
-      {fromCache && places.length > 0 && (
+      {fromCache && allPlaces.length > 0 && (
         <View style={styles.cacheBanner}>
           <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
         </View>
       )}
 
       {/* View mode toggle — only shown when the map is available */}
-      {places.length > 0 && MapView && (
+      {allPlaces.length > 0 && MapView && (
         <View style={styles.viewToggleRow}>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.viewList")}
+            accessibilityState={{ selected: viewMode === "list" }}
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("common.viewMap")}
+            accessibilityState={{ selected: viewMode === "map" }}
           >
             <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
           </Pressable>
@@ -638,51 +667,76 @@ out center 120;`;
         {viewMode === "list" && (
           filteredPlaces.length === 0 && !loading ? (
             <Text style={styles.bodyText}>
-              {nameSearch.trim() && places.length > 0 ? t("garage.noSearchResults") : emptyText}
+              {nameSearch.trim() && allPlaces.length > 0 ? t("garage.noSearchResults") : emptyText}
             </Text>
           ) : (
-            filteredPlaces.map((place) => (
-              <Pressable
-                key={place.id}
-                style={[styles.placeRow, { borderLeftColor: CATEGORY_COLORS[selected] }]}
-                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}
-                accessibilityRole="button"
-                accessibilityLabel={place.name}
-              >
-                <View style={styles.placeInfo}>
-                  <Text style={styles.bodyText}>{place.name}</Text>
-                  <View style={styles.tagRow}>
-                    <Text style={styles.metaText}>{place.category}</Text>
-                    {place.note && (
-                      <Text style={styles.highlightTag}>{place.note}</Text>
+            <>
+              {/* Pagination summary: "Showing 20 of 47 results" */}
+              {!nameSearch.trim() && totalFound > visibleCount && (
+                <Text style={styles.paginationSummary}>
+                  {t("common.showingOf", { shown: visibleCount, total: totalFound })}
+                </Text>
+              )}
+              {filteredPlaces.map((place) => (
+                <Pressable
+                  key={place.id}
+                  style={[styles.placeRow, { borderLeftColor: CATEGORY_COLORS[selected] }]}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}
+                  accessibilityRole="button"
+                  accessibilityLabel={place.name}
+                  accessibilityHint={t("common.openInMapsHint")}
+                >
+                  <View style={styles.placeInfo}>
+                    <Text style={styles.bodyText}>{place.name}</Text>
+                    <View style={styles.tagRow}>
+                      <Text style={styles.metaText}>{place.category}</Text>
+                      {place.note && (
+                        <Text style={styles.highlightTag}>{place.note}</Text>
+                      )}
+                    </View>
+                    {selected === "fuel" && place.fuelTypes && place.fuelTypes.length > 0 && (
+                      <View style={styles.fuelTypesRow}>
+                        {place.fuelTypes.map((ft) => (
+                          <View key={ft} style={styles.fuelTypeBadge}>
+                            <Text style={styles.fuelTypeBadgeText}>{ft}</Text>
+                          </View>
+                        ))}
+                      </View>
                     )}
                   </View>
-                  {selected === "fuel" && place.fuelTypes && place.fuelTypes.length > 0 && (
-                    <View style={styles.fuelTypesRow}>
-                      {place.fuelTypes.map((ft) => (
-                        <View key={ft} style={styles.fuelTypeBadge}>
-                          <Text style={styles.fuelTypeBadgeText}>{ft}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
-                </View>
-                <View style={styles.placeRight}>
-                  <Text style={styles.metaText}>
-                    {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
-                  </Text>
-                  <Pressable
-                    style={styles.infoButton}
-                    onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInfo(place); }}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Info: ${place.name}`}
-                  >
-                    <Text style={styles.infoButtonText}>ⓘ</Text>
-                  </Pressable>
-                </View>
-              </Pressable>
-            ))
+                  <View style={styles.placeRight}>
+                    <Text style={styles.metaText}>
+                      {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
+                    </Text>
+                    <Pressable
+                      style={styles.infoButton}
+                      onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInfo(place); }}
+                      hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t("common.infoFor")} ${place.name}`}
+                      accessibilityHint={t("common.openInfoHint")}
+                    >
+                      <Text style={styles.infoButtonText}>ⓘ</Text>
+                    </Pressable>
+                  </View>
+                </Pressable>
+              ))}
+              {/* Load More button — only when not searching and more results exist */}
+              {!nameSearch.trim() && totalFound > visibleCount && (
+                <Pressable
+                  style={styles.loadMoreButton}
+                  onPress={() => {
+                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                    setVisibleCount((prev) => prev + 20);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("common.loadMore")}
+                  accessibilityHint={t("common.loadMoreHint")}
+                >
+                  <Text style={styles.loadMoreText}>{t("common.loadMore")}</Text>
+                </Pressable>
+              )}
+            </>
           )
         )}
       </View>
@@ -1091,5 +1145,24 @@ const styles = StyleSheet.create({
     color: "#4285F4",
     fontSize: 14,
     fontWeight: "600",
+  },
+  paginationSummary: {
+    color: "#888888",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  loadMoreButton: {
+    marginTop: 12,
+    paddingVertical: 11,
+    borderRadius: 6,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.5)",
+  },
+  loadMoreText: {
+    color: "#ff6600",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });
