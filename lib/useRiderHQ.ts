@@ -114,7 +114,11 @@ export function useRiderHQ(): RiderHQState {
           for (let i = 0; i < times.length; i++) {
             if (times[i] <= today) continue;
             if (forecast.length >= 3) break;
-            if (maxTemps[i] === undefined || minTemps[i] === undefined) continue;
+            if (
+              maxTemps[i] === undefined ||
+              minTemps[i] === undefined ||
+              dailyCodes[i] === undefined
+            ) continue;
             forecast.push({
               date: times[i],
               weatherCode: wmoToSymbol(dailyCodes[i] as number),
