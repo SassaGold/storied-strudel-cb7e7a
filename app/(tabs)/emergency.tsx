@@ -94,8 +94,18 @@ const EMERGENCY_NUMBERS = [
   { region: "NZ", number: "111", emoji: "🇳🇿" },
 ];
 
-/** Initiates a phone call; falls back to an alert if the device cannot handle it. */
+/** Initiates a phone call; falls back to an alert if the device cannot handle it.
+ *  In development builds (__DEV__) a dialog is shown instead so real calls are
+ *  never accidentally placed while testing. */
 const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: string, callFailedTitle: string, callFailedMsg: string) => {
+  if (__DEV__) {
+    Alert.alert(
+      "Dev Mode — Call Blocked",
+      `This would call ${number} in production.`,
+      [{ text: "OK" }]
+    );
+    return;
+  }
   Linking.canOpenURL(`tel:${number}`)
     .then((supported) => {
       if (supported) {
