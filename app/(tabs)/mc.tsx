@@ -481,7 +481,10 @@ out center 120;`;
               <Text style={styles.modalNoInfo}>{t("common:noContactInfo")}</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>{t("common:wikiLoading")}</Text>
+              <View style={styles.modalWikiLoading}>
+                <ActivityIndicator size="small" color="#fbbf24" />
+                <Text style={styles.modalLoadingText}>{t("common:wikiLoading")}</Text>
+              </View>
             )}
             {wikiExtract && (
               <View style={styles.modalWikiSection}>
@@ -1013,6 +1016,11 @@ const styles = StyleSheet.create({
     color: "#666666",
     fontSize: 13,
     fontStyle: "italic",
+  },
+  modalWikiLoading: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   modalWikiSection: {
     backgroundColor: "rgba(255,255,255,0.04)",
