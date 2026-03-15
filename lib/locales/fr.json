@@ -43,7 +43,8 @@
     "openInfoHint": "Ouvre le panneau de détails",
     "infoFor": "Infos sur",
     "staleRefreshing": "🔄 Actualisation… dernières données il y a {{age}}",
-    "staleOffline": "⚠️ Hors ligne — données de il y a {{age}}"
+    "staleOffline": "⚠️ Hors ligne — données de il y a {{age}}",
+    "forceFetchHint": "🔄 Appui long pour vider le cache & relancer la recherche"
   },
   "language": {
     "label": "🌍 Langue",

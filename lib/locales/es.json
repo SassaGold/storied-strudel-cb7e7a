@@ -43,7 +43,8 @@
     "openInfoHint": "Abre el panel de detalles",
     "infoFor": "Info de",
     "staleRefreshing": "🔄 Actualizando… últimos datos hace {{age}}",
-    "staleOffline": "⚠️ Sin conexión — mostrando datos de hace {{age}}"
+    "staleOffline": "⚠️ Sin conexión — mostrando datos de hace {{age}}",
+    "forceFetchHint": "🔄 Mantén pulsado para borrar caché y nueva búsqueda"
   },
   "language": {
     "label": "🌍 Idioma",

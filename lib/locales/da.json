@@ -43,7 +43,8 @@
     "openInfoHint": "Åbner detaljer",
     "infoFor": "Info om",
     "staleRefreshing": "🔄 Opdaterer… seneste data for {{age}} siden",
-    "staleOffline": "⚠️ Offline — viser data fra {{age}} siden"
+    "staleOffline": "⚠️ Offline — viser data fra {{age}} siden",
+    "forceFetchHint": "🔄 Hold nede for at rydde cache & søge forfra"
   },
   "language": {
     "label": "🌍 Sprog",

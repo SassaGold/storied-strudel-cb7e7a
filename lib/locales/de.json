@@ -43,7 +43,8 @@
     "openInfoHint": "Öffnet das Detailfeld",
     "infoFor": "Info zu",
     "staleRefreshing": "🔄 Wird aktualisiert… letzte Daten vor {{age}}",
-    "staleOffline": "⚠️ Offline — Daten von vor {{age}}"
+    "staleOffline": "⚠️ Offline — Daten von vor {{age}}",
+    "forceFetchHint": "🔄 Lang drücken zum Cache leeren & neue Suche starten"
   },
   "language": {
     "label": "🌍 Sprache",

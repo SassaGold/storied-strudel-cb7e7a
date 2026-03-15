@@ -43,7 +43,8 @@
     "openInfoHint": "Opens details panel",
     "infoFor": "Info for",
     "staleRefreshing": "🔄 Refreshing… last data {{age}} ago",
-    "staleOffline": "⚠️ Offline — showing data from {{age}} ago"
+    "staleOffline": "⚠️ Offline — showing data from {{age}} ago",
+    "forceFetchHint": "🔄 Long-press to clear cache & force new search"
   },
   "language": {
     "label": "🌍 Language",

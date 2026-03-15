@@ -59,6 +59,11 @@ export interface POIScreenProps {
   wikiExtract: string | null;
   wikiLoading: boolean;
   onLoad: () => void;
+  /**
+   * Force a fresh network search, discarding any cached data first.
+   * Wired to long-press on the find button.
+   */
+  forceFetch?: () => void;
   /** Load the next page of already-fetched results. */
   onLoadMore: () => void;
   onOpenInMaps: (place: Place) => void;
@@ -93,6 +98,7 @@ export default function POIScreen({
   wikiExtract,
   wikiLoading,
   onLoad,
+  forceFetch,
   onLoadMore,
   onOpenInMaps,
   onOpenInfo,
@@ -268,13 +274,23 @@ export default function POIScreen({
           Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
           onLoad();
         }}
+        onLongPress={forceFetch ? () => {
+          Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => null);
+          forceFetch();
+        } : undefined}
+        delayLongPress={500}
         accessibilityRole="button"
         accessibilityLabel={t(`${i18nPrefix}.findButton`)}
+        accessibilityHint={forceFetch ? t("common.forceFetchHint") : undefined}
       >
         <Text style={styles.primaryButtonText}>
           {loading ? t("common.loading") : t(`${i18nPrefix}.findButton`)}
         </Text>
       </Pressable>
+      {/* Long-press hint — only shown when there is stale cached data visible */}
+      {fromCache && places.length > 0 && forceFetch && !loading && (
+        <Text style={styles.forceFetchHint}>{t("common.forceFetchHint")}</Text>
+      )}
 
       {/* ── Loading indicator ── */}
       {loading && (
@@ -522,6 +538,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.8,
+  },
+  forceFetchHint: {
+    color: "#666666",
+    fontSize: 11,
+    textAlign: "center",
+    marginTop: -10,
+    marginBottom: 12,
+    letterSpacing: 0.2,
   },
   loadingRow: {
     flexDirection: "row",

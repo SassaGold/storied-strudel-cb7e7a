@@ -43,7 +43,8 @@
     "openInfoHint": "Opnar upplýsingaglugga",
     "infoFor": "Upplýsingar um",
     "staleRefreshing": "🔄 Uppfæri… síðustu gögn fyrir {{age}}",
-    "staleOffline": "⚠️ Án nettengingar — gögn frá {{age}}"
+    "staleOffline": "⚠️ Án nettengingar — gögn frá {{age}}",
+    "forceFetchHint": "🔄 Haltu inni til að hreinsa skyndiminni og leita að nýju"
   },
   "language": {
     "label": "🌍 Tungumál",

@@ -43,7 +43,8 @@
     "openInfoHint": "Öppnar detaljpanelen",
     "infoFor": "Info om",
     "staleRefreshing": "🔄 Uppdaterar… senaste data för {{age}} sedan",
-    "staleOffline": "⚠️ Offline — visar data från {{age}} sedan"
+    "staleOffline": "⚠️ Offline — visar data från {{age}} sedan",
+    "forceFetchHint": "🔄 Håll inne för att rensa cache & söka på nytt"
   },
   "language": {
     "label": "🌍 Språk",

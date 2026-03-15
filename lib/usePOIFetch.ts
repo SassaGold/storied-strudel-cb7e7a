@@ -90,6 +90,13 @@ export interface UsePOIFetchResult {
   wikiExtract: string | null;
   wikiLoading: boolean;
   loadPlaces: () => Promise<void>;
+  /**
+   * Clears the local cache entry and starts a fully-fresh network search,
+   * skipping the stale-data pre-fill so the user sees clean loading state.
+   * Use this when the user has moved significantly and wants results for
+   * their new location rather than the previously-cached area.
+   */
+  forceFetch: () => Promise<void>;
   /** Reveal the next page of already-fetched results. */
   loadMore: () => void;
   openInMaps: (place: Place) => void;
@@ -221,6 +228,21 @@ export function usePOIFetch({
     setVisibleCount((prev) => prev + PAGE_SIZE);
   }, []);
 
+  const forceFetch = useCallback(async () => {
+    // Delete the cached entry so `loadPlaces` starts with a blank slate —
+    // no stale data is pre-filled and the user sees a clean loading state.
+    try {
+      await AsyncStorage?.removeItem(cacheKey);
+    } catch (e) {
+      console.warn("[usePOIFetch] cache clear error:", e);
+    }
+    setAllPlaces([]);
+    setFromCache(false);
+    setCacheTimestamp(null);
+    setRefreshError(false);
+    await loadPlaces();
+  }, [cacheKey, loadPlaces]);
+
   const openInMaps = useCallback((place: Place) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
     Linking.openURL(url).catch((e) => console.warn("[usePOIFetch] openInMaps error:", e));
@@ -261,6 +283,7 @@ export function usePOIFetch({
     wikiExtract,
     wikiLoading,
     loadPlaces,
+    forceFetch,
     loadMore,
     openInMaps,
     openInfo,
