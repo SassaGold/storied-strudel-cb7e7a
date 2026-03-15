@@ -41,7 +41,9 @@
     "loadMoreHint": "Afficher plus de résultats",
     "openInMapsHint": "Ouvre l'emplacement dans l'application de cartes",
     "openInfoHint": "Ouvre le panneau de détails",
-    "infoFor": "Infos sur"
+    "infoFor": "Infos sur",
+    "staleRefreshing": "🔄 Actualisation… dernières données il y a {{age}}",
+    "staleOffline": "⚠️ Hors ligne — données de il y a {{age}}"
   },
   "language": {
     "label": "🌍 Langue",

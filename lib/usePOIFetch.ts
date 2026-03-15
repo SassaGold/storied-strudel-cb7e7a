@@ -7,7 +7,7 @@ import { Linking } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "./settings";
-import { fetchOverpass, CACHE_TTL_MS, parseWikiTag, OverpassElement } from "./overpass";
+import { fetchOverpass, parseWikiTag, OverpassElement } from "./overpass";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
@@ -75,6 +75,16 @@ export interface UsePOIFetchResult {
   loading: boolean;
   error: string | null;
   fromCache: boolean;
+  /**
+   * Unix timestamp (ms) of when the currently-displayed data was cached.
+   * Present whenever `fromCache` is true so the UI can show "last updated X min ago".
+   */
+  cacheTimestamp: number | null;
+  /**
+   * True when a background refresh failed but stale cached data is still visible.
+   * The UI should show an "offline" indicator rather than a hard error.
+   */
+  refreshError: boolean;
   userLocation: { latitude: number; longitude: number } | null;
   infoPlace: Place | null;
   wikiExtract: string | null;
@@ -113,6 +123,10 @@ export function usePOIFetch({
     longitude: number;
   } | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  /** Unix timestamp (ms) of the cache entry currently displayed. */
+  const [cacheTimestamp, setCacheTimestamp] = useState<number | null>(null);
+  /** True when the background refresh failed but we still have stale data. */
+  const [refreshError, setRefreshError] = useState(false);
 
   // AbortController ref for request deduplication (#6): cancels any in-flight
   // Overpass request before starting a new one so rapid taps don't race.
@@ -124,15 +138,20 @@ export function usePOIFetch({
     const controller = new AbortController();
     abortRef.current = controller;
 
-    // Show last-known cached results immediately while re-fetching
+    // Show last-known cached results immediately while re-fetching.
+    // The TTL check is intentionally removed here: stale data is always
+    // better than nothing — we show it and refresh in the background.
+    let hadCachedData = false;
     try {
       const raw = await AsyncStorage?.getItem(cacheKey);
       if (raw) {
         const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
-        if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
+        if (data?.length > 0) {
           setAllPlaces(data);
           setVisibleCount(PAGE_SIZE);
           setFromCache(true);
+          setCacheTimestamp(ts);
+          hadCachedData = true;
         }
       }
     } catch (e) {
@@ -141,6 +160,7 @@ export function usePOIFetch({
 
     setLoading(true);
     setError(null);
+    setRefreshError(false);
 
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
@@ -171,6 +191,7 @@ export function usePOIFetch({
       setAllPlaces(sorted);
       setVisibleCount(PAGE_SIZE);
       setFromCache(false);
+      setCacheTimestamp(null);
       try {
         await AsyncStorage?.setItem(
           cacheKey,
@@ -184,7 +205,13 @@ export function usePOIFetch({
         return; // Silently ignore cancellation
       }
       console.warn("[usePOIFetch] load error:", e);
-      setError(t(loadErrorKey));
+      if (hadCachedData) {
+        // Stale data is already visible — set the offline flag instead of
+        // replacing the list with a hard error message.
+        setRefreshError(true);
+      } else {
+        setError(t(loadErrorKey));
+      }
     } finally {
       setLoading(false);
     }
@@ -227,6 +254,8 @@ export function usePOIFetch({
     loading,
     error,
     fromCache,
+    cacheTimestamp,
+    refreshError,
     userLocation,
     infoPlace,
     wikiExtract,

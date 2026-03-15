@@ -41,7 +41,9 @@
     "loadMoreHint": "Show more results",
     "openInMapsHint": "Opens location in maps app",
     "openInfoHint": "Opens details panel",
-    "infoFor": "Info for"
+    "infoFor": "Info for",
+    "staleRefreshing": "🔄 Refreshing… last data {{age}} ago",
+    "staleOffline": "⚠️ Offline — showing data from {{age}} ago"
   },
   "language": {
     "label": "🌍 Language",

@@ -41,7 +41,9 @@
     "loadMoreHint": "Mehr Ergebnisse anzeigen",
     "openInMapsHint": "Öffnet den Standort in der Karten-App",
     "openInfoHint": "Öffnet das Detailfeld",
-    "infoFor": "Info zu"
+    "infoFor": "Info zu",
+    "staleRefreshing": "🔄 Wird aktualisiert… letzte Daten vor {{age}}",
+    "staleOffline": "⚠️ Offline — Daten von vor {{age}}"
   },
   "language": {
     "label": "🌍 Sprache",

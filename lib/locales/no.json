@@ -41,7 +41,9 @@
     "loadMoreHint": "Vis flere resultater",
     "openInMapsHint": "Åpner stedet i kart-appen",
     "openInfoHint": "Åpner detaljpanelet",
-    "infoFor": "Info om"
+    "infoFor": "Info om",
+    "staleRefreshing": "🔄 Oppdaterer… siste data for {{age}} siden",
+    "staleOffline": "⚠️ Frakoblet — viser data fra {{age}} siden"
   },
   "language": {
     "label": "🌍 Språk",

@@ -41,7 +41,9 @@
     "loadMoreHint": "Visa fler resultat",
     "openInMapsHint": "Öppnar platsen i kartan",
     "openInfoHint": "Öppnar detaljpanelen",
-    "infoFor": "Info om"
+    "infoFor": "Info om",
+    "staleRefreshing": "🔄 Uppdaterar… senaste data för {{age}} sedan",
+    "staleOffline": "⚠️ Offline — visar data från {{age}} sedan"
   },
   "language": {
     "label": "🌍 Språk",

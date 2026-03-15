@@ -44,6 +44,16 @@ export interface POIScreenProps {
   loading: boolean;
   error: string | null;
   fromCache: boolean;
+  /**
+   * Unix timestamp (ms) of the cache entry currently displayed.
+   * Used to show "last updated X min ago" in the stale-data banner.
+   */
+  cacheTimestamp: number | null;
+  /**
+   * True when the background network refresh failed but stale cached data
+   * is still visible. Triggers the "offline" variant of the cache banner.
+   */
+  refreshError: boolean;
   userLocation: { latitude: number; longitude: number } | null;
   infoPlace: Place | null;
   wikiExtract: string | null;
@@ -76,6 +86,8 @@ export default function POIScreen({
   loading,
   error,
   fromCache,
+  cacheTimestamp,
+  refreshError,
   userLocation,
   infoPlace,
   wikiExtract,
@@ -94,6 +106,13 @@ export default function POIScreen({
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
 
   const fmtCategory = categoryLabel ?? ((c: string) => c);
+
+  /** Format cache age as "5 min" or "2 h" for use in the stale-data banner. */
+  const formatAge = (ts: number): string => {
+    const diffMin = Math.floor((Date.now() - ts) / 60_000);
+    if (diffMin < 60) return `${diffMin} min`;
+    return `${Math.floor(diffMin / 60)} h`;
+  };
 
   const handleClose = () => {
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
@@ -268,10 +287,19 @@ export default function POIScreen({
       {/* ── Error ── */}
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {/* ── Cache banner ── */}
-      {fromCache && places.length > 0 && (
+      {/* ── Stale-cache / offline banner ── */}
+      {fromCache && places.length > 0 && cacheTimestamp && loading && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>
+            {t("common.staleRefreshing", { age: formatAge(cacheTimestamp) })}
+          </Text>
+        </View>
+      )}
+      {fromCache && places.length > 0 && cacheTimestamp && refreshError && (
+        <View style={[styles.cacheBanner, styles.cacheBannerOffline]}>
+          <Text style={styles.cacheBannerText}>
+            {t("common.staleOffline", { age: formatAge(cacheTimestamp) })}
+          </Text>
         </View>
       )}
 
@@ -711,6 +739,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderWidth: 1,
     borderColor: "rgba(255,153,0,0.3)",
+  },
+  cacheBannerOffline: {
+    backgroundColor: "rgba(248,113,113,0.10)",
+    borderColor: "rgba(248,113,113,0.35)",
   },
   cacheBannerText: {
     color: "#f59e0b",

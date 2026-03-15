@@ -41,7 +41,9 @@
     "loadMoreHint": "Sýna fleiri niðurstöður",
     "openInMapsHint": "Opnar staðsetningu í kortaforritinu",
     "openInfoHint": "Opnar upplýsingaglugga",
-    "infoFor": "Upplýsingar um"
+    "infoFor": "Upplýsingar um",
+    "staleRefreshing": "🔄 Uppfæri… síðustu gögn fyrir {{age}}",
+    "staleOffline": "⚠️ Án nettengingar — gögn frá {{age}}"
   },
   "language": {
     "label": "🌍 Tungumál",
