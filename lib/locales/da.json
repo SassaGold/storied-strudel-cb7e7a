@@ -309,7 +309,9 @@
     "tooShortTitle": "Tur ikke gemt",
     "tooShortMsg": "Turen var under 10 m — ikke gemt.",
     "startHint": "Begynder at optage din tur",
-    "stopHint": "Stopper optagelse og gemmer turen"
+    "stopHint": "Stopper optagelse og gemmer turen",
+    "bgServiceTitle": "Roamly — Optager",
+    "bgServiceBody": "Optager din tur i baggrunden"
   },
   "about": {
     "badge": "ℹ️ OM",

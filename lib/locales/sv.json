@@ -309,7 +309,9 @@
     "tooShortTitle": "Tur inte sparad",
     "tooShortMsg": "Turen var under 10 m — inte sparad.",
     "startHint": "Börjar spela in din resa",
-    "stopHint": "Stoppar inspelning och sparar resan"
+    "stopHint": "Stoppar inspelning och sparar resan",
+    "bgServiceTitle": "Roamly — Spelar in",
+    "bgServiceBody": "Spelar in din resa i bakgrunden"
   },
   "about": {
     "badge": "ℹ️ OM",

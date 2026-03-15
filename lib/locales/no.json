@@ -309,7 +309,9 @@
     "tooShortTitle": "Tur ikke lagret",
     "tooShortMsg": "Turen var under 10 m — ikke lagret.",
     "startHint": "Begynner å registrere turen din",
-    "stopHint": "Stopper registrering og lagrer turen"
+    "stopHint": "Stopper registrering og lagrer turen",
+    "bgServiceTitle": "Roamly — Registrering",
+    "bgServiceBody": "Registrerer turen din i bakgrunnen"
   },
   "about": {
     "badge": "ℹ️ OM",

@@ -322,7 +322,9 @@
     "viewMapShort": "Ruta",
     "speedLabel": "VELOCIDAD",
     "startHint": "Inicia la grabación de tu ruta",
-    "stopHint": "Detiene la grabación y guarda la ruta"
+    "stopHint": "Detiene la grabación y guarda la ruta",
+    "bgServiceTitle": "Roamly — Grabando",
+    "bgServiceBody": "Grabando tu ruta en segundo plano"
   },
   "about": {
     "badge": "ℹ️ ACERCA DE",

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
+  AppState,
   Modal,
   Platform,
   Pressable,
@@ -15,6 +16,8 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
+import { LOCATION_TASK_NAME, BG_POINTS_KEY } from "../../lib/locationTask";
+import type { BgPoint } from "../../lib/locationTask";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
@@ -93,13 +96,84 @@ export default function TripLoggerScreen() {
   const recordingRef = useRef(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const prevSpeedPointRef = useRef<{ latitude: number; longitude: number; timestamp: number } | null>(null);
+  /** True while Location.startLocationUpdatesAsync is active (background task running). */
+  const bgTrackingRef = useRef(false);
 
   // Keep recordingRef in sync so the idle watcher can check it without stale closure
   useEffect(() => { recordingRef.current = recording; }, [recording]);
 
+  // On mount: clean up any orphaned background task from a previous session
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME)
+      .then((started) => {
+        if (started) {
+          return Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        }
+      })
+      .catch((e) => console.warn("[TripLogger] orphan task cleanup error:", e));
+    // Also clear leftover background buffer from any previous unfinished ride
+    AsyncStorage?.removeItem(BG_POINTS_KEY).catch(() => null);
+  }, []);
+
   // Load saved rides on mount
   useEffect(() => {
     loadRides();
+  }, []);
+
+  /**
+   * Merges GPS points accumulated by the background task into the live route.
+   * Only points newer than the last foreground point are kept (gap-fill only),
+   * and the same 3 m jitter filter used by the foreground watcher is applied.
+   * The AsyncStorage buffer is cleared after a successful flush.
+   */
+  const flushBackgroundPoints = useCallback(async () => {
+    if (!AsyncStorage || !recordingRef.current) return;
+    try {
+      const raw: string | null = await AsyncStorage.getItem(BG_POINTS_KEY);
+      if (!raw) return;
+      const bgPoints: BgPoint[] = JSON.parse(raw) as BgPoint[];
+      if (!bgPoints.length) return;
+
+      // Clear the shared buffer immediately so the next flush starts fresh
+      await AsyncStorage.removeItem(BG_POINTS_KEY);
+
+      // Only accept points that are strictly newer than the last foreground point
+      // to avoid duplicate distance from the parallel foreground watcher
+      const lastFgTs = routeRef.current.length > 0
+        ? routeRef.current[routeRef.current.length - 1].timestamp
+        : 0;
+      const newPoints = bgPoints.filter((p) => p.timestamp > lastFgTs);
+      if (!newPoints.length) return;
+
+      // Sort defensively (task may batch out-of-order)
+      newPoints.sort((a, b) => a.timestamp - b.timestamp);
+
+      // Apply same 3 m jitter filter as the foreground watcher
+      let last: GpsPoint | null = routeRef.current[routeRef.current.length - 1] ?? null;
+      const merged: GpsPoint[] = [];
+      for (const p of newPoints) {
+        if (last) {
+          const dist = haversineMeters(last.latitude, last.longitude, p.latitude, p.longitude);
+          if (dist >= 3) {
+            distRef.current += dist / 1000;
+            merged.push(p);
+            last = p;
+          }
+        } else {
+          merged.push(p);
+          last = p;
+        }
+      }
+
+      if (merged.length > 0) {
+        routeRef.current = [...routeRef.current, ...merged];
+        setRoute([...routeRef.current]);
+        setDistanceKm(distRef.current);
+      }
+    } catch (e) {
+      console.warn("[TripLogger] flushBackgroundPoints error:", e);
+    }
   }, []);
 
   /** Start the "idle" watcher (Balanced accuracy, for live speedometer only). */
@@ -192,6 +266,17 @@ export default function TripLoggerScreen() {
     }
   }, [recording, pulseAnim]);
 
+  // When the app returns to the foreground, merge any GPS points that the
+  // background task accumulated while the screen was off / app was suspended.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active") {
+        flushBackgroundPoints();
+      }
+    });
+    return () => sub.remove();
+  }, [flushBackgroundPoints]);
+
   const startRecording = useCallback(async () => {
     setPermError(false);
 
@@ -207,6 +292,9 @@ export default function TripLoggerScreen() {
     watchRef.current?.remove();
     watchRef.current = null;
 
+    // Clear any leftover background GPS buffer from a previous ride
+    await AsyncStorage?.removeItem(BG_POINTS_KEY).catch(() => null);
+
     // Reset state
     routeRef.current = [];
     distRef.current = 0;
@@ -219,6 +307,7 @@ export default function TripLoggerScreen() {
     setCurrentSpeedKmh(null);
     setRecording(true);
 
+    // ── Foreground watcher: live speed display + route building ─────────────────────
     watchRef.current = await Location.watchPositionAsync(
       {
         accuracy: Location.Accuracy.BestForNavigation,
@@ -259,16 +348,63 @@ export default function TripLoggerScreen() {
         }
       },
     );
-  }, []);
+
+    // ── Background task: keeps tracking while app is suspended ────────────────
+    // Only attempted on native; requires "Always" / background location permission.
+    if (Platform.OS !== "web") {
+      try {
+        const { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
+        if (bgStatus === "granted") {
+          await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+            accuracy: Location.Accuracy.BestForNavigation,
+            distanceInterval: 5,
+            timeInterval: 5000,
+            // Android: show a persistent foreground-service notification so the
+            // OS does not kill the background task.
+            foregroundService: {
+              notificationTitle: t("triplog.bgServiceTitle"),
+              notificationBody: t("triplog.bgServiceBody"),
+              notificationColor: "#ff6600",
+            },
+            // iOS: show the blue location pill in the status bar.
+            showsBackgroundLocationIndicator: true,
+          });
+          bgTrackingRef.current = true;
+        }
+        // If permission is denied we silently continue with foreground-only
+        // tracking — the ride will still be recorded while the app is open.
+      } catch (e) {
+        console.warn("[TripLogger] startLocationUpdatesAsync error:", e);
+      }
+    }
+  }, [t]);
 
   const stopRecording = useCallback(async () => {
-    // Stop the recording watcher and immediately restart the idle watcher.
+    // Stop the foreground watcher and immediately restart the idle watcher.
     watchRef.current?.remove();
     watchRef.current = null;
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+
+    // Stop the background location task (if it was started)
+    if (bgTrackingRef.current) {
+      try {
+        const isStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+        if (isStarted) {
+          await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        }
+      } catch (e) {
+        console.warn("[TripLogger] stopLocationUpdatesAsync error:", e);
+      }
+      bgTrackingRef.current = false;
+    }
+
+    // Flush any GPS points buffered by the background task while the app was
+    // suspended, then compute the final ride statistics.
+    recordingRef.current = true; // keep flag high so flush accepts the points
+    await flushBackgroundPoints();
 
     const durationMs = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
     const distKm = distRef.current;
@@ -295,7 +431,7 @@ export default function TripLoggerScreen() {
     } else {
       Alert.alert(t("triplog.tooShortTitle"), t("triplog.tooShortMsg"));
     }
-  }, [rides, saveRides, t, startIdleWatch]);
+  }, [rides, saveRides, t, startIdleWatch, flushBackgroundPoints]);
 
   const deleteRide = useCallback(async (id: string) => {
     const updated = rides.filter((r) => r.id !== id);

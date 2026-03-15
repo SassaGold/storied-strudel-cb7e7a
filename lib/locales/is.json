@@ -322,7 +322,9 @@
     "viewMapShort": "Leið",
     "speedLabel": "HRAÐI",
     "startHint": "Byrjar að skrá ferðina þína",
-    "stopHint": "Stoppar skráningu og vistar ferðina"
+    "stopHint": "Stoppar skráningu og vistar ferðina",
+    "bgServiceTitle": "Roamly — Skráning",
+    "bgServiceBody": "Skráir ferð þína í bakgrunni"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

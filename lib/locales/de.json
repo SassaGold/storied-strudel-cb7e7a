@@ -322,7 +322,9 @@
     "viewMapShort": "Route",
     "speedLabel": "TEMPO",
     "startHint": "Startet die Aufzeichnung Ihrer Fahrt",
-    "stopHint": "Stoppt die Aufzeichnung und speichert die Fahrt"
+    "stopHint": "Stoppt die Aufzeichnung und speichert die Fahrt",
+    "bgServiceTitle": "Roamly — Aufzeichnung",
+    "bgServiceBody": "Fahrt wird im Hintergrund aufgezeichnet"
   },
   "about": {
     "badge": "ℹ️ ÜBER",

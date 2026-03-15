@@ -51,6 +51,14 @@
       "expo-router",
       "react-native-maps",
       [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked.",
+          "isAndroidBackgroundLocationEnabled": true,
+          "isIosBackgroundLocationEnabled": true
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",

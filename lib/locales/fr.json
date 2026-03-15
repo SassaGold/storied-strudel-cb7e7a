@@ -322,7 +322,9 @@
     "viewMapShort": "Itinéraire",
     "speedLabel": "VITESSE",
     "startHint": "Commence à enregistrer votre trajet",
-    "stopHint": "Arrête l'enregistrement et sauvegarde le trajet"
+    "stopHint": "Arrête l'enregistrement et sauvegarde le trajet",
+    "bgServiceTitle": "Roamly — Enregistrement",
+    "bgServiceBody": "Enregistrement de votre trajet en arrière-plan"
   },
   "about": {
     "badge": "ℹ️ À PROPOS",
