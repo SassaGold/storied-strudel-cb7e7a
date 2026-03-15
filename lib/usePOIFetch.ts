@@ -113,7 +113,7 @@ export function usePOIFetch({
   locationErrorKey,
   loadErrorKey,
 }: UsePOIFetchOptions): UsePOIFetchResult {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const { settings } = useSettings();
 
   const [loading, setLoading] = useState(false);

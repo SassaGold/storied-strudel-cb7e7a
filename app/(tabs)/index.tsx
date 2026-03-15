@@ -26,7 +26,7 @@ const Haptics: typeof import("expo-haptics") | null = (() => { try { return requ
 const LOGO_FONT = Platform.select({ ios: "-apple-system", android: "sans-serif-black", web: "Inter, -apple-system, system-ui, sans-serif" });
 
 export default function Index() {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation(["home","common"]);
   const router = useRouter();
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
@@ -73,7 +73,7 @@ export default function Index() {
             style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/about"); }}
             accessibilityRole="button"
-            accessibilityLabel={t("tabs.about")}
+            accessibilityLabel={t("tabs:about")}
             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
           >
             <Text style={styles.headerIconBtnText}>ℹ️</Text>
@@ -87,7 +87,7 @@ export default function Index() {
               style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
               onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setLangModalVisible(true); }}
               accessibilityRole="button"
-              accessibilityLabel={t("language.label")}
+              accessibilityLabel={t("language:label")}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
               <Text style={styles.headerIconBtnText}>🌐</Text>
@@ -96,7 +96,7 @@ export default function Index() {
               style={({ pressed }) => [styles.headerIconBtn, pressed && styles.headerIconBtnPressed]}
               onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/settings"); }}
               accessibilityRole="button"
-              accessibilityLabel={t("settings.title")}
+              accessibilityLabel={t("settings:title")}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
               <Text style={styles.headerIconBtnText}>⚙️</Text>
@@ -115,7 +115,7 @@ export default function Index() {
       >
         <Pressable style={styles.langModalOverlay} onPress={() => setLangModalVisible(false)}>
           <View style={styles.langModalContent} onStartShouldSetResponder={() => true}>
-            <Text style={styles.langModalTitle}>{t("language.label")}</Text>
+            <Text style={styles.langModalTitle}>{t("language:label")}</Text>
             {(["en", "es", "de", "fr", "is", "no", "sv", "da"] as const).map((lang) => (
               <Pressable
                 key={lang}
@@ -130,11 +130,11 @@ export default function Index() {
                   setLangModalVisible(false);
                 }}
                 accessibilityRole="button"
-                accessibilityLabel={t(`language.${lang}`)}
+                accessibilityLabel={t(`language:${lang}`)}
                 accessibilityState={{ selected: i18n.language === lang }}
               >
                 <Text style={[styles.langModalOptionText, i18n.language === lang && styles.langModalOptionTextActive]}>
-                  {t(`language.${lang}`)}
+                  {t(`language:${lang}`)}
                 </Text>
               </Pressable>
             ))}
@@ -145,14 +145,14 @@ export default function Index() {
       {/* ── Update button ── */}
       <Pressable style={styles.primaryButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadData(); }}>
         <Text style={styles.primaryButtonText}>
-          {loading ? t("common.loading") : t("home.updateLocation")}
+          {loading ? t("common:loading") : t("updateLocation")}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>{t("home.fetchingData")}</Text>
+          <Text style={styles.loadingText}>{t("fetchingData")}</Text>
         </View>
       )}
 
@@ -161,18 +161,18 @@ export default function Index() {
       {/* ── Location card ── */}
       {location && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t("home.yourLocation")}</Text>
+          <Text style={styles.cardTitle}>{t("yourLocation")}</Text>
           <Text style={styles.bodyText}>
-            {address?.displayName ?? t("home.addressNotAvailable")}
+            {address?.displayName ?? t("addressNotAvailable")}
           </Text>
           <Text style={styles.metaText}>
             Lat {location.coords.latitude.toFixed(5)} · Lon {location.coords.longitude.toFixed(5)}
           </Text>
           <Text style={styles.metaText}>
-            {t("home.accuracy", { value: Math.round(location.coords.accuracy ?? 0) })}
+            {t("accuracy", { value: Math.round(location.coords.accuracy ?? 0) })}
           </Text>
           <Pressable style={styles.secondaryButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openMaps(); }}>
-            <Text style={styles.secondaryButtonText}>{t("common.openInMaps")}</Text>
+            <Text style={styles.secondaryButtonText}>{t("common:openInMaps")}</Text>
           </Pressable>
         </View>
       )}
@@ -186,7 +186,7 @@ export default function Index() {
       {/* ── Riding Suitability card ── */}
       {weather && (
         <View style={[styles.card, styles.suitabilityCard, { borderColor: suitability.color }]}>
-          <Text style={styles.cardTitle}>{t("home.ridingSuitability", { score: suitability.score })}</Text>
+          <Text style={styles.cardTitle}>{t("ridingSuitability", { score: suitability.score })}</Text>
           <View style={[styles.suitabilityBadge, styles.suitabilityBadgeSelf, { backgroundColor: suitability.color }]}>
             <Text style={styles.suitabilityBadgeText}>{t(suitability.labelKey)}</Text>
           </View>
@@ -196,7 +196,7 @@ export default function Index() {
       {/* ── Riding Alerts card ── */}
       {weather && alerts.length > 0 && (
         <View style={[styles.card, styles.alertCard]}>
-          <Text style={styles.cardTitle}>{t("home.ridingAlerts")}</Text>
+          <Text style={styles.cardTitle}>{t("ridingAlerts")}</Text>
           {alerts.map((key) => (
             <Text key={key} style={styles.weatherBullet}>{ALERT_ICONS[key] ?? DEFAULT_ALERT_ICON} {t(key)}</Text>
           ))}
@@ -206,7 +206,7 @@ export default function Index() {
       {/* ── Recommendations card ── */}
       {weather && recommendations.length > 0 && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t("home.recommendations")}</Text>
+          <Text style={styles.cardTitle}>{t("recommendations")}</Text>
           {recommendations.map((key) => (
             <Text key={key} style={styles.weatherBullet}>{REC_ICONS[key] ?? DEFAULT_REC_ICON} {t(key)}</Text>
           ))}
@@ -221,7 +221,7 @@ export default function Index() {
 
       {lastUpdated && (
         <Text style={styles.metaText}>
-          {t("home.lastUpdated", { time: lastUpdated.toLocaleTimeString() })}
+          {t("lastUpdated", { time: lastUpdated.toLocaleTimeString() })}
         </Text>
       )}
 
@@ -231,42 +231,42 @@ export default function Index() {
       )}
 
       {/* ── Quick navigation grid ── */}
-      <Text style={styles.quickNavLabel}>{t("home.quickNav")}</Text>
+      <Text style={styles.quickNavLabel}>{t("quickNav")}</Text>
       <View style={styles.quickNavGrid}>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/restaurants"); }}
         >
           <Text style={styles.quickNavEmoji}>🍽️</Text>
-          <Text style={styles.quickNavText}>{t("tabs.food")}</Text>
+          <Text style={styles.quickNavText}>{t("tabs:food")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/hotels"); }}
         >
           <Text style={styles.quickNavEmoji}>🛏️</Text>
-          <Text style={styles.quickNavText}>{t("tabs.sleep")}</Text>
+          <Text style={styles.quickNavText}>{t("tabs:sleep")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/attractions"); }}
         >
           <Text style={styles.quickNavEmoji}>🏁</Text>
-          <Text style={styles.quickNavText}>{t("tabs.explore")}</Text>
+          <Text style={styles.quickNavText}>{t("tabs:explore")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/mc"); }}
         >
           <Text style={styles.quickNavEmoji}>⚙️</Text>
-          <Text style={styles.quickNavText}>{t("tabs.garage")}</Text>
+          <Text style={styles.quickNavText}>{t("tabs:garage")}</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [styles.quickNavBtn, pressed && styles.quickNavBtnPressed]}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.navigate("/triplogger"); }}
         >
           <Text style={styles.quickNavEmoji}>📏</Text>
-          <Text style={styles.quickNavText}>{t("tabs.trip")}</Text>
+          <Text style={styles.quickNavText}>{t("tabs:trip")}</Text>
         </Pressable>
       </View>
       <Pressable
@@ -274,7 +274,7 @@ export default function Index() {
         onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); router.navigate("/emergency"); }}
       >
         <Text style={styles.quickNavEmoji}>🆘</Text>
-        <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>
+        <Text style={styles.quickNavTextSos}>{t("tabs:sos")}</Text>
       </Pressable>
     </ScrollView>
   );

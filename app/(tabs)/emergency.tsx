@@ -111,7 +111,7 @@ const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: stri
 const CACHE_KEY = "cache_emergency_v2";
 
 export default function EmergencyScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("sos");
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,10 +129,10 @@ export default function EmergencyScreen() {
     Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null);
     callNumber(
       number,
-      t("sos.cannotCall"),
-      t("sos.cannotCallMsg", { number }),
-      t("sos.callFailed"),
-      t("sos.callFailedMsg", { number })
+      t("cannotCall"),
+      t("cannotCallMsg", { number }),
+      t("callFailed"),
+      t("callFailedMsg", { number })
     );
   }, [t]);
 
@@ -145,7 +145,7 @@ export default function EmergencyScreen() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== "granted") {
-        Alert.alert(t("sos.permissionAlert"), t("sos.locationPermissionMsg"));
+        Alert.alert(t("permissionAlert"), t("locationPermissionMsg"));
         return;
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
@@ -155,7 +155,7 @@ export default function EmergencyScreen() {
         message: `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
       });
     } catch {
-      Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
+      Alert.alert(t("shareFailed"), t("shareFailedMsg"));
     }
   }, [t]);
 
@@ -176,7 +176,7 @@ export default function EmergencyScreen() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== "granted") {
-        setError(t("sos.locationError"));
+        setError(t("locationError"));
         return;
       }
 
@@ -248,7 +248,7 @@ out center ${MAX_RESULTS};`;
       try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
     } catch (err) {
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
-      setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
+      setError(isNetwork ? t("networkError") : t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -267,7 +267,7 @@ out center ${MAX_RESULTS};`;
       {/* ── Torch Screen Overlay ─────────────────────────────────── */}
       <Modal visible={torchOn} transparent animationType="fade" onRequestClose={() => setTorchOn(false)}>
         <Pressable style={styles.torchOverlay} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(false); }}>
-          <Text style={styles.torchOffText}>{t("sos.torchScreenOff")}</Text>
+          <Text style={styles.torchOffText}>{t("torchScreenOff")}</Text>
         </Pressable>
       </Modal>
 
@@ -276,13 +276,13 @@ out center ${MAX_RESULTS};`;
         <View style={styles.instructionsOverlay}>
           <View style={styles.instructionsCard}>
             <View style={styles.instructionsHeader}>
-              <Text style={styles.instructionsTitle}>{t("sos.instructionsTitle")}</Text>
+              <Text style={styles.instructionsTitle}>{t("instructionsTitle")}</Text>
               <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(false); }} hitSlop={12}>
-                <Text style={styles.instructionsClose}>{t("sos.instructionsClose")} ✕</Text>
+                <Text style={styles.instructionsClose}>{t("instructionsClose")} ✕</Text>
               </Pressable>
             </View>
             <ScrollView style={styles.instructionsBody} showsVerticalScrollIndicator={false}>
-              <Text style={styles.instructionsText}>{t("sos.instructionsBody")}</Text>
+              <Text style={styles.instructionsText}>{t("instructionsBody")}</Text>
             </ScrollView>
           </View>
         </View>
@@ -302,14 +302,14 @@ out center ${MAX_RESULTS};`;
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.type")}</Text>
+              <Text style={styles.modalLabel}>{t("common:type")}</Text>
               <Text style={styles.modalValue}>
                 {t(`sos.categoryLabels.${infoPlace?.category}`, { defaultValue: formatCategory(infoPlace?.category ?? "") })}
               </Text>
             </View>
             {infoPlace?.distanceMeters !== undefined && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.distance")}</Text>
+                <Text style={styles.modalLabel}>{t("common:distance")}</Text>
                 <Text style={styles.modalValue}>
                   {formatDistance(infoPlace.distanceMeters)}
                 </Text>
@@ -317,7 +317,7 @@ out center ${MAX_RESULTS};`;
             )}
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
+                <Text style={styles.modalLabel}>{t("common:phone")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => call(infoPlace.phone!)}
@@ -328,19 +328,19 @@ out center ${MAX_RESULTS};`;
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
+                <Text style={styles.modalLabel}>{t("common:address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
+                <Text style={styles.modalLabel}>{t("common:hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
+                <Text style={styles.modalLabel}>{t("common:website")}</Text>
                 <Text
                   style={styles.modalLink}
                   numberOfLines={1}
@@ -356,7 +356,7 @@ out center ${MAX_RESULTS};`;
               !infoPlace?.address &&
               !infoPlace?.website && (
                 <Text style={styles.modalNoInfo}>
-                  {t("common.noContactInfoEmergency")}
+                  {t("common:noContactInfoEmergency")}
                 </Text>
               )}
             <View style={styles.modalActions}>
@@ -371,7 +371,7 @@ out center ${MAX_RESULTS};`;
                       styles.modalCallButtonText,
                     ]}
                   >
-                    {t("sos.callNow")}
+                    {t("callNow")}
                   </Text>
                 </Pressable>
               )}
@@ -384,7 +384,7 @@ out center ${MAX_RESULTS};`;
                 }
               >
                 <Text style={styles.modalActionButtonText}>
-                  {t("sos.navigateThere")}
+                  {t("navigateThere")}
                 </Text>
               </Pressable>
             </View>
@@ -392,7 +392,7 @@ out center ${MAX_RESULTS};`;
               style={styles.modalClose}
               onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}
             >
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
+              <Text style={styles.modalCloseText}>{t("common:close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -402,10 +402,10 @@ out center ${MAX_RESULTS};`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>{t("sos.badge")}</Text>
-        <Text style={styles.title}>{t("sos.title")}</Text>
+        <Text style={styles.headerBadge}>{t("badge")}</Text>
+        <Text style={styles.title}>{t("title")}</Text>
         <Text style={styles.subtitle}>
-          {t("sos.subtitle")}
+          {t("subtitle")}
         </Text>
       </View>
 
@@ -414,15 +414,15 @@ out center ${MAX_RESULTS};`;
         style={({ pressed }) => [styles.bigSosButton, pressed && { opacity: 0.85 }]}
         onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
         accessibilityRole="button"
-        accessibilityLabel={t("sos.callSos")}
+        accessibilityLabel={t("callSos")}
       >
         <Text style={styles.bigSosEmoji}>🆘</Text>
-        <Text style={styles.bigSosText}>{t("sos.callSos")}</Text>
+        <Text style={styles.bigSosText}>{t("callSos")}</Text>
       </Pressable>
 
       {/* ── Quick Actions ─────────────────────────────────────────── */}
       <View style={styles.quickActionsCard}>
-        <Text style={styles.quickActionsTitle}>{t("sos.quickActions")}</Text>
+        <Text style={styles.quickActionsTitle}>{t("quickActions")}</Text>
         <View style={styles.quickActionsGrid}>
           {/* Call 112 */}
           <Pressable
@@ -430,7 +430,7 @@ out center ${MAX_RESULTS};`;
             onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
           >
             <Text style={styles.quickActionEmoji}>📞</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")}</Text>
+            <Text style={styles.quickActionLabel}>{t("quickActionCall")}</Text>
           </Pressable>
           {/* Share Location */}
           <Pressable
@@ -438,7 +438,7 @@ out center ${MAX_RESULTS};`;
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); shareLocation(); }}
           >
             <Text style={styles.quickActionEmoji}>📍</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.shareLocation").replace("📍 ", "")}</Text>
+            <Text style={styles.quickActionLabel}>{t("shareLocation").replace("📍 ", "")}</Text>
           </Pressable>
           {/* Torch Screen */}
           <Pressable
@@ -446,7 +446,7 @@ out center ${MAX_RESULTS};`;
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(true); }}
           >
             <Text style={styles.quickActionEmoji}>🔦</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.quickActionTorch")}</Text>
+            <Text style={styles.quickActionLabel}>{t("quickActionTorch")}</Text>
           </Pressable>
           {/* Emergency Instructions */}
           <Pressable
@@ -454,14 +454,14 @@ out center ${MAX_RESULTS};`;
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(true); }}
           >
             <Text style={styles.quickActionEmoji}>📋</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.quickActionInstructions")}</Text>
+            <Text style={styles.quickActionLabel}>{t("quickActionInstructions")}</Text>
           </Pressable>
         </View>
       </View>
 
       {/* Universal emergency numbers */}
       <View style={styles.sosCard}>
-        <Text style={styles.sosCardTitle}>{t("sos.universalNumbers")}</Text>
+        <Text style={styles.sosCardTitle}>{t("universalNumbers")}</Text>
         <View style={styles.sosNumbersGrid}>
           {EMERGENCY_NUMBERS.map((item) => (
             <Pressable
@@ -476,7 +476,7 @@ out center ${MAX_RESULTS};`;
           ))}
         </View>
         <Pressable style={styles.shareButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); shareLocation(); }}>
-          <Text style={styles.shareButtonText}>{t("sos.shareLocation")}</Text>
+          <Text style={styles.shareButtonText}>{t("shareLocation")}</Text>
         </Pressable>
       </View>
       <Pressable
@@ -484,17 +484,17 @@ out center ${MAX_RESULTS};`;
         onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadPlaces(); }}
         disabled={loading}
         accessibilityRole="button"
-        accessibilityLabel={t("sos.findButton")}
+        accessibilityLabel={t("findButton")}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? t("common.searching") : t("sos.findButton")}
+          {loading ? t("common:searching") : t("findButton")}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" color="#ef4444" />
-          <Text style={styles.loadingText}>{t("sos.searching")}</Text>
+          <Text style={styles.loadingText}>{t("searching")}</Text>
         </View>
       )}
 
@@ -503,7 +503,7 @@ out center ${MAX_RESULTS};`;
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>{t("common:cachedResults")}</Text>
         </View>
       )}
 
@@ -514,13 +514,13 @@ out center ${MAX_RESULTS};`;
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common:viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common:viewMap")}</Text>
           </Pressable>
         </View>
       )}
@@ -568,7 +568,7 @@ out center ${MAX_RESULTS};`;
                     selected === key && styles.segmentTextActive,
                   ]}
                 >
-                  {t(`sos.categories.${key}`)}
+                  {t(`categories.${key}`)}
                 </Text>
               </Pressable>
             ))}
@@ -578,16 +578,16 @@ out center ${MAX_RESULTS};`;
           <View style={styles.sectionCard}>
             <Text style={styles.cardTitle}>
               {selected === "all"
-                ? t("sos.allNearby")
+                ? t("allNearby")
                 : t(`sos.categories.${selected}`, { defaultValue: selected })}
             </Text>
             <Text style={styles.cardDescription}>
-              {t("sos.sortedBy")}
+              {t("sortedBy")}
             </Text>
             {viewMode === "list" && (
               filtered.length === 0 ? (
                 <Text style={styles.bodyText}>
-                  {t("sos.noneInCategory")}
+                  {t("noneInCategory")}
                 </Text>
               ) : (
                 filtered.map((place) => (
@@ -645,7 +645,7 @@ out center ${MAX_RESULTS};`;
 
       {!loading && places.length === 0 && !error && (
         <Text style={styles.bodyText}>
-          {t("sos.noResults")}
+          {t("noResults")}
         </Text>
       )}
     </ScrollView>

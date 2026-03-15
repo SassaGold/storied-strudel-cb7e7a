@@ -10,27 +10,27 @@ interface Props {
 }
 
 export default function SunCard({ sunTimes }: Props) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("home");
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{t("home.sunriseSunset")}</Text>
+      <Text style={styles.cardTitle}>{t("sunriseSunset")}</Text>
       <View style={styles.sunTimesRowSpaced}>
         <View style={styles.sunTimesItem}>
           <Text style={styles.sunTimesEmoji}>🌅</Text>
           <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
-          <Text style={styles.sunTimesLabel}>{t("home.sunrise")}</Text>
+          <Text style={styles.sunTimesLabel}>{t("sunrise")}</Text>
         </View>
         <View style={styles.sunTimesDivider} />
         <View style={styles.sunTimesItem}>
           <Text style={styles.sunTimesEmoji}>🌇</Text>
           <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
-          <Text style={styles.sunTimesLabel}>{t("home.sunset")}</Text>
+          <Text style={styles.sunTimesLabel}>{t("sunset")}</Text>
         </View>
         <View style={styles.sunTimesDivider} />
         <View style={styles.sunTimesItem}>
           <Text style={styles.sunTimesEmoji}>☀️</Text>
           <Text style={styles.sunTimesValue}>{formatDuration(sunTimes.daylightMinutes)}</Text>
-          <Text style={styles.sunTimesLabel}>{t("home.daylight")}</Text>
+          <Text style={styles.sunTimesLabel}>{t("daylight")}</Text>
         </View>
       </View>
     </View>

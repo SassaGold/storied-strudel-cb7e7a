@@ -22,12 +22,12 @@ interface Props {
 }
 
 export default function WeatherCard({ weather, weatherUrl }: Props) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("home");
   const { settings } = useSettings();
 
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{t("home.localWeather")}</Text>
+      <Text style={styles.cardTitle}>{t("localWeather")}</Text>
 
       {/* Main condition row */}
       <View style={styles.weatherMainRow}>
@@ -38,7 +38,7 @@ export default function WeatherCard({ weather, weatherUrl }: Props) {
           </Text>
           {weather.feelsLikeC != null && (
             <Text style={styles.weatherFeelsLike}>
-              {t("home.feelsLike")}: {fmtTemp(weather.feelsLikeC, settings.unitSystem)}
+              {t("feelsLike")}: {fmtTemp(weather.feelsLikeC, settings.unitSystem)}
             </Text>
           )}
           <Text style={styles.weatherConditionText}>
@@ -55,12 +55,12 @@ export default function WeatherCard({ weather, weatherUrl }: Props) {
               {weather.windSpeed?.toFixed(1) ?? "0"}
               {weather.windDirection != null ? ` ${windDegToCompass(weather.windDirection)}` : ""}
             </Text>
-            <Text style={styles.weatherStatLabel}>{t("home.wind")}</Text>
+            <Text style={styles.weatherStatLabel}>{t("wind")}</Text>
           </View>
           <View style={styles.weatherStatDivider} />
           <View style={styles.weatherStatItem}>
             <Text style={styles.weatherStatValue}>{weather.precipitationProbability ?? 0}%</Text>
-            <Text style={styles.weatherStatLabel}>{t("home.rainChance")}</Text>
+            <Text style={styles.weatherStatLabel}>{t("rainChance")}</Text>
           </View>
         </View>
         <View style={styles.weatherStatsRowDivider} />
@@ -69,12 +69,12 @@ export default function WeatherCard({ weather, weatherUrl }: Props) {
             <Text style={styles.weatherStatValue}>
               {weather.humidity != null ? `${weather.humidity}%` : "—"}
             </Text>
-            <Text style={styles.weatherStatLabel}>{t("home.humidity")}</Text>
+            <Text style={styles.weatherStatLabel}>{t("humidity")}</Text>
           </View>
           <View style={styles.weatherStatDivider} />
           <View style={styles.weatherStatItem}>
             <Text style={styles.weatherStatValue}>{weather.precipitation ?? 0}</Text>
-            <Text style={styles.weatherStatLabel}>{t("home.precip")}</Text>
+            <Text style={styles.weatherStatLabel}>{t("precip")}</Text>
           </View>
         </View>
       </View>
@@ -83,7 +83,7 @@ export default function WeatherCard({ weather, weatherUrl }: Props) {
         style={styles.secondaryButton}
         onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(weatherUrl).catch(() => null); }}
       >
-        <Text style={styles.secondaryButtonText}>{t("home.openWeather")}</Text>
+        <Text style={styles.secondaryButtonText}>{t("openWeather")}</Text>
       </Pressable>
     </View>
   );
@@ -92,12 +92,12 @@ export default function WeatherCard({ weather, weatherUrl }: Props) {
 // ── Hourly forecast card ───────────────────────────────────────────────────────
 
 export function HourlyForecastCard({ weather }: { weather: WeatherInfo }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("home");
   const { settings } = useSettings();
   if (!weather.hourly || weather.hourly.length === 0) return null;
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{t("home.hourlyForecast")}</Text>
+      <Text style={styles.cardTitle}>{t("hourlyForecast")}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} nestedScrollEnabled>
         <View style={styles.hourlyCardsRow}>
           {weather.hourly.map((hour) => (
@@ -117,12 +117,12 @@ export function HourlyForecastCard({ weather }: { weather: WeatherInfo }) {
 // ── 3-day forecast card ────────────────────────────────────────────────────────
 
 export function DailyForecastCard({ weather }: { weather: WeatherInfo }) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("home");
   const { settings } = useSettings();
   if (!weather.forecast || weather.forecast.length === 0) return null;
   return (
     <View style={styles.card}>
-      <Text style={styles.cardTitle}>{t("home.forecast")}</Text>
+      <Text style={styles.cardTitle}>{t("forecast")}</Text>
       <View style={styles.forecastCardsRow}>
         {weather.forecast.slice(0, 3).map((day) => (
           <View key={day.date} style={styles.forecastCard}>

@@ -51,8 +51,8 @@ export default function AttractionsScreen() {
     cacheKey: CACHE_KEY,
     buildOverpassQuery,
     mapElement,
-    locationErrorKey: "explore.locationError",
-    loadErrorKey: "explore.loadError",
+    locationErrorKey: "explore:locationError",
+    loadErrorKey: "explore:loadError",
   });
 
   return (

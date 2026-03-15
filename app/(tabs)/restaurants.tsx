@@ -66,13 +66,13 @@ const mapElement: MapElement = (element, userLat, userLon) => {
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function RestaurantsScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("food");
   const poi = usePOIFetch({
     cacheKey: CACHE_KEY,
     buildOverpassQuery,
     mapElement,
-    locationErrorKey: "food.locationError",
-    loadErrorKey: "food.loadError",
+    locationErrorKey: "food:locationError",
+    loadErrorKey: "food:loadError",
   });
 
   return (

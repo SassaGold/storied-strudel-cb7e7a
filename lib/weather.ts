@@ -114,7 +114,7 @@ export const formatWeatherCode = (sym?: string) => {
     "lightrainandthunder", "lightsnowandthunder", "lightsleetandthunder",
     "lightrainshowersandthunder", "lightsnowshowersandthunder", "lightsleetshowersandthunder",
   ];
-  if (knownKeys.includes(s)) return `home.weather.${s}`;
+  if (knownKeys.includes(s)) return `weather.${s}`;
   return s;
 };
 
@@ -136,22 +136,22 @@ export const weatherEmoji = (sym?: string): string => {
 // ── Riding analysis ────────────────────────────────────────────────────────────
 
 export const ALERT_ICONS: Record<string, string> = {
-  "home.alerts.veryCold":    "❄️",
-  "home.alerts.cold":        "🌡️",
-  "home.alerts.extremeHeat": "🔥",
-  "home.alerts.highHeat":    "☀️",
-  "home.alerts.strongWinds": "🌬️",
-  "home.alerts.gustyWinds":  "💨",
-  "home.alerts.rainExpected":"🌧️",
+  "alerts.veryCold":    "❄️",
+  "alerts.cold":        "🌡️",
+  "alerts.extremeHeat": "🔥",
+  "alerts.highHeat":    "☀️",
+  "alerts.strongWinds": "🌬️",
+  "alerts.gustyWinds":  "💨",
+  "alerts.rainExpected":"🌧️",
 };
 export const DEFAULT_ALERT_ICON = "⚠️";
 
 export const REC_ICONS: Record<string, string> = {
-  "home.recs.thermalGear":   "🧥",
-  "home.recs.layerUp":       "🧤",
-  "home.recs.lightGear":     "👕",
-  "home.recs.secureLuggage": "🎒",
-  "home.recs.rainGear":      "☂️",
+  "recs.thermalGear":   "🧥",
+  "recs.layerUp":       "🧤",
+  "recs.lightGear":     "👕",
+  "recs.secureLuggage": "🎒",
+  "recs.rainGear":      "☂️",
 };
 export const DEFAULT_REC_ICON = "💡";
 
@@ -162,18 +162,18 @@ export function buildAlerts(weather?: WeatherInfo): string[] {
   const wind = weather.windSpeed ?? 0;
   const rainChance = weather.precipitationProbability ?? 0;
 
-  if (temp <= 0) alerts.push("home.alerts.veryCold");
-  else if (temp <= 5) alerts.push("home.alerts.cold");
-  if (temp >= 35) alerts.push("home.alerts.extremeHeat");
-  else if (temp >= 30) alerts.push("home.alerts.highHeat");
-  if (wind >= 15) alerts.push("home.alerts.strongWinds");
-  else if (wind >= 10) alerts.push("home.alerts.gustyWinds");
-  if (rainChance >= 60) alerts.push("home.alerts.rainExpected");
+  if (temp <= 0) alerts.push("alerts.veryCold");
+  else if (temp <= 5) alerts.push("alerts.cold");
+  if (temp >= 35) alerts.push("alerts.extremeHeat");
+  else if (temp >= 30) alerts.push("alerts.highHeat");
+  if (wind >= 15) alerts.push("alerts.strongWinds");
+  else if (wind >= 10) alerts.push("alerts.gustyWinds");
+  if (rainChance >= 60) alerts.push("alerts.rainExpected");
   return alerts;
 }
 
 export function ridingSuitability(weather?: WeatherInfo): { score: number; labelKey: string; color: string } {
-  if (!weather) return { score: 0, labelKey: "home.suitability.na", color: "#94a3b8" };
+  if (!weather) return { score: 0, labelKey: "suitability.na", color: "#94a3b8" };
   let score = 100;
   const temp = weather.temperatureC ?? 20;
   const wind = weather.windSpeed ?? 0;
@@ -197,11 +197,11 @@ export function ridingSuitability(weather?: WeatherInfo): { score: number; label
 
   score = Math.max(0, Math.min(100, score));
 
-  if (score >= 80) return { score, labelKey: "home.suitability.great", color: "#22c55e" };
-  if (score >= 60) return { score, labelKey: "home.suitability.good", color: "#84cc16" };
-  if (score >= 40) return { score, labelKey: "home.suitability.fair", color: "#f59e0b" };
-  if (score >= 20) return { score, labelKey: "home.suitability.poor", color: "#f97316" };
-  return { score, labelKey: "home.suitability.dangerous", color: "#ef4444" };
+  if (score >= 80) return { score, labelKey: "suitability.great", color: "#22c55e" };
+  if (score >= 60) return { score, labelKey: "suitability.good", color: "#84cc16" };
+  if (score >= 40) return { score, labelKey: "suitability.fair", color: "#f59e0b" };
+  if (score >= 20) return { score, labelKey: "suitability.poor", color: "#f97316" };
+  return { score, labelKey: "suitability.dangerous", color: "#ef4444" };
 }
 
 export function buildRecommendations(weather?: WeatherInfo): string[] {
@@ -211,10 +211,10 @@ export function buildRecommendations(weather?: WeatherInfo): string[] {
   const wind = weather.windSpeed ?? 0;
   const rainChance = weather.precipitationProbability ?? 0;
 
-  if (temp <= 0) recs.push("home.recs.thermalGear");
-  else if (temp <= 10) recs.push("home.recs.layerUp");
-  if (temp >= 30) recs.push("home.recs.lightGear");
-  if (wind >= 10) recs.push("home.recs.secureLuggage");
-  if (rainChance >= 60) recs.push("home.recs.rainGear");
+  if (temp <= 0) recs.push("recs.thermalGear");
+  else if (temp <= 10) recs.push("recs.layerUp");
+  if (temp >= 30) recs.push("recs.lightGear");
+  if (wind >= 10) recs.push("recs.secureLuggage");
+  if (rainChance >= 60) recs.push("recs.rainGear");
   return recs;
 }

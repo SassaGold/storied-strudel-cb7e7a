@@ -43,7 +43,7 @@ export interface RiderHQState {
 }
 
 export function useRiderHQ(): RiderHQState {
-  const { t } = useTranslation();
+  const { t } = useTranslation("home");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export function useRiderHQ(): RiderHQState {
       // On web (iOS Safari), 'undetermined' maps to the browser dialog — only bail
       // on 'denied'.
       if (permission.status === "denied") {
-        setError(t("home.locationError"));
+        setError(t("locationError"));
         return;
       }
 
@@ -210,7 +210,7 @@ export function useRiderHQ(): RiderHQState {
       setLastUpdated(new Date());
     } catch (e) {
       console.warn("[useRiderHQ] data fetch error:", e);
-      setError(t("home.dataError"));
+      setError(t("dataError"));
     } finally {
       setLoading(false);
     }

@@ -16,23 +16,23 @@ interface Props {
 }
 
 export default function RoadConditionsCard({ loading, roadAlerts, location }: Props) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("home");
 
   return (
     <View style={[styles.card, roadAlerts.length > 0 && styles.roadAlertCard]}>
-      <Text style={styles.cardTitle}>{t("home.roadConditions")}</Text>
+      <Text style={styles.cardTitle}>{t("roadConditions")}</Text>
 
       {loading ? (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" color="#ff6600" />
-          <Text style={styles.loadingText}>{t("home.roadConditionsLoading")}</Text>
+          <Text style={styles.loadingText}>{t("roadConditionsLoading")}</Text>
         </View>
       ) : roadAlerts.length === 0 ? (
-        <Text style={styles.roadConditionsAllClear}>{t("home.roadConditionsNone")}</Text>
+        <Text style={styles.roadConditionsAllClear}>{t("roadConditionsNone")}</Text>
       ) : (
         <>
           <Text style={styles.roadConditionsCount}>
-            {t("home.roadConditionsCount", { count: roadAlerts.length })}
+            {t("roadConditionsCount", { count: roadAlerts.length })}
           </Text>
           {roadAlerts.map((alert) => {
             const canOpen = alert.lat != null && alert.lon != null;
@@ -102,7 +102,7 @@ export default function RoadConditionsCard({ loading, roadAlerts, location }: Pr
             ).catch(() => null);
           }}
         >
-          <Text style={styles.secondaryButtonText}>{t("home.openTrafficMap")}</Text>
+          <Text style={styles.secondaryButtonText}>{t("openTrafficMap")}</Text>
         </Pressable>
       )}
     </View>

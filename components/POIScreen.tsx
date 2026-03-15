@@ -106,7 +106,7 @@ export default function POIScreen({
   i18nPrefix,
   categoryLabel,
 }: POIScreenProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
@@ -141,20 +141,20 @@ export default function POIScreen({
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.category")}</Text>
+              <Text style={styles.modalLabel}>{t("category")}</Text>
               <Text style={styles.modalValue}>
                 {fmtCategory(infoPlace?.category ?? "")}
               </Text>
             </View>
             {infoPlace?.stars && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.stars")}</Text>
+                <Text style={styles.modalLabel}>{t("stars")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.stars}★</Text>
               </View>
             )}
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
+                <Text style={styles.modalLabel}>{t("phone")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => {
@@ -168,7 +168,7 @@ export default function POIScreen({
             )}
             {infoPlace?.email && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.email")}</Text>
+                <Text style={styles.modalLabel}>{t("email")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => {
@@ -183,13 +183,13 @@ export default function POIScreen({
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
+                <Text style={styles.modalLabel}>{t("address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
+                <Text style={styles.modalLabel}>{t("website")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => {
@@ -204,19 +204,19 @@ export default function POIScreen({
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
+                <Text style={styles.modalLabel}>{t("hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && (
-              <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
+              <Text style={styles.modalNoInfo}>{t("noContactInfo")}</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>{t("common.wikiLoading")}</Text>
+              <Text style={styles.modalLoadingText}>{t("wikiLoading")}</Text>
             )}
             {wikiExtract && (
               <View style={styles.modalWikiSection}>
-                <Text style={styles.modalWikiLabel}>{t("common.wikiLabel")}</Text>
+                <Text style={styles.modalWikiLabel}>{t("wikiLabel")}</Text>
                 <Text style={styles.modalWikiExtract} numberOfLines={5}>
                   {wikiExtract}
                 </Text>
@@ -232,7 +232,7 @@ export default function POIScreen({
                   ).catch(() => null);
                 }}
               >
-                <Text style={styles.modalActionButtonText}>{t("common.reviewsGoogle")}</Text>
+                <Text style={styles.modalActionButtonText}>{t("reviewsGoogle")}</Text>
               </Pressable>
               {infoPlace?.wikipedia && (
                 <Pressable
@@ -246,13 +246,13 @@ export default function POIScreen({
                   }}
                 >
                   <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>
-                    {t("common.readWikipedia")}
+                    {t("readWikipedia")}
                   </Text>
                 </Pressable>
               )}
             </View>
             <Pressable style={styles.modalClose} onPress={handleClose}>
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
+              <Text style={styles.modalCloseText}>{t("close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -262,9 +262,9 @@ export default function POIScreen({
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>{t(`${i18nPrefix}.badge`)}</Text>
-        <Text style={styles.title}>{t(`${i18nPrefix}.title`)}</Text>
-        <Text style={styles.subtitle}>{t(`${i18nPrefix}.subtitle`)}</Text>
+        <Text style={styles.headerBadge}>{t("badge", { ns: i18nPrefix })}</Text>
+        <Text style={styles.title}>{t("title", { ns: i18nPrefix })}</Text>
+        <Text style={styles.subtitle}>{t("subtitle", { ns: i18nPrefix })}</Text>
       </View>
 
       {/* ── Find button ── */}
@@ -280,23 +280,23 @@ export default function POIScreen({
         } : undefined}
         delayLongPress={500}
         accessibilityRole="button"
-        accessibilityLabel={t(`${i18nPrefix}.findButton`)}
-        accessibilityHint={forceFetch ? t("common.forceFetchHint") : undefined}
+        accessibilityLabel={t("findButton", { ns: i18nPrefix })}
+        accessibilityHint={forceFetch ? t("forceFetchHint") : undefined}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? t("common.loading") : t(`${i18nPrefix}.findButton`)}
+          {loading ? t("loading") : t("findButton", { ns: i18nPrefix })}
         </Text>
       </Pressable>
       {/* Long-press hint — only shown when there is stale cached data visible */}
       {fromCache && places.length > 0 && forceFetch && !loading && (
-        <Text style={styles.forceFetchHint}>{t("common.forceFetchHint")}</Text>
+        <Text style={styles.forceFetchHint}>{t("forceFetchHint")}</Text>
       )}
 
       {/* ── Loading indicator ── */}
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>{t(`${i18nPrefix}.searching`)}</Text>
+          <Text style={styles.loadingText}>{t("searching", { ns: i18nPrefix })}</Text>
         </View>
       )}
 
@@ -307,14 +307,14 @@ export default function POIScreen({
       {fromCache && places.length > 0 && cacheTimestamp && loading && (
         <View style={styles.cacheBanner}>
           <Text style={styles.cacheBannerText}>
-            {t("common.staleRefreshing", { age: formatAge(cacheTimestamp) })}
+            {t("staleRefreshing", { age: formatAge(cacheTimestamp) })}
           </Text>
         </View>
       )}
       {fromCache && places.length > 0 && cacheTimestamp && refreshError && (
         <View style={[styles.cacheBanner, styles.cacheBannerOffline]}>
           <Text style={styles.cacheBannerText}>
-            {t("common.staleOffline", { age: formatAge(cacheTimestamp) })}
+            {t("staleOffline", { age: formatAge(cacheTimestamp) })}
           </Text>
         </View>
       )}
@@ -329,11 +329,11 @@ export default function POIScreen({
               setViewMode("list");
             }}
             accessibilityRole="button"
-            accessibilityLabel={t("common.viewList")}
+            accessibilityLabel={t("viewList")}
             accessibilityState={{ selected: viewMode === "list" }}
           >
             <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>
-              {t("common.viewList")}
+              {t("viewList")}
             </Text>
           </Pressable>
           <Pressable
@@ -343,11 +343,11 @@ export default function POIScreen({
               setViewMode("map");
             }}
             accessibilityRole="button"
-            accessibilityLabel={t("common.viewMap")}
+            accessibilityLabel={t("viewMap")}
             accessibilityState={{ selected: viewMode === "map" }}
           >
             <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>
-              {t("common.viewMap")}
+              {t("viewMap")}
             </Text>
           </Pressable>
         </View>
@@ -365,7 +365,7 @@ export default function POIScreen({
             latitudeDelta: 0.06,
             longitudeDelta: 0.06,
           }}
-          accessibilityLabel={t(`${i18nPrefix}.title`)}
+          accessibilityLabel={t("title", { ns: i18nPrefix })}
         >
           {places.map((place) => (
             <Marker
@@ -385,13 +385,13 @@ export default function POIScreen({
       {/* ── List view ── */}
       {viewMode === "list" && (
         places.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
+          <Text style={styles.bodyText}>{t("noResults", { ns: i18nPrefix })}</Text>
         ) : (
           <>
             {/* Pagination summary: "Showing 20 of 47 results" */}
             {totalFound > places.length && (
               <Text style={styles.paginationSummary}>
-                {t("common.showingOf", { shown: places.length, total: totalFound })}
+                {t("showingOf", { shown: places.length, total: totalFound })}
               </Text>
             )}
             {places.map((place) => (
@@ -404,7 +404,7 @@ export default function POIScreen({
                 }}
                 accessibilityRole="button"
                 accessibilityLabel={place.name}
-                accessibilityHint={t("common.openInMapsHint")}
+                accessibilityHint={t("openInMapsHint")}
               >
                 <View style={styles.placeInfo}>
                   <Text style={styles.bodyText}>{place.name}</Text>
@@ -428,8 +428,8 @@ export default function POIScreen({
                     }}
                     hitSlop={8}
                     accessibilityRole="button"
-                    accessibilityLabel={`${t("common.infoFor")} ${place.name}`}
-                    accessibilityHint={t("common.openInfoHint")}
+                    accessibilityLabel={`${t("infoFor")} ${place.name}`}
+                    accessibilityHint={t("openInfoHint")}
                   >
                     <Text style={styles.infoButtonText}>ⓘ</Text>
                   </Pressable>
@@ -445,10 +445,10 @@ export default function POIScreen({
                   onLoadMore();
                 }}
                 accessibilityRole="button"
-                accessibilityLabel={t("common.loadMore")}
-                accessibilityHint={t("common.loadMoreHint")}
+                accessibilityLabel={t("loadMore")}
+                accessibilityHint={t("loadMoreHint")}
               >
-                <Text style={styles.loadMoreText}>{t("common.loadMore")}</Text>
+                <Text style={styles.loadMoreText}>{t("loadMore")}</Text>
               </Pressable>
             )}
           </>

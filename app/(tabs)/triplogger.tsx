@@ -67,7 +67,7 @@ const formatDate = (iso: string): string => {
 };
 
 export default function TripLoggerScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("triplog");
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
 
@@ -362,8 +362,8 @@ export default function TripLoggerScreen() {
             // Android: show a persistent foreground-service notification so the
             // OS does not kill the background task.
             foregroundService: {
-              notificationTitle: t("triplog.bgServiceTitle"),
-              notificationBody: t("triplog.bgServiceBody"),
+              notificationTitle: t("bgServiceTitle"),
+              notificationBody: t("bgServiceBody"),
               notificationColor: "#ff6600",
             },
             // iOS: show the blue location pill in the status bar.
@@ -429,7 +429,7 @@ export default function TripLoggerScreen() {
       setRides(updated);
       await saveRides(updated);
     } else {
-      Alert.alert(t("triplog.tooShortTitle"), t("triplog.tooShortMsg"));
+      Alert.alert(t("tooShortTitle"), t("tooShortMsg"));
     }
   }, [rides, saveRides, t, startIdleWatch, flushBackgroundPoints]);
 
@@ -441,12 +441,12 @@ export default function TripLoggerScreen() {
 
   const confirmClearAll = useCallback(() => {
     Alert.alert(
-      t("triplog.confirmClear"),
-      t("triplog.confirmClearMsg"),
+      t("confirmClear"),
+      t("confirmClearMsg"),
       [
-        { text: t("triplog.cancel"), style: "cancel" },
+        { text: t("cancel"), style: "cancel" },
         {
-          text: t("triplog.confirm"),
+          text: t("confirm"),
           style: "destructive",
           onPress: async () => {
             setRides([]);
@@ -479,8 +479,8 @@ export default function TripLoggerScreen() {
     : 0;
 
   const isImperial = settings.unitSystem === "imperial";
-  const distUnit = isImperial ? "mi" : t("triplog.km");
-  const speedUnit = isImperial ? "mph" : t("triplog.kmh");
+  const distUnit = isImperial ? "mi" : t("km");
+  const speedUnit = isImperial ? "mph" : t("kmh");
   const displayDistVal = distanceKm >= 0.01 ? fmtDist(distanceKm, settings.unitSystem).split(" ")[0] : "0.00";
   const displayAvgSpeedVal = avgSpeedKmh > 0 ? fmtSpeed(avgSpeedKmh, settings.unitSystem).split(" ")[0] : "—";
 
@@ -488,22 +488,22 @@ export default function TripLoggerScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.badge}>{t("triplog.badge")}</Text>
-        <Text style={styles.title}>{t("triplog.title")}</Text>
-        <Text style={styles.subtitle}>{t("triplog.subtitle")}</Text>
+        <Text style={styles.badge}>{t("badge")}</Text>
+        <Text style={styles.title}>{t("title")}</Text>
+        <Text style={styles.subtitle}>{t("subtitle")}</Text>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {/* Live stats card */}
         <View style={styles.card}>
           {permError && (
-            <Text style={styles.errorText}>{t("triplog.locationPermRequired")}</Text>
+            <Text style={styles.errorText}>{t("locationPermRequired")}</Text>
           )}
 
           {recording && (
             <View style={styles.trackingBadge}>
               <Animated.View style={[styles.recDot, { opacity: pulseAnim }]} />
-              <Text style={styles.trackingText}>{t("triplog.tracking")}</Text>
+              <Text style={styles.trackingText}>{t("tracking")}</Text>
             </View>
           )}
 
@@ -513,7 +513,7 @@ export default function TripLoggerScreen() {
               speedKmh={currentSpeedKmh}
               maxKmh={isImperial ? 100 : 160}
               unit={speedUnit}
-              label={t("triplog.speedLabel")}
+              label={t("speedLabel")}
               size={190}
             />
           </View>
@@ -521,17 +521,17 @@ export default function TripLoggerScreen() {
           {/* 3-stat row: distance / duration / avg speed */}
           <View style={styles.statsRow}>
             <StatBox
-              label={t("triplog.distance")}
+              label={t("distance")}
               value={displayDistVal}
               unit={distUnit}
             />
             <StatBox
-              label={t("triplog.duration")}
+              label={t("duration")}
               value={formatDuration(elapsedMs)}
               unit=""
             />
             <StatBox
-              label={t("triplog.avgSpeed")}
+              label={t("avgSpeed")}
               value={displayAvgSpeedVal}
               unit={speedUnit}
             />
@@ -539,13 +539,13 @@ export default function TripLoggerScreen() {
 
           {recording && accuracy != null && (
             <Text style={styles.accuracyText}>
-              {t("triplog.accuracy", { value: Math.round(accuracy) })}
+              {t("accuracy", { value: Math.round(accuracy) })}
             </Text>
           )}
 
           {recording && route.length > 1 && (
             <Text style={styles.accuracyText}>
-              {t("triplog.points", { count: route.length })}
+              {t("points", { count: route.length })}
             </Text>
           )}
 
@@ -597,27 +597,27 @@ export default function TripLoggerScreen() {
             ]}
             onPress={recording ? stopRecording : startRecording}
             accessibilityRole="button"
-            accessibilityLabel={recording ? t("triplog.stop") : t("triplog.start")}
-            accessibilityHint={recording ? t("triplog.stopHint") : t("triplog.startHint")}
+            accessibilityLabel={recording ? t("stop") : t("start")}
+            accessibilityHint={recording ? t("stopHint") : t("startHint")}
           >
             <Text style={styles.mainBtnText}>
-              {recording ? `⏹  ${t("triplog.stop")}` : `▶  ${t("triplog.start")}`}
+              {recording ? `⏹  ${t("stop")}` : `▶  ${t("start")}`}
             </Text>
           </Pressable>
         </View>
 
         {/* Ride History */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{t("triplog.history")}</Text>
+          <Text style={styles.sectionTitle}>{t("history")}</Text>
           {rides.length > 0 && (
-            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); confirmClearAll(); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("triplog.clearAll")}>
-              <Text style={styles.clearAllText}>{t("triplog.clearAll")}</Text>
+            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); confirmClearAll(); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("clearAll")}>
+              <Text style={styles.clearAllText}>{t("clearAll")}</Text>
             </Pressable>
           )}
         </View>
 
         {rides.length === 0 ? (
-          <Text style={styles.emptyText}>{t("triplog.noRides")}</Text>
+          <Text style={styles.emptyText}>{t("noRides")}</Text>
         ) : (
           rides.map((ride, idx) => (
             <View key={ride.id} style={styles.rideCard}>
@@ -626,7 +626,7 @@ export default function TripLoggerScreen() {
               {/* Card header: title + date */}
               <View style={styles.rideCardHeader}>
                 <Text style={styles.rideTitle}>
-                  🏍️ {t("triplog.rideLabel", { n: rides.length - idx })}
+                  🏍️ {t("rideLabel", { n: rides.length - idx })}
                 </Text>
                 <Text style={styles.rideDate}>{formatDate(ride.date)}</Text>
               </View>
@@ -634,15 +634,15 @@ export default function TripLoggerScreen() {
               <View style={styles.rideStatChips}>
                 <View style={styles.rideStatChip}>
                   <Text style={styles.rideStatChipValue}>{fmtDist(ride.distanceKm, settings.unitSystem)}</Text>
-                  <Text style={styles.rideStatChipLabel}>📏 {t("triplog.distance")}</Text>
+                  <Text style={styles.rideStatChipLabel}>📏 {t("distance")}</Text>
                 </View>
                 <View style={styles.rideStatChip}>
                   <Text style={styles.rideStatChipValue}>{formatDuration(ride.durationMs)}</Text>
-                  <Text style={styles.rideStatChipLabel}>⏱ {t("triplog.duration")}</Text>
+                  <Text style={styles.rideStatChipLabel}>⏱ {t("duration")}</Text>
                 </View>
                 <View style={styles.rideStatChip}>
                   <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.avgSpeedKmh, settings.unitSystem)}</Text>
-                  <Text style={styles.rideStatChipLabel}>⚡ {t("triplog.avgSpeed")}</Text>
+                  <Text style={styles.rideStatChipLabel}>⚡ {t("avgSpeed")}</Text>
                 </View>
               </View>
               {/* Action buttons */}
@@ -652,7 +652,7 @@ export default function TripLoggerScreen() {
                     style={[styles.rideBtn, styles.viewRouteBtn]}
                     onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(ride); }}
                   >
-                    <Text style={styles.rideBtnText}>🗺  {t("triplog.viewMap")}</Text>
+                    <Text style={styles.rideBtnText}>🗺  {t("viewMap")}</Text>
                   </Pressable>
                 )}
                 <Pressable
@@ -660,9 +660,9 @@ export default function TripLoggerScreen() {
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); deleteRide(ride.id); }}
                   hitSlop={8}
                   accessibilityRole="button"
-                  accessibilityLabel={t("triplog.deleteRide")}
+                  accessibilityLabel={t("deleteRide")}
                 >
-                  <Text style={[styles.rideBtnText, styles.deleteBtnText]}>{t("triplog.deleteRide")}</Text>
+                  <Text style={[styles.rideBtnText, styles.deleteBtnText]}>{t("deleteRide")}</Text>
                 </Pressable>
               </View>
             </View>
@@ -680,9 +680,9 @@ export default function TripLoggerScreen() {
       >
         <View style={styles.modalContainer}>
           <View style={[styles.modalHeader, { paddingTop: insets.top + 12 }]}>
-            <Text style={styles.modalTitle}>{t("triplog.mapTitle")}</Text>
+            <Text style={styles.modalTitle}>{t("mapTitle")}</Text>
             <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(null); }}>
-              <Text style={styles.modalClose}>{t("triplog.closeMap")}</Text>
+              <Text style={styles.modalClose}>{t("closeMap")}</Text>
             </Pressable>
           </View>
           {mapRide && mapRegion && MapView ? (
@@ -702,7 +702,7 @@ export default function TripLoggerScreen() {
             </MapView>
           ) : (
             <View style={styles.noMapMsg}>
-              <Text style={styles.noMapText}>{t("triplog.mapUnavailable")}</Text>
+              <Text style={styles.noMapText}>{t("mapUnavailable")}</Text>
             </View>
           )}
           {mapRide && (

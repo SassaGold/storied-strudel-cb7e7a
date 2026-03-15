@@ -162,7 +162,7 @@ const CATEGORY_ICONS: Record<Category, string> = {
 };
 
 export default function McScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("garage");
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
@@ -319,7 +319,7 @@ out center 120;`;
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
-        setError(t("garage.locationError"));
+        setError(t("locationError"));
         return;
       }
 
@@ -355,8 +355,8 @@ out center 120;`;
       console.warn("[MC] loadPlaces error:", err);
       const message =
         err instanceof Error && err.message
-          ? `${t("garage.loadError")} (${err.message})`
-          : t("garage.loadError");
+          ? `${t("loadError")} (${err.message})`
+          : t("loadError");
       setError(message);
     } finally {
       setLoading(false);
@@ -383,12 +383,12 @@ out center 120;`;
     }
   }, []);
 
-  const sectionTitle = t(`garage.titles.${selected}`);
-  const sectionDescription = t(`garage.descriptions.${selected}`);
-  const emptyText = t(`garage.empty.${selected}`);
+  const sectionTitle = t(`titles.${selected}`);
+  const sectionDescription = t(`descriptions.${selected}`);
+  const emptyText = t(`empty.${selected}`);
   const mapsButtonLabel = selected === "fuel"
-    ? t("common.checkFuelPrices")
-    : t("common.reviewsGoogle");
+    ? t("common:checkFuelPrices")
+    : t("common:reviewsGoogle");
 
   // Paginated and optionally name-filtered visible places
   const visiblePlaces = allPlaces.slice(0, visibleCount);
@@ -409,18 +409,18 @@ out center 120;`;
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.category")}</Text>
+              <Text style={styles.modalLabel}>{t("common:category")}</Text>
               <Text style={styles.modalValue}>{infoPlace?.category}</Text>
             </View>
             {infoPlace?.note && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.note")}</Text>
+                <Text style={styles.modalLabel}>{t("common:note")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.note}</Text>
               </View>
             )}
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
+                <Text style={styles.modalLabel}>{t("common:phone")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null); }}
@@ -431,7 +431,7 @@ out center 120;`;
             )}
             {infoPlace?.email && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.email")}</Text>
+                <Text style={styles.modalLabel}>{t("common:email")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null); }}
@@ -443,13 +443,13 @@ out center 120;`;
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
+                <Text style={styles.modalLabel}>{t("common:address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
+                <Text style={styles.modalLabel}>{t("common:website")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(infoPlace.website!).catch(() => null); }}
@@ -461,13 +461,13 @@ out center 120;`;
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
+                <Text style={styles.modalLabel}>{t("common:hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {infoPlace?.fuelTypes && infoPlace.fuelTypes.length > 0 && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.fuelTypes")}</Text>
+                <Text style={styles.modalLabel}>{t("common:fuelTypes")}</Text>
                 <View style={styles.fuelTypesRow}>
                   {infoPlace.fuelTypes.map((ft) => (
                     <View key={ft} style={styles.fuelTypeBadge}>
@@ -478,14 +478,14 @@ out center 120;`;
               </View>
             )}
             {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && !infoPlace?.fuelTypes?.length && (
-              <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
+              <Text style={styles.modalNoInfo}>{t("common:noContactInfo")}</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>{t("common.wikiLoading")}</Text>
+              <Text style={styles.modalLoadingText}>{t("common:wikiLoading")}</Text>
             )}
             {wikiExtract && (
               <View style={styles.modalWikiSection}>
-                <Text style={styles.modalWikiLabel}>{t("common.wikiLabel")}</Text>
+                <Text style={styles.modalWikiLabel}>{t("common:wikiLabel")}</Text>
                 <Text style={styles.modalWikiExtract} numberOfLines={5}>{wikiExtract}</Text>
               </View>
             )}
@@ -505,12 +505,12 @@ out center 120;`;
                     Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
                   }}
                 >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common.readWikipedia")}</Text>
+                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common:readWikipedia")}</Text>
                 </Pressable>
               )}
             </View>
             <Pressable style={styles.modalClose} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); setWikiExtract(null); }}>
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
+              <Text style={styles.modalCloseText}>{t("common:close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -518,10 +518,10 @@ out center 120;`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>{t("garage.badge")}</Text>
-        <Text style={styles.title}>{t("garage.title")}</Text>
+        <Text style={styles.headerBadge}>{t("badge")}</Text>
+        <Text style={styles.title}>{t("title")}</Text>
         <Text style={styles.subtitle}>
-          {t("garage.subtitle")}
+          {t("subtitle")}
         </Text>
       </View>
 
@@ -547,11 +547,11 @@ out center 120;`;
                 setNameSearch("");
               }}
               accessibilityRole="button"
-              accessibilityLabel={t(`garage.titles.${key}`)}
+              accessibilityLabel={t(`titles.${key}`)}
             >
               <Text style={styles.segmentTileIcon}>{CATEGORY_ICONS[key]}</Text>
               <Text style={[styles.segmentTileText, isActive && { color }]}>
-                {t(`garage.titles.${key}`)}
+                {t(`titles.${key}`)}
               </Text>
             </Pressable>
           );
@@ -563,17 +563,17 @@ out center 120;`;
         onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadPlaces(); }}
         disabled={loading}
         accessibilityRole="button"
-        accessibilityLabel={t("garage.findButton", { title: sectionTitle })}
+        accessibilityLabel={t("findButton", { title: sectionTitle })}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? t("common.loading") : t("garage.findButton", { title: sectionTitle })}
+          {loading ? t("common:loading") : t("findButton", { title: sectionTitle })}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>{t("garage.searching")}</Text>
+          <Text style={styles.loadingText}>{t("searching")}</Text>
         </View>
       )}
 
@@ -582,7 +582,7 @@ out center 120;`;
       {/* Cache banner */}
       {fromCache && allPlaces.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>{t("common:cachedResults")}</Text>
         </View>
       )}
 
@@ -593,19 +593,19 @@ out center 120;`;
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}
             accessibilityRole="button"
-            accessibilityLabel={t("common.viewList")}
+            accessibilityLabel={t("common:viewList")}
             accessibilityState={{ selected: viewMode === "list" }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common:viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}
             accessibilityRole="button"
-            accessibilityLabel={t("common.viewMap")}
+            accessibilityLabel={t("common:viewMap")}
             accessibilityState={{ selected: viewMode === "map" }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common:viewMap")}</Text>
           </Pressable>
         </View>
       )}
@@ -643,11 +643,11 @@ out center 120;`;
               style={styles.searchInput}
               value={nameSearch}
               onChangeText={setNameSearch}
-              placeholder={t("garage.searchPlaceholder")}
+              placeholder={t("searchPlaceholder")}
               placeholderTextColor="#555555"
               clearButtonMode="while-editing"
               returnKeyType="search"
-              accessibilityLabel={t("garage.searchPlaceholder")}
+              accessibilityLabel={t("searchPlaceholder")}
             />
             {nameSearch.trim() ? (
               <Pressable
@@ -657,9 +657,9 @@ out center 120;`;
                   Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nameSearch.trim())}`).catch(() => null);
                 }}
                 accessibilityRole="button"
-                accessibilityLabel={t("garage.searchGoogleMaps")}
+                accessibilityLabel={t("searchGoogleMaps")}
               >
-                <Text style={styles.googleMapsSearchButtonText}>{t("garage.searchGoogleMaps")}</Text>
+                <Text style={styles.googleMapsSearchButtonText}>{t("searchGoogleMaps")}</Text>
               </Pressable>
             ) : null}
           </>
@@ -667,14 +667,14 @@ out center 120;`;
         {viewMode === "list" && (
           filteredPlaces.length === 0 && !loading ? (
             <Text style={styles.bodyText}>
-              {nameSearch.trim() && allPlaces.length > 0 ? t("garage.noSearchResults") : emptyText}
+              {nameSearch.trim() && allPlaces.length > 0 ? t("noSearchResults") : emptyText}
             </Text>
           ) : (
             <>
               {/* Pagination summary: "Showing 20 of 47 results" */}
               {!nameSearch.trim() && totalFound > visibleCount && (
                 <Text style={styles.paginationSummary}>
-                  {t("common.showingOf", { shown: visibleCount, total: totalFound })}
+                  {t("common:showingOf", { shown: visibleCount, total: totalFound })}
                 </Text>
               )}
               {filteredPlaces.map((place) => (
@@ -684,7 +684,7 @@ out center 120;`;
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}
                   accessibilityRole="button"
                   accessibilityLabel={place.name}
-                  accessibilityHint={t("common.openInMapsHint")}
+                  accessibilityHint={t("common:openInMapsHint")}
                 >
                   <View style={styles.placeInfo}>
                     <Text style={styles.bodyText}>{place.name}</Text>
@@ -713,8 +713,8 @@ out center 120;`;
                       onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInfo(place); }}
                       hitSlop={8}
                       accessibilityRole="button"
-                      accessibilityLabel={`${t("common.infoFor")} ${place.name}`}
-                      accessibilityHint={t("common.openInfoHint")}
+                      accessibilityLabel={`${t("common:infoFor")} ${place.name}`}
+                      accessibilityHint={t("common:openInfoHint")}
                     >
                       <Text style={styles.infoButtonText}>ⓘ</Text>
                     </Pressable>
@@ -730,10 +730,10 @@ out center 120;`;
                     setVisibleCount((prev) => prev + 20);
                   }}
                   accessibilityRole="button"
-                  accessibilityLabel={t("common.loadMore")}
-                  accessibilityHint={t("common.loadMoreHint")}
+                  accessibilityLabel={t("common:loadMore")}
+                  accessibilityHint={t("common:loadMoreHint")}
                 >
-                  <Text style={styles.loadMoreText}>{t("common.loadMore")}</Text>
+                  <Text style={styles.loadMoreText}>{t("common:loadMore")}</Text>
                 </Pressable>
               )}
             </>

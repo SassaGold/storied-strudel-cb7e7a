@@ -52,8 +52,8 @@ export default function HotelsScreen() {
     cacheKey: CACHE_KEY,
     buildOverpassQuery,
     mapElement,
-    locationErrorKey: "sleep.locationError",
-    loadErrorKey: "sleep.loadError",
+    locationErrorKey: "sleep:locationError",
+    loadErrorKey: "sleep:loadError",
   });
 
   return (
