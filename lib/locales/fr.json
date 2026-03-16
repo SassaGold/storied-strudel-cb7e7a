@@ -165,7 +165,8 @@
     "wind_S": "S",
     "wind_SW": "SO",
     "wind_W": "O",
-    "wind_NW": "NO"
+    "wind_NW": "NO",
+    "yesterday": "Hier"
   },
   "food": {
     "badge": "🍽️ PAUSES REPAS",

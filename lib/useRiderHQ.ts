@@ -63,6 +63,16 @@ function fetchWithTimeout(input: RequestInfo, init?: RequestInit, timeoutMs = 8_
   return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(id));
 }
 
+/**
+ * Coerce a raw API value to a valid WMO weather code in the 0-99 range.
+ * If the value is outside the valid range or not a number, falls back to 0
+ * (clear sky), which is always a safe, renderable default.
+ */
+function toWmoCode(raw: unknown): number {
+  const n = typeof raw === "number" ? Math.round(raw) : 0;
+  return n >= 0 && n <= 99 ? n : 0;
+}
+
 export function useRiderHQ(): RiderHQState {
   const { t } = useTranslation("home");
 
@@ -138,7 +148,7 @@ export function useRiderHQ(): RiderHQState {
           const current = data.current ?? {};
           if (current.temperature_2m === undefined) return null;
 
-          const symbol = wmoToSymbol(current.weather_code as number);
+          const symbol = wmoToSymbol(toWmoCode(current.weather_code));
           const precipitation: number = current.precipitation ?? 0;
           const precipProbability: number = current.precipitation_probability ?? 0;
 
@@ -161,7 +171,7 @@ export function useRiderHQ(): RiderHQState {
             ) continue;
             forecast.push({
               date: times[i],
-              weatherCode: wmoToSymbol(dailyCodes[i] as number),
+              weatherCode: wmoToSymbol(toWmoCode(dailyCodes[i])),
               maxTempC: maxTemps[i],
               minTempC: minTemps[i],
               precipitationProbability: Math.round(rainProbs[i] ?? 0),
@@ -185,7 +195,7 @@ export function useRiderHQ(): RiderHQState {
               hourly.push({
                 time: hourlyTimes[i],
                 temperatureC: hourlyTemps[i],
-                weatherCode: wmoToSymbol(hourlyCodes[i] as number),
+                weatherCode: wmoToSymbol(toWmoCode(hourlyCodes[i])),
                 precipitationProbability: Math.round(hourlyRainProbs[i] ?? 0),
               });
             }
@@ -207,6 +217,10 @@ export function useRiderHQ(): RiderHQState {
         .catch((e: unknown) => { console.warn("[useRiderHQ] weather error:", e instanceof Error ? e.message : String(e)); return null; });
 
       // Overpass (OpenStreetMap) — free road conditions, no API key required
+      // We clamp rather than reject out-of-range coordinates: GPS hardware can
+      // briefly return values outside the valid WGS-84 range during GNSS warm-up.
+      // Clamping keeps the road-alerts fetch alive while the address/weather
+      // requests (which use the raw coords) remain correct.
       const lat = Math.max(-90, Math.min(90, latitude));
       const lon = Math.max(-180, Math.min(180, longitude));
       const roadPromise = fetchWithTimeout(OVERPASS_ENDPOINTS[0], {

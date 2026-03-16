@@ -165,7 +165,8 @@
     "wind_S": "S",
     "wind_SW": "SW",
     "wind_W": "V",
-    "wind_NW": "NV"
+    "wind_NW": "NV",
+    "yesterday": "I går"
   },
   "food": {
     "badge": "🍽️ MADSTOPP",

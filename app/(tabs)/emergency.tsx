@@ -237,7 +237,12 @@ out center ${MAX_RESULTS};`;
         .filter(Boolean) as Place[];
 
       const sorted = mapped
-        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .sort((a, b) => {
+          if (a.distanceMeters == null && b.distanceMeters == null) return 0;
+          if (a.distanceMeters == null) return 1;
+          if (b.distanceMeters == null) return -1;
+          return a.distanceMeters - b.distanceMeters;
+        })
         .slice(0, 40);
       setPlaces(sorted);
       setFromCache(false);

@@ -115,7 +115,9 @@ export const formatWeatherCode = (sym?: string) => {
     "lightrainshowersandthunder", "lightsnowshowersandthunder", "lightsleetshowersandthunder",
   ];
   if (knownKeys.includes(s)) return `weather.${s}`;
-  return s;
+  // Unknown WMO extension: fall back to the generic "cloudy" translation key
+  // so the UI always shows a valid i18n string rather than a raw symbol name.
+  return "weather.cloudy";
 };
 
 export const weatherEmoji = (sym?: string): string => {
@@ -172,6 +174,32 @@ export function buildAlerts(weather?: WeatherInfo): string[] {
   return alerts;
 }
 
+/**
+ * Compute a 0-100 motorcycle riding suitability score from current weather.
+ *
+ * Scoring starts at 100 and penalties are subtracted for adverse conditions:
+ *
+ * **Temperature (°C)**
+ * - ≤ 0   → -40  (ice risk, full protective gear required)
+ * - 1–5   → -20  (very cold, thermal gear required)
+ * - 30–34 → -10  (hot, fatigue risk)
+ * - ≥ 35  → -20  (extreme heat, dehydration/heat-stroke risk)
+ *
+ * **Wind speed (km/h)**
+ * - 7–9   → -8   (noticeable crosswind)
+ * - 10–14 → -15  (strong crosswind, affects handling)
+ * - ≥ 15  → -30  (dangerous crosswind, reduced control)
+ *
+ * **Current precipitation (mm)**
+ * - 1–4   → -10  (light rain, reduced grip)
+ * - ≥ 5   → -20  (heavy rain, significantly reduced visibility/grip)
+ *
+ * **Rain probability (%)**
+ * - 60–79 → -10  (likely rain ahead)
+ * - ≥ 80  → -20  (rain almost certain)
+ *
+ * Final score is clamped to [0, 100].
+ */
 export function ridingSuitability(weather?: WeatherInfo): { score: number; labelKey: string; color: string } {
   if (!weather) return { score: 0, labelKey: "suitability.na", color: "#94a3b8" };
   let score = 100;

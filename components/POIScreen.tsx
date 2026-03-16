@@ -5,6 +5,7 @@
 
 import {
   ActivityIndicator,
+  FlatList,
   Linking,
   Modal,
   Platform,
@@ -103,11 +104,12 @@ export default function POIScreen({
 
   const fmtCategory = categoryLabel ?? ((c: string) => c);
 
-  /** Format cache age as "5 min" or "2 h" for use in the stale-data banner. */
+  /** Format cache age as "5 min", "2 h", or "3 d" for use in the stale-data banner. */
   const formatAge = (ts: number): string => {
     const diffMin = Math.floor((Date.now() - ts) / 60_000);
     if (diffMin < 60) return `${diffMin} min`;
-    return `${Math.floor(diffMin / 60)} h`;
+    if (diffMin < 1440) return `${Math.floor(diffMin / 60)} h`;
+    return `${Math.floor(diffMin / 1440)} d`;
   };
 
   const handleClose = () => {
@@ -116,21 +118,8 @@ export default function POIScreen({
   };
 
   return (
-    <ScrollView
-      style={styles.scrollView}
-      contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
-      refreshControl={
-        forceFetch ? (
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={forceFetch}
-            tintColor="#ff6600"
-            colors={["#ff6600"]}
-          />
-        ) : undefined
-      }
-    >
-      {/* ── Info modal ── */}
+    <View style={styles.scrollView}>
+      {/* ── Info modal — rendered outside the scroll container so it floats above ── */}
       <Modal
         visible={infoPlace !== null}
         transparent
@@ -259,203 +248,221 @@ export default function POIScreen({
         </Pressable>
       </Modal>
 
-      {/* ── Header ── */}
-      <View style={styles.header}>
-        <View style={styles.headerGlow} />
-        <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>{t("badge", { ns: i18nPrefix })}</Text>
-        <Text style={styles.title}>{t("title", { ns: i18nPrefix })}</Text>
-        <Text style={styles.subtitle}>{t("subtitle", { ns: i18nPrefix })}</Text>
-      </View>
-
-      {/* ── Find button ── */}
-      <Pressable
-        style={styles.primaryButton}
-        onPress={() => {
-          Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
-          onLoad();
-        }}
-        onLongPress={forceFetch ? () => {
-          Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => null);
-          forceFetch();
-        } : undefined}
-        delayLongPress={500}
-        accessibilityRole="button"
-        accessibilityLabel={t("findButton", { ns: i18nPrefix })}
-        accessibilityHint={forceFetch ? t("forceFetchHint") : undefined}
-      >
-        <Text style={styles.primaryButtonText}>
-          {loading ? t("loading") : t("findButton", { ns: i18nPrefix })}
-        </Text>
-      </Pressable>
-      {/* Long-press hint — only shown when there is stale cached data visible */}
-      {fromCache && places.length > 0 && forceFetch && !loading && (
-        <Text style={styles.forceFetchHint}>{t("forceFetchHint")}</Text>
-      )}
-
-      {/* ── Loading indicator ── */}
-      {loading && (
-        <View style={styles.loadingRow}>
-          <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>{t("searching", { ns: i18nPrefix })}</Text>
-        </View>
-      )}
-
-      {/* ── Error ── */}
-      {error && <Text style={styles.errorText}>{error}</Text>}
-
-      {/* ── Stale-cache / offline banner ── */}
-      {fromCache && places.length > 0 && cacheTimestamp && loading && (
-        <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>
-            {t("staleRefreshing", { age: formatAge(cacheTimestamp) })}
-          </Text>
-        </View>
-      )}
-      {fromCache && places.length > 0 && cacheTimestamp && refreshError && (
-        <View style={[styles.cacheBanner, styles.cacheBannerOffline]}>
-          <Text style={styles.cacheBannerText}>
-            {t("staleOffline", { age: formatAge(cacheTimestamp) })}
-          </Text>
-        </View>
-      )}
-
-      {/* ── View mode toggle (list / map) ── */}
-      {places.length > 0 && MapView && (
-        <View style={styles.viewToggleRow}>
-          <Pressable
-            style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
-            onPress={() => {
-              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-              setViewMode("list");
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={t("viewList")}
-            accessibilityState={{ selected: viewMode === "list" }}
-          >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>
-              {t("viewList")}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-            onPress={() => {
-              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-              setViewMode("map");
-            }}
-            accessibilityRole="button"
-            accessibilityLabel={t("viewMap")}
-            accessibilityState={{ selected: viewMode === "map" }}
-          >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>
-              {t("viewMap")}
-            </Text>
-          </Pressable>
-        </View>
-      )}
-
-      {/* ── Map view ── */}
-      {viewMode === "map" && userLocation && MapView && (
-        <MapView
-          style={styles.mapView}
-          provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-          showsUserLocation
-          initialRegion={{
-            latitude: userLocation.latitude,
-            longitude: userLocation.longitude,
-            latitudeDelta: 0.06,
-            longitudeDelta: 0.06,
-          }}
-          accessibilityLabel={t("title", { ns: i18nPrefix })}
-        >
-          {places.map((place) => (
-            <Marker
-              key={place.id}
-              coordinate={{ latitude: place.latitude, longitude: place.longitude }}
-              title={place.name}
-              description={fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
-              onPress={() => {
-                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                onOpenInfo(place);
-              }}
+      {/* ── FlatList — replaces ScrollView + places.map() for windowed rendering ── */}
+      <FlatList
+        data={viewMode === "list" ? places : []}
+        keyExtractor={(item) => item.id}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+        refreshControl={
+          forceFetch ? (
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={forceFetch}
+              tintColor="#ff6600"
+              colors={["#ff6600"]}
             />
-          ))}
-        </MapView>
-      )}
-
-      {/* ── List view ── */}
-      {viewMode === "list" && (
-        places.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>{t("noResults", { ns: i18nPrefix })}</Text>
-        ) : (
+          ) : undefined
+        }
+        ListHeaderComponent={() => (
           <>
-            {/* Pagination summary: "Showing 20 of 47 results" */}
-            {totalFound > places.length && (
+            {/* ── Header ── */}
+            <View style={styles.header}>
+              <View style={styles.headerGlow} />
+              <View style={styles.headerGlowSecondary} />
+              <Text style={styles.headerBadge}>{t("badge", { ns: i18nPrefix })}</Text>
+              <Text style={styles.title}>{t("title", { ns: i18nPrefix })}</Text>
+              <Text style={styles.subtitle}>{t("subtitle", { ns: i18nPrefix })}</Text>
+            </View>
+
+            {/* ── Find button ── */}
+            <Pressable
+              style={styles.primaryButton}
+              onPress={() => {
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
+                onLoad();
+              }}
+              onLongPress={forceFetch ? () => {
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Heavy).catch(() => null);
+                forceFetch();
+              } : undefined}
+              delayLongPress={500}
+              accessibilityRole="button"
+              accessibilityLabel={t("findButton", { ns: i18nPrefix })}
+              accessibilityHint={forceFetch ? t("forceFetchHint") : undefined}
+            >
+              <Text style={styles.primaryButtonText}>
+                {loading ? t("loading") : t("findButton", { ns: i18nPrefix })}
+              </Text>
+            </Pressable>
+            {/* Long-press hint — only shown when there is stale cached data visible */}
+            {fromCache && places.length > 0 && forceFetch && !loading && (
+              <Text style={styles.forceFetchHint}>{t("forceFetchHint")}</Text>
+            )}
+
+            {/* ── Loading indicator ── */}
+            {loading && (
+              <View style={styles.loadingRow}>
+                <ActivityIndicator size="small" />
+                <Text style={styles.loadingText}>{t("searching", { ns: i18nPrefix })}</Text>
+              </View>
+            )}
+
+            {/* ── Error ── */}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+
+            {/* ── Stale-cache / offline banner ── */}
+            {fromCache && places.length > 0 && cacheTimestamp && loading && (
+              <View style={styles.cacheBanner}>
+                <Text style={styles.cacheBannerText}>
+                  {t("staleRefreshing", { age: formatAge(cacheTimestamp) })}
+                </Text>
+              </View>
+            )}
+            {fromCache && places.length > 0 && cacheTimestamp && refreshError && (
+              <View style={[styles.cacheBanner, styles.cacheBannerOffline]}>
+                <Text style={styles.cacheBannerText}>
+                  {t("staleOffline", { age: formatAge(cacheTimestamp) })}
+                </Text>
+              </View>
+            )}
+
+            {/* ── View mode toggle (list / map) ── */}
+            {places.length > 0 && MapView && (
+              <View style={styles.viewToggleRow}>
+                <Pressable
+                  style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
+                  onPress={() => {
+                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                    setViewMode("list");
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("viewList")}
+                  accessibilityState={{ selected: viewMode === "list" }}
+                >
+                  <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>
+                    {t("viewList")}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
+                  onPress={() => {
+                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                    setViewMode("map");
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("viewMap")}
+                  accessibilityState={{ selected: viewMode === "map" }}
+                >
+                  <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>
+                    {t("viewMap")}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+
+            {/* ── Map view ── */}
+            {viewMode === "map" && userLocation && MapView && (
+              <MapView
+                style={styles.mapView}
+                provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+                showsUserLocation
+                initialRegion={{
+                  latitude: userLocation.latitude,
+                  longitude: userLocation.longitude,
+                  latitudeDelta: 0.06,
+                  longitudeDelta: 0.06,
+                }}
+                accessibilityLabel={t("title", { ns: i18nPrefix })}
+              >
+                {places.map((place) => (
+                  <Marker
+                    key={place.id}
+                    coordinate={{ latitude: place.latitude, longitude: place.longitude }}
+                    title={place.name}
+                    description={fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
+                    onPress={() => {
+                      Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                      onOpenInfo(place);
+                    }}
+                  />
+                ))}
+              </MapView>
+            )}
+
+            {/* ── No results (list mode, no data, not loading) ── */}
+            {viewMode === "list" && places.length === 0 && !loading && (
+              <Text style={styles.bodyText}>{t("noResults", { ns: i18nPrefix })}</Text>
+            )}
+
+            {/* ── Pagination summary: "Showing 20 of 47 results" ── */}
+            {viewMode === "list" && places.length > 0 && totalFound > places.length && (
               <Text style={styles.paginationSummary}>
                 {t("showingOf", { shown: places.length, total: totalFound })}
               </Text>
             )}
-            {places.map((place) => (
-              <Pressable
-                key={place.id}
-                style={styles.placeRow}
-                onPress={() => {
-                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                  onOpenInMaps(place);
-                }}
-                accessibilityRole="button"
-                accessibilityLabel={place.name}
-                accessibilityHint={t("openInMapsHint")}
-              >
-                <View style={styles.placeInfo}>
-                  <Text style={styles.bodyText}>{place.name}</Text>
-                  <View style={styles.tagRow}>
-                    <Text style={styles.metaText}>{fmtCategory(place.category)}</Text>
-                    {place.stars && (
-                      <Text style={styles.starsTag}>{place.stars}★</Text>
-                    )}
-                  </View>
-                </View>
-                <View style={styles.placeRight}>
-                  <Text style={styles.metaText}>
-                    {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
-                  </Text>
-                  <Pressable
-                    style={styles.infoButton}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                      onOpenInfo(place);
-                    }}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${t("infoFor")} ${place.name}`}
-                    accessibilityHint={t("openInfoHint")}
-                  >
-                    <Text style={styles.infoButtonText}>ⓘ</Text>
-                  </Pressable>
-                </View>
-              </Pressable>
-            ))}
-            {/* Load More button — only shown when more results are available */}
-            {totalFound > places.length && (
-              <Pressable
-                style={styles.loadMoreButton}
-                onPress={() => {
-                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-                  onLoadMore();
-                }}
-                accessibilityRole="button"
-                accessibilityLabel={t("loadMore")}
-                accessibilityHint={t("loadMoreHint")}
-              >
-                <Text style={styles.loadMoreText}>{t("loadMore")}</Text>
-              </Pressable>
-            )}
           </>
-        )
-      )}
-    </ScrollView>
+        )}
+        renderItem={({ item: place }) => (
+          <Pressable
+            style={styles.placeRow}
+            onPress={() => {
+              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+              onOpenInMaps(place);
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={place.name}
+            accessibilityHint={t("openInMapsHint")}
+          >
+            <View style={styles.placeInfo}>
+              <Text style={styles.bodyText}>{place.name}</Text>
+              <View style={styles.tagRow}>
+                <Text style={styles.metaText}>{fmtCategory(place.category)}</Text>
+                {place.stars && (
+                  <Text style={styles.starsTag}>{place.stars}★</Text>
+                )}
+              </View>
+            </View>
+            <View style={styles.placeRight}>
+              <Text style={styles.metaText}>
+                {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
+              </Text>
+              <Pressable
+                style={styles.infoButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                  onOpenInfo(place);
+                }}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={`${t("infoFor")} ${place.name}`}
+                accessibilityHint={t("openInfoHint")}
+              >
+                <Text style={styles.infoButtonText}>ⓘ</Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        )}
+        ListFooterComponent={() =>
+          viewMode === "list" && totalFound > places.length ? (
+            <Pressable
+              style={styles.loadMoreButton}
+              onPress={() => {
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                onLoadMore();
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t("loadMore")}
+              accessibilityHint={t("loadMoreHint")}
+            >
+              <Text style={styles.loadMoreText}>{t("loadMore")}</Text>
+            </Pressable>
+          ) : null
+        }
+      />
+    </View>
   );
 }
 

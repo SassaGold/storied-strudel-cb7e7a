@@ -56,6 +56,8 @@ export const OVERPASS_ENDPOINTS = [
 const DEFAULT_TIMEOUT_MS = 40_000;
 /** Base delay for exponential backoff between endpoint retries (ms). */
 const BACKOFF_BASE_MS = 500;
+/** Maximum backoff per retry to prevent very long waits when many mirrors are added. */
+const BACKOFF_MAX_MS = 5_000;
 
 /**
  * POST a query to the Overpass API, cycling through mirrors on failure.
@@ -77,7 +79,7 @@ export async function fetchOverpass(
 
     // Apply exponential backoff between retries (not before the first attempt)
     if (i > 0) {
-      const backoffMs = BACKOFF_BASE_MS * 2 ** (i - 1) + Math.random() * 200;
+      const backoffMs = Math.min(BACKOFF_BASE_MS * 2 ** (i - 1) + Math.random() * 200, BACKOFF_MAX_MS);
       await new Promise((resolve) => setTimeout(resolve, backoffMs));
     }
 
@@ -103,9 +105,11 @@ export async function fetchOverpass(
       signal?.removeEventListener("abort", onCallerAbort);
 
       if (response.status === 429) {
-        // Rate-limited: respect Retry-After if present, then continue to next endpoint
+        // Rate-limited: respect Retry-After if present, then continue to next endpoint.
+        // Cap at 30 s so we honour the server's guidance up to a reasonable limit
+        // without blocking the user for too long; longer waits move on to the next mirror.
         const retryAfter = response.headers.get("Retry-After");
-        const waitMs = retryAfter ? Math.min(parseFloat(retryAfter) * 1000, 10_000) : 2_000;
+        const waitMs = retryAfter ? Math.min(parseFloat(retryAfter) * 1000, 30_000) : 2_000;
         await new Promise((resolve) => setTimeout(resolve, waitMs));
         lastError = "Rate limited (429)";
         continue;

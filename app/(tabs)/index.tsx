@@ -164,7 +164,7 @@ export default function Index() {
             {address?.displayName ?? t("addressNotAvailable")}
           </Text>
           <Text style={styles.metaText}>
-            Lat {location.coords.latitude.toFixed(4)} · Lon {location.coords.longitude.toFixed(4)}
+            Lat {location.coords.latitude.toFixed(3)} · Lon {location.coords.longitude.toFixed(3)}
           </Text>
           <Text style={styles.metaText}>
             {t("accuracy", { value: Math.round(location.coords.accuracy ?? 0) })}
@@ -219,7 +219,26 @@ export default function Index() {
 
       {lastUpdated && (
         <Text style={styles.metaText}>
-          {t("lastUpdated", { time: lastUpdated.toLocaleTimeString(i18n.language || undefined, { hour: "2-digit", minute: "2-digit" }) })}
+          {t("lastUpdated", {
+            time: (() => {
+              const locale = i18n.language || undefined;
+              const timeStr = lastUpdated.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+              const now = new Date();
+              const isToday =
+                lastUpdated.getFullYear() === now.getFullYear() &&
+                lastUpdated.getMonth() === now.getMonth() &&
+                lastUpdated.getDate() === now.getDate();
+              if (isToday) return timeStr;
+              const yesterday = new Date(now);
+              yesterday.setDate(now.getDate() - 1);
+              const isYesterday =
+                lastUpdated.getFullYear() === yesterday.getFullYear() &&
+                lastUpdated.getMonth() === yesterday.getMonth() &&
+                lastUpdated.getDate() === yesterday.getDate();
+              if (isYesterday) return `${t("yesterday")} ${timeStr}`;
+              return `${lastUpdated.toLocaleDateString(locale, { month: "short", day: "numeric" })} ${timeStr}`;
+            })(),
+          })}
         </Text>
       )}
 

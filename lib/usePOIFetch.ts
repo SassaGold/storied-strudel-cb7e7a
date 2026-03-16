@@ -232,7 +232,14 @@ export function usePOIFetch({
         .filter(Boolean) as Place[];
 
       const sorted = mapped
-        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
+        .sort((a, b) => {
+          // Push places with unknown distance to the end rather than
+          // treating null as 0 (which would place them at the top).
+          if (a.distanceMeters == null && b.distanceMeters == null) return 0;
+          if (a.distanceMeters == null) return 1;
+          if (b.distanceMeters == null) return -1;
+          return a.distanceMeters - b.distanceMeters;
+        });
 
       setAllPlaces(sorted);
       setVisibleCount(PAGE_SIZE);

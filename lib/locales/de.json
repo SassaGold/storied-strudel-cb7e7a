@@ -165,7 +165,8 @@
     "wind_S": "S",
     "wind_SW": "SW",
     "wind_W": "W",
-    "wind_NW": "NW"
+    "wind_NW": "NW",
+    "yesterday": "Gestern"
   },
   "food": {
     "badge": "🍽️ ESSENSSTOPPS",
