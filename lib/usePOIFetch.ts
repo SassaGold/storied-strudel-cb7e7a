@@ -3,7 +3,7 @@
 // previously copy-pasted across restaurants.tsx, hotels.tsx and attractions.tsx.
 
 import { useCallback, useRef, useState } from "react";
-import { Linking } from "react-native";
+import { Alert, Linking } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "./settings";
@@ -13,6 +13,12 @@ import { wikipediaSummaryUrl } from "./config";
 
 /** How many results to show initially and on each "Load More" tap. */
 const PAGE_SIZE = 20;
+
+/**
+ * Minimum milliseconds between Overpass fetch requests to avoid overloading
+ * the shared public infrastructure when the user taps Find rapidly.
+ */
+const FETCH_COOLDOWN_MS = 5_000;
 
 /**
  * Module-level cache for Wikipedia summaries keyed by "<lang>/<title>".
@@ -149,8 +155,16 @@ export function usePOIFetch({
   // AbortController ref for request deduplication (#6): cancels any in-flight
   // Overpass request before starting a new one so rapid taps don't race.
   const abortRef = useRef<AbortController | null>(null);
+  // Tracks the timestamp of the last initiated fetch to enforce FETCH_COOLDOWN_MS.
+  const lastFetchRef = useRef<number>(0);
 
   const loadPlaces = useCallback(async () => {
+    // Rate-limit: silently skip if a fetch was started within the last
+    // FETCH_COOLDOWN_MS milliseconds to avoid hammering the public Overpass servers.
+    const now = Date.now();
+    if (now - lastFetchRef.current < FETCH_COOLDOWN_MS) return;
+    lastFetchRef.current = now;
+
     // Cancel any in-flight request before starting a fresh one
     abortRef.current?.abort();
     const controller = new AbortController();
@@ -173,7 +187,7 @@ export function usePOIFetch({
         }
       }
     } catch (e) {
-      console.warn("[usePOIFetch] cache read error:", e);
+      console.warn("[usePOIFetch] cache read error:", e instanceof Error ? e.message : String(e));
     }
 
     setLoading(true);
@@ -181,6 +195,20 @@ export function usePOIFetch({
     setRefreshError(false);
 
     try {
+      // Show an in-app rationale before triggering the OS permission dialog
+      // so the user understands why location access is required.
+      const { status: currentStatus } = await Location.getForegroundPermissionsAsync();
+      if (currentStatus === "undetermined") {
+        await new Promise<void>((resolve) =>
+          Alert.alert(
+            t("locationRationaleTitle"),
+            t("locationRationaleBody"),
+            [{ text: "OK", onPress: () => resolve() }],
+            { cancelable: false }
+          )
+        );
+      }
+
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
         setError(t(locationErrorKey));
@@ -216,13 +244,13 @@ export function usePOIFetch({
           JSON.stringify({ ts: Date.now(), data: sorted })
         );
       } catch (e) {
-        console.warn("[usePOIFetch] cache write error:", e);
+        console.warn("[usePOIFetch] cache write error:", e instanceof Error ? e.message : String(e));
       }
     } catch (e) {
       if (e instanceof Error && (e.name === "AbortError" || e.message === "Cancelled")) {
         return; // Silently ignore cancellation
       }
-      console.warn("[usePOIFetch] load error:", e);
+      console.warn("[usePOIFetch] load error:", e instanceof Error ? e.message : String(e));
       if (hadCachedData) {
         // Stale data is already visible — set the offline flag instead of
         // replacing the list with a hard error message.
@@ -241,12 +269,14 @@ export function usePOIFetch({
   }, []);
 
   const forceFetch = useCallback(async () => {
+    // Reset rate-limit timer so a force-refresh always goes through immediately.
+    lastFetchRef.current = 0;
     // Delete the cached entry so `loadPlaces` starts with a blank slate —
     // no stale data is pre-filled and the user sees a clean loading state.
     try {
       await AsyncStorage?.removeItem(cacheKey);
     } catch (e) {
-      console.warn("[usePOIFetch] cache clear error:", e);
+      console.warn("[usePOIFetch] cache clear error:", e instanceof Error ? e.message : String(e));
     }
     setAllPlaces([]);
     setFromCache(false);
@@ -257,7 +287,7 @@ export function usePOIFetch({
 
   const openInMaps = useCallback((place: Place) => {
     const url = buildMapsUrl(place.latitude, place.longitude, place.name);
-    Linking.openURL(url).catch((e) => console.warn("[usePOIFetch] openInMaps error:", e));
+    Linking.openURL(url).catch((e) => console.warn("[usePOIFetch] openInMaps error:", e instanceof Error ? e.message : String(e)));
   }, []);
 
   const openInfo = useCallback((place: Place) => {
@@ -285,7 +315,7 @@ export function usePOIFetch({
           if (extract) wikiCache.set(cacheKey, extract);
           setWikiExtract(extract);
         })
-        .catch((e) => { console.warn("[usePOIFetch] wikipedia error:", e); setWikiExtract(null); })
+        .catch((e) => { console.warn("[usePOIFetch] wikipedia error:", e instanceof Error ? e.message : String(e)); setWikiExtract(null); })
         .finally(() => { clearTimeout(wikiTimeout); setWikiLoading(false); });
     }
   }, []);

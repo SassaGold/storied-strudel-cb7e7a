@@ -44,7 +44,9 @@
     "infoFor": "Info for",
     "staleRefreshing": "🔄 Refreshing… last data {{age}} ago",
     "staleOffline": "⚠️ Offline — showing data from {{age}} ago",
-    "forceFetchHint": "🔄 Long-press to clear cache & force new search"
+    "forceFetchHint": "🔄 Long-press to clear cache & force new search",
+    "locationRationaleTitle": "Location Access Needed",
+    "locationRationaleBody": "Roamly uses your location to find nearby places and show weather for your ride. Your GPS data stays on your device."
   },
   "language": {
     "label": "🌍 Language",

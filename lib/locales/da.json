@@ -44,7 +44,9 @@
     "infoFor": "Info om",
     "staleRefreshing": "🔄 Opdaterer… seneste data for {{age}} siden",
     "staleOffline": "⚠️ Offline — viser data fra {{age}} siden",
-    "forceFetchHint": "🔄 Hold nede for at rydde cache & søge forfra"
+    "forceFetchHint": "🔄 Hold nede for at rydde cache & søge forfra",
+    "locationRationaleTitle": "Placeringsadgang kræves",
+    "locationRationaleBody": "Roamly bruger din placering til at finde steder i nærheden og vise vejret for din tur. Dine GPS-data forbliver på din enhed."
   },
   "language": {
     "label": "🌍 Sprog",

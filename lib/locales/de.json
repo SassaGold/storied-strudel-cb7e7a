@@ -44,7 +44,9 @@
     "infoFor": "Info zu",
     "staleRefreshing": "🔄 Wird aktualisiert… letzte Daten vor {{age}}",
     "staleOffline": "⚠️ Offline — Daten von vor {{age}}",
-    "forceFetchHint": "🔄 Lang drücken zum Cache leeren & neue Suche starten"
+    "forceFetchHint": "🔄 Lang drücken zum Cache leeren & neue Suche starten",
+    "locationRationaleTitle": "Standortzugriff erforderlich",
+    "locationRationaleBody": "Roamly verwendet Ihren Standort, um nahegelegene Orte zu finden und das Wetter für Ihre Fahrt anzuzeigen. Ihre GPS-Daten bleiben auf Ihrem Gerät."
   },
   "language": {
     "label": "🌍 Sprache",

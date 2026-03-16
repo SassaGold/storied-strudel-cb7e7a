@@ -44,7 +44,9 @@
     "infoFor": "Upplýsingar um",
     "staleRefreshing": "🔄 Uppfæri… síðustu gögn fyrir {{age}}",
     "staleOffline": "⚠️ Án nettengingar — gögn frá {{age}}",
-    "forceFetchHint": "🔄 Haltu inni til að hreinsa skyndiminni og leita að nýju"
+    "forceFetchHint": "🔄 Haltu inni til að hreinsa skyndiminni og leita að nýju",
+    "locationRationaleTitle": "Staðsetningaraðgangur nauðsynlegur",
+    "locationRationaleBody": "Roamly notar staðsetningu þína til að finna staði í nágrenninu og sýna veður fyrir ferðina þína. GPS-gögn þín eru geymd á tækinu þínu."
   },
   "language": {
     "label": "🌍 Tungumál",

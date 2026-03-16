@@ -3,7 +3,7 @@
 // derived state, and the openMaps helper.
 
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Linking, Platform } from "react-native";
+import { Alert, Linking, Platform } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import {
@@ -86,6 +86,20 @@ export function useRiderHQ(): RiderHQState {
     setLoading(true);
     setError(null);
     try {
+      // Show an in-app rationale before triggering the OS permission dialog
+      // so the user understands why location access is required.
+      const { status: currentStatus } = await Location.getForegroundPermissionsAsync();
+      if (currentStatus === "undetermined") {
+        await new Promise<void>((resolve) =>
+          Alert.alert(
+            t("common:locationRationaleTitle"),
+            t("common:locationRationaleBody"),
+            [{ text: "OK", onPress: () => resolve() }],
+            { cancelable: false }
+          )
+        );
+      }
+
       const permission = await Location.requestForegroundPermissionsAsync();
       // On web (iOS Safari), 'undetermined' maps to the browser dialog — only bail
       // on 'denied'.
@@ -112,7 +126,7 @@ export function useRiderHQ(): RiderHQState {
           city: data.address?.city || data.address?.town || data.address?.village,
           country: data.address?.country,
         }))
-        .catch((e: unknown) => { console.warn("[useRiderHQ] address error:", e); return null; });
+        .catch((e: unknown) => { console.warn("[useRiderHQ] address error:", e instanceof Error ? e.message : String(e)); return null; });
 
       // Open-Meteo — free, browser-friendly weather API (no API key required)
       const weatherPromise = fetchWithTimeout(
@@ -190,7 +204,7 @@ export function useRiderHQ(): RiderHQState {
             hourly,
           };
         })
-        .catch((e: unknown) => { console.warn("[useRiderHQ] weather error:", e); return null; });
+        .catch((e: unknown) => { console.warn("[useRiderHQ] weather error:", e instanceof Error ? e.message : String(e)); return null; });
 
       // Overpass (OpenStreetMap) — free road conditions, no API key required
       const lat = Math.max(-90, Math.min(90, latitude));
@@ -227,7 +241,7 @@ export function useRiderHQ(): RiderHQState {
             .filter((a) => ROAD_TYPES.has(a.type.toLowerCase()))
             .slice(0, 10);
         })
-        .catch((e: unknown) => { console.warn("[useRiderHQ] road alerts error:", e); return [] as RoadAlert[]; });
+        .catch((e: unknown) => { console.warn("[useRiderHQ] road alerts error:", e instanceof Error ? e.message : String(e)); return [] as RoadAlert[]; });
 
       const [addressResult, weatherResult, roadResult] = await Promise.all([
         addressPromise,
@@ -244,7 +258,7 @@ export function useRiderHQ(): RiderHQState {
       setLastUpdated(new Date());
     } catch (e) {
       if (e instanceof Error && e.name === "AbortError") return;
-      console.warn("[useRiderHQ] data fetch error:", e);
+      console.warn("[useRiderHQ] data fetch error:", e instanceof Error ? e.message : String(e));
       setError(t("dataError"));
     } finally {
       if (!controller.signal.aborted) setLoading(false);
@@ -273,7 +287,7 @@ export function useRiderHQ(): RiderHQState {
       Platform.OS === "ios"
         ? `maps://?ll=${latitude},${longitude}&q=${latitude},${longitude}`
         : `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-    Linking.openURL(url).catch((e) => console.warn("[useRiderHQ] openMaps error:", e));
+    Linking.openURL(url).catch((e) => console.warn("[useRiderHQ] openMaps error:", e instanceof Error ? e.message : String(e)));
   }, [location]);
 
   return {
