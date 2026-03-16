@@ -16,23 +16,9 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS, parseWikiTag, OverpassElement, buildMapsUrl } from "../../lib/overpass";
-// Safely load react-native-maps: requires a custom dev/production build.
-// In Expo Go or any environment where the native module isn't compiled in,
-// MapView and Marker will be null and the map toggle is hidden automatically.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Marker: any = rnMaps?.Marker;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-// Safely load AsyncStorage: the native implementation throws at module-evaluation
-// time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
-// Using require() in try/catch means the screen still loads; the existing
-// try/catch wrappers inside loadPlaces already handle AsyncStorage === null.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics, AsyncStorage, MapView, Marker, PROVIDER_GOOGLE } from "../../lib/safeRequire";
+import { wikiCache } from "../../lib/usePOIFetch";
+import { wikipediaSummaryUrl, wikipediaPageUrl } from "../../lib/config";
 
 type Place = {
   id: string;
@@ -353,15 +339,12 @@ out center 120;`;
         return; // Silently ignore cancellation
       }
       console.warn("[MC] loadPlaces error:", err);
-      const message =
-        err instanceof Error && err.message
-          ? `${t("loadError")} (${err.message})`
-          : t("loadError");
-      setError(message);
+      setError(t("loadError"));
     } finally {
       setLoading(false);
     }
-  }, [selected, t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
 
   const openInMaps = useCallback((place: Place) => {
     const url = buildMapsUrl(place.latitude, place.longitude, place.name);
@@ -372,14 +355,26 @@ out center 120;`;
     setInfoPlace(place);
     setWikiExtract(null);
     if (place.wikipedia) {
-      setWikiLoading(true);
       const { lang, title } = parseWikiTag(place.wikipedia);
-      // Wikipedia REST API — free, no API key required
-      fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
+      const key = `${lang}/${title}`;
+      // Return cached extract immediately if available
+      if (wikiCache.has(key)) {
+        setWikiExtract(wikiCache.get(key)!);
+        return;
+      }
+      setWikiLoading(true);
+      // Wikipedia REST API — free, no API key required; 8 s timeout to prevent hangs
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8_000);
+      fetch(wikipediaSummaryUrl(lang, title), { signal: controller.signal })
         .then((r) => r.json())
-        .then((data: { extract?: string }) => setWikiExtract((data.extract || "").trim() || null))
+        .then((data: { extract?: string }) => {
+          const extract = (data.extract || "").trim() || null;
+          if (extract) wikiCache.set(key, extract);
+          setWikiExtract(extract);
+        })
         .catch((e) => { console.warn("[MC] wikipedia error:", e); setWikiExtract(null); })
-        .finally(() => setWikiLoading(false));
+        .finally(() => { clearTimeout(timeout); setWikiLoading(false); });
     }
   }, []);
 
@@ -505,7 +500,7 @@ out center 120;`;
                   onPress={() => {
                     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                     const { lang, title } = parseWikiTag(infoPlace.wikipedia!);
-                    Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
+                    Linking.openURL(wikipediaPageUrl(lang, title)).catch(() => null);
                   }}
                 >
                   <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common:readWikipedia")}</Text>

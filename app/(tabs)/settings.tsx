@@ -5,8 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics } from "../../lib/safeRequire";
 
 const RADIUS_OPTIONS = [2, 5, 10, 15, 20] as const;
 

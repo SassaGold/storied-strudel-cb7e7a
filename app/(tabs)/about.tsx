@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics } from "../../lib/safeRequire";
 
 const APP_VERSION: string =
   (Constants.expoConfig?.version ?? "1.0.0") as string;

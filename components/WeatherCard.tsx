@@ -13,9 +13,7 @@ import {
   formatForecastDate,
   type WeatherInfo,
 } from "../lib/weather";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics } from "../lib/safeRequire";
 
 interface Props {
   weather: WeatherInfo;

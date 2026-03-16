@@ -21,19 +21,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../lib/settings";
 import { parseWikiTag } from "../lib/overpass";
 import type { Place } from "../lib/usePOIFetch";
-
-// Safely load react-native-maps: requires a custom dev/production build.
-// In Expo Go or any environment where the native module isn't compiled in,
-// MapView and Marker will be null and the map toggle is hidden automatically.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Marker: any = rnMaps?.Marker;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics, MapView, Marker, PROVIDER_GOOGLE } from "../lib/safeRequire";
+import { wikipediaPageUrl } from "../lib/config";
 
 // ── Component props ───────────────────────────────────────────────────────────
 
@@ -254,9 +243,7 @@ export default function POIScreen({
                   onPress={() => {
                     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                     const { lang, title } = parseWikiTag(infoPlace.wikipedia!);
-                    Linking.openURL(
-                      `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`
-                    ).catch(() => null);
+                    Linking.openURL(wikipediaPageUrl(lang, title)).catch(() => null);
                   }}
                 >
                   <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>

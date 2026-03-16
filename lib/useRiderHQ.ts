@@ -17,6 +17,13 @@ import {
 } from "./weather";
 import { computeSunTimes, type SunTimes } from "./sun";
 import { type GeoAddress, type RoadAlert, ROAD_TYPES, haversineKm } from "./roads";
+import { OVERPASS_ENDPOINTS } from "./overpass";
+import {
+  nominatimReverseUrl,
+  openMeteoForecastUrl,
+  yrNoForecastUrl,
+  YR_NO_HOME_URL,
+} from "./config";
 
 export type { WeatherInfo, ForecastDay, HourlyForecast, GeoAddress, RoadAlert, SunTimes };
 
@@ -96,7 +103,7 @@ export function useRiderHQ(): RiderHQState {
 
       // Nominatim (OpenStreetMap) — free reverse geocoding, no API key required
       const addressPromise = fetchWithTimeout(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
+        nominatimReverseUrl(latitude, longitude),
         { headers: { "User-Agent": "roamly-app" }, signal: controller.signal }
       )
         .then((r) => r.json())
@@ -109,11 +116,7 @@ export function useRiderHQ(): RiderHQState {
 
       // Open-Meteo — free, browser-friendly weather API (no API key required)
       const weatherPromise = fetchWithTimeout(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(4)}&longitude=${longitude.toFixed(4)}` +
-        `&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,relative_humidity_2m,precipitation,weather_code,precipitation_probability` +
-        `&hourly=temperature_2m,weather_code,precipitation_probability` +
-        `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
-        `&forecast_days=4&timezone=auto`,
+        openMeteoForecastUrl(latitude, longitude),
         { signal: controller.signal }
       )
         .then((r) => r.json())
@@ -192,7 +195,7 @@ export function useRiderHQ(): RiderHQState {
       // Overpass (OpenStreetMap) — free road conditions, no API key required
       const lat = Math.max(-90, Math.min(90, latitude));
       const lon = Math.max(-180, Math.min(180, longitude));
-      const roadPromise = fetchWithTimeout("https://overpass-api.de/api/interpreter", {
+      const roadPromise = fetchWithTimeout(OVERPASS_ENDPOINTS[0], {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `data=[out:json][timeout:10];(way["highway"="construction"](around:10000,${lat},${lon});node["highway"="construction"](around:10000,${lat},${lon});way["construction"~"."](around:10000,${lat},${lon});node["construction"~"."](around:10000,${lat},${lon}););out center 20;`,
@@ -260,8 +263,8 @@ export function useRiderHQ(): RiderHQState {
     [location]
   );
   const weatherUrl = location
-    ? `https://www.yr.no/en/forecast/daily-table/${encodeURIComponent(`${location.coords.latitude.toFixed(4)},${location.coords.longitude.toFixed(4)}`)}`
-    : "https://www.yr.no";
+    ? yrNoForecastUrl(location.coords.latitude, location.coords.longitude)
+    : YR_NO_HOME_URL;
 
   const openMaps = useCallback(() => {
     if (!location) return;

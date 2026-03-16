@@ -15,33 +15,8 @@ import {
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS, buildMapsUrl } from "../../lib/overpass";
-// Safely load expo-haptics: may not be available in all environments
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-// Safely load react-native-maps: requires a custom dev/production build.
-// In Expo Go or any environment where the native module isn't compiled in,
-// MapView and Marker will be null and the map toggle is hidden automatically.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Marker: any = rnMaps?.Marker;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-// Safely load AsyncStorage: the native implementation throws at module-evaluation
-// time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
-// Using require() in try/catch means the screen still loads; the existing
-// try/catch wrappers inside loadPlaces already handle AsyncStorage === null.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
-
-type OverpassElement = {
-  id: number;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: Record<string, string>;
-};
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, buildMapsUrl, type OverpassElement } from "../../lib/overpass";
+import { Haptics, AsyncStorage, MapView, Marker, PROVIDER_GOOGLE } from "../../lib/safeRequire";
 
 /** Maximum results to fetch from Overpass API (balances response time vs. coverage) */
 const MAX_RESULTS = 80;
@@ -86,12 +61,13 @@ const formatDistance = (d?: number) => {
   return d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`;
 };
 
+/** Emergency numbers with i18n region keys — displayed in the universal numbers grid. */
 const EMERGENCY_NUMBERS = [
-  { region: "EU / Intl", number: "112", emoji: "🌍" },
-  { region: "USA / CA", number: "911", emoji: "🇺🇸" },
-  { region: "UK", number: "999", emoji: "🇬🇧" },
-  { region: "Australia", number: "000", emoji: "🇦🇺" },
-  { region: "NZ", number: "111", emoji: "🇳🇿" },
+  { regionKey: "euIntl",    number: "112", emoji: "🌍" },
+  { regionKey: "usaCa",     number: "911", emoji: "🇺🇸" },
+  { regionKey: "uk",        number: "999", emoji: "🇬🇧" },
+  { regionKey: "australia", number: "000", emoji: "🇦🇺" },
+  { regionKey: "nz",        number: "111", emoji: "🇳🇿" },
 ];
 
 /** Initiates a phone call; falls back to an alert if the device cannot handle it.
@@ -499,7 +475,7 @@ out center ${MAX_RESULTS};`;
             >
               <Text style={styles.sosNumberEmoji}>{item.emoji}</Text>
               <Text style={styles.sosNumber}>{item.number}</Text>
-              <Text style={styles.sosRegion}>{item.region}</Text>
+              <Text style={styles.sosRegion}>{t(`regions.${item.regionKey}`)}</Text>
             </Pressable>
           ))}
         </View>

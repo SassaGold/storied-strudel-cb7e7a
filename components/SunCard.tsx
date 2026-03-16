@@ -3,6 +3,7 @@
 
 import { StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import i18n from "../lib/i18n";
 import { formatTime, formatDuration, type SunTimes } from "../lib/sun";
 
 interface Props {
@@ -17,13 +18,13 @@ export default function SunCard({ sunTimes }: Props) {
       <View style={styles.sunTimesRowSpaced}>
         <View style={styles.sunTimesItem}>
           <Text style={styles.sunTimesEmoji}>🌅</Text>
-          <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise)}</Text>
+          <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunrise, i18n.language)}</Text>
           <Text style={styles.sunTimesLabel}>{t("sunrise")}</Text>
         </View>
         <View style={styles.sunTimesDivider} />
         <View style={styles.sunTimesItem}>
           <Text style={styles.sunTimesEmoji}>🌇</Text>
-          <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset)}</Text>
+          <Text style={styles.sunTimesValue}>{formatTime(sunTimes.sunset, i18n.language)}</Text>
           <Text style={styles.sunTimesLabel}>{t("sunset")}</Text>
         </View>
         <View style={styles.sunTimesDivider} />

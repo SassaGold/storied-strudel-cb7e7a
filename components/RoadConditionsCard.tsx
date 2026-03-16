@@ -5,9 +5,7 @@ import { ActivityIndicator, Linking, Platform, Pressable, StyleSheet, Text, View
 import { useTranslation } from "react-i18next";
 import * as Location from "expo-location";
 import { type RoadAlert, humanizeConstructionType } from "../lib/roads";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics } from "../lib/safeRequire";
 
 interface Props {
   loading: boolean;

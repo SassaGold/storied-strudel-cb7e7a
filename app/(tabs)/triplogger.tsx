@@ -19,20 +19,7 @@ import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY } from "../../lib/locationTask";
 import type { BgPoint } from "../../lib/locationTask";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-
-// Safely load react-native-maps: requires a custom dev/production build.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Polyline: any = rnMaps?.Polyline;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-
-// Safely load AsyncStorage
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
+import { Haptics, AsyncStorage, MapView, Polyline, PROVIDER_GOOGLE } from "../../lib/safeRequire";
 
 const STORAGE_KEY = "triplogger_rides_v1";
 

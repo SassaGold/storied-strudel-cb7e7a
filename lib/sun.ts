@@ -61,9 +61,9 @@ export function computeSunTimes(
   return { sunrise, sunset, daylightMinutes };
 }
 
-export const formatTime = (date: Date): string => {
+export const formatTime = (date: Date, locale?: string): string => {
   try {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+    return date.toLocaleTimeString(locale ?? [], { hour: "2-digit", minute: "2-digit", hour12: false });
   } catch {
     return "--:--";
   }

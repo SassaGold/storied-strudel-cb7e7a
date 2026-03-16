@@ -8,19 +8,18 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "./settings";
 import { fetchOverpass, parseWikiTag, OverpassElement, buildMapsUrl } from "./overpass";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
+import { AsyncStorage } from "./safeRequire";
+import { wikipediaSummaryUrl } from "./config";
 
 /** How many results to show initially and on each "Load More" tap. */
 const PAGE_SIZE = 20;
 
 /**
  * Module-level cache for Wikipedia summaries keyed by "<lang>/<title>".
- * Persists across component mounts so reopening the same info card avoids
- * a redundant network round-trip.
+ * Exported so screens that manage their own fetch logic (e.g. mc.tsx) can
+ * share the same in-memory cache and avoid redundant network requests.
  */
-const wikiCache = new Map<string, string>();
+export const wikiCache = new Map<string, string>();
 
 // ── Shared Place type ─────────────────────────────────────────────────────────
 
@@ -277,7 +276,7 @@ export function usePOIFetch({
       const wikiController = new AbortController();
       const wikiTimeout = setTimeout(() => wikiController.abort(), 8_000);
       fetch(
-        `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+        wikipediaSummaryUrl(lang, title),
         { signal: wikiController.signal }
       )
         .then((r) => r.json())
@@ -289,6 +288,11 @@ export function usePOIFetch({
         .catch((e) => { console.warn("[usePOIFetch] wikipedia error:", e); setWikiExtract(null); })
         .finally(() => { clearTimeout(wikiTimeout); setWikiLoading(false); });
     }
+  }, []);
+
+  const cancel = useCallback(() => {
+    abortRef.current?.abort();
+    setLoading(false);
   }, []);
 
   const closeInfo = useCallback(() => {
@@ -310,6 +314,7 @@ export function usePOIFetch({
     wikiLoading,
     loadPlaces,
     forceFetch,
+    cancel,
     loadMore,
     openInMaps,
     openInfo,

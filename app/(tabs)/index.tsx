@@ -18,9 +18,7 @@ import { ALERT_ICONS, DEFAULT_ALERT_ICON, REC_ICONS, DEFAULT_REC_ICON } from "..
 import WeatherCard, { HourlyForecastCard, DailyForecastCard } from "../../components/WeatherCard";
 import SunCard from "../../components/SunCard";
 import RoadConditionsCard from "../../components/RoadConditionsCard";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics } from "../../lib/safeRequire";
 
 /** Modern sans-serif font family: SF Pro on iOS, Roboto Black on Android, Inter on web */
 const LOGO_FONT = Platform.select({ ios: "-apple-system", android: "sans-serif-black", web: "Inter, -apple-system, system-ui, sans-serif" });
