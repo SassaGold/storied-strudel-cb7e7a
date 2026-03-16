@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -15,24 +15,10 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS, parseWikiTag } from "../../lib/overpass";
-// Safely load react-native-maps: requires a custom dev/production build.
-// In Expo Go or any environment where the native module isn't compiled in,
-// MapView and Marker will be null and the map toggle is hidden automatically.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Marker: any = rnMaps?.Marker;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-// Safely load AsyncStorage: the native implementation throws at module-evaluation
-// time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
-// Using require() in try/catch means the screen still loads; the existing
-// try/catch wrappers inside loadPlaces already handle AsyncStorage === null.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, parseWikiTag, OverpassElement, buildMapsUrl } from "../../lib/overpass";
+import { Haptics, AsyncStorage, MapView, Marker, PROVIDER_GOOGLE } from "../../lib/safeRequire";
+import { wikiCache } from "../../lib/usePOIFetch";
+import { wikipediaSummaryUrl, wikipediaPageUrl, CACHE_SCHEMA_VERSION } from "../../lib/config";
 
 type Place = {
   id: string;
@@ -65,12 +51,12 @@ const FUEL_TYPE_TAGS: [string, string][] = [
 ];
 
 const mapElements = (
-  elements: any[],
+  elements: OverpassElement[],
   latitude: number,
   longitude: number,
   fallbackCategory: string
 ) =>
-  (elements as any[])
+  elements
     .map((element) => {
       const lat = element.lat ?? element.center?.lat;
       const lon = element.lon ?? element.center?.lon;
@@ -162,13 +148,16 @@ const CATEGORY_ICONS: Record<Category, string> = {
 };
 
 export default function McScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("garage");
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<Category>("services");
-  const [places, setPlaces] = useState<Place[]>([]);
+  // All fetched results sorted by distance
+  const [allPlaces, setAllPlaces] = useState<Place[]>([]);
+  // Number of results visible in the list (pagination)
+  const [visibleCount, setVisibleCount] = useState(20);
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
   const [wikiExtract, setWikiExtract] = useState<string | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
@@ -176,6 +165,8 @@ export default function McScreen() {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
   const [nameSearch, setNameSearch] = useState("");
+  // AbortController ref for request deduplication (#6)
+  const abortRef = useRef<AbortController | null>(null);
 
   const buildQuery = (category: Category, lat: number, lon: number) => {
     if (category === "services") {
@@ -289,24 +280,32 @@ out center 120;`;
   };
 
   const loadPlaces = useCallback(async () => {
-    const cacheKey = `cache_mc_v2_${selected}`;
+    // Cancel any in-flight request before starting a fresh one (#6)
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const cacheKey = `cache_mc_${CACHE_SCHEMA_VERSION}_${selected}`;
     // Load cache so user sees last-known results immediately while fetching
     try {
       const raw = await AsyncStorage.getItem(cacheKey);
       if (raw) {
         const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
         if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
-          setPlaces(data);
+          setAllPlaces(data);
+          setVisibleCount(20);
           setFromCache(true);
         }
       }
-    } catch {}
+    } catch (e) {
+      console.warn("[MC] cache read error:", e);
+    }
     setLoading(true);
     setError(null);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
       if (permission.status !== "granted") {
-        setError(t("garage.locationError"));
+        setError(t("locationError"));
         return;
       }
 
@@ -317,63 +316,81 @@ out center 120;`;
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
       const query = buildQuery(selected, latitude, longitude);
-      const data = await fetchOverpass(query, CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000);
-      const results = data.elements
-        ? mapElements(
-            data.elements,
-            latitude,
-            longitude,
-            fallbackLabel(selected)
-          )
-        : [];
+      const data = await fetchOverpass(query, CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000, controller.signal);
+      const results = mapElements(
+        data.elements,
+        latitude,
+        longitude,
+        fallbackLabel(selected)
+      );
 
       const sorted = results
-        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-        .slice(0, 20);
-      setPlaces(sorted);
+        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
+      setAllPlaces(sorted);
+      setVisibleCount(20);
       setFromCache(false);
-      try { await AsyncStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
+      try {
+        await AsyncStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted }));
+      } catch (e) {
+        console.warn("[MC] cache write error:", e);
+      }
     } catch (err) {
-      const message =
-        err instanceof Error && err.message
-          ? `${t("garage.loadError")} (${err.message})`
-          : t("garage.loadError");
-      setError(message);
+      if (err instanceof Error && (err.name === "AbortError" || err.message === "Cancelled")) {
+        return; // Silently ignore cancellation
+      }
+      console.warn("[MC] loadPlaces error:", err);
+      setError(t("loadError"));
     } finally {
       setLoading(false);
     }
-  }, [selected, t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
 
   const openInMaps = useCallback((place: Place) => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
-    Linking.openURL(url).catch(() => null);
+    const url = buildMapsUrl(place.latitude, place.longitude, place.name);
+    Linking.openURL(url).catch((e) => console.warn("[MC] openInMaps error:", e));
   }, []);
 
   const openInfo = useCallback((place: Place) => {
     setInfoPlace(place);
     setWikiExtract(null);
     if (place.wikipedia) {
-      setWikiLoading(true);
       const { lang, title } = parseWikiTag(place.wikipedia);
-      // Wikipedia REST API — free, no API key required
-      fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
+      const key = `${lang}/${title}`;
+      // Return cached extract immediately if available
+      if (wikiCache.has(key)) {
+        setWikiExtract(wikiCache.get(key)!);
+        return;
+      }
+      setWikiLoading(true);
+      // Wikipedia REST API — free, no API key required; 8 s timeout to prevent hangs
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8_000);
+      fetch(wikipediaSummaryUrl(lang, title), { signal: controller.signal })
         .then((r) => r.json())
-        .then((data) => setWikiExtract((data.extract || "").trim() || null))
-        .catch(() => setWikiExtract(null))
-        .finally(() => setWikiLoading(false));
+        .then((data: { extract?: string }) => {
+          const extract = (data.extract || "").trim() || null;
+          if (extract) wikiCache.set(key, extract);
+          setWikiExtract(extract);
+        })
+        .catch((e) => { console.warn("[MC] wikipedia error:", e); setWikiExtract(null); })
+        .finally(() => { clearTimeout(timeout); setWikiLoading(false); });
     }
   }, []);
 
-  const sectionTitle = t(`garage.titles.${selected}`);
-  const sectionDescription = t(`garage.descriptions.${selected}`);
-  const emptyText = t(`garage.empty.${selected}`);
+  const sectionTitle = t(`titles.${selected}`);
+  const sectionDescription = t(`descriptions.${selected}`);
+  const emptyText = t(`empty.${selected}`);
   const mapsButtonLabel = selected === "fuel"
-    ? t("common.checkFuelPrices")
-    : t("common.reviewsGoogle");
+    ? t("common:checkFuelPrices")
+    : t("common:reviewsGoogle");
 
+  // Paginated and optionally name-filtered visible places
+  const visiblePlaces = allPlaces.slice(0, visibleCount);
   const filteredPlaces = nameSearch.trim()
-    ? places.filter((p) => p.name.toLowerCase().includes(nameSearch.trim().toLowerCase()))
-    : places;
+    ? visiblePlaces.filter((p) => p.name.toLowerCase().includes(nameSearch.trim().toLowerCase()))
+    : visiblePlaces;
+  const totalFound = allPlaces.length;
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
@@ -387,18 +404,18 @@ out center 120;`;
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.category")}</Text>
+              <Text style={styles.modalLabel}>{t("common:category")}</Text>
               <Text style={styles.modalValue}>{infoPlace?.category}</Text>
             </View>
             {infoPlace?.note && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.note")}</Text>
+                <Text style={styles.modalLabel}>{t("common:note")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.note}</Text>
               </View>
             )}
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
+                <Text style={styles.modalLabel}>{t("common:phone")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null); }}
@@ -409,7 +426,7 @@ out center 120;`;
             )}
             {infoPlace?.email && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.email")}</Text>
+                <Text style={styles.modalLabel}>{t("common:email")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null); }}
@@ -421,13 +438,13 @@ out center 120;`;
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
+                <Text style={styles.modalLabel}>{t("common:address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
+                <Text style={styles.modalLabel}>{t("common:website")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(infoPlace.website!).catch(() => null); }}
@@ -439,13 +456,13 @@ out center 120;`;
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
+                <Text style={styles.modalLabel}>{t("common:hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {infoPlace?.fuelTypes && infoPlace.fuelTypes.length > 0 && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.fuelTypes")}</Text>
+                <Text style={styles.modalLabel}>{t("common:fuelTypes")}</Text>
                 <View style={styles.fuelTypesRow}>
                   {infoPlace.fuelTypes.map((ft) => (
                     <View key={ft} style={styles.fuelTypeBadge}>
@@ -456,21 +473,24 @@ out center 120;`;
               </View>
             )}
             {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && !infoPlace?.fuelTypes?.length && (
-              <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
+              <Text style={styles.modalNoInfo}>{t("common:noContactInfo")}</Text>
             )}
             {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>{t("common.wikiLoading")}</Text>
+              <View style={styles.modalWikiLoading}>
+                <ActivityIndicator size="small" color="#fbbf24" />
+                <Text style={styles.modalLoadingText}>{t("common:wikiLoading")}</Text>
+              </View>
             )}
             {wikiExtract && (
               <View style={styles.modalWikiSection}>
-                <Text style={styles.modalWikiLabel}>{t("common.wikiLabel")}</Text>
+                <Text style={styles.modalWikiLabel}>{t("common:wikiLabel")}</Text>
                 <Text style={styles.modalWikiExtract} numberOfLines={5}>{wikiExtract}</Text>
               </View>
             )}
             <View style={styles.modalActions}>
               <Pressable
                 style={styles.modalActionButton}
-                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null); }}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); if (infoPlace) { Linking.openURL(buildMapsUrl(infoPlace.latitude, infoPlace.longitude, infoPlace.name)).catch(() => null); } }}
               >
                 <Text style={styles.modalActionButtonText}>{mapsButtonLabel}</Text>
               </Pressable>
@@ -480,15 +500,15 @@ out center 120;`;
                   onPress={() => {
                     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                     const { lang, title } = parseWikiTag(infoPlace.wikipedia!);
-                    Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
+                    Linking.openURL(wikipediaPageUrl(lang, title)).catch(() => null);
                   }}
                 >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common.readWikipedia")}</Text>
+                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common:readWikipedia")}</Text>
                 </Pressable>
               )}
             </View>
             <Pressable style={styles.modalClose} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); setWikiExtract(null); }}>
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
+              <Text style={styles.modalCloseText}>{t("common:close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -496,10 +516,10 @@ out center 120;`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>{t("garage.badge")}</Text>
-        <Text style={styles.title}>{t("garage.title")}</Text>
+        <Text style={styles.headerBadge}>{t("badge")}</Text>
+        <Text style={styles.title}>{t("title")}</Text>
         <Text style={styles.subtitle}>
-          {t("garage.subtitle")}
+          {t("subtitle")}
         </Text>
       </View>
 
@@ -519,16 +539,17 @@ out center 120;`;
               onPress={() => {
                 Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                 setSelected(key);
-                setPlaces([]);
+                setAllPlaces([]);
+                setVisibleCount(20);
                 setError(null);
                 setNameSearch("");
               }}
               accessibilityRole="button"
-              accessibilityLabel={t(`garage.titles.${key}`)}
+              accessibilityLabel={t(`titles.${key}`)}
             >
               <Text style={styles.segmentTileIcon}>{CATEGORY_ICONS[key]}</Text>
               <Text style={[styles.segmentTileText, isActive && { color }]}>
-                {t(`garage.titles.${key}`)}
+                {t(`titles.${key}`)}
               </Text>
             </Pressable>
           );
@@ -540,43 +561,49 @@ out center 120;`;
         onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadPlaces(); }}
         disabled={loading}
         accessibilityRole="button"
-        accessibilityLabel={t("garage.findButton", { title: sectionTitle })}
+        accessibilityLabel={t("findButton", { title: sectionTitle })}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? t("common.loading") : t("garage.findButton", { title: sectionTitle })}
+          {loading ? t("common:loading") : t("findButton", { title: sectionTitle })}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" />
-          <Text style={styles.loadingText}>{t("garage.searching")}</Text>
+          <Text style={styles.loadingText}>{t("searching")}</Text>
         </View>
       )}
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       {/* Cache banner */}
-      {fromCache && places.length > 0 && (
+      {fromCache && allPlaces.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>{t("common:cachedResults")}</Text>
         </View>
       )}
 
       {/* View mode toggle — only shown when the map is available */}
-      {places.length > 0 && MapView && (
+      {allPlaces.length > 0 && MapView && (
         <View style={styles.viewToggleRow}>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("common:viewList")}
+            accessibilityState={{ selected: viewMode === "list" }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common:viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("common:viewMap")}
+            accessibilityState={{ selected: viewMode === "map" }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common:viewMap")}</Text>
           </Pressable>
         </View>
       )}
@@ -614,11 +641,11 @@ out center 120;`;
               style={styles.searchInput}
               value={nameSearch}
               onChangeText={setNameSearch}
-              placeholder={t("garage.searchPlaceholder")}
+              placeholder={t("searchPlaceholder")}
               placeholderTextColor="#555555"
               clearButtonMode="while-editing"
               returnKeyType="search"
-              accessibilityLabel={t("garage.searchPlaceholder")}
+              accessibilityLabel={t("searchPlaceholder")}
             />
             {nameSearch.trim() ? (
               <Pressable
@@ -628,9 +655,9 @@ out center 120;`;
                   Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nameSearch.trim())}`).catch(() => null);
                 }}
                 accessibilityRole="button"
-                accessibilityLabel={t("garage.searchGoogleMaps")}
+                accessibilityLabel={t("searchGoogleMaps")}
               >
-                <Text style={styles.googleMapsSearchButtonText}>{t("garage.searchGoogleMaps")}</Text>
+                <Text style={styles.googleMapsSearchButtonText}>{t("searchGoogleMaps")}</Text>
               </Pressable>
             ) : null}
           </>
@@ -638,51 +665,76 @@ out center 120;`;
         {viewMode === "list" && (
           filteredPlaces.length === 0 && !loading ? (
             <Text style={styles.bodyText}>
-              {nameSearch.trim() && places.length > 0 ? t("garage.noSearchResults") : emptyText}
+              {nameSearch.trim() && allPlaces.length > 0 ? t("noSearchResults") : emptyText}
             </Text>
           ) : (
-            filteredPlaces.map((place) => (
-              <Pressable
-                key={place.id}
-                style={[styles.placeRow, { borderLeftColor: CATEGORY_COLORS[selected] }]}
-                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}
-                accessibilityRole="button"
-                accessibilityLabel={place.name}
-              >
-                <View style={styles.placeInfo}>
-                  <Text style={styles.bodyText}>{place.name}</Text>
-                  <View style={styles.tagRow}>
-                    <Text style={styles.metaText}>{place.category}</Text>
-                    {place.note && (
-                      <Text style={styles.highlightTag}>{place.note}</Text>
+            <>
+              {/* Pagination summary: "Showing 20 of 47 results" */}
+              {!nameSearch.trim() && totalFound > visibleCount && (
+                <Text style={styles.paginationSummary}>
+                  {t("common:showingOf", { shown: visibleCount, total: totalFound })}
+                </Text>
+              )}
+              {filteredPlaces.map((place) => (
+                <Pressable
+                  key={place.id}
+                  style={[styles.placeRow, { borderLeftColor: CATEGORY_COLORS[selected] }]}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInMaps(place); }}
+                  accessibilityRole="button"
+                  accessibilityLabel={place.name}
+                  accessibilityHint={t("common:openInMapsHint")}
+                >
+                  <View style={styles.placeInfo}>
+                    <Text style={styles.bodyText}>{place.name}</Text>
+                    <View style={styles.tagRow}>
+                      <Text style={styles.metaText}>{place.category}</Text>
+                      {place.note && (
+                        <Text style={styles.highlightTag}>{place.note}</Text>
+                      )}
+                    </View>
+                    {selected === "fuel" && place.fuelTypes && place.fuelTypes.length > 0 && (
+                      <View style={styles.fuelTypesRow}>
+                        {place.fuelTypes.map((ft) => (
+                          <View key={ft} style={styles.fuelTypeBadge}>
+                            <Text style={styles.fuelTypeBadgeText}>{ft}</Text>
+                          </View>
+                        ))}
+                      </View>
                     )}
                   </View>
-                  {selected === "fuel" && place.fuelTypes && place.fuelTypes.length > 0 && (
-                    <View style={styles.fuelTypesRow}>
-                      {place.fuelTypes.map((ft) => (
-                        <View key={ft} style={styles.fuelTypeBadge}>
-                          <Text style={styles.fuelTypeBadgeText}>{ft}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
-                </View>
-                <View style={styles.placeRight}>
-                  <Text style={styles.metaText}>
-                    {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
-                  </Text>
-                  <Pressable
-                    style={styles.infoButton}
-                    onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInfo(place); }}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Info: ${place.name}`}
-                  >
-                    <Text style={styles.infoButtonText}>ⓘ</Text>
-                  </Pressable>
-                </View>
-              </Pressable>
-            ))
+                  <View style={styles.placeRight}>
+                    <Text style={styles.metaText}>
+                      {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
+                    </Text>
+                    <Pressable
+                      style={styles.infoButton}
+                      onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openInfo(place); }}
+                      hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t("common:infoFor")} ${place.name}`}
+                      accessibilityHint={t("common:openInfoHint")}
+                    >
+                      <Text style={styles.infoButtonText}>ⓘ</Text>
+                    </Pressable>
+                  </View>
+                </Pressable>
+              ))}
+              {/* Load More button — only when not searching and more results exist */}
+              {!nameSearch.trim() && totalFound > visibleCount && (
+                <Pressable
+                  style={styles.loadMoreButton}
+                  onPress={() => {
+                    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                    setVisibleCount((prev) => prev + 20);
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("common:loadMore")}
+                  accessibilityHint={t("common:loadMoreHint")}
+                >
+                  <Text style={styles.loadMoreText}>{t("common:loadMore")}</Text>
+                </Pressable>
+              )}
+            </>
           )
         )}
       </View>
@@ -960,6 +1012,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontStyle: "italic",
   },
+  modalWikiLoading: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   modalWikiSection: {
     backgroundColor: "rgba(255,255,255,0.04)",
     borderRadius: 8,
@@ -1091,5 +1148,24 @@ const styles = StyleSheet.create({
     color: "#4285F4",
     fontSize: 14,
     fontWeight: "600",
+  },
+  paginationSummary: {
+    color: "#888888",
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  loadMoreButton: {
+    marginTop: 12,
+    paddingVertical: 11,
+    borderRadius: 6,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.5)",
+  },
+  loadMoreText: {
+    color: "#ff6600",
+    fontSize: 14,
+    fontWeight: "700",
   },
 });

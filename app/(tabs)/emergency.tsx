@@ -15,33 +15,9 @@ import {
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
-// Safely load expo-haptics: may not be available in all environments
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-// Safely load react-native-maps: requires a custom dev/production build.
-// In Expo Go or any environment where the native module isn't compiled in,
-// MapView and Marker will be null and the map toggle is hidden automatically.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Marker: any = rnMaps?.Marker;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-// Safely load AsyncStorage: the native implementation throws at module-evaluation
-// time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
-// Using require() in try/catch means the screen still loads; the existing
-// try/catch wrappers inside loadPlaces already handle AsyncStorage === null.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
-
-type OverpassElement = {
-  id: number;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: Record<string, string>;
-};
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, buildMapsUrl, type OverpassElement } from "../../lib/overpass";
+import { Haptics, AsyncStorage, MapView, Marker, PROVIDER_GOOGLE } from "../../lib/safeRequire";
+import { CACHE_SCHEMA_VERSION } from "../../lib/config";
 
 /** Maximum results to fetch from Overpass API (balances response time vs. coverage) */
 const MAX_RESULTS = 80;
@@ -86,20 +62,40 @@ const formatDistance = (d?: number) => {
   return d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`;
 };
 
+/** Emergency numbers with i18n region keys — displayed in the universal numbers grid. */
 const EMERGENCY_NUMBERS = [
-  { region: "EU / Intl", number: "112", emoji: "🌍" },
-  { region: "USA / CA", number: "911", emoji: "🇺🇸" },
-  { region: "UK", number: "999", emoji: "🇬🇧" },
-  { region: "Australia", number: "000", emoji: "🇦🇺" },
-  { region: "NZ", number: "111", emoji: "🇳🇿" },
+  { regionKey: "euIntl",    number: "112", emoji: "🌍" },
+  { regionKey: "usaCa",     number: "911", emoji: "🇺🇸" },
+  { regionKey: "uk",        number: "999", emoji: "🇬🇧" },
+  { regionKey: "australia", number: "000", emoji: "🇦🇺" },
+  { regionKey: "nz",        number: "111", emoji: "🇳🇿" },
 ];
 
-/** Initiates a phone call; falls back to an alert if the device cannot handle it. */
+/** Initiates a phone call; falls back to an alert if the device cannot handle it.
+ *  In development builds (__DEV__) a dialog is shown instead so real calls are
+ *  never accidentally placed while testing. */
 const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: string, callFailedTitle: string, callFailedMsg: string) => {
-  Linking.canOpenURL(`tel:${number}`)
+  // Sanitize OSM phone data before passing to tel: URI.
+  // Keep: digits (0-9), leading '+' for international prefix, spaces,
+  // hyphens, dots, and parentheses — all legal in tel: URIs per RFC 3966.
+  // Strip anything else (letters, slashes, etc.) that would form an invalid URL.
+  const sanitized = number.replace(/[^0-9+\s\-().]/g, "").trim();
+  if (!sanitized) {
+    Alert.alert(cannotCallTitle, cannotCallMsg, [{ text: "OK" }]);
+    return;
+  }
+  if (__DEV__) {
+    Alert.alert(
+      "Dev Mode — Call Blocked",
+      `This would call ${sanitized} in production.`,
+      [{ text: "OK" }]
+    );
+    return;
+  }
+  Linking.canOpenURL(`tel:${sanitized}`)
     .then((supported) => {
       if (supported) {
-        return Linking.openURL(`tel:${number}`);
+        return Linking.openURL(`tel:${sanitized}`);
       }
       Alert.alert(cannotCallTitle, cannotCallMsg, [{ text: "OK" }]);
     })
@@ -108,10 +104,10 @@ const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: stri
     });
 };
 
-const CACHE_KEY = "cache_emergency_v2";
+const CACHE_KEY = `cache_emergency_${CACHE_SCHEMA_VERSION}`;
 
 export default function EmergencyScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("sos");
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -129,15 +125,15 @@ export default function EmergencyScreen() {
     Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null);
     callNumber(
       number,
-      t("sos.cannotCall"),
-      t("sos.cannotCallMsg", { number }),
-      t("sos.callFailed"),
-      t("sos.callFailedMsg", { number })
+      t("cannotCall"),
+      t("cannotCallMsg", { number }),
+      t("callFailed"),
+      t("callFailedMsg", { number })
     );
   }, [t]);
 
   const openInMaps = useCallback((place: Place) => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
+    const url = buildMapsUrl(place.latitude, place.longitude, place.name);
     Linking.openURL(url).catch(() => null);
   }, []);
 
@@ -145,7 +141,7 @@ export default function EmergencyScreen() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== "granted") {
-        Alert.alert(t("sos.permissionAlert"), t("sos.locationPermissionMsg"));
+        Alert.alert(t("permissionAlert"), t("locationPermissionMsg"));
         return;
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
@@ -155,7 +151,7 @@ export default function EmergencyScreen() {
         message: `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
       });
     } catch {
-      Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
+      Alert.alert(t("shareFailed"), t("shareFailedMsg"));
     }
   }, [t]);
 
@@ -176,7 +172,7 @@ export default function EmergencyScreen() {
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
       if (perm.status !== "granted") {
-        setError(t("sos.locationError"));
+        setError(t("locationError"));
         return;
       }
 
@@ -241,14 +237,19 @@ out center ${MAX_RESULTS};`;
         .filter(Boolean) as Place[];
 
       const sorted = mapped
-        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
+        .sort((a, b) => {
+          if (a.distanceMeters == null && b.distanceMeters == null) return 0;
+          if (a.distanceMeters == null) return 1;
+          if (b.distanceMeters == null) return -1;
+          return a.distanceMeters - b.distanceMeters;
+        })
         .slice(0, 40);
       setPlaces(sorted);
       setFromCache(false);
       try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
     } catch (err) {
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
-      setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
+      setError(isNetwork ? t("networkError") : t("loadError"));
     } finally {
       setLoading(false);
     }
@@ -267,7 +268,7 @@ out center ${MAX_RESULTS};`;
       {/* ── Torch Screen Overlay ─────────────────────────────────── */}
       <Modal visible={torchOn} transparent animationType="fade" onRequestClose={() => setTorchOn(false)}>
         <Pressable style={styles.torchOverlay} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(false); }}>
-          <Text style={styles.torchOffText}>{t("sos.torchScreenOff")}</Text>
+          <Text style={styles.torchOffText}>{t("torchScreenOff")}</Text>
         </Pressable>
       </Modal>
 
@@ -276,13 +277,13 @@ out center ${MAX_RESULTS};`;
         <View style={styles.instructionsOverlay}>
           <View style={styles.instructionsCard}>
             <View style={styles.instructionsHeader}>
-              <Text style={styles.instructionsTitle}>{t("sos.instructionsTitle")}</Text>
+              <Text style={styles.instructionsTitle}>{t("instructionsTitle")}</Text>
               <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(false); }} hitSlop={12}>
-                <Text style={styles.instructionsClose}>{t("sos.instructionsClose")} ✕</Text>
+                <Text style={styles.instructionsClose}>{t("instructionsClose")} ✕</Text>
               </Pressable>
             </View>
             <ScrollView style={styles.instructionsBody} showsVerticalScrollIndicator={false}>
-              <Text style={styles.instructionsText}>{t("sos.instructionsBody")}</Text>
+              <Text style={styles.instructionsText}>{t("instructionsBody")}</Text>
             </ScrollView>
           </View>
         </View>
@@ -302,14 +303,14 @@ out center ${MAX_RESULTS};`;
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.type")}</Text>
+              <Text style={styles.modalLabel}>{t("common:type")}</Text>
               <Text style={styles.modalValue}>
                 {t(`sos.categoryLabels.${infoPlace?.category}`, { defaultValue: formatCategory(infoPlace?.category ?? "") })}
               </Text>
             </View>
             {infoPlace?.distanceMeters !== undefined && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.distance")}</Text>
+                <Text style={styles.modalLabel}>{t("common:distance")}</Text>
                 <Text style={styles.modalValue}>
                   {formatDistance(infoPlace.distanceMeters)}
                 </Text>
@@ -317,7 +318,7 @@ out center ${MAX_RESULTS};`;
             )}
             {infoPlace?.phone && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
+                <Text style={styles.modalLabel}>{t("common:phone")}</Text>
                 <Text
                   style={styles.modalLink}
                   onPress={() => call(infoPlace.phone!)}
@@ -328,19 +329,19 @@ out center ${MAX_RESULTS};`;
             )}
             {infoPlace?.address && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
+                <Text style={styles.modalLabel}>{t("common:address")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.address}</Text>
               </View>
             )}
             {infoPlace?.openingHours && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
+                <Text style={styles.modalLabel}>{t("common:hours")}</Text>
                 <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
               </View>
             )}
             {infoPlace?.website && (
               <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
+                <Text style={styles.modalLabel}>{t("common:website")}</Text>
                 <Text
                   style={styles.modalLink}
                   numberOfLines={1}
@@ -356,7 +357,7 @@ out center ${MAX_RESULTS};`;
               !infoPlace?.address &&
               !infoPlace?.website && (
                 <Text style={styles.modalNoInfo}>
-                  {t("common.noContactInfoEmergency")}
+                  {t("common:noContactInfoEmergency")}
                 </Text>
               )}
             <View style={styles.modalActions}>
@@ -371,7 +372,7 @@ out center ${MAX_RESULTS};`;
                       styles.modalCallButtonText,
                     ]}
                   >
-                    {t("sos.callNow")}
+                    {t("callNow")}
                   </Text>
                 </Pressable>
               )}
@@ -384,7 +385,7 @@ out center ${MAX_RESULTS};`;
                 }
               >
                 <Text style={styles.modalActionButtonText}>
-                  {t("sos.navigateThere")}
+                  {t("navigateThere")}
                 </Text>
               </Pressable>
             </View>
@@ -392,7 +393,7 @@ out center ${MAX_RESULTS};`;
               style={styles.modalClose}
               onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}
             >
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
+              <Text style={styles.modalCloseText}>{t("common:close")}</Text>
             </Pressable>
           </Pressable>
         </Pressable>
@@ -402,10 +403,10 @@ out center ${MAX_RESULTS};`;
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>{t("sos.badge")}</Text>
-        <Text style={styles.title}>{t("sos.title")}</Text>
+        <Text style={styles.headerBadge}>{t("badge")}</Text>
+        <Text style={styles.title}>{t("title")}</Text>
         <Text style={styles.subtitle}>
-          {t("sos.subtitle")}
+          {t("subtitle")}
         </Text>
       </View>
 
@@ -414,54 +415,63 @@ out center ${MAX_RESULTS};`;
         style={({ pressed }) => [styles.bigSosButton, pressed && { opacity: 0.85 }]}
         onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
         accessibilityRole="button"
-        accessibilityLabel={t("sos.callSos")}
+        accessibilityLabel={t("callSos")}
       >
         <Text style={styles.bigSosEmoji}>🆘</Text>
-        <Text style={styles.bigSosText}>{t("sos.callSos")}</Text>
+        <Text style={styles.bigSosText}>{t("callSos")}</Text>
       </Pressable>
 
       {/* ── Quick Actions ─────────────────────────────────────────── */}
       <View style={styles.quickActionsCard}>
-        <Text style={styles.quickActionsTitle}>{t("sos.quickActions")}</Text>
+        <Text style={styles.quickActionsTitle}>{t("quickActions")}</Text>
         <View style={styles.quickActionsGrid}>
           {/* Call 112 */}
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("quickActionCall")}
           >
             <Text style={styles.quickActionEmoji}>📞</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")}</Text>
+            <Text style={styles.quickActionLabel}>{t("quickActionCall")}</Text>
           </Pressable>
           {/* Share Location */}
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); shareLocation(); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("shareLocation").replace("📍 ", "")}
           >
             <Text style={styles.quickActionEmoji}>📍</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.shareLocation").replace("📍 ", "")}</Text>
+            <Text style={styles.quickActionLabel}>{t("shareLocation").replace("📍 ", "")}</Text>
           </Pressable>
           {/* Torch Screen */}
           <Pressable
             style={[styles.quickActionBtn, torchOn && styles.quickActionBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("quickActionTorch")}
+            accessibilityState={{ selected: torchOn }}
           >
             <Text style={styles.quickActionEmoji}>🔦</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.quickActionTorch")}</Text>
+            <Text style={styles.quickActionLabel}>{t("quickActionTorch")}</Text>
           </Pressable>
           {/* Emergency Instructions */}
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("quickActionInstructions")}
           >
             <Text style={styles.quickActionEmoji}>📋</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.quickActionInstructions")}</Text>
+            <Text style={styles.quickActionLabel}>{t("quickActionInstructions")}</Text>
           </Pressable>
         </View>
       </View>
 
       {/* Universal emergency numbers */}
       <View style={styles.sosCard}>
-        <Text style={styles.sosCardTitle}>{t("sos.universalNumbers")}</Text>
+        <Text style={styles.sosCardTitle}>{t("universalNumbers")}</Text>
         <View style={styles.sosNumbersGrid}>
           {EMERGENCY_NUMBERS.map((item) => (
             <Pressable
@@ -471,12 +481,12 @@ out center ${MAX_RESULTS};`;
             >
               <Text style={styles.sosNumberEmoji}>{item.emoji}</Text>
               <Text style={styles.sosNumber}>{item.number}</Text>
-              <Text style={styles.sosRegion}>{item.region}</Text>
+              <Text style={styles.sosRegion}>{t(`regions.${item.regionKey}`)}</Text>
             </Pressable>
           ))}
         </View>
         <Pressable style={styles.shareButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); shareLocation(); }}>
-          <Text style={styles.shareButtonText}>{t("sos.shareLocation")}</Text>
+          <Text style={styles.shareButtonText}>{t("shareLocation")}</Text>
         </Pressable>
       </View>
       <Pressable
@@ -484,17 +494,17 @@ out center ${MAX_RESULTS};`;
         onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadPlaces(); }}
         disabled={loading}
         accessibilityRole="button"
-        accessibilityLabel={t("sos.findButton")}
+        accessibilityLabel={t("findButton")}
       >
         <Text style={styles.primaryButtonText}>
-          {loading ? t("common.searching") : t("sos.findButton")}
+          {loading ? t("common:searching") : t("findButton")}
         </Text>
       </Pressable>
 
       {loading && (
         <View style={styles.loadingRow}>
           <ActivityIndicator size="small" color="#ef4444" />
-          <Text style={styles.loadingText}>{t("sos.searching")}</Text>
+          <Text style={styles.loadingText}>{t("searching")}</Text>
         </View>
       )}
 
@@ -503,7 +513,7 @@ out center ${MAX_RESULTS};`;
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>{t("common:cachedResults")}</Text>
         </View>
       )}
 
@@ -514,13 +524,13 @@ out center ${MAX_RESULTS};`;
             style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common:viewList")}</Text>
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}
           >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
+            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common:viewMap")}</Text>
           </Pressable>
         </View>
       )}
@@ -568,7 +578,7 @@ out center ${MAX_RESULTS};`;
                     selected === key && styles.segmentTextActive,
                   ]}
                 >
-                  {t(`sos.categories.${key}`)}
+                  {t(`categories.${key}`)}
                 </Text>
               </Pressable>
             ))}
@@ -578,16 +588,16 @@ out center ${MAX_RESULTS};`;
           <View style={styles.sectionCard}>
             <Text style={styles.cardTitle}>
               {selected === "all"
-                ? t("sos.allNearby")
+                ? t("allNearby")
                 : t(`sos.categories.${selected}`, { defaultValue: selected })}
             </Text>
             <Text style={styles.cardDescription}>
-              {t("sos.sortedBy")}
+              {t("sortedBy")}
             </Text>
             {viewMode === "list" && (
               filtered.length === 0 ? (
                 <Text style={styles.bodyText}>
-                  {t("sos.noneInCategory")}
+                  {t("noneInCategory")}
                 </Text>
               ) : (
                 filtered.map((place) => (
@@ -645,7 +655,7 @@ out center ${MAX_RESULTS};`;
 
       {!loading && places.length === 0 && !error && (
         <Text style={styles.bodyText}>
-          {t("sos.noResults")}
+          {t("noResults")}
         </Text>
       )}
     </ScrollView>

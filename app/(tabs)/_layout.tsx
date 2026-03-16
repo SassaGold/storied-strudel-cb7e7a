@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { flags } from "../../lib/featureFlags";
 
 /** Wraps each tab icon to add a coloured top-bar indicator when focused */
 function TabIcon({
@@ -37,7 +38,7 @@ function TabIcon({
 }
 
 export default function TabLayout() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("tabs");
   return (
     <Tabs
       screenOptions={{
@@ -62,7 +63,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t("tabs.home"),
+          title: t("home"),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="compass" color={color} focused={focused} />
           ),
@@ -71,7 +72,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="restaurants"
         options={{
-          title: t("tabs.food"),
+          title: t("food"),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="restaurant" color={color} focused={focused} />
           ),
@@ -80,7 +81,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="hotels"
         options={{
-          title: t("tabs.sleep"),
+          title: t("sleep"),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="bed" color={color} focused={focused} />
           ),
@@ -89,7 +90,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="attractions"
         options={{
-          title: t("tabs.explore"),
+          title: t("explore"),
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="flag" color={color} focused={focused} />
           ),
@@ -98,7 +99,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mc"
         options={{
-          title: t("tabs.garage"),
+          title: t("garage"),
+          href: flags.mcTab ? undefined : null,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="speedometer" color={color} focused={focused} />
           ),
@@ -107,7 +109,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="triplogger"
         options={{
-          title: t("tabs.trip"),
+          title: t("trip"),
+          href: flags.triploggerTab ? undefined : null,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="navigate" color={color} focused={focused} />
           ),
@@ -124,7 +127,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="emergency"
         options={{
-          title: t("tabs.sos"),
+          title: t("sos"),
+          href: flags.emergencyTab ? undefined : null,
           tabBarActiveTintColor: "#ef4444",
           tabBarIcon: ({ focused }) => (
             <TabIcon

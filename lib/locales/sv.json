@@ -35,7 +35,18 @@
     "checkFuelPrices": "⛽ Kontrollera bränslepriser",
     "readWikipedia": "📖 Läs på Wikipedia",
     "cachedResults": "📡 Visar cachade resultat — tryck uppdatera för senaste",
-    "fuelTypes": "⛽ Bränsletyper"
+    "fuelTypes": "⛽ Bränsletyper",
+    "showingOf": "Visar {{shown}} av {{total}} resultat",
+    "loadMore": "Ladda mer",
+    "loadMoreHint": "Visa fler resultat",
+    "openInMapsHint": "Öppnar platsen i kartan",
+    "openInfoHint": "Öppnar detaljpanelen",
+    "infoFor": "Info om",
+    "staleRefreshing": "🔄 Uppdaterar… senaste data för {{age}} sedan",
+    "staleOffline": "⚠️ Offline — visar data från {{age}} sedan",
+    "forceFetchHint": "🔄 Håll inne för att rensa cache & söka på nytt",
+    "locationRationaleTitle": "Platsåtkomst krävs",
+    "locationRationaleBody": "Roamly använder din plats för att hitta platser i närheten och visa väder för din resa. Din GPS-data stannar på din enhet."
   },
   "language": {
     "label": "🌍 Språk",
@@ -146,7 +157,16 @@
       "lightrainshowersandthunder": "Lätta regnskurar och åska",
       "lightsnowshowersandthunder": "Lätta snöbyar och åska",
       "lightsleetshowersandthunder": "Lätta snöblandat regn-skurar och åska"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NO",
+    "wind_E": "O",
+    "wind_SE": "SO",
+    "wind_S": "S",
+    "wind_SW": "SV",
+    "wind_W": "V",
+    "wind_NW": "NV",
+    "yesterday": "Igår"
   },
   "food": {
     "badge": "🍽️ MATSTOPP",
@@ -268,7 +288,25 @@
       "clinic": "🏨 Klinik",
       "doctors": "👨‍⚕️ Läkare",
       "ambulance_station": "🚑 Ambulans"
-    }
+    },
+    "regions": {
+      "euIntl": "EU / Intl",
+      "usaCa": "USA / CA",
+      "uk": "UK",
+      "australia": "Australien",
+      "nz": "NZ"
+    },
+    "callSos": "RING SOS (112)",
+    "emergencyInstructions": "📋 Instruktioner",
+    "instructionsBody": "1. HÅLL LUGNET — bedöm situationen.\n\n2. RING 112 (EU/Intl) eller 911 (USA) omedelbart.\n\n3. PLATS — tala om exakt var du befinner dig.\n\n4. HJÄLM — ta inte av den om inte luftvägen är blockerad.\n\n5. BLÖDNING — tryck fast direkt mot såret.\n\n6. FLYTTA INTE en skadad ryttare om de inte är i omedelbar fara.\n\n7. HÅLL DEM VARMA — använd reservkläder eller foliefilt.\n\n8. STANNA PÅ LINJEN — lägg inte på tills hjälpen anländer.",
+    "instructionsClose": "Stäng",
+    "instructionsTitle": "Nödinstruktioner",
+    "quickActionCall": "Ring 112",
+    "quickActionInstructions": "Instruktioner",
+    "quickActionTorch": "Ficklampa",
+    "quickActions": "SNABBA ÅTGÄRDER",
+    "torchScreen": "🔦 Ficklampa",
+    "torchScreenOff": "🔦 Stäng av"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -301,7 +339,13 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Karta ej tillgänglig",
     "tooShortTitle": "Tur inte sparad",
-    "tooShortMsg": "Turen var under 10 m — inte sparad."
+    "tooShortMsg": "Turen var under 10 m — inte sparad.",
+    "startHint": "Börjar spela in din resa",
+    "stopHint": "Stoppar inspelning och sparar resan",
+    "bgServiceTitle": "Roamly — Spelar in",
+    "bgServiceBody": "Spelar in din resa i bakgrunden",
+    "speedLabel": "FART",
+    "viewMapShort": "Rutt"
   },
   "about": {
     "badge": "ℹ️ OM",

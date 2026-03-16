@@ -5,23 +5,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-
-const RADIUS_OPTIONS = [2, 5, 10, 15, 20] as const;
+import { Haptics } from "../../lib/safeRequire";
+import { SEARCH_RADIUS_OPTIONS_KM } from "../../lib/config";
 
 const DEFAULT_TAB_OPTIONS: { key: DefaultTab; emoji: string; labelKey: string }[] = [
-  { key: "index", emoji: "🧭", labelKey: "tabs.home" },
-  { key: "restaurants", emoji: "🍽️", labelKey: "tabs.food" },
-  { key: "hotels", emoji: "🛏️", labelKey: "tabs.sleep" },
-  { key: "attractions", emoji: "🏁", labelKey: "tabs.explore" },
-  { key: "mc", emoji: "⚙️", labelKey: "tabs.garage" },
-  { key: "triplogger", emoji: "📏", labelKey: "tabs.trip" },
-  { key: "emergency", emoji: "🆘", labelKey: "tabs.sos" },
+  { key: "index", emoji: "🧭", labelKey: "tabs:home" },
+  { key: "restaurants", emoji: "🍽️", labelKey: "tabs:food" },
+  { key: "hotels", emoji: "🛏️", labelKey: "tabs:sleep" },
+  { key: "attractions", emoji: "🏁", labelKey: "tabs:explore" },
+  { key: "mc", emoji: "⚙️", labelKey: "tabs:garage" },
+  { key: "triplogger", emoji: "📏", labelKey: "tabs:trip" },
+  { key: "emergency", emoji: "🆘", labelKey: "tabs:sos" },
 ];
 
 export default function SettingsScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(["settings","language","tabs"]);
   const { settings, setSetting } = useSettings();
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -31,25 +29,25 @@ export default function SettingsScreen() {
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
-        <Text style={styles.headerBadge}>{t("settings.badge")}</Text>
-        <Text style={styles.title}>{t("settings.title")}</Text>
-        <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
+        <Text style={styles.headerBadge}>{t("badge")}</Text>
+        <Text style={styles.title}>{t("title")}</Text>
+        <Text style={styles.subtitle}>{t("subtitle")}</Text>
         <Pressable
           style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.back(); }}
           accessibilityRole="button"
-          accessibilityLabel={t("common.back")}
+          accessibilityLabel={t("common:back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Ionicons name="arrow-back" size={18} color="#ff6600" />
-          <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
+          <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common:back")}</Text>
         </Pressable>
       </View>
 
       {/* ── Units ── */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("settings.units")}</Text>
-        <Text style={styles.sectionDesc}>{t("settings.unitsDesc")}</Text>
+        <Text style={styles.sectionTitle}>{t("units")}</Text>
+        <Text style={styles.sectionDesc}>{t("unitsDesc")}</Text>
         <View style={styles.chipRow}>
           {(["metric", "imperial"] as UnitSystem[]).map((u) => (
             <Pressable
@@ -64,7 +62,7 @@ export default function SettingsScreen() {
               accessibilityState={{ selected: settings.unitSystem === u }}
             >
               <Text style={[styles.chipText, settings.unitSystem === u && styles.chipTextActive]}>
-                {t(`settings.unit_${u}`)}
+                {t(`unit_${u}`)}
               </Text>
             </Pressable>
           ))}
@@ -73,10 +71,10 @@ export default function SettingsScreen() {
 
       {/* ── Search radius ── */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("settings.searchRadius")}</Text>
-        <Text style={styles.sectionDesc}>{t("settings.searchRadiusDesc")}</Text>
+        <Text style={styles.sectionTitle}>{t("searchRadius")}</Text>
+        <Text style={styles.sectionDesc}>{t("searchRadiusDesc")}</Text>
         <View style={styles.chipRow}>
-          {RADIUS_OPTIONS.map((r) => (
+          {SEARCH_RADIUS_OPTIONS_KM.map((r) => (
             <Pressable
               key={r}
               style={({ pressed }) => [
@@ -98,8 +96,8 @@ export default function SettingsScreen() {
 
       {/* ── Default tab ── */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t("settings.defaultTab")}</Text>
-        <Text style={styles.sectionDesc}>{t("settings.defaultTabDesc")}</Text>
+        <Text style={styles.sectionTitle}>{t("defaultTab")}</Text>
+        <Text style={styles.sectionDesc}>{t("defaultTabDesc")}</Text>
         <View style={styles.chipRow}>
           {DEFAULT_TAB_OPTIONS.map(({ key, emoji, labelKey }) => (
             <Pressable

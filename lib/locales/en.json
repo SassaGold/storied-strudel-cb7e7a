@@ -35,7 +35,18 @@
     "checkFuelPrices": "⛽ Check Fuel Prices",
     "readWikipedia": "📖 Read on Wikipedia",
     "cachedResults": "📡 Showing cached results — tap refresh for latest",
-    "fuelTypes": "⛽ Fuel Types"
+    "fuelTypes": "⛽ Fuel Types",
+    "showingOf": "Showing {{shown}} of {{total}} results",
+    "loadMore": "Load More",
+    "loadMoreHint": "Show more results",
+    "openInMapsHint": "Opens location in maps app",
+    "openInfoHint": "Opens details panel",
+    "infoFor": "Info for",
+    "staleRefreshing": "🔄 Refreshing… last data {{age}} ago",
+    "staleOffline": "⚠️ Offline — showing data from {{age}} ago",
+    "forceFetchHint": "🔄 Long-press to clear cache & force new search",
+    "locationRationaleTitle": "Location Access Needed",
+    "locationRationaleBody": "Roamly uses your location to find nearby places and show weather for your ride. Your GPS data stays on your device."
   },
   "language": {
     "label": "🌍 Language",
@@ -146,7 +157,16 @@
       "lightrainshowersandthunder": "Light rain showers and thunder",
       "lightsnowshowersandthunder": "Light snow showers and thunder",
       "lightsleetshowersandthunder": "Light sleet showers and thunder"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NE",
+    "wind_E": "E",
+    "wind_SE": "SE",
+    "wind_S": "S",
+    "wind_SW": "SW",
+    "wind_W": "W",
+    "wind_NW": "NW",
+    "yesterday": "Yesterday"
   },
   "food": {
     "badge": "🍽️ FOOD STOPS",
@@ -279,7 +299,14 @@
     "instructionsBody": "1. STAY CALM — assess the situation.\n\n2. CALL 112 (EU/Intl) or 911 (USA) immediately.\n\n3. LOCATION — tell them exactly where you are.\n\n4. HELMET — do not remove unless airway is blocked.\n\n5. BLEEDING — apply firm direct pressure.\n\n6. DO NOT MOVE an injured rider unless in immediate danger.\n\n7. KEEP THEM WARM — use spare clothing or foil blanket.\n\n8. STAY ON LINE — do not hang up until help arrives.",
     "quickActionCall": "Call 112",
     "quickActionTorch": "Torch",
-    "quickActionInstructions": "Instructions"
+    "quickActionInstructions": "Instructions",
+    "regions": {
+      "euIntl": "EU / Intl",
+      "usaCa": "USA / CA",
+      "uk": "UK",
+      "australia": "Australia",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ TRIP LOGGER",
@@ -314,7 +341,11 @@
     "mapUnavailable": "Map not available",
     "tooShortTitle": "Ride Not Saved",
     "tooShortMsg": "Ride was under 10 m — not saved.",
-    "speedLabel": "SPEED"
+    "speedLabel": "SPEED",
+    "startHint": "Begins recording your ride",
+    "stopHint": "Stops recording and saves the ride",
+    "bgServiceTitle": "Roamly — Recording",
+    "bgServiceBody": "Recording your ride in the background"
   },
   "about": {
     "badge": "ℹ️ ABOUT",

@@ -35,7 +35,18 @@
     "checkFuelPrices": "⛽ Kraftstoffpreise prüfen",
     "readWikipedia": "📖 Auf Wikipedia lesen",
     "cachedResults": "📡 Zwischengespeicherte Ergebnisse — aktualisieren für neueste",
-    "fuelTypes": "⛽ Kraftstoffarten"
+    "fuelTypes": "⛽ Kraftstoffarten",
+    "showingOf": "{{shown}} von {{total}} Ergebnissen",
+    "loadMore": "Mehr laden",
+    "loadMoreHint": "Mehr Ergebnisse anzeigen",
+    "openInMapsHint": "Öffnet den Standort in der Karten-App",
+    "openInfoHint": "Öffnet das Detailfeld",
+    "infoFor": "Info zu",
+    "staleRefreshing": "🔄 Wird aktualisiert… letzte Daten vor {{age}}",
+    "staleOffline": "⚠️ Offline — Daten von vor {{age}}",
+    "forceFetchHint": "🔄 Lang drücken zum Cache leeren & neue Suche starten",
+    "locationRationaleTitle": "Standortzugriff erforderlich",
+    "locationRationaleBody": "Roamly verwendet Ihren Standort, um nahegelegene Orte zu finden und das Wetter für Ihre Fahrt anzuzeigen. Ihre GPS-Daten bleiben auf Ihrem Gerät."
   },
   "language": {
     "label": "🌍 Sprache",
@@ -146,7 +157,16 @@
       "lightrainshowersandthunder": "Leichte Regenschauer und Gewitter",
       "lightsnowshowersandthunder": "Leichte Schneeschauer und Gewitter",
       "lightsleetshowersandthunder": "Leichte Schneeregenschauer und Gewitter"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NO",
+    "wind_E": "O",
+    "wind_SE": "SO",
+    "wind_S": "S",
+    "wind_SW": "SW",
+    "wind_W": "W",
+    "wind_NW": "NW",
+    "yesterday": "Gestern"
   },
   "food": {
     "badge": "🍽️ ESSENSSTOPPS",
@@ -279,7 +299,14 @@
     "instructionsBody": "1. RUHE BEWAHREN — Lage einschätzen.\n\n2. SOFORT 112 ANRUFEN.\n\n3. STANDORT — genau angeben, wo du bist.\n\n4. HELM — nur entfernen wenn Atemweg blockiert.\n\n5. BLUTUNG — festen direkten Druck anwenden.\n\n6. VERLETZTEN NICHT BEWEGEN außer bei unmittelbarer Gefahr.\n\n7. WARM HALTEN — Kleidung oder Rettungsdecke nutzen.\n\n8. VERBINDUNG HALTEN — nicht auflegen bis Hilfe kommt.",
     "quickActionCall": "112 anrufen",
     "quickActionTorch": "Licht",
-    "quickActionInstructions": "Anweisungen"
+    "quickActionInstructions": "Anweisungen",
+    "regions": {
+      "euIntl": "EU / Intl",
+      "usaCa": "USA / KA",
+      "uk": "UK",
+      "australia": "Australien",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ TOUR",
@@ -314,7 +341,11 @@
     "tooShortTitle": "Fahrt Nicht Gespeichert",
     "tooShortMsg": "Fahrt war unter 10 m — nicht gespeichert.",
     "viewMapShort": "Route",
-    "speedLabel": "TEMPO"
+    "speedLabel": "TEMPO",
+    "startHint": "Startet die Aufzeichnung Ihrer Fahrt",
+    "stopHint": "Stoppt die Aufzeichnung und speichert die Fahrt",
+    "bgServiceTitle": "Roamly — Aufzeichnung",
+    "bgServiceBody": "Fahrt wird im Hintergrund aufgezeichnet"
   },
   "about": {
     "badge": "ℹ️ ÜBER",

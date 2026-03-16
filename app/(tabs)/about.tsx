@@ -4,8 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+import { Haptics } from "../../lib/safeRequire";
 
 const APP_VERSION: string =
   (Constants.expoConfig?.version ?? "1.0.0") as string;
@@ -38,7 +37,7 @@ function Section({ title, children }: SectionProps) {
 }
 
 export default function AboutScreen() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("about");
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -46,98 +45,98 @@ export default function AboutScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.badge}>{t("about.badge")}</Text>
-        <Text style={styles.title}>{t("about.title")}</Text>
-        <Text style={styles.subtitle}>{t("about.subtitle")}</Text>
+        <Text style={styles.badge}>{t("badge")}</Text>
+        <Text style={styles.title}>{t("title")}</Text>
+        <Text style={styles.subtitle}>{t("subtitle")}</Text>
         <Pressable
           style={({ pressed }) => [styles.backBtn, pressed && styles.backBtnPressed]}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); router.back(); }}
           accessibilityRole="button"
-          accessibilityLabel={t("common.back")}
+          accessibilityLabel={t("common:back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           <Ionicons name="arrow-back" size={18} color="#ff6600" />
-          <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
+          <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common:back")}</Text>
         </Pressable>
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
 
         {/* Data Sources */}
-        <Section title={t("about.dataSources")}>
+        <Section title={t("dataSources")}>
 
           {/* OpenStreetMap */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>🗺️ {t("about.osm")}</Text>
-            <Text style={styles.cardBody}>{t("about.osmDesc")}</Text>
-            <Text style={styles.licenseText}>{t("about.osmLicense")}</Text>
+            <Text style={styles.cardTitle}>🗺️ {t("osm")}</Text>
+            <Text style={styles.cardBody}>{t("osmDesc")}</Text>
+            <Text style={styles.licenseText}>{t("osmLicense")}</Text>
             <LinkRow
               label="openstreetmap.org"
               url="https://www.openstreetmap.org"
-              openLabel={t("about.openLink")}
+              openLabel={t("openLink")}
             />
           </View>
 
           {/* Overpass API */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>🔍 {t("about.overpass")}</Text>
-            <Text style={styles.cardBody}>{t("about.overpassDesc")}</Text>
+            <Text style={styles.cardTitle}>🔍 {t("overpass")}</Text>
+            <Text style={styles.cardBody}>{t("overpassDesc")}</Text>
             <LinkRow
               label="overpass-api.de"
               url="https://overpass-api.de"
-              openLabel={t("about.openLink")}
+              openLabel={t("openLink")}
             />
           </View>
 
           {/* Open-Meteo */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>⛅ {t("about.weather")}</Text>
-            <Text style={styles.cardBody}>{t("about.weatherDesc")}</Text>
-            <Text style={styles.licenseText}>{t("about.weatherLicense")}</Text>
+            <Text style={styles.cardTitle}>⛅ {t("weather")}</Text>
+            <Text style={styles.cardBody}>{t("weatherDesc")}</Text>
+            <Text style={styles.licenseText}>{t("weatherLicense")}</Text>
             <LinkRow
               label="open-meteo.com"
               url="https://open-meteo.com"
-              openLabel={t("about.openLink")}
+              openLabel={t("openLink")}
             />
           </View>
 
           {/* Wikipedia */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>📖 {t("about.wikipedia")}</Text>
-            <Text style={styles.cardBody}>{t("about.wikipediaDesc")}</Text>
-            <Text style={styles.licenseText}>{t("about.wikiLicense")}</Text>
+            <Text style={styles.cardTitle}>📖 {t("wikipedia")}</Text>
+            <Text style={styles.cardBody}>{t("wikipediaDesc")}</Text>
+            <Text style={styles.licenseText}>{t("wikiLicense")}</Text>
             <LinkRow
               label="wikipedia.org"
               url="https://www.wikipedia.org"
-              openLabel={t("about.openLink")}
+              openLabel={t("openLink")}
             />
           </View>
 
           {/* Maps */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>📍 {t("about.maps")}</Text>
-            <Text style={styles.cardBody}>{t("about.mapsDesc")}</Text>
+            <Text style={styles.cardTitle}>📍 {t("maps")}</Text>
+            <Text style={styles.cardBody}>{t("mapsDesc")}</Text>
           </View>
         </Section>
 
         {/* Privacy */}
-        <Section title={t("about.privacy")}>
+        <Section title={t("privacy")}>
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>🔒 {t("about.privacyTitle")}</Text>
-            <Text style={styles.cardBody}>{t("about.privacyP1")}</Text>
+            <Text style={styles.cardTitle}>🔒 {t("privacyTitle")}</Text>
+            <Text style={styles.cardBody}>{t("privacyP1")}</Text>
             <View style={styles.divider} />
-            <Text style={styles.cardBody}>{t("about.privacyP2")}</Text>
+            <Text style={styles.cardBody}>{t("privacyP2")}</Text>
             <View style={styles.divider} />
-            <Text style={styles.cardBody}>{t("about.privacyP3")}</Text>
+            <Text style={styles.cardBody}>{t("privacyP3")}</Text>
             <View style={styles.divider} />
-            <Text style={styles.cardBody}>{t("about.privacyP4")}</Text>
+            <Text style={styles.cardBody}>{t("privacyP4")}</Text>
           </View>
         </Section>
 
         {/* Open-source credits */}
-        <Section title={t("about.credits")}>
+        <Section title={t("credits")}>
           <View style={styles.card}>
-            <Text style={styles.cardBody}>{t("about.creditsBody")}</Text>
+            <Text style={styles.cardBody}>{t("creditsBody")}</Text>
             <View style={styles.chipsRow}>
               {[
                 "Expo",
@@ -156,15 +155,15 @@ export default function AboutScreen() {
         </Section>
 
         {/* Legal */}
-        <Section title={t("about.legal")}>
+        <Section title={t("legal")}>
           <View style={styles.card}>
-            <Text style={styles.cardBody}>{t("about.legalBody")}</Text>
+            <Text style={styles.cardBody}>{t("legalBody")}</Text>
           </View>
         </Section>
 
         {/* Version */}
         <View style={styles.versionRow}>
-          <Text style={styles.versionLabel}>{t("about.version")}</Text>
+          <Text style={styles.versionLabel}>{t("version")}</Text>
           <Text style={styles.versionValue}>{APP_VERSION}</Text>
         </View>
 

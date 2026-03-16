@@ -35,7 +35,18 @@
     "checkFuelPrices": "⛽ Athuga eldsneytisverð",
     "readWikipedia": "📖 Lesa á Wikipediu",
     "cachedResults": "📡 Sýni geymd niðurstöður — uppfærðu til að fá nýjustu",
-    "fuelTypes": "⛽ Eldsneytistegundir"
+    "fuelTypes": "⛽ Eldsneytistegundir",
+    "showingOf": "Sýnir {{shown}} af {{total}} niðurstöðum",
+    "loadMore": "Sækja fleiri",
+    "loadMoreHint": "Sýna fleiri niðurstöður",
+    "openInMapsHint": "Opnar staðsetningu í kortaforritinu",
+    "openInfoHint": "Opnar upplýsingaglugga",
+    "infoFor": "Upplýsingar um",
+    "staleRefreshing": "🔄 Uppfæri… síðustu gögn fyrir {{age}}",
+    "staleOffline": "⚠️ Án nettengingar — gögn frá {{age}}",
+    "forceFetchHint": "🔄 Haltu inni til að hreinsa skyndiminni og leita að nýju",
+    "locationRationaleTitle": "Staðsetningaraðgangur nauðsynlegur",
+    "locationRationaleBody": "Roamly notar staðsetningu þína til að finna staði í nágrenninu og sýna veður fyrir ferðina þína. GPS-gögn þín eru geymd á tækinu þínu."
   },
   "language": {
     "label": "🌍 Tungumál",
@@ -146,7 +157,16 @@
       "lightrainshowersandthunder": "Létt rigninguarél og þruma",
       "lightsnowshowersandthunder": "Létt snjóél og þruma",
       "lightsleetshowersandthunder": "Létt slydduél og þruma"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NA",
+    "wind_E": "A",
+    "wind_SE": "SA",
+    "wind_S": "S",
+    "wind_SW": "SV",
+    "wind_W": "V",
+    "wind_NW": "NV",
+    "yesterday": "Í gær"
   },
   "food": {
     "badge": "🍽️ MATARSTOPP",
@@ -279,7 +299,14 @@
     "instructionsBody": "1. HALTU RÓ — mettu ástandið.\n\n2. HRINGDU Í 112 strax.\n\n3. STAÐSETNING — segðu nákvæmlega hvar þú ert.\n\n4. HJÁLMUR — fjarlægðu hann ekki nema loftvegi sé stíflaður.\n\n5. BLÆÐING — beitu þrýstingi beint á sárið.\n\n6. EKKI FÆRA meiddur nema yfirvofandi hætta sé.\n\n7. GEYMDU HLÝJA — notaðu föt eða björgunarfiltu.\n\n8. HALTU LÍNUNNI — leggðu ekki niður þar til hjálp kemur.",
     "quickActionCall": "Hringja 112",
     "quickActionTorch": "Ljós",
-    "quickActionInstructions": "Leiðbeiningar"
+    "quickActionInstructions": "Leiðbeiningar",
+    "regions": {
+      "euIntl": "ESB / Alþjóðl.",
+      "usaCa": "USA / CA",
+      "uk": "UK",
+      "australia": "Ástralía",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ FERÐASKRÁ",
@@ -314,7 +341,11 @@
     "tooShortTitle": "Ferð Ekki Vistuð",
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
     "viewMapShort": "Leið",
-    "speedLabel": "HRAÐI"
+    "speedLabel": "HRAÐI",
+    "startHint": "Byrjar að skrá ferðina þína",
+    "stopHint": "Stoppar skráningu og vistar ferðina",
+    "bgServiceTitle": "Roamly — Skráning",
+    "bgServiceBody": "Skráir ferð þína í bakgrunni"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

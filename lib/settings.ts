@@ -1,4 +1,4 @@
-import { createContext, createElement, useContext, useEffect, useState } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 const AsyncStorage: any = (() => {
@@ -58,23 +58,29 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (raw) {
           setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(raw) });
         }
-      } catch {}
+      } catch (e) {
+        console.warn("[Settings] load error:", e);
+      }
     })();
   }, []);
 
-  const setSetting = <K extends keyof AppSettings>(key: K, val: AppSettings[K]) => {
+  const setSetting = useCallback(<K extends keyof AppSettings>(key: K, val: AppSettings[K]) => {
     setSettings((prev) => {
       const next = { ...prev, [key]: val };
       try {
         AsyncStorage?.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {}
+      } catch (e) {
+        console.warn("[Settings] save error:", e);
+      }
       return next;
     });
-  };
+  }, []);
+
+  const ctxValue = useMemo(() => ({ settings, setSetting }), [settings, setSetting]);
 
   return createElement(
     SettingsContext.Provider,
-    { value: { settings, setSetting } },
+    { value: ctxValue },
     children
   );
 }

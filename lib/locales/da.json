@@ -35,7 +35,18 @@
     "checkFuelPrices": "⛽ Tjek brændstofpriser",
     "readWikipedia": "📖 Læs på Wikipedia",
     "cachedResults": "📡 Viser cachelagrede resultater — tryk opdater for seneste",
-    "fuelTypes": "⛽ Brændstoftyper"
+    "fuelTypes": "⛽ Brændstoftyper",
+    "showingOf": "Viser {{shown}} af {{total}} resultater",
+    "loadMore": "Indlæs mere",
+    "loadMoreHint": "Vis flere resultater",
+    "openInMapsHint": "Åbner stedet i kortappen",
+    "openInfoHint": "Åbner detaljer",
+    "infoFor": "Info om",
+    "staleRefreshing": "🔄 Opdaterer… seneste data for {{age}} siden",
+    "staleOffline": "⚠️ Offline — viser data fra {{age}} siden",
+    "forceFetchHint": "🔄 Hold nede for at rydde cache & søge forfra",
+    "locationRationaleTitle": "Placeringsadgang kræves",
+    "locationRationaleBody": "Roamly bruger din placering til at finde steder i nærheden og vise vejret for din tur. Dine GPS-data forbliver på din enhed."
   },
   "language": {
     "label": "🌍 Sprog",
@@ -146,7 +157,16 @@
       "lightrainshowersandthunder": "Lette regnbyger og torden",
       "lightsnowshowersandthunder": "Lette snebyger og torden",
       "lightsleetshowersandthunder": "Lette sludbyger og torden"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NØ",
+    "wind_E": "Ø",
+    "wind_SE": "SØ",
+    "wind_S": "S",
+    "wind_SW": "SW",
+    "wind_W": "V",
+    "wind_NW": "NV",
+    "yesterday": "I går"
   },
   "food": {
     "badge": "🍽️ MADSTOPP",
@@ -268,7 +288,25 @@
       "clinic": "🏨 Klinik",
       "doctors": "👨‍⚕️ Læge",
       "ambulance_station": "🚑 Ambulance"
-    }
+    },
+    "regions": {
+      "euIntl": "EU / Intl",
+      "usaCa": "USA / CA",
+      "uk": "UK",
+      "australia": "Australien",
+      "nz": "NZ"
+    },
+    "callSos": "RING SOS (112)",
+    "emergencyInstructions": "📋 Instruktioner",
+    "instructionsBody": "1. FORBLIV ROLIG — vurder situationen.\n\n2. RING 112 (EU/Intl) eller 911 (USA) med det samme.\n\n3. PLACERING — fortæl dem præcis hvor du er.\n\n4. HJELM — fjern den ikke medmindre luftvejen er blokeret.\n\n5. BLØDNING — tryk fast direkte på såret.\n\n6. FLYT IKKE en skadet rytter medmindre de er i umiddelbar fare.\n\n7. HOLD DEM VARME — brug reservetøj eller folie tæppe.\n\n8. BLIV PÅ LINJEN — læg ikke på, før hjælpen ankommer.",
+    "instructionsClose": "Luk",
+    "instructionsTitle": "Nødinstruktioner",
+    "quickActionCall": "Ring 112",
+    "quickActionInstructions": "Instruktioner",
+    "quickActionTorch": "Lommelygte",
+    "quickActions": "HURTIGE HANDLINGER",
+    "torchScreen": "🔦 Lommelygte",
+    "torchScreenOff": "🔦 Sluk"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -301,7 +339,13 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Kort ikke tilgængeligt",
     "tooShortTitle": "Tur ikke gemt",
-    "tooShortMsg": "Turen var under 10 m — ikke gemt."
+    "tooShortMsg": "Turen var under 10 m — ikke gemt.",
+    "startHint": "Begynder at optage din tur",
+    "stopHint": "Stopper optagelse og gemmer turen",
+    "bgServiceTitle": "Roamly — Optager",
+    "bgServiceBody": "Optager din tur i baggrunden",
+    "speedLabel": "FART",
+    "viewMapShort": "Rute"
   },
   "about": {
     "badge": "ℹ️ OM",

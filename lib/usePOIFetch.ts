@@ -1,0 +1,360 @@
+// ── Shared POI-fetch hook ─────────────────────────────────────────────────────
+// Encapsulates the identical data-fetching and state-management logic that was
+// previously copy-pasted across restaurants.tsx, hotels.tsx and attractions.tsx.
+
+import { useCallback, useRef, useState } from "react";
+import { Alert, Linking } from "react-native";
+import * as Location from "expo-location";
+import { useTranslation } from "react-i18next";
+import { useSettings } from "./settings";
+import { fetchOverpass, parseWikiTag, OverpassElement, buildMapsUrl } from "./overpass";
+import { AsyncStorage } from "./safeRequire";
+import { wikipediaSummaryUrl } from "./config";
+
+/** How many results to show initially and on each "Load More" tap. */
+const PAGE_SIZE = 20;
+
+/**
+ * Minimum milliseconds between Overpass fetch requests to avoid overloading
+ * the shared public infrastructure when the user taps Find rapidly.
+ */
+const FETCH_COOLDOWN_MS = 5_000;
+
+/**
+ * Module-level cache for Wikipedia summaries keyed by "<lang>/<title>".
+ * Exported so screens that manage their own fetch logic (e.g. mc.tsx) can
+ * share the same in-memory cache and avoid redundant network requests.
+ */
+export const wikiCache = new Map<string, string>();
+
+// ── Shared Place type ─────────────────────────────────────────────────────────
+
+export type Place = {
+  id: string;
+  name: string;
+  category: string;
+  distanceMeters?: number;
+  latitude: number;
+  longitude: number;
+  /** Hotel star rating, e.g. "4" */
+  stars?: string;
+  website?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  openingHours?: string;
+  wikipedia?: string;
+};
+
+// ── Hook types ────────────────────────────────────────────────────────────────
+
+/**
+ * Builds a complete Overpass QL query string for the given user position and
+ * search radius (in metres).  Defined at module level so the reference is
+ * stable and won't trigger extra re-renders.
+ */
+export type BuildOverpassQuery = (
+  lat: number,
+  lon: number,
+  radiusM: number
+) => string;
+
+/**
+ * Maps a single raw Overpass element to a Place.  Returns null when the
+ * element lacks valid coordinates and should be skipped.
+ */
+export type MapElement = (
+  element: OverpassElement,
+  userLat: number,
+  userLon: number
+) => Place | null;
+
+export interface UsePOIFetchOptions {
+  cacheKey: string;
+  buildOverpassQuery: BuildOverpassQuery;
+  mapElement: MapElement;
+  /** i18n key for the location-permission error message */
+  locationErrorKey: string;
+  /** i18n key for the generic load-failure error message */
+  loadErrorKey: string;
+}
+
+export interface UsePOIFetchResult {
+  /** Visible page of results (up to `visibleCount` items). */
+  places: Place[];
+  /** Total number of results fetched (may be > places.length when paginated). */
+  totalFound: number;
+  loading: boolean;
+  error: string | null;
+  fromCache: boolean;
+  /**
+   * Unix timestamp (ms) of when the currently-displayed data was cached.
+   * Present whenever `fromCache` is true so the UI can show "last updated X min ago".
+   */
+  cacheTimestamp: number | null;
+  /**
+   * True when a background refresh failed but stale cached data is still visible.
+   * The UI should show an "offline" indicator rather than a hard error.
+   */
+  refreshError: boolean;
+  userLocation: { latitude: number; longitude: number } | null;
+  infoPlace: Place | null;
+  wikiExtract: string | null;
+  wikiLoading: boolean;
+  loadPlaces: () => Promise<void>;
+  /**
+   * Clears the local cache entry and starts a fully-fresh network search,
+   * skipping the stale-data pre-fill so the user sees clean loading state.
+   * Use this when the user has moved significantly and wants results for
+   * their new location rather than the previously-cached area.
+   */
+  forceFetch: () => Promise<void>;
+  /**
+   * Cancels any in-flight Overpass request and resets the loading state.
+   * Shows any stale cached data that was pre-filled, or clears to idle.
+   */
+  cancel: () => void;
+  /** Reveal the next page of already-fetched results. */
+  loadMore: () => void;
+  openInMaps: (place: Place) => void;
+  openInfo: (place: Place) => void;
+  closeInfo: () => void;
+}
+
+// ── Hook ──────────────────────────────────────────────────────────────────────
+
+export function usePOIFetch({
+  cacheKey,
+  buildOverpassQuery,
+  mapElement,
+  locationErrorKey,
+  loadErrorKey,
+}: UsePOIFetchOptions): UsePOIFetchResult {
+  const { t } = useTranslation("common");
+  const { settings } = useSettings();
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // All fetched results sorted by distance
+  const [allPlaces, setAllPlaces] = useState<Place[]>([]);
+  // How many results to expose to the UI (pagination)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [infoPlace, setInfoPlace] = useState<Place | null>(null);
+  const [wikiExtract, setWikiExtract] = useState<string | null>(null);
+  const [wikiLoading, setWikiLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [fromCache, setFromCache] = useState(false);
+  /** Unix timestamp (ms) of the cache entry currently displayed. */
+  const [cacheTimestamp, setCacheTimestamp] = useState<number | null>(null);
+  /** True when the background refresh failed but we still have stale data. */
+  const [refreshError, setRefreshError] = useState(false);
+
+  // AbortController ref for request deduplication (#6): cancels any in-flight
+  // Overpass request before starting a new one so rapid taps don't race.
+  const abortRef = useRef<AbortController | null>(null);
+  // Tracks the timestamp of the last initiated fetch to enforce FETCH_COOLDOWN_MS.
+  const lastFetchRef = useRef<number>(0);
+
+  const loadPlaces = useCallback(async () => {
+    // Rate-limit: silently skip if a fetch was started within the last
+    // FETCH_COOLDOWN_MS milliseconds to avoid hammering the public Overpass servers.
+    const now = Date.now();
+    if (now - lastFetchRef.current < FETCH_COOLDOWN_MS) return;
+    lastFetchRef.current = now;
+
+    // Cancel any in-flight request before starting a fresh one
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    // Show last-known cached results immediately while re-fetching.
+    // The TTL check is intentionally removed here: stale data is always
+    // better than nothing — we show it and refresh in the background.
+    let hadCachedData = false;
+    try {
+      const raw = await AsyncStorage?.getItem(cacheKey);
+      if (raw) {
+        const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
+        if (data?.length > 0) {
+          setAllPlaces(data);
+          setVisibleCount(PAGE_SIZE);
+          setFromCache(true);
+          setCacheTimestamp(ts);
+          hadCachedData = true;
+        }
+      }
+    } catch (e) {
+      console.warn("[usePOIFetch] cache read error:", e instanceof Error ? e.message : String(e));
+    }
+
+    setLoading(true);
+    setError(null);
+    setRefreshError(false);
+
+    try {
+      // Show an in-app rationale before triggering the OS permission dialog
+      // so the user understands why location access is required.
+      const { status: currentStatus } = await Location.getForegroundPermissionsAsync();
+      if (currentStatus === "undetermined") {
+        await new Promise<void>((resolve) =>
+          Alert.alert(
+            t("locationRationaleTitle"),
+            t("locationRationaleBody"),
+            [{ text: "OK", onPress: () => resolve() }],
+            { cancelable: false }
+          )
+        );
+      }
+
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== "granted") {
+        setError(t(locationErrorKey));
+        return;
+      }
+
+      const position = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const { latitude, longitude } = position.coords;
+      setUserLocation({ latitude, longitude });
+
+      const radiusM = settings.searchRadiusKm * 1000;
+      const overpassQuery = buildOverpassQuery(latitude, longitude, radiusM);
+
+      // Overpass API (OpenStreetMap) — free place/POI data, no API key required
+      const data = await fetchOverpass(overpassQuery, undefined, controller.signal);
+
+      const mapped = data.elements
+        .map((el) => mapElement(el, latitude, longitude))
+        .filter(Boolean) as Place[];
+
+      const sorted = mapped
+        .sort((a, b) => {
+          // Push places with unknown distance to the end rather than
+          // treating null as 0 (which would place them at the top).
+          if (a.distanceMeters == null && b.distanceMeters == null) return 0;
+          if (a.distanceMeters == null) return 1;
+          if (b.distanceMeters == null) return -1;
+          return a.distanceMeters - b.distanceMeters;
+        });
+
+      setAllPlaces(sorted);
+      setVisibleCount(PAGE_SIZE);
+      setFromCache(false);
+      setCacheTimestamp(null);
+      try {
+        await AsyncStorage?.setItem(
+          cacheKey,
+          JSON.stringify({ ts: Date.now(), data: sorted })
+        );
+      } catch (e) {
+        console.warn("[usePOIFetch] cache write error:", e instanceof Error ? e.message : String(e));
+      }
+    } catch (e) {
+      if (e instanceof Error && (e.name === "AbortError" || e.message === "Cancelled")) {
+        return; // Silently ignore cancellation
+      }
+      console.warn("[usePOIFetch] load error:", e instanceof Error ? e.message : String(e));
+      if (hadCachedData) {
+        // Stale data is already visible — set the offline flag instead of
+        // replacing the list with a hard error message.
+        setRefreshError(true);
+      } else {
+        setError(t(loadErrorKey));
+      }
+    } finally {
+      setLoading(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.searchRadiusKm, cacheKey, buildOverpassQuery, mapElement, locationErrorKey, loadErrorKey]);
+
+  const loadMore = useCallback(() => {
+    setVisibleCount((prev) => prev + PAGE_SIZE);
+  }, []);
+
+  const forceFetch = useCallback(async () => {
+    // Reset rate-limit timer so a force-refresh always goes through immediately.
+    lastFetchRef.current = 0;
+    // Delete the cached entry so `loadPlaces` starts with a blank slate —
+    // no stale data is pre-filled and the user sees a clean loading state.
+    try {
+      await AsyncStorage?.removeItem(cacheKey);
+    } catch (e) {
+      console.warn("[usePOIFetch] cache clear error:", e instanceof Error ? e.message : String(e));
+    }
+    setAllPlaces([]);
+    setFromCache(false);
+    setCacheTimestamp(null);
+    setRefreshError(false);
+    await loadPlaces();
+  }, [cacheKey, loadPlaces]);
+
+  const openInMaps = useCallback((place: Place) => {
+    const url = buildMapsUrl(place.latitude, place.longitude, place.name);
+    Linking.openURL(url).catch((e) => console.warn("[usePOIFetch] openInMaps error:", e instanceof Error ? e.message : String(e)));
+  }, []);
+
+  const openInfo = useCallback((place: Place) => {
+    setInfoPlace(place);
+    setWikiExtract(null);
+    if (place.wikipedia) {
+      const { lang, title } = parseWikiTag(place.wikipedia);
+      const cacheKey = `${lang}/${title}`;
+      // Return cached extract immediately if available
+      if (wikiCache.has(cacheKey)) {
+        setWikiExtract(wikiCache.get(cacheKey)!);
+        return;
+      }
+      setWikiLoading(true);
+      // Wikipedia REST API — free, no API key required; 8 s timeout to prevent hangs
+      const wikiController = new AbortController();
+      const wikiTimeout = setTimeout(() => wikiController.abort(), 8_000);
+      fetch(
+        wikipediaSummaryUrl(lang, title),
+        { signal: wikiController.signal }
+      )
+        .then((r) => r.json())
+        .then((d: { extract?: string }) => {
+          const extract = (d.extract || "").trim() || null;
+          if (extract) wikiCache.set(cacheKey, extract);
+          setWikiExtract(extract);
+        })
+        .catch((e) => { console.warn("[usePOIFetch] wikipedia error:", e instanceof Error ? e.message : String(e)); setWikiExtract(null); })
+        .finally(() => { clearTimeout(wikiTimeout); setWikiLoading(false); });
+    }
+  }, []);
+
+  const cancel = useCallback(() => {
+    abortRef.current?.abort();
+    setLoading(false);
+  }, []);
+
+  const closeInfo = useCallback(() => {
+    setInfoPlace(null);
+    setWikiExtract(null);
+  }, []);
+
+  return {
+    places: allPlaces.slice(0, visibleCount),
+    totalFound: allPlaces.length,
+    loading,
+    error,
+    fromCache,
+    cacheTimestamp,
+    refreshError,
+    userLocation,
+    infoPlace,
+    wikiExtract,
+    wikiLoading,
+    loadPlaces,
+    forceFetch,
+    cancel,
+    loadMore,
+    openInMaps,
+    openInfo,
+    closeInfo,
+  };
+}

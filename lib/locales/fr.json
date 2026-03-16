@@ -35,7 +35,18 @@
     "checkFuelPrices": "⛽ Vérifier les prix du carburant",
     "readWikipedia": "📖 Lire sur Wikipédia",
     "cachedResults": "📡 Résultats en cache — actualiser pour les derniers",
-    "fuelTypes": "⛽ Types de carburant"
+    "fuelTypes": "⛽ Types de carburant",
+    "showingOf": "{{shown}} sur {{total}} résultats",
+    "loadMore": "Charger plus",
+    "loadMoreHint": "Afficher plus de résultats",
+    "openInMapsHint": "Ouvre l'emplacement dans l'application de cartes",
+    "openInfoHint": "Ouvre le panneau de détails",
+    "infoFor": "Infos sur",
+    "staleRefreshing": "🔄 Actualisation… dernières données il y a {{age}}",
+    "staleOffline": "⚠️ Hors ligne — données de il y a {{age}}",
+    "forceFetchHint": "🔄 Appui long pour vider le cache & relancer la recherche",
+    "locationRationaleTitle": "Accès à la localisation requis",
+    "locationRationaleBody": "Roamly utilise votre position pour trouver des lieux à proximité et afficher la météo pour votre trajet. Vos données GPS restent sur votre appareil."
   },
   "language": {
     "label": "🌍 Langue",
@@ -146,7 +157,16 @@
       "lightrainshowersandthunder": "Averses légères et orage",
       "lightsnowshowersandthunder": "Averses de neige légères et orage",
       "lightsleetshowersandthunder": "Averses de grésil légères et orage"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NE",
+    "wind_E": "E",
+    "wind_SE": "SE",
+    "wind_S": "S",
+    "wind_SW": "SO",
+    "wind_W": "O",
+    "wind_NW": "NO",
+    "yesterday": "Hier"
   },
   "food": {
     "badge": "🍽️ PAUSES REPAS",
@@ -279,7 +299,14 @@
     "instructionsBody": "1. RESTEZ CALME — évaluez la situation.\n\n2. APPELEZ LE 112 immédiatement.\n\n3. LOCALISATION — indiquez exactement où vous êtes.\n\n4. CASQUE — ne le retirez pas sauf obstruction des voies respiratoires.\n\n5. SAIGNEMENT — appliquez une pression directe ferme.\n\n6. NE BOUGEZ PAS le blessé sauf danger immédiat.\n\n7. GARDEZ-LE AU CHAUD — utilisez vêtements ou couverture de survie.\n\n8. RESTEZ EN LIGNE — ne raccrochez pas avant l'arrivée des secours.",
     "quickActionCall": "Appeler 112",
     "quickActionTorch": "Torche",
-    "quickActionInstructions": "Instructions"
+    "quickActionInstructions": "Instructions",
+    "regions": {
+      "euIntl": "UE / Intl",
+      "usaCa": "USA / CA",
+      "uk": "RU",
+      "australia": "Australie",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ TRAJET",
@@ -314,7 +341,11 @@
     "tooShortTitle": "Trajet Non Enregistré",
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
     "viewMapShort": "Itinéraire",
-    "speedLabel": "VITESSE"
+    "speedLabel": "VITESSE",
+    "startHint": "Commence à enregistrer votre trajet",
+    "stopHint": "Arrête l'enregistrement et sauvegarde le trajet",
+    "bgServiceTitle": "Roamly — Enregistrement",
+    "bgServiceBody": "Enregistrement de votre trajet en arrière-plan"
   },
   "about": {
     "badge": "ℹ️ À PROPOS",
