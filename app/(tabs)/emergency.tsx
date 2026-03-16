@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS, buildMapsUrl, type OverpassElement } from "../../lib/overpass";
 import { Haptics, AsyncStorage, MapView, Marker, PROVIDER_GOOGLE } from "../../lib/safeRequire";
+import { CACHE_SCHEMA_VERSION } from "../../lib/config";
 
 /** Maximum results to fetch from Overpass API (balances response time vs. coverage) */
 const MAX_RESULTS = 80;
@@ -103,7 +104,7 @@ const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: stri
     });
 };
 
-const CACHE_KEY = "cache_emergency_v2";
+const CACHE_KEY = `cache_emergency_${CACHE_SCHEMA_VERSION}`;
 
 export default function EmergencyScreen() {
   const { t } = useTranslation("sos");

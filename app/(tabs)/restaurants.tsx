@@ -3,13 +3,14 @@ import { haversineMeters } from "../../lib/overpass";
 import { usePOIFetch } from "../../lib/usePOIFetch";
 import type { BuildOverpassQuery, MapElement } from "../../lib/usePOIFetch";
 import POIScreen from "../../components/POIScreen";
+import { CACHE_SCHEMA_VERSION } from "../../lib/config";
 
 // ── Screen-specific configuration ────────────────────────────────────────────
 
 const AMENITY_TYPES =
   "restaurant|cafe|fast_food|bar|pub|food_court|ice_cream|bakery";
 
-const CACHE_KEY = "cache_restaurants_v2";
+const CACHE_KEY = `cache_restaurants_${CACHE_SCHEMA_VERSION}`;
 
 const categoryLabel: Record<string, string> = {
   restaurant: "🍽️ Restaurant",

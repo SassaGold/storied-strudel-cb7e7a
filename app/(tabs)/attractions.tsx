@@ -2,10 +2,11 @@ import { haversineMeters } from "../../lib/overpass";
 import { usePOIFetch } from "../../lib/usePOIFetch";
 import type { BuildOverpassQuery, MapElement } from "../../lib/usePOIFetch";
 import POIScreen from "../../components/POIScreen";
+import { CACHE_SCHEMA_VERSION } from "../../lib/config";
 
 // ── Screen-specific configuration ────────────────────────────────────────────
 
-const CACHE_KEY = "cache_attractions_v2";
+const CACHE_KEY = `cache_attractions_${CACHE_SCHEMA_VERSION}`;
 
 // Defined at module level so the reference is stable across renders.
 const buildOverpassQuery: BuildOverpassQuery = (lat, lon, radiusM) => `

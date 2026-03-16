@@ -2,13 +2,14 @@ import { haversineMeters } from "../../lib/overpass";
 import { usePOIFetch } from "../../lib/usePOIFetch";
 import type { BuildOverpassQuery, MapElement } from "../../lib/usePOIFetch";
 import POIScreen from "../../components/POIScreen";
+import { CACHE_SCHEMA_VERSION } from "../../lib/config";
 
 // ── Screen-specific configuration ────────────────────────────────────────────
 
 const ACCOMMODATION_TYPES =
   "hotel|motel|hostel|guest_house|apartment|chalet|resort|camp_site|caravan_site|alpine_hut|wilderness_hut|villa|bungalow";
 
-const CACHE_KEY = "cache_hotels_v2";
+const CACHE_KEY = `cache_hotels_${CACHE_SCHEMA_VERSION}`;
 
 // Defined at module level so the reference is stable across renders.
 const buildOverpassQuery: BuildOverpassQuery = (lat, lon, radiusM) => `

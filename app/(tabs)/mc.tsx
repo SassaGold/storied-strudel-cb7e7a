@@ -18,7 +18,7 @@ import { useSettings, fmtDistShort } from "../../lib/settings";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS, parseWikiTag, OverpassElement, buildMapsUrl } from "../../lib/overpass";
 import { Haptics, AsyncStorage, MapView, Marker, PROVIDER_GOOGLE } from "../../lib/safeRequire";
 import { wikiCache } from "../../lib/usePOIFetch";
-import { wikipediaSummaryUrl, wikipediaPageUrl } from "../../lib/config";
+import { wikipediaSummaryUrl, wikipediaPageUrl, CACHE_SCHEMA_VERSION } from "../../lib/config";
 
 type Place = {
   id: string;
@@ -285,7 +285,7 @@ out center 120;`;
     const controller = new AbortController();
     abortRef.current = controller;
 
-    const cacheKey = `cache_mc_v2_${selected}`;
+    const cacheKey = `cache_mc_${CACHE_SCHEMA_VERSION}_${selected}`;
     // Load cache so user sees last-known results immediately while fetching
     try {
       const raw = await AsyncStorage.getItem(cacheKey);

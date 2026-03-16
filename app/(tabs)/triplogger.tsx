@@ -19,6 +19,7 @@ import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY } from "../../lib/locationTask";
 import type { BgPoint } from "../../lib/locationTask";
+import { JITTER_FILTER_METERS } from "../../lib/config";
 import { Haptics, AsyncStorage, MapView, Polyline, PROVIDER_GOOGLE } from "../../lib/safeRequire";
 
 const STORAGE_KEY = "triplogger_rides_v1";
@@ -143,7 +144,7 @@ export default function TripLoggerScreen() {
       for (const p of newPoints) {
         if (last) {
           const dist = haversineMeters(last.latitude, last.longitude, p.latitude, p.longitude);
-          if (dist >= 3) {
+          if (dist >= JITTER_FILTER_METERS) {
             distRef.current += dist / 1000;
             merged.push(p);
             last = p;
@@ -323,8 +324,8 @@ export default function TripLoggerScreen() {
 
         if (prev) {
           const dist = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
-          // Ignore jitter: only count if moved >= 3 m
-          if (dist >= 3) {
+          // Ignore jitter: only count if moved >= JITTER_FILTER_METERS
+          if (dist >= JITTER_FILTER_METERS) {
             distRef.current += dist / 1000;
             setDistanceKm(distRef.current);
             routeRef.current = [...routeRef.current, newPoint];

@@ -6,8 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
 import { Haptics } from "../../lib/safeRequire";
-
-const RADIUS_OPTIONS = [2, 5, 10, 15, 20] as const;
+import { SEARCH_RADIUS_OPTIONS_KM } from "../../lib/config";
 
 const DEFAULT_TAB_OPTIONS: { key: DefaultTab; emoji: string; labelKey: string }[] = [
   { key: "index", emoji: "🧭", labelKey: "tabs:home" },
@@ -75,7 +74,7 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>{t("searchRadius")}</Text>
         <Text style={styles.sectionDesc}>{t("searchRadiusDesc")}</Text>
         <View style={styles.chipRow}>
-          {RADIUS_OPTIONS.map((r) => (
+          {SEARCH_RADIUS_OPTIONS_KM.map((r) => (
             <Pressable
               key={r}
               style={({ pressed }) => [
