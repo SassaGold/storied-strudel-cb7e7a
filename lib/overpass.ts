@@ -2,6 +2,7 @@
 // Used by restaurants, hotels, attractions, mc, and emergency tabs.
 
 import { Platform } from "react-native";
+import Constants from "expo-constants";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -47,11 +48,27 @@ export function haversineMeters(
 }
 
 /** Overpass API mirrors — free OpenStreetMap data, no API key required. */
-export const OVERPASS_ENDPOINTS = [
+/** Default Overpass API mirrors, tried in order. */
+const DEFAULT_OVERPASS_ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
   "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
 ];
+
+/**
+ * Resolved Overpass endpoints.  Override all mirrors at once by setting the
+ * OVERPASS_ENDPOINTS env var to a comma-separated list of URLs in `.env`
+ * (see `.env.example`).  Falls back to DEFAULT_OVERPASS_ENDPOINTS when the
+ * variable is absent or empty.
+ */
+const _extra = (Constants.expoConfig?.extra ?? {}) as Record<string, unknown>;
+const _envEndpoints =
+  typeof _extra.overpassEndpoints === "string" && _extra.overpassEndpoints
+    ? _extra.overpassEndpoints.split(",").map((s) => s.trim()).filter(Boolean)
+    : [];
+
+export const OVERPASS_ENDPOINTS: string[] =
+  _envEndpoints.length > 0 ? _envEndpoints : DEFAULT_OVERPASS_ENDPOINTS;
 
 const DEFAULT_TIMEOUT_MS = 40_000;
 /** Base delay for exponential backoff between endpoint retries (ms). */

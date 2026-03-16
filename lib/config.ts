@@ -2,6 +2,27 @@
 // All external service URLs and shared magic numbers live here so they can be
 // found and updated in one place rather than scattered across lib/useRiderHQ.ts,
 // lib/usePOIFetch.ts, app/(tabs)/settings.tsx, app/(tabs)/triplogger.tsx, etc.
+//
+// API base URLs can be overridden at build time via environment variables
+// (see .env.example and app.config.js).  Use NOMINATIM_BASE_URL,
+// OPEN_METEO_BASE_URL, and OVERPASS_ENDPOINTS to point at a self-hosted or
+// staging mirror without touching this file.
+
+import Constants from "expo-constants";
+
+const _extra = (Constants.expoConfig?.extra ?? {}) as Record<string, unknown>;
+
+/** Resolved Nominatim base URL — override via NOMINATIM_BASE_URL env var. */
+const NOMINATIM_BASE =
+  typeof _extra.nominatimBaseUrl === "string" && _extra.nominatimBaseUrl
+    ? _extra.nominatimBaseUrl.replace(/\/$/, "")
+    : "https://nominatim.openstreetmap.org";
+
+/** Resolved Open-Meteo base URL — override via OPEN_METEO_BASE_URL env var. */
+const OPEN_METEO_BASE =
+  typeof _extra.openMeteoBaseUrl === "string" && _extra.openMeteoBaseUrl
+    ? _extra.openMeteoBaseUrl.replace(/\/$/, "")
+    : "https://api.open-meteo.com";
 
 // ── POI search ────────────────────────────────────────────────────────────────
 
@@ -34,11 +55,11 @@ export const CACHE_SCHEMA_VERSION = "v2";
 
 /** Nominatim reverse-geocoding (OpenStreetMap) — free, no API key required. */
 export const nominatimReverseUrl = (lat: number, lon: number): string =>
-  `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
+  `${NOMINATIM_BASE}/reverse?format=jsonv2&lat=${lat}&lon=${lon}`;
 
 /** Open-Meteo weather forecast — free, no API key required. */
 export const openMeteoForecastUrl = (lat: number, lon: number): string =>
-  `https://api.open-meteo.com/v1/forecast` +
+  `${OPEN_METEO_BASE}/v1/forecast` +
   `?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}` +
   `&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,relative_humidity_2m,precipitation,weather_code,precipitation_probability` +
   `&hourly=temperature_2m,weather_code,precipitation_probability` +

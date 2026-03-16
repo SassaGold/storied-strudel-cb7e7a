@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { flags } from "../../lib/featureFlags";
 
 /** Wraps each tab icon to add a coloured top-bar indicator when focused */
 function TabIcon({
@@ -99,6 +100,7 @@ export default function TabLayout() {
         name="mc"
         options={{
           title: t("garage"),
+          href: flags.mcTab ? undefined : null,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="speedometer" color={color} focused={focused} />
           ),
@@ -108,6 +110,7 @@ export default function TabLayout() {
         name="triplogger"
         options={{
           title: t("trip"),
+          href: flags.triploggerTab ? undefined : null,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon name="navigate" color={color} focused={focused} />
           ),
@@ -125,6 +128,7 @@ export default function TabLayout() {
         name="emergency"
         options={{
           title: t("sos"),
+          href: flags.emergencyTab ? undefined : null,
           tabBarActiveTintColor: "#ef4444",
           tabBarIcon: ({ focused }) => (
             <TabIcon

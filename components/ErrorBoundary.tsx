@@ -6,6 +6,7 @@
 
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { crashReporter } from "../lib/crash";
 
 interface Props {
   children: ReactNode;
@@ -26,6 +27,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: unknown, info: ErrorInfo) {
     console.error("[ErrorBoundary] Unhandled render error:", error, info.componentStack);
+    crashReporter.captureException(error);
   }
 
   handleReset = () => {
