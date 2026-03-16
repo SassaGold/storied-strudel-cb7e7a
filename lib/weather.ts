@@ -75,9 +75,9 @@ export function wmoToSymbol(code: number): string {
 export const normalizeSymbol = (sym: string) =>
   sym.replace(/_(day|night|polartwilight)$/, "");
 
-export const windDegToCompass = (deg: number): string => {
-  const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-  return dirs[((Math.round(deg / 45) % 8) + 8) % 8];
+export const windDegToKey = (deg: number): string => {
+  const keys = ["wind_N", "wind_NE", "wind_E", "wind_SE", "wind_S", "wind_SW", "wind_W", "wind_NW"];
+  return keys[((Math.round(deg / 45) % 8) + 8) % 8];
 };
 
 export const formatHourlyTime = (isoTime: string): string => {
@@ -86,10 +86,10 @@ export const formatHourlyTime = (isoTime: string): string => {
   return isoTime.slice(tIdx + 1, tIdx + 6);
 };
 
-export const formatForecastDate = (dateStr: string) => {
+export const formatForecastDate = (dateStr: string, locale = "en-US") => {
   const [year, month, day] = dateStr.split("-").map(Number);
   const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale, {
     weekday: "short",
     month: "short",
     day: "numeric",

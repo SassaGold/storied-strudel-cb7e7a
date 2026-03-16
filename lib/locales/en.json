@@ -155,7 +155,15 @@
       "lightrainshowersandthunder": "Light rain showers and thunder",
       "lightsnowshowersandthunder": "Light snow showers and thunder",
       "lightsleetshowersandthunder": "Light sleet showers and thunder"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NE",
+    "wind_E": "E",
+    "wind_SE": "SE",
+    "wind_S": "S",
+    "wind_SW": "SW",
+    "wind_W": "W",
+    "wind_NW": "NW"
   },
   "food": {
     "badge": "🍽️ FOOD STOPS",
@@ -288,7 +296,14 @@
     "instructionsBody": "1. STAY CALM — assess the situation.\n\n2. CALL 112 (EU/Intl) or 911 (USA) immediately.\n\n3. LOCATION — tell them exactly where you are.\n\n4. HELMET — do not remove unless airway is blocked.\n\n5. BLEEDING — apply firm direct pressure.\n\n6. DO NOT MOVE an injured rider unless in immediate danger.\n\n7. KEEP THEM WARM — use spare clothing or foil blanket.\n\n8. STAY ON LINE — do not hang up until help arrives.",
     "quickActionCall": "Call 112",
     "quickActionTorch": "Torch",
-    "quickActionInstructions": "Instructions"
+    "quickActionInstructions": "Instructions",
+    "regions": {
+      "euIntl": "EU / Intl",
+      "usaCa": "USA / CA",
+      "uk": "UK",
+      "australia": "Australia",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ TRIP LOGGER",

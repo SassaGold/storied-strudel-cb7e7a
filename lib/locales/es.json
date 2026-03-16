@@ -155,7 +155,15 @@
       "lightrainshowersandthunder": "Chubascos ligeros y tormenta",
       "lightsnowshowersandthunder": "Nieve ligera y tormenta",
       "lightsleetshowersandthunder": "Aguanieve ligera y tormenta"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NE",
+    "wind_E": "E",
+    "wind_SE": "SE",
+    "wind_S": "S",
+    "wind_SW": "SO",
+    "wind_W": "O",
+    "wind_NW": "NO"
   },
   "food": {
     "badge": "🍽️ PARADAS FOOD",
@@ -288,7 +296,14 @@
     "instructionsBody": "1. MANTÉN LA CALMA — evalúa la situación.\n\n2. LLAMA AL 112 inmediatamente.\n\n3. UBICACIÓN — indica exactamente dónde estás.\n\n4. CASCO — no lo retires a menos que la vía aérea esté bloqueada.\n\n5. HEMORRAGIA — aplica presión directa firme.\n\n6. NO MUEVAS al herido salvo peligro inmediato.\n\n7. MANTÉN LO CALIENTE — usa ropa o manta de rescate.\n\n8. NO CUELGUES — quédate en línea hasta que llegue la ayuda.",
     "quickActionCall": "Llamar 112",
     "quickActionTorch": "Linterna",
-    "quickActionInstructions": "Instrucciones"
+    "quickActionInstructions": "Instrucciones",
+    "regions": {
+      "euIntl": "UE / Intl",
+      "usaCa": "USA / CA",
+      "uk": "RU",
+      "australia": "Australia",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ VIAJE",

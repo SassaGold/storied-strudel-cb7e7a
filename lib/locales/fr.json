@@ -155,7 +155,15 @@
       "lightrainshowersandthunder": "Averses légères et orage",
       "lightsnowshowersandthunder": "Averses de neige légères et orage",
       "lightsleetshowersandthunder": "Averses de grésil légères et orage"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NE",
+    "wind_E": "E",
+    "wind_SE": "SE",
+    "wind_S": "S",
+    "wind_SW": "SO",
+    "wind_W": "O",
+    "wind_NW": "NO"
   },
   "food": {
     "badge": "🍽️ PAUSES REPAS",
@@ -288,7 +296,14 @@
     "instructionsBody": "1. RESTEZ CALME — évaluez la situation.\n\n2. APPELEZ LE 112 immédiatement.\n\n3. LOCALISATION — indiquez exactement où vous êtes.\n\n4. CASQUE — ne le retirez pas sauf obstruction des voies respiratoires.\n\n5. SAIGNEMENT — appliquez une pression directe ferme.\n\n6. NE BOUGEZ PAS le blessé sauf danger immédiat.\n\n7. GARDEZ-LE AU CHAUD — utilisez vêtements ou couverture de survie.\n\n8. RESTEZ EN LIGNE — ne raccrochez pas avant l'arrivée des secours.",
     "quickActionCall": "Appeler 112",
     "quickActionTorch": "Torche",
-    "quickActionInstructions": "Instructions"
+    "quickActionInstructions": "Instructions",
+    "regions": {
+      "euIntl": "UE / Intl",
+      "usaCa": "USA / CA",
+      "uk": "RU",
+      "australia": "Australie",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ TRAJET",

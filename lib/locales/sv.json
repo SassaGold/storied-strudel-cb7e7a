@@ -155,7 +155,15 @@
       "lightrainshowersandthunder": "Lätta regnskurar och åska",
       "lightsnowshowersandthunder": "Lätta snöbyar och åska",
       "lightsleetshowersandthunder": "Lätta snöblandat regn-skurar och åska"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NO",
+    "wind_E": "O",
+    "wind_SE": "SO",
+    "wind_S": "S",
+    "wind_SW": "SV",
+    "wind_W": "V",
+    "wind_NW": "NV"
   },
   "food": {
     "badge": "🍽️ MATSTOPP",
@@ -277,7 +285,25 @@
       "clinic": "🏨 Klinik",
       "doctors": "👨‍⚕️ Läkare",
       "ambulance_station": "🚑 Ambulans"
-    }
+    },
+    "regions": {
+      "euIntl": "EU / Intl",
+      "usaCa": "USA / CA",
+      "uk": "UK",
+      "australia": "Australien",
+      "nz": "NZ"
+    },
+    "callSos": "RING SOS (112)",
+    "emergencyInstructions": "📋 Instruktioner",
+    "instructionsBody": "1. HÅLL LUGNET — bedöm situationen.\n\n2. RING 112 (EU/Intl) eller 911 (USA) omedelbart.\n\n3. PLATS — tala om exakt var du befinner dig.\n\n4. HJÄLM — ta inte av den om inte luftvägen är blockerad.\n\n5. BLÖDNING — tryck fast direkt mot såret.\n\n6. FLYTTA INTE en skadad ryttare om de inte är i omedelbar fara.\n\n7. HÅLL DEM VARMA — använd reservkläder eller foliefilt.\n\n8. STANNA PÅ LINJEN — lägg inte på tills hjälpen anländer.",
+    "instructionsClose": "Stäng",
+    "instructionsTitle": "Nödinstruktioner",
+    "quickActionCall": "Ring 112",
+    "quickActionInstructions": "Instruktioner",
+    "quickActionTorch": "Ficklampa",
+    "quickActions": "SNABBA ÅTGÄRDER",
+    "torchScreen": "🔦 Ficklampa",
+    "torchScreenOff": "🔦 Stäng av"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -314,7 +340,9 @@
     "startHint": "Börjar spela in din resa",
     "stopHint": "Stoppar inspelning och sparar resan",
     "bgServiceTitle": "Roamly — Spelar in",
-    "bgServiceBody": "Spelar in din resa i bakgrunden"
+    "bgServiceBody": "Spelar in din resa i bakgrunden",
+    "speedLabel": "FART",
+    "viewMapShort": "Rutt"
   },
   "about": {
     "badge": "ℹ️ OM",

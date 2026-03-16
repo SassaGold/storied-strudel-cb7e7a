@@ -155,7 +155,15 @@
       "lightrainshowersandthunder": "Leichte Regenschauer und Gewitter",
       "lightsnowshowersandthunder": "Leichte Schneeschauer und Gewitter",
       "lightsleetshowersandthunder": "Leichte Schneeregenschauer und Gewitter"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NO",
+    "wind_E": "O",
+    "wind_SE": "SO",
+    "wind_S": "S",
+    "wind_SW": "SW",
+    "wind_W": "W",
+    "wind_NW": "NW"
   },
   "food": {
     "badge": "🍽️ ESSENSSTOPPS",
@@ -288,7 +296,14 @@
     "instructionsBody": "1. RUHE BEWAHREN — Lage einschätzen.\n\n2. SOFORT 112 ANRUFEN.\n\n3. STANDORT — genau angeben, wo du bist.\n\n4. HELM — nur entfernen wenn Atemweg blockiert.\n\n5. BLUTUNG — festen direkten Druck anwenden.\n\n6. VERLETZTEN NICHT BEWEGEN außer bei unmittelbarer Gefahr.\n\n7. WARM HALTEN — Kleidung oder Rettungsdecke nutzen.\n\n8. VERBINDUNG HALTEN — nicht auflegen bis Hilfe kommt.",
     "quickActionCall": "112 anrufen",
     "quickActionTorch": "Licht",
-    "quickActionInstructions": "Anweisungen"
+    "quickActionInstructions": "Anweisungen",
+    "regions": {
+      "euIntl": "EU / Intl",
+      "usaCa": "USA / KA",
+      "uk": "UK",
+      "australia": "Australien",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ TOUR",

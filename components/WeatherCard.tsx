@@ -3,11 +3,12 @@
 
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import i18n from "../lib/i18n";
 import { useSettings, fmtTemp } from "../lib/settings";
 import {
   weatherEmoji,
   formatWeatherCode,
-  windDegToCompass,
+  windDegToKey,
   formatHourlyTime,
   formatForecastDate,
   type WeatherInfo,
@@ -53,7 +54,7 @@ export default function WeatherCard({ weather, weatherUrl }: Props) {
           <View style={styles.weatherStatItem}>
             <Text style={styles.weatherStatValue}>
               {weather.windSpeed?.toFixed(1) ?? "0"}
-              {weather.windDirection != null ? ` ${windDegToCompass(weather.windDirection)}` : ""}
+              {weather.windDirection != null ? ` ${t(windDegToKey(weather.windDirection))}` : ""}
             </Text>
             <Text style={styles.weatherStatLabel}>{t("wind")}</Text>
           </View>
@@ -127,10 +128,10 @@ export function DailyForecastCard({ weather }: { weather: WeatherInfo }) {
         {weather.forecast.slice(0, 3).map((day) => (
           <View key={day.date} style={styles.forecastCard}>
             <Text style={styles.forecastCardDay}>
-              {formatForecastDate(day.date).split(",")[0]}
+              {formatForecastDate(day.date, i18n.language).split(",")[0]}
             </Text>
             <Text style={styles.forecastCardDate}>
-              {formatForecastDate(day.date).split(",")[1]?.trim() ?? ""}
+              {formatForecastDate(day.date, i18n.language).split(",")[1]?.trim() ?? ""}
             </Text>
             <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
             <Text style={styles.forecastCardCondition}>

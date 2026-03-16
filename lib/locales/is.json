@@ -155,7 +155,15 @@
       "lightrainshowersandthunder": "Létt rigninguarél og þruma",
       "lightsnowshowersandthunder": "Létt snjóél og þruma",
       "lightsleetshowersandthunder": "Létt slydduél og þruma"
-    }
+    },
+    "wind_N": "N",
+    "wind_NE": "NA",
+    "wind_E": "A",
+    "wind_SE": "SA",
+    "wind_S": "S",
+    "wind_SW": "SV",
+    "wind_W": "V",
+    "wind_NW": "NV"
   },
   "food": {
     "badge": "🍽️ MATARSTOPP",
@@ -288,7 +296,14 @@
     "instructionsBody": "1. HALTU RÓ — mettu ástandið.\n\n2. HRINGDU Í 112 strax.\n\n3. STAÐSETNING — segðu nákvæmlega hvar þú ert.\n\n4. HJÁLMUR — fjarlægðu hann ekki nema loftvegi sé stíflaður.\n\n5. BLÆÐING — beitu þrýstingi beint á sárið.\n\n6. EKKI FÆRA meiddur nema yfirvofandi hætta sé.\n\n7. GEYMDU HLÝJA — notaðu föt eða björgunarfiltu.\n\n8. HALTU LÍNUNNI — leggðu ekki niður þar til hjálp kemur.",
     "quickActionCall": "Hringja 112",
     "quickActionTorch": "Ljós",
-    "quickActionInstructions": "Leiðbeiningar"
+    "quickActionInstructions": "Leiðbeiningar",
+    "regions": {
+      "euIntl": "ESB / Alþjóðl.",
+      "usaCa": "USA / CA",
+      "uk": "UK",
+      "australia": "Ástralía",
+      "nz": "NZ"
+    }
   },
   "triplog": {
     "badge": "🏍️ FERÐASKRÁ",
