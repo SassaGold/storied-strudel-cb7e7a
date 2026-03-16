@@ -7,7 +7,7 @@ import { Linking } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "./settings";
-import { fetchOverpass, parseWikiTag, OverpassElement } from "./overpass";
+import { fetchOverpass, parseWikiTag, OverpassElement, buildMapsUrl } from "./overpass";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
@@ -244,7 +244,7 @@ export function usePOIFetch({
   }, [cacheKey, loadPlaces]);
 
   const openInMaps = useCallback((place: Place) => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
+    const url = buildMapsUrl(place.latitude, place.longitude, place.name);
     Linking.openURL(url).catch((e) => console.warn("[usePOIFetch] openInMaps error:", e));
   }, []);
 

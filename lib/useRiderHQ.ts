@@ -3,7 +3,7 @@
 // derived state, and the openMaps helper.
 
 import { useCallback, useMemo, useState } from "react";
-import { Linking } from "react-native";
+import { Linking, Platform } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import {
@@ -237,7 +237,10 @@ export function useRiderHQ(): RiderHQState {
   const openMaps = useCallback(() => {
     if (!location) return;
     const { latitude, longitude } = location.coords;
-    const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+    const url =
+      Platform.OS === "ios"
+        ? `maps://?ll=${latitude},${longitude}&q=${latitude},${longitude}`
+        : `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
     Linking.openURL(url).catch((e) => console.warn("[useRiderHQ] openMaps error:", e));
   }, [location]);
 

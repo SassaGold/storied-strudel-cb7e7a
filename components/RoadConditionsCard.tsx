@@ -1,7 +1,7 @@
 // ── RoadConditionsCard ────────────────────────────────────────────────────────
 // Renders the road conditions / construction alerts card on the RIDER HQ screen.
 
-import { ActivityIndicator, Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import * as Location from "expo-location";
 import { type RoadAlert, humanizeConstructionType } from "../lib/roads";
@@ -38,13 +38,11 @@ export default function RoadConditionsCard({ loading, roadAlerts, location }: Pr
             const canOpen = alert.lat != null && alert.lon != null;
             const openAlertInMaps = () => {
               if (!canOpen) return;
-              Linking.openURL(
-                `https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lon}`
-              ).catch(() =>
-                Linking.openURL(
-                  `https://maps.apple.com/?q=${alert.lat},${alert.lon}`
-                ).catch(() => null)
-              );
+              const url =
+                Platform.OS === "ios"
+                  ? `maps://?ll=${alert.lat},${alert.lon}&q=${alert.lat},${alert.lon}`
+                  : `https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lon}`;
+              Linking.openURL(url).catch(() => null);
             };
             return (
               <Pressable

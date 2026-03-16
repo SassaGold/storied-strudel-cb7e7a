@@ -15,7 +15,7 @@ import {
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
+import { haversineMeters, fetchOverpass, CACHE_TTL_MS, buildMapsUrl } from "../../lib/overpass";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -147,7 +147,7 @@ export default function EmergencyScreen() {
   }, [t]);
 
   const openInMaps = useCallback((place: Place) => {
-    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
+    const url = buildMapsUrl(place.latitude, place.longitude, place.name);
     Linking.openURL(url).catch(() => null);
   }, []);
 

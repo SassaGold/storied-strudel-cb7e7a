@@ -1,6 +1,8 @@
 // ── Shared Overpass / geo utilities ──────────────────────────────────────────
 // Used by restaurants, hotels, attractions, mc, and emergency tabs.
 
+import { Platform } from "react-native";
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 /** A single element returned by the Overpass API (node, way, or relation). */
@@ -146,4 +148,17 @@ export function parseWikiTag(tag: string): { lang: string; title: string } {
     lang: colonIdx > 0 ? tag.slice(0, colonIdx) : "en",
     title: (colonIdx > 0 ? tag.slice(colonIdx + 1) : tag).replace(/ /g, "_"),
   };
+}
+
+/**
+ * Build a platform-appropriate "open in maps" deep-link URL.
+ *  iOS   → Apple Maps  (`maps://` scheme)
+ *  other → Google Maps web URL
+ */
+export function buildMapsUrl(lat: number, lon: number, name?: string): string {
+  if (Platform.OS === "ios") {
+    const q = name ? `&q=${encodeURIComponent(name)}` : `&q=${lat},${lon}`;
+    return `maps://?ll=${lat},${lon}${q}`;
+  }
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 }
