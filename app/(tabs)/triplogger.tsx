@@ -45,7 +45,7 @@ const formatDuration = (ms: number): string => {
 
 const formatDate = (iso: string): string => {
   const d = new Date(iso);
-  return d.toLocaleDateString(i18n.language, {
+  return d.toLocaleDateString(i18n.language || undefined, {
     day: "2-digit",
     month: "short",
     year: "numeric",

@@ -14,7 +14,7 @@ export const openMeteoForecastUrl = (lat: number, lon: number): string =>
   `&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,relative_humidity_2m,precipitation,weather_code,precipitation_probability` +
   `&hourly=temperature_2m,weather_code,precipitation_probability` +
   `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
-  `&forecast_days=4&timezone=auto`;
+  `&forecast_days=3&timezone=auto`;
 
 /** yr.no daily forecast deep-link for a lat/lon pair. */
 export const yrNoForecastUrl = (lat: number, lon: number): string =>

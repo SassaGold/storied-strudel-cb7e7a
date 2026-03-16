@@ -219,7 +219,7 @@ export default function Index() {
 
       {lastUpdated && (
         <Text style={styles.metaText}>
-          {t("lastUpdated", { time: lastUpdated.toLocaleTimeString(i18n.language, { hour: "2-digit", minute: "2-digit" }) })}
+          {t("lastUpdated", { time: lastUpdated.toLocaleTimeString(i18n.language || undefined, { hour: "2-digit", minute: "2-digit" }) })}
         </Text>
       )}
 

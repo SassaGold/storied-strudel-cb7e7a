@@ -1,4 +1,4 @@
-import { createContext, createElement, useContext, useEffect, useState } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 const AsyncStorage: any = (() => {
@@ -64,7 +64,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  const setSetting = <K extends keyof AppSettings>(key: K, val: AppSettings[K]) => {
+  const setSetting = useCallback(<K extends keyof AppSettings>(key: K, val: AppSettings[K]) => {
     setSettings((prev) => {
       const next = { ...prev, [key]: val };
       try {
@@ -74,11 +74,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       }
       return next;
     });
-  };
+  }, []);
+
+  const ctxValue = useMemo(() => ({ settings, setSetting }), [settings, setSetting]);
 
   return createElement(
     SettingsContext.Provider,
-    { value: { settings, setSetting } },
+    { value: ctxValue },
     children
   );
 }
