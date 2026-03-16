@@ -42,6 +42,18 @@ export interface RiderHQState {
   openMaps: () => void;
 }
 
+/**
+ * Fetch with an AbortController-based timeout.
+ * @param timeoutMs  How long to wait before aborting (default 8 s).
+ *                   On abort, the returned promise rejects with an `AbortError`,
+ *                   which callers should handle via `.catch()`.
+ */
+function fetchWithTimeout(input: RequestInfo, init?: RequestInit, timeoutMs = 8_000): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(id));
+}
+
 export function useRiderHQ(): RiderHQState {
   const { t } = useTranslation("home");
 
@@ -73,7 +85,7 @@ export function useRiderHQ(): RiderHQState {
       const { latitude, longitude } = position.coords;
 
       // Nominatim (OpenStreetMap) — free reverse geocoding, no API key required
-      const addressPromise = fetch(
+      const addressPromise = fetchWithTimeout(
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
         { headers: { "User-Agent": "roamly-app" } }
       )
@@ -86,7 +98,7 @@ export function useRiderHQ(): RiderHQState {
         .catch((e: unknown) => { console.warn("[useRiderHQ] address error:", e); return null; });
 
       // Open-Meteo — free, browser-friendly weather API (no API key required)
-      const weatherPromise = fetch(
+      const weatherPromise = fetchWithTimeout(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude.toFixed(4)}&longitude=${longitude.toFixed(4)}` +
         `&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,relative_humidity_2m,precipitation,weather_code,precipitation_probability` +
         `&hourly=temperature_2m,weather_code,precipitation_probability` +
@@ -169,11 +181,11 @@ export function useRiderHQ(): RiderHQState {
       // Overpass (OpenStreetMap) — free road conditions, no API key required
       const lat = Math.max(-90, Math.min(90, latitude));
       const lon = Math.max(-180, Math.min(180, longitude));
-      const roadPromise = fetch("https://overpass-api.de/api/interpreter", {
+      const roadPromise = fetchWithTimeout("https://overpass-api.de/api/interpreter", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `data=[out:json][timeout:10];(way["highway"="construction"](around:10000,${lat},${lon});node["highway"="construction"](around:10000,${lat},${lon});way["construction"~"."](around:10000,${lat},${lon});node["construction"~"."](around:10000,${lat},${lon}););out center 20;`,
-      })
+      }, 15_000)
         .then((r) => r.json())
         .then((data) => {
           const elements: any[] = data.elements ?? [];

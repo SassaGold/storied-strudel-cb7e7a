@@ -98,18 +98,27 @@ const EMERGENCY_NUMBERS = [
  *  In development builds (__DEV__) a dialog is shown instead so real calls are
  *  never accidentally placed while testing. */
 const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: string, callFailedTitle: string, callFailedMsg: string) => {
+  // Sanitize OSM phone data before passing to tel: URI.
+  // Keep: digits (0-9), leading '+' for international prefix, spaces,
+  // hyphens, dots, and parentheses — all legal in tel: URIs per RFC 3966.
+  // Strip anything else (letters, slashes, etc.) that would form an invalid URL.
+  const sanitized = number.replace(/[^0-9+\s\-().]/g, "").trim();
+  if (!sanitized) {
+    Alert.alert(cannotCallTitle, cannotCallMsg, [{ text: "OK" }]);
+    return;
+  }
   if (__DEV__) {
     Alert.alert(
       "Dev Mode — Call Blocked",
-      `This would call ${number} in production.`,
+      `This would call ${sanitized} in production.`,
       [{ text: "OK" }]
     );
     return;
   }
-  Linking.canOpenURL(`tel:${number}`)
+  Linking.canOpenURL(`tel:${sanitized}`)
     .then((supported) => {
       if (supported) {
-        return Linking.openURL(`tel:${number}`);
+        return Linking.openURL(`tel:${sanitized}`);
       }
       Alert.alert(cannotCallTitle, cannotCallMsg, [{ text: "OK" }]);
     })

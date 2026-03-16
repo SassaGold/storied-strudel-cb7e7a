@@ -254,14 +254,17 @@ export function usePOIFetch({
     if (place.wikipedia) {
       setWikiLoading(true);
       const { lang, title } = parseWikiTag(place.wikipedia);
-      // Wikipedia REST API — free, no API key required
+      // Wikipedia REST API — free, no API key required; 8 s timeout to prevent hangs
+      const wikiController = new AbortController();
+      const wikiTimeout = setTimeout(() => wikiController.abort(), 8_000);
       fetch(
-        `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
+        `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+        { signal: wikiController.signal }
       )
         .then((r) => r.json())
         .then((d: { extract?: string }) => setWikiExtract((d.extract || "").trim() || null))
         .catch((e) => { console.warn("[usePOIFetch] wikipedia error:", e); setWikiExtract(null); })
-        .finally(() => setWikiLoading(false));
+        .finally(() => { clearTimeout(wikiTimeout); setWikiLoading(false); });
     }
   }, []);
 
