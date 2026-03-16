@@ -15,6 +15,13 @@ const AsyncStorage: any = (() => { try { return require("@react-native-async-sto
 /** How many results to show initially and on each "Load More" tap. */
 const PAGE_SIZE = 20;
 
+/**
+ * Module-level cache for Wikipedia summaries keyed by "<lang>/<title>".
+ * Persists across component mounts so reopening the same info card avoids
+ * a redundant network round-trip.
+ */
+const wikiCache = new Map<string, string>();
+
 // ── Shared Place type ─────────────────────────────────────────────────────────
 
 export type Place = {
@@ -97,6 +104,11 @@ export interface UsePOIFetchResult {
    * their new location rather than the previously-cached area.
    */
   forceFetch: () => Promise<void>;
+  /**
+   * Cancels any in-flight Overpass request and resets the loading state.
+   * Shows any stale cached data that was pre-filled, or clears to idle.
+   */
+  cancel: () => void;
   /** Reveal the next page of already-fetched results. */
   loadMore: () => void;
   openInMaps: (place: Place) => void;
@@ -222,7 +234,8 @@ export function usePOIFetch({
     } finally {
       setLoading(false);
     }
-  }, [t, settings.searchRadiusKm, cacheKey, buildOverpassQuery, mapElement, locationErrorKey, loadErrorKey]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.searchRadiusKm, cacheKey, buildOverpassQuery, mapElement, locationErrorKey, loadErrorKey]);
 
   const loadMore = useCallback(() => {
     setVisibleCount((prev) => prev + PAGE_SIZE);
@@ -252,8 +265,14 @@ export function usePOIFetch({
     setInfoPlace(place);
     setWikiExtract(null);
     if (place.wikipedia) {
-      setWikiLoading(true);
       const { lang, title } = parseWikiTag(place.wikipedia);
+      const cacheKey = `${lang}/${title}`;
+      // Return cached extract immediately if available
+      if (wikiCache.has(cacheKey)) {
+        setWikiExtract(wikiCache.get(cacheKey)!);
+        return;
+      }
+      setWikiLoading(true);
       // Wikipedia REST API — free, no API key required; 8 s timeout to prevent hangs
       const wikiController = new AbortController();
       const wikiTimeout = setTimeout(() => wikiController.abort(), 8_000);
@@ -262,7 +281,11 @@ export function usePOIFetch({
         { signal: wikiController.signal }
       )
         .then((r) => r.json())
-        .then((d: { extract?: string }) => setWikiExtract((d.extract || "").trim() || null))
+        .then((d: { extract?: string }) => {
+          const extract = (d.extract || "").trim() || null;
+          if (extract) wikiCache.set(cacheKey, extract);
+          setWikiExtract(extract);
+        })
         .catch((e) => { console.warn("[usePOIFetch] wikipedia error:", e); setWikiExtract(null); })
         .finally(() => { clearTimeout(wikiTimeout); setWikiLoading(false); });
     }

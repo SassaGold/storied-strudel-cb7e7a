@@ -166,7 +166,7 @@ export default function Index() {
             {address?.displayName ?? t("addressNotAvailable")}
           </Text>
           <Text style={styles.metaText}>
-            Lat {location.coords.latitude.toFixed(5)} · Lon {location.coords.longitude.toFixed(5)}
+            Lat {location.coords.latitude.toFixed(4)} · Lon {location.coords.longitude.toFixed(4)}
           </Text>
           <Text style={styles.metaText}>
             {t("accuracy", { value: Math.round(location.coords.accuracy ?? 0) })}

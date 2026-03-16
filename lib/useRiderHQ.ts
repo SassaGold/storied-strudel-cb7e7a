@@ -2,7 +2,7 @@
 // Encapsulates all API calls (reverse geocoding, weather, road alerts),
 // derived state, and the openMaps helper.
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Linking, Platform } from "react-native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
@@ -51,6 +51,8 @@ export interface RiderHQState {
 function fetchWithTimeout(input: RequestInfo, init?: RequestInit, timeoutMs = 8_000): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
+  // If caller passed a cancellation signal, chain it so either abort fires
+  init?.signal?.addEventListener("abort", () => controller.abort(), { once: true });
   return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(id));
 }
 
@@ -65,7 +67,15 @@ export function useRiderHQ(): RiderHQState {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [roadAlerts, setRoadAlerts] = useState<RoadAlert[]>([]);
 
+  // AbortController ref — cancels any in-flight request before starting a new
+  // one so rapid navigate-away/back cycles don't fire parallel requests.
+  const abortRef = useRef<AbortController | null>(null);
+
   const loadData = useCallback(async () => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setError(null);
     try {
@@ -87,7 +97,7 @@ export function useRiderHQ(): RiderHQState {
       // Nominatim (OpenStreetMap) — free reverse geocoding, no API key required
       const addressPromise = fetchWithTimeout(
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
-        { headers: { "User-Agent": "roamly-app" } }
+        { headers: { "User-Agent": "roamly-app" }, signal: controller.signal }
       )
         .then((r) => r.json())
         .then((data) => ({
@@ -103,7 +113,8 @@ export function useRiderHQ(): RiderHQState {
         `&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,relative_humidity_2m,precipitation,weather_code,precipitation_probability` +
         `&hourly=temperature_2m,weather_code,precipitation_probability` +
         `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
-        `&forecast_days=4&timezone=auto`
+        `&forecast_days=4&timezone=auto`,
+        { signal: controller.signal }
       )
         .then((r) => r.json())
         .then((data): WeatherInfo | null => {
@@ -185,6 +196,7 @@ export function useRiderHQ(): RiderHQState {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `data=[out:json][timeout:10];(way["highway"="construction"](around:10000,${lat},${lon});node["highway"="construction"](around:10000,${lat},${lon});way["construction"~"."](around:10000,${lat},${lon});node["construction"~"."](around:10000,${lat},${lon}););out center 20;`,
+        signal: controller.signal,
       }, 15_000)
         .then((r) => r.json())
         .then((data) => {
@@ -220,17 +232,22 @@ export function useRiderHQ(): RiderHQState {
         roadPromise,
       ]);
 
+      // If the request was cancelled while awaiting, skip state updates
+      if (controller.signal.aborted) return;
+
       setAddress(addressResult);
       setWeather(weatherResult);
       setRoadAlerts(roadResult);
       setLastUpdated(new Date());
     } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") return;
       console.warn("[useRiderHQ] data fetch error:", e);
       setError(t("dataError"));
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
-  }, [t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
   const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
