@@ -108,8 +108,11 @@ export async function fetchOverpass(
         // Rate-limited: respect Retry-After if present, then continue to next endpoint.
         // Cap at 30 s so we honour the server's guidance up to a reasonable limit
         // without blocking the user for too long; longer waits move on to the next mirror.
+        // Note: Retry-After can be either a delay-seconds string or an HTTP date;
+        // parseFloat returns NaN for date strings, so we fall back to 2 s in that case.
         const retryAfter = response.headers.get("Retry-After");
-        const waitMs = retryAfter ? Math.min(parseFloat(retryAfter) * 1000, 30_000) : 2_000;
+        const retryAfterSec = retryAfter ? parseFloat(retryAfter) : NaN;
+        const waitMs = Number.isFinite(retryAfterSec) ? Math.min(retryAfterSec * 1000, 30_000) : 2_000;
         await new Promise((resolve) => setTimeout(resolve, waitMs));
         lastError = "Rate limited (429)";
         continue;

@@ -164,6 +164,7 @@ export default function Index() {
             {address?.displayName ?? t("addressNotAvailable")}
           </Text>
           <Text style={styles.metaText}>
+          {/* 3 decimal places ≈ 111 m precision — sufficient for display, respects privacy */}
             Lat {location.coords.latitude.toFixed(3)} · Lon {location.coords.longitude.toFixed(3)}
           </Text>
           <Text style={styles.metaText}>
