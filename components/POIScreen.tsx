@@ -9,6 +9,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -129,6 +130,16 @@ export default function POIScreen({
     <ScrollView
       style={styles.scrollView}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+      refreshControl={
+        forceFetch ? (
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={forceFetch}
+            tintColor="#ff6600"
+            colors={["#ff6600"]}
+          />
+        ) : undefined
+      }
     >
       {/* ── Info modal ── */}
       <Modal

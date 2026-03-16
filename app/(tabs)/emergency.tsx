@@ -447,6 +447,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("quickActionCall")}
           >
             <Text style={styles.quickActionEmoji}>📞</Text>
             <Text style={styles.quickActionLabel}>{t("quickActionCall")}</Text>
@@ -455,6 +457,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); shareLocation(); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("shareLocation").replace("📍 ", "")}
           >
             <Text style={styles.quickActionEmoji}>📍</Text>
             <Text style={styles.quickActionLabel}>{t("shareLocation").replace("📍 ", "")}</Text>
@@ -463,6 +467,9 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={[styles.quickActionBtn, torchOn && styles.quickActionBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("quickActionTorch")}
+            accessibilityState={{ selected: torchOn }}
           >
             <Text style={styles.quickActionEmoji}>🔦</Text>
             <Text style={styles.quickActionLabel}>{t("quickActionTorch")}</Text>
@@ -471,6 +478,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("quickActionInstructions")}
           >
             <Text style={styles.quickActionEmoji}>📋</Text>
             <Text style={styles.quickActionLabel}>{t("quickActionInstructions")}</Text>
