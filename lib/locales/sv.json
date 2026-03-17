@@ -268,7 +268,18 @@
       "clinic": "🏨 Klinik",
       "doctors": "👨‍⚕️ Läkare",
       "ambulance_station": "🚑 Ambulans"
-    }
+    },
+    "callSos": "RING SOS (112)",
+    "quickActions": "SNABBA ÅTGÄRDER",
+    "torchScreen": "🔦 Ficklampa",
+    "torchScreenOff": "🔦 Stäng av",
+    "emergencyInstructions": "📋 Instruktioner",
+    "instructionsTitle": "Nödinstruktioner",
+    "instructionsClose": "Stäng",
+    "instructionsBody": "1. HÅLL LUGNET — bedöm situationen.\n\n2. RING 112 omedelbart.\n\n3. POSITION — berätta exakt var du är.\n\n4. HJÄLM — ta inte av hjälmen om inte luftvägen är blockerad.\n\n5. BLÖDNING — tryck hårt direkt mot såret.\n\n6. FLYTTA INTE den skadade om det inte är omedelbar fara.\n\n7. HÅLL DEM VARMA — använd kläder eller räddningsfilt.\n\n8. HÅLL LINJEN — lägg inte på förrän hjälp anländer.",
+    "quickActionCall": "Ring 112",
+    "quickActionTorch": "Ficklampa",
+    "quickActionInstructions": "Instruktioner"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -301,7 +312,9 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Karta ej tillgänglig",
     "tooShortTitle": "Tur inte sparad",
-    "tooShortMsg": "Turen var under 10 m — inte sparad."
+    "tooShortMsg": "Turen var under 10 m — inte sparad.",
+    "speedLabel": "HASTIGHET",
+    "viewMapShort": "Rutt"
   },
   "about": {
     "badge": "ℹ️ OM",

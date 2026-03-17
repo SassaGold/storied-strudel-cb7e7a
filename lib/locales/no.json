@@ -268,7 +268,18 @@
       "clinic": "🏨 Klinikk",
       "doctors": "👨‍⚕️ Lege",
       "ambulance_station": "🚑 Ambulanse"
-    }
+    },
+    "callSos": "RING SOS (112)",
+    "quickActions": "HURTIGE HANDLINGER",
+    "torchScreen": "🔦 Lommelykt",
+    "torchScreenOff": "🔦 Slå av",
+    "emergencyInstructions": "📋 Instruksjoner",
+    "instructionsTitle": "Nødinstruksjoner",
+    "instructionsClose": "Lukk",
+    "instructionsBody": "1. HOLD ROEN — vurder situasjonen.\n\n2. RING 112 umiddelbart.\n\n3. POSISJON — fortell nøyaktig hvor du er.\n\n4. HJELM — ikke fjern hjelmen med mindre luftveien er blokkert.\n\n5. BLØDNING — legg fast direkte trykk.\n\n6. IKKE FLYTT den skadde med mindre det er umiddelbar fare.\n\n7. HOLD DEM VARME — bruk klær eller redningsfolie.\n\n8. BLI PÅ LINJEN — ikke legg på før hjelp ankommer.",
+    "quickActionCall": "Ring 112",
+    "quickActionTorch": "Lommelykt",
+    "quickActionInstructions": "Instruksjoner"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -301,7 +312,9 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Kart ikke tilgjengelig",
     "tooShortTitle": "Tur ikke lagret",
-    "tooShortMsg": "Turen var under 10 m — ikke lagret."
+    "tooShortMsg": "Turen var under 10 m — ikke lagret.",
+    "speedLabel": "FART",
+    "viewMapShort": "Rute"
   },
   "about": {
     "badge": "ℹ️ OM",
