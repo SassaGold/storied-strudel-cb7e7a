@@ -46,7 +46,8 @@
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA"
+    "da": "🇩🇰 DA",
+    "nl": "🇳🇱 NL"
   },
   "home": {
     "quickNav": "FLJÓTLEGAR LEIÐIR",
@@ -95,7 +96,7 @@
       "living_street": "Íbúasvæðisgata",
       "construction": "Vegaframkvæmdir",
       "bridge": "Brúaframkvæmdir",
-      "tunnel": "Gönguframkvæmdir"
+      "tunnel": "Jarðgangaframkvæmdir"
     },
     "suitability": {
       "great": "FRÁBÆRT",

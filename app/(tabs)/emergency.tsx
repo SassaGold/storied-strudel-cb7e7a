@@ -151,9 +151,20 @@ export default function EmergencyScreen() {
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const { latitude, longitude } = pos.coords;
       const mapsLink = `https://maps.google.com/?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
-      await Share.share({
-        message: `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-      });
+      const shareText = `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+      // On web, Share API is limited — copy to clipboard as fallback
+      if (Platform.OS === "web") {
+        try {
+          await navigator.clipboard.writeText(shareText);
+          Alert.alert("📍 Copied!", "Your location link has been copied to the clipboard.");
+          return;
+        } catch {
+          // clipboard not available, fall through to Share.share
+        }
+      }
+
+      await Share.share({ message: shareText });
     } catch {
       Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
     }
@@ -428,6 +439,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.quickActionCall")}
           >
             <Text style={styles.quickActionEmoji}>📞</Text>
             <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")}</Text>
@@ -436,6 +449,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); shareLocation(); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.shareLocation")}
           >
             <Text style={styles.quickActionEmoji}>📍</Text>
             <Text style={styles.quickActionLabel}>{t("sos.shareLocation").replace("📍 ", "")}</Text>
@@ -444,6 +459,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={[styles.quickActionBtn, torchOn && styles.quickActionBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.torchScreen")}
           >
             <Text style={styles.quickActionEmoji}>🔦</Text>
             <Text style={styles.quickActionLabel}>{t("sos.quickActionTorch")}</Text>
@@ -452,6 +469,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.emergencyInstructions")}
           >
             <Text style={styles.quickActionEmoji}>📋</Text>
             <Text style={styles.quickActionLabel}>{t("sos.quickActionInstructions")}</Text>

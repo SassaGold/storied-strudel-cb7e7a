@@ -399,6 +399,7 @@ export default function Index() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const { settings } = useSettings();
+  const { searchRadiusKm } = settings;
   const insets = useSafeAreaInsets();
   const hasNavigated = useRef(false);
   const [loading, setLoading] = useState(false);
@@ -530,7 +531,7 @@ export default function Index() {
       // Overpass (OpenStreetMap) — free road conditions API, no API key required
       const lat = Math.max(-90, Math.min(90, latitude));
       const lon = Math.max(-180, Math.min(180, longitude));
-      const roadRadiusM = Math.round(settings.searchRadiusKm * 1000);
+      const roadRadiusM = Math.round(searchRadiusKm * 1000);
       const roadPromise = fetch("https://overpass-api.de/api/interpreter", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -579,7 +580,7 @@ export default function Index() {
     } finally {
       setLoading(false);
     }
-  }, [t, settings]);
+  }, [t, searchRadiusKm]);
 
   const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
   const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
@@ -697,7 +698,7 @@ export default function Index() {
         </Pressable>
       </Modal>
 
-      <Pressable style={styles.primaryButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadData(); }}>
+      <Pressable style={styles.primaryButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); loadData(); }} accessibilityRole="button" accessibilityLabel={t("home.updateLocation")} accessibilityState={{ busy: loading }}>
         <Text style={styles.primaryButtonText}>
           {loading ? t("common.loading") : t("home.updateLocation")}
         </Text>
@@ -724,7 +725,7 @@ export default function Index() {
           <Text style={styles.metaText}>
             {t("home.accuracy", { value: Math.round(location.coords.accuracy ?? 0) })}
           </Text>
-          <Pressable style={styles.secondaryButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openMaps(); }}>
+          <Pressable style={styles.secondaryButton} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); openMaps(); }} accessibilityRole="button" accessibilityLabel={t("common.openInMaps")}>
             <Text style={styles.secondaryButtonText}>{t("common.openInMaps")}</Text>
           </Pressable>
         </View>
@@ -783,6 +784,8 @@ export default function Index() {
           <Pressable
             style={styles.secondaryButton}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(weatherUrl).catch(() => null); }}
+            accessibilityRole="link"
+            accessibilityLabel={t("home.openWeather")}
           >
             <Text style={styles.secondaryButtonText}>{t("home.openWeather")}</Text>
           </Pressable>
@@ -910,11 +913,11 @@ export default function Index() {
               <Text style={styles.loadingText}>{t("home.roadConditionsLoading")}</Text>
             </View>
           ) : roadAlerts.length === 0 ? (
-            <Text style={styles.roadConditionsAllClear}>{t("home.roadConditionsNone", { radius: settings.searchRadiusKm })}</Text>
+            <Text style={styles.roadConditionsAllClear}>{t("home.roadConditionsNone", { radius: searchRadiusKm })}</Text>
           ) : (
             <>
               <Text style={styles.roadConditionsCount}>
-                {t("home.roadConditionsCount", { count: roadAlerts.length, radius: settings.searchRadiusKm })}
+                {t("home.roadConditionsCount", { count: roadAlerts.length, radius: searchRadiusKm })}
               </Text>
               {roadAlerts.map((alert) => {
                 const canOpen = alert.lat != null && alert.lon != null;
@@ -982,6 +985,8 @@ export default function Index() {
                   `https://www.google.com/maps/@${latitude},${longitude},14z/data=!5m1!1e1`
                 ).catch(() => null);
               }}
+              accessibilityRole="link"
+              accessibilityLabel={t("home.openTrafficMap")}
             >
               <Text style={styles.secondaryButtonText}>{t("home.openTrafficMap")}</Text>
             </Pressable>

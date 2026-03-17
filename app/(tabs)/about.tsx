@@ -1,14 +1,17 @@
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useEffect, useState } from "react";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Updates: typeof import("expo-updates") | null = (() => { try { return require("expo-updates"); } catch { return null; } })();
 
 const APP_VERSION: string =
-  (Constants.expoConfig?.version ?? "1.0.0") as string;
+  (Constants.expoConfig?.version ?? "2.0.0") as string;
 
 type LinkRowProps = { label: string; url: string; openLabel: string };
 
@@ -41,6 +44,35 @@ export default function AboutScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const [updateStatus, setUpdateStatus] = useState<"idle" | "checking" | "available" | "latest" | "error">("idle");
+
+  // Sync update status from expo-updates if available
+  useEffect(() => {
+    const available = Updates?.useUpdates?.()?.isUpdateAvailable;
+    if (available === true) setUpdateStatus("available");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function checkForUpdate() {
+    if (!Updates || typeof Updates.checkForUpdateAsync !== "function") {
+      setUpdateStatus("error");
+      return;
+    }
+    setUpdateStatus("checking");
+    try {
+      const result = await Updates.checkForUpdateAsync();
+      if (result.isAvailable) {
+        setUpdateStatus("available");
+        await Updates.fetchUpdateAsync();
+        await Updates.reloadAsync();
+      } else {
+        setUpdateStatus("latest");
+      }
+    } catch {
+      setUpdateStatus("error");
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -167,6 +199,26 @@ export default function AboutScreen() {
           <Text style={styles.versionLabel}>{t("about.version")}</Text>
           <Text style={styles.versionValue}>{APP_VERSION}</Text>
         </View>
+
+        {/* Check for update */}
+        <Pressable
+          style={({ pressed }) => [styles.updateBtn, pressed && styles.updateBtnPressed]}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); checkForUpdate(); }}
+          disabled={updateStatus === "checking"}
+          accessibilityRole="button"
+          accessibilityLabel="Check for app update"
+        >
+          {updateStatus === "checking" ? (
+            <ActivityIndicator size="small" color="#ff6600" />
+          ) : (
+            <Text style={styles.updateBtnText}>
+              {updateStatus === "available" ? "⬇️ Update available — installing…" :
+               updateStatus === "latest"    ? "✅ You're up to date" :
+               updateStatus === "error"     ? "❌ Update check failed" :
+               "🔄 Check for Update"}
+            </Text>
+          )}
+        </Pressable>
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -333,4 +385,24 @@ const styles = StyleSheet.create({
   },
 
   bottomPad: { height: 20 },
+
+  updateBtn: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.4)",
+    backgroundColor: "rgba(255,102,0,0.08)",
+    marginTop: 8,
+    marginBottom: 8,
+    minHeight: 44,
+  },
+  updateBtnPressed: { opacity: 0.7 },
+  updateBtnText: {
+    color: "#ff6600",
+    fontWeight: "700",
+    fontSize: 14,
+  },
 });

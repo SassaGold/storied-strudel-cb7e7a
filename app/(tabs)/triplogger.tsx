@@ -441,6 +441,9 @@ export default function TripLoggerScreen() {
               pressed && styles.mainBtnPressed,
             ]}
             onPress={recording ? stopRecording : startRecording}
+            accessibilityRole="button"
+            accessibilityLabel={recording ? t("triplog.stop") : t("triplog.start")}
+            accessibilityState={{ selected: recording }}
           >
             <Text style={styles.mainBtnText}>
               {recording ? `⏹  ${t("triplog.stop")}` : `▶  ${t("triplog.start")}`}
@@ -493,6 +496,8 @@ export default function TripLoggerScreen() {
                   <Pressable
                     style={[styles.rideBtn, styles.viewRouteBtn]}
                     onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(ride); }}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("triplog.viewMap")}
                   >
                     <Text style={styles.rideBtnText}>🗺  {t("triplog.viewMap")}</Text>
                   </Pressable>
@@ -523,7 +528,7 @@ export default function TripLoggerScreen() {
         <View style={styles.modalContainer}>
           <View style={[styles.modalHeader, { paddingTop: insets.top + 12 }]}>
             <Text style={styles.modalTitle}>{t("triplog.mapTitle")}</Text>
-            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(null); }}>
+            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setMapRide(null); }} accessibilityRole="button" accessibilityLabel={t("triplog.closeMap")}>
               <Text style={styles.modalClose}>{t("triplog.closeMap")}</Text>
             </Pressable>
           </View>
