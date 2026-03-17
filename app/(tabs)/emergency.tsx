@@ -16,6 +16,7 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
+import { useSettings, fmtDistShort } from "../../lib/settings";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -81,11 +82,6 @@ const formatCategory = (cat: string) =>
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ")}`;
 
-const formatDistance = (d?: number) => {
-  if (d === undefined) return "";
-  return d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`;
-};
-
 const EMERGENCY_NUMBERS = [
   { region: "EU / Intl", number: "112", emoji: "🌍" },
   { region: "USA / CA", number: "911", emoji: "🇺🇸" },
@@ -112,6 +108,7 @@ const CACHE_KEY = "cache_emergency_v2";
 
 export default function EmergencyScreen() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -173,7 +170,7 @@ export default function EmergencyScreen() {
   const loadPlaces = useCallback(async () => {
     // Load cache so user sees last-known results immediately while fetching
     try {
-      const raw = await AsyncStorage.getItem(CACHE_KEY);
+      const raw = await AsyncStorage?.getItem(CACHE_KEY);
       if (raw) {
         const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
         if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
@@ -256,7 +253,7 @@ out center ${MAX_RESULTS};`;
         .slice(0, 40);
       setPlaces(sorted);
       setFromCache(false);
-      try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
+      try { await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
     } catch (err) {
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
       setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
@@ -322,7 +319,7 @@ out center ${MAX_RESULTS};`;
               <View style={styles.modalRow}>
                 <Text style={styles.modalLabel}>{t("common.distance")}</Text>
                 <Text style={styles.modalValue}>
-                  {formatDistance(infoPlace.distanceMeters)}
+                  {fmtDistShort(infoPlace.distanceMeters ?? 0, settings.unitSystem)}
                 </Text>
               </View>
             )}
@@ -642,7 +639,7 @@ out center ${MAX_RESULTS};`;
                     </View>
                     <View style={styles.placeRight}>
                       <Text style={styles.distanceText}>
-                        {formatDistance(place.distanceMeters)}
+                        {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
                       </Text>
                       <Pressable
                         style={styles.infoButton}

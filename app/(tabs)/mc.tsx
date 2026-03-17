@@ -91,7 +91,7 @@ const CATEGORY_BG_ACTIVE: Record<Category, string> = {
 };
 
 const CATEGORY_ICONS: Record<Category, string> = {
-  services:     "��️",
+  services:     "🛠️",
   fuel:         "⛽",
   parking:      "🅿️",
   clubs_tracks: "🏁",
