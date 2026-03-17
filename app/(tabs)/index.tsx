@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtTemp } from "../../lib/settings";
+import { saveLanguage } from "../../lib/i18n";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
@@ -91,12 +92,12 @@ const CONSTRUCTION_TYPE_LABELS: Record<string, string> = {
 /** OSM construction/highway values that represent actual road work. */
 const ROAD_TYPES = new Set(Object.keys(CONSTRUCTION_TYPE_LABELS));
 
-function humanizeConstructionType(type: string): string {
-  const normalized = type.toLowerCase().replace(/_/g, " ");
-  return (
-    CONSTRUCTION_TYPE_LABELS[type.toLowerCase()] ??
-    normalized.replace(/\b\w/g, (c) => c.toUpperCase())
-  );
+function humanizeConstructionType(type: string, t: (key: string) => string): string {
+  const key = `home.roadTypes.${type.toLowerCase()}`;
+  const translated = t(key);
+  // i18next returns the key itself when not found; fall back to formatted type
+  if (translated !== key) return translated;
+  return type.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -529,10 +530,11 @@ export default function Index() {
       // Overpass (OpenStreetMap) — free road conditions API, no API key required
       const lat = Math.max(-90, Math.min(90, latitude));
       const lon = Math.max(-180, Math.min(180, longitude));
+      const roadRadiusM = Math.round(settings.searchRadiusKm * 1000);
       const roadPromise = fetch("https://overpass-api.de/api/interpreter", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `data=[out:json][timeout:10];(way["highway"="construction"](around:10000,${lat},${lon});node["highway"="construction"](around:10000,${lat},${lon});way["construction"~"."](around:10000,${lat},${lon});node["construction"~"."](around:10000,${lat},${lon}););out center 20;`,
+        body: `data=[out:json][timeout:10];(way["highway"="construction"](around:${roadRadiusM},${lat},${lon});node["highway"="construction"](around:${roadRadiusM},${lat},${lon});way["construction"~"."](around:${roadRadiusM},${lat},${lon});node["construction"~"."](around:${roadRadiusM},${lat},${lon}););out center 20;`,
       })
         .then((r) => r.json())
         .then((data) => {
@@ -577,7 +579,7 @@ export default function Index() {
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, [t, settings]);
 
   const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
   const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
@@ -668,7 +670,7 @@ export default function Index() {
         <Pressable style={styles.langModalOverlay} onPress={() => setLangModalVisible(false)}>
           <View style={styles.langModalContent} onStartShouldSetResponder={() => true}>
             <Text style={styles.langModalTitle}>{t("language.label")}</Text>
-            {(["en", "es", "de", "fr", "is", "no", "sv", "da"] as const).map((lang) => (
+            {(["en", "es", "de", "fr", "is", "no", "sv", "da", "nl"] as const).map((lang) => (
               <Pressable
                 key={lang}
                 style={({ pressed }) => [
@@ -679,6 +681,7 @@ export default function Index() {
                 onPress={() => {
                   Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
                   i18n.changeLanguage(lang);
+                  saveLanguage(lang);
                   setLangModalVisible(false);
                 }}
                 accessibilityRole="button"
@@ -907,11 +910,11 @@ export default function Index() {
               <Text style={styles.loadingText}>{t("home.roadConditionsLoading")}</Text>
             </View>
           ) : roadAlerts.length === 0 ? (
-            <Text style={styles.roadConditionsAllClear}>{t("home.roadConditionsNone")}</Text>
+            <Text style={styles.roadConditionsAllClear}>{t("home.roadConditionsNone", { radius: settings.searchRadiusKm })}</Text>
           ) : (
             <>
               <Text style={styles.roadConditionsCount}>
-                {t("home.roadConditionsCount", { count: roadAlerts.length })}
+                {t("home.roadConditionsCount", { count: roadAlerts.length, radius: settings.searchRadiusKm })}
               </Text>
               {roadAlerts.map((alert) => {
                 const canOpen = alert.lat != null && alert.lon != null;
@@ -939,7 +942,7 @@ export default function Index() {
                     <View style={styles.roadAlertInfo}>
                       <View style={styles.roadAlertHeader}>
                         <Text style={styles.roadAlertType}>
-                          {humanizeConstructionType(alert.type)}
+                          {humanizeConstructionType(alert.type, t)}
                         </Text>
                         {alert.distance != null && (
                           <Text style={styles.roadAlertDistance}>

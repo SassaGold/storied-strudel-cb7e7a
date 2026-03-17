@@ -29,7 +29,7 @@ Second major release of **Roamly**. Expanded to 9 tabs and added Trip Logger, SO
 - App name, version, description, and credits
 
 #### i18n expanded to 8 languages
-- English, Spanish, German, French, Dutch, Norwegian, Swedish, Danish
+- English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish
 
 #### Header / UI polish
 - All POI tabs use safe-area insets
