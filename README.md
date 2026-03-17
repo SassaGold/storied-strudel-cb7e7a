@@ -1,6 +1,6 @@
 # Roamly — Biker Companion App 🏍️
 
-A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, emergency services), log your trips, and more. Supports English, Spanish, German, French, Dutch, Norwegian, Swedish, and Danish.
+A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, emergency services), log your trips, and more. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, and Dutch.
 
 > **Current version: 2.0.0** — live on Netlify and saved permanently in this GitHub repository.
 

@@ -68,29 +68,17 @@ type RoadAlert = {
   lon?: number;
 };
 
-const CONSTRUCTION_TYPE_LABELS: Record<string, string> = {
-  service: "Service Road",
-  residential: "Residential Road",
-  primary: "Primary Road",
-  primary_link: "Primary Road",
-  secondary: "Secondary Road",
-  secondary_link: "Secondary Road",
-  tertiary: "Tertiary Road",
-  tertiary_link: "Tertiary Road",
-  unclassified: "Unclassified Road",
-  trunk: "Trunk Road",
-  trunk_link: "Trunk Road",
-  motorway: "Motorway",
-  motorway_link: "Motorway",
-  road: "Road",
-  living_street: "Living Street",
-  construction: "Road Construction",
-  bridge: "Bridge Works",
-  tunnel: "Tunnel Works",
-};
-
 /** OSM construction/highway values that represent actual road work. */
-const ROAD_TYPES = new Set(Object.keys(CONSTRUCTION_TYPE_LABELS));
+const ROAD_TYPES = new Set([
+  "service", "residential",
+  "primary", "primary_link",
+  "secondary", "secondary_link",
+  "tertiary", "tertiary_link",
+  "unclassified", "trunk", "trunk_link",
+  "motorway", "motorway_link",
+  "road", "living_street",
+  "construction", "bridge", "tunnel",
+]);
 
 function humanizeConstructionType(type: string, t: (key: string) => string): string {
   const key = `home.roadTypes.${type.toLowerCase()}`;

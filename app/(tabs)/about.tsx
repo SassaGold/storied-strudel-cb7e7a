@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -46,13 +46,6 @@ export default function AboutScreen() {
   const insets = useSafeAreaInsets();
 
   const [updateStatus, setUpdateStatus] = useState<"idle" | "checking" | "available" | "latest" | "error">("idle");
-
-  // Sync update status from expo-updates if available
-  useEffect(() => {
-    const available = Updates?.useUpdates?.()?.isUpdateAvailable;
-    if (available === true) setUpdateStatus("available");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   async function checkForUpdate() {
     if (!Updates || typeof Updates.checkForUpdateAsync !== "function") {
