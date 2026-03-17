@@ -78,22 +78,31 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
 
 #### Step 2 — Add a Google Maps API key for Android
 
-The map on Android works best with a Google Maps API key.
+The map on Android uses Google Maps tiles and requires an API key.  
+The key must **never** be committed to source control — it is injected at build time via `app.config.js`.
+
+**For local / emulator builds:**
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com).
 2. Create a project → enable **Maps SDK for Android**.
-3. Create an API key → restrict it to your Android package `com.sassagold.roamly`.
-4. Open `app.json` and replace the empty string:
-   ```json
-   "android": {
-     "config": {
-       "googleMaps": {
-         "apiKey": "YOUR_ANDROID_MAPS_KEY_HERE"
-       }
-     }
-   }
+3. Create an API key → restrict it to your Android package `com.sassagold.roamly` and its SHA-1 signing certificate.
+4. In the project root, copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
    ```
-5. Save and push the change to GitHub.
+5. Open `.env` and fill in your key:
+   ```
+   GOOGLE_MAPS_ANDROID_API_KEY=YOUR_ANDROID_MAPS_KEY_HERE
+   ```
+6. `.env` is gitignored — it will never be committed to GitHub.
+
+**For EAS cloud builds (production / Play Store):**
+
+Add the key as an EAS secret so the cloud builder can access it without committing it:
+```bash
+npx eas secret:create --scope project --name GOOGLE_MAPS_ANDROID_API_KEY
+```
+EAS will prompt you to paste the value. This replaces steps 4–6 above for cloud builds.
 
 #### Step 3 — Build the production Android AAB (App Bundle)
 
