@@ -99,7 +99,7 @@ export function useRiderHQ(): RiderHQState {
             city: data.address?.city || data.address?.town || data.address?.village,
             country: data.address?.country,
           }))
-      ).catch(() => null as GeoAddress | null);
+      ).catch(() => null);
 
       // ── Open-Meteo — free weather API, retried up to 3 times ─────────────
       const weatherPromise = withRetry(() =>
@@ -181,7 +181,7 @@ export function useRiderHQ(): RiderHQState {
             hourly,
           } as WeatherInfo;
         })
-        .catch(() => null as WeatherInfo | null);
+        .catch(() => null);
 
       // ── Road conditions via Overpass (multi-mirror, already retries) ──────
       const lat = Math.max(-90, Math.min(90, latitude));
@@ -221,7 +221,7 @@ export function useRiderHQ(): RiderHQState {
             .filter((a) => ROAD_TYPES.has(a.type.toLowerCase()))
             .slice(0, 10);
         })
-        .catch(() => [] as RoadAlert[]);
+        .catch(() => []);
 
       const [addressResult, weatherResult, roadResult] = await Promise.all([
         addressPromise,
