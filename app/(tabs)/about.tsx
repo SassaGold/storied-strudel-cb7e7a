@@ -11,7 +11,7 @@ const Haptics: typeof import("expo-haptics") | null = (() => { try { return requ
 const Updates: typeof import("expo-updates") | null = (() => { try { return require("expo-updates"); } catch { return null; } })();
 
 const APP_VERSION =
-  Constants.expoConfig?.version ?? "1.0.0";
+  Constants.expoConfig?.version ?? "2.0.0";
 
 type LinkRowProps = { label: string; url: string; openLabel: string };
 

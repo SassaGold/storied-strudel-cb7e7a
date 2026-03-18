@@ -7,36 +7,39 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.roamly`
-- [x] App version: `1.0.0`
-- [x] Android `versionCode`: `1` (in `app.json`; auto-incremented by EAS on each production build)
+- [x] App version: `2.0.0`
+- [x] Android `versionCode`: `2` (in `app.json`; auto-incremented by EAS on each production build via `autoIncrement: true`)
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
-- [x] Required permissions declared in `app.json`:
-  - `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`
-  - `ACCESS_BACKGROUND_LOCATION`
-  - `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION`
-- [x] iOS & Android permission usage descriptions written
+- [x] Required permissions declared and used:
+  - `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` — POI search, weather, map
+  - `ACCESS_BACKGROUND_LOCATION` — Trip Logger background GPS recording
+  - `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION` — Android foreground service notification during trip recording
+- [x] `expo-location` plugin configured in `app.json` with background location enabled
+- [x] `expo-task-manager` plugin configured in `app.json`
+- [x] Background location task implemented (`lib/locationTask.ts`) — writes GPS points to AsyncStorage while screen is locked
+- [x] Background task registered at app boot (`app/_layout.tsx`)
+- [x] Trip Logger requests background permission and starts `Location.startLocationUpdatesAsync` during a recording session
+- [x] iOS & Android permission usage descriptions written (in `app.json` `ios.infoPlist` and via `expo-location` plugin config)
+- [x] iOS background mode `location` declared in `app.json` → `ios.backgroundModes`
 - [x] EAS project linked (`eas.json`, project ID `625b8a7c-5d22-4ebc-a8a6-d0a47451870e`)
 - [x] Production EAS build profile with `autoIncrement: true`
 - [x] Error boundaries wrapping the full app tree
 - [x] No hardcoded API keys or secrets in source code
 - [x] No analytics, no crash reporters, no ad SDKs
 - [x] 9-language i18n (EN / ES / DE / FR / IS / NO / SV / DA / NL)
-- [x] Privacy statement in About screen
-- [x] `store-listing/privacy_policy.md` created
+- [x] Privacy statement in About screen (links to privacy policy)
+- [x] `store-listing/privacy_policy.md` created (covers background location, Trip Logger data, third-party APIs)
 - [x] `store-listing/short_description.txt` (72 chars ≤ 80 limit) ✓
 - [x] `store-listing/full_description.txt` (≤ 4000 chars) ✓
+- [x] All map tiles served from OpenStreetMap (no Google Maps API key required)
+- [x] `edgeToEdgeEnabled: true` in `app.json` for Android 15+
 
 ---
 
 ## ⚠️ Required Before Submitting
 
-### 1. ~~Google Maps API Key~~ — Not needed
-
-The Android map now uses **OpenStreetMap** tiles via `UrlTile` (`mapType="none"` + OSM tile overlay).  
-No Google Maps API key is required. The `android.config.googleMaps` block has been removed from `app.json`.
-
-### 2. Privacy Policy — Hosted URL
+### 1. Privacy Policy — Hosted URL
 Google Play requires a **publicly accessible URL** for your privacy policy.
 
 Options:
@@ -45,7 +48,7 @@ Options:
 - **Free generators** — [privacypolicytemplate.net](https://privacypolicytemplate.net), [app-privacy-policy-generator.firebaseapp.com](https://app-privacy-policy-generator.firebaseapp.com)
 - Host the `store-listing/privacy_policy.md` on any free static host.
 
-### 3. Screenshots (Required)
+### 2. Screenshots (Required)
 Google Play requires **at least 2 screenshots** per device type.
 Recommended: 5–8 screenshots covering each major tab.
 
@@ -60,12 +63,12 @@ Suggested screenshots:
 
 Take screenshots using an Android emulator or physical device.
 
-### 4. Feature Graphic (Required)
+### 3. Feature Graphic (Required)
 - Dimensions: **1024 × 500 px** PNG or JPEG
 - Shown at the top of your Play Store listing
 - Design with Roamly branding (`#ff6600` orange accent, dark background)
 
-### 5. Store Listing Entry
+### 4. Store Listing Entry
 In Google Play Console → Store Presence → Main Store Listing:
 
 | Field | Value |
@@ -78,17 +81,28 @@ In Google Play Console → Store Presence → Main Store Listing:
 | Category | **Travel & Local** |
 | Tags | motorcycle, biker, navigation, trip logger, POI |
 | Email | Your support email address |
-| Privacy policy URL | Hosted URL from step 2 above |
+| Privacy policy URL | Hosted URL from step 1 above |
 
-### 6. Content Rating
+### 5. Content Rating
 Complete the content rating questionnaire in Play Console.
 Expected rating: **Everyone (3+)** — no violence, no adult content, no user interaction.
 
-### 7. App Content Declaration
+### 6. App Content Declaration
 In Play Console → App Content, declare:
 - **Ads:** No ads
-- **Data Safety:** Location (used on-device, not collected or shared)
+- **Data Safety:**
+  - Location: used on-device and anonymised coordinates sent to third-party open APIs (Nominatim, Overpass, Open-Meteo). Not shared with Roamly servers.
+  - Trip data: stored only on-device, never uploaded.
 - **Target Audience:** All ages (no children-targeted content)
+- **Background Location:** Used only while a trip is actively being recorded in the Trip Logger. Not used at any other time.
+
+### 7. Background Location Permission Declaration
+Google Play will request a **Prominent Disclosure** for `ACCESS_BACKGROUND_LOCATION`.
+
+In Play Console → App Content → Sensitive app permissions, provide:
+- **Core functionality:** Trip Logger records GPS route and distance even when the screen is locked.
+- **Why background access is needed:** Without background location, GPS tracking stops when the screen locks during a ride, resulting in incomplete route data.
+- The foreground service notification ("Recording your ride in the background") is shown to users while background tracking is active.
 
 ---
 
@@ -120,3 +134,4 @@ After first submission, for each new version:
 4. Upload new `.aab` in Play Console
 
 > **Note:** `"autoIncrement": true` in `eas.json` automatically increments `versionCode` on each EAS production build.
+
