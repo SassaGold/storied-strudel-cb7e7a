@@ -353,7 +353,7 @@
     "wikipediaDesc": "Ortsbeschreibungen werden von der Wikipedia-REST-API abgerufen, wenn ein Wikipedia-Tag in den OpenStreetMap-Daten vorhanden ist.",
     "wikiLicense": "© Wikipedia-Mitwirkende · CC BY-SA",
     "maps": "Karten & Navigation",
-    "mapsDesc": "Die In-App-Karte verwendet react-native-maps. Beim Tippen auf 'In Karten öffnen' wird deine Standard-Karten-App geöffnet.",
+    "mapsDesc": "Die In-App-Karte verwendet react-native-maps (Apple Maps auf iOS, OpenStreetMap auf Android). Beim Tippen auf 'In Karten öffnen' wird deine Standard-Karten-App geöffnet. Kein Google Maps API-Schlüssel erforderlich.",
     "privacy": "DATENSCHUTZ",
     "privacyTitle": "Deine Privatsphäre",
     "privacyP1": "Diese App sammelt, überträgt oder teilt keine persönlichen Daten. Keine Analysen, keine Absturzberichte, keine Werbe-SDKs.",

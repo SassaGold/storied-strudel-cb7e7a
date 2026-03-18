@@ -31,22 +31,10 @@ Use this checklist before submitting to Google Play.
 
 ## ⚠️ Required Before Submitting
 
-### 1. Google Maps API Key
-The Android map requires a Google Maps API key for production.
+### 1. ~~Google Maps API Key~~ — Not needed
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Enable **Maps SDK for Android**
-3. Create an API key → restrict to package `com.sassagold.roamly`
-4. In `app.json`, set:
-   ```json
-   "android": {
-     "config": {
-       "googleMaps": {
-         "apiKey": "YOUR_KEY_HERE"
-       }
-     }
-   }
-   ```
+The Android map now uses **OpenStreetMap** tiles via `UrlTile` (`mapType="none"` + OSM tile overlay).  
+No Google Maps API key is required. The `android.config.googleMaps` block has been removed from `app.json`.
 
 ### 2. Privacy Policy — Hosted URL
 Google Play requires a **publicly accessible URL** for your privacy policy.

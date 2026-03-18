@@ -353,7 +353,7 @@
     "wikipediaDesc": "Platsbeskrivningar hämtas från Wikipedia REST API där en Wikipedia-tagg finns tillgänglig i OpenStreetMap-data. Wikipedia-innehåll är licensierat under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia-bidragsgivare · CC BY-SA",
     "maps": "Kartor och navigation",
-    "mapsDesc": "Kartan i appen använder react-native-maps (Apple Maps på iOS, Google Maps på Android). Att trycka 'Öppna i karta' öppnar din standardkartapp. Ingen Google Maps API-nyckel krävs för djuplänkar.",
+    "mapsDesc": "Kartan i appen använder react-native-maps (Apple Maps på iOS, OpenStreetMap på Android). Att trycka 'Öppna i karta' öppnar din standardkartapp. Ingen Google Maps API-nyckel krävs.",
     "privacy": "INTEGRITET",
     "privacyTitle": "Din integritet",
     "privacyP1": "Den här appen samlar inte in, överför eller delar personuppgifter. Det finns ingen analys, inga kraschrapportörer och inga annonsprogramvaror.",

@@ -28,7 +28,7 @@ let rnMaps: any = null;
 try { rnMaps = require("react-native-maps"); } catch {}
 const MapView: any = rnMaps?.default;
 const Marker: any = rnMaps?.Marker;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
+const UrlTile: any = rnMaps?.UrlTile ?? null;
 
 /** Alias so the rest of this file keeps using the shorter `Place` name. */
 type Place = EmergencyPlace;
@@ -426,7 +426,7 @@ export default function EmergencyScreen() {
       {viewMode === "map" && userLocation && MapView && (
         <MapView
           style={styles.mapView}
-          provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+          mapType={Platform.OS === "android" ? "none" : "standard"}
           showsUserLocation
           initialRegion={{
             latitude: userLocation.latitude,
@@ -435,6 +435,9 @@ export default function EmergencyScreen() {
             longitudeDelta: 0.06,
           }}
         >
+          {Platform.OS === "android" && UrlTile && (
+            <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
+          )}
           {filtered.map((place) => (
             <Marker
               key={place.id}

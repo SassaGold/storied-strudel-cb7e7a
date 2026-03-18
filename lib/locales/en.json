@@ -353,7 +353,7 @@
     "wikipediaDesc": "Place descriptions are fetched from the Wikipedia REST API where a Wikipedia tag is available in OpenStreetMap data. Wikipedia content is licensed under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia contributors · CC BY-SA",
     "maps": "Maps & Navigation",
-    "mapsDesc": "The in-app map uses react-native-maps (Apple Maps on iOS, Google Maps on Android). Tapping 'Open in Maps' deeplinks to your default maps app. No Google Maps API key is required for deeplinks.",
+    "mapsDesc": "The in-app map uses react-native-maps (Apple Maps on iOS, OpenStreetMap on Android). Tapping 'Open in Maps' deeplinks to your default maps app. No Google Maps API key is required.",
     "privacy": "PRIVACY",
     "privacyTitle": "Your Privacy",
     "privacyP1": "This app does not collect, transmit, or share any personal data. There are no analytics, no crash reporters, and no advertising SDKs.",

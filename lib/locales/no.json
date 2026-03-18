@@ -353,7 +353,7 @@
     "wikipediaDesc": "Stedsbeskrivelser hentes fra Wikipedia REST API der en Wikipedia-tag er tilgjengelig i OpenStreetMap-data. Wikipedia-innhold er lisensiert under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia-bidragsytere · CC BY-SA",
     "maps": "Kart og navigasjon",
-    "mapsDesc": "Kartet i appen bruker react-native-maps (Apple Maps på iOS, Google Maps på Android). Å trykke 'Åpne i kart' åpner standardkartappen din. Ingen Google Maps API-nøkkel kreves for dyplenker.",
+    "mapsDesc": "Kartet i appen bruker react-native-maps (Apple Maps på iOS, OpenStreetMap på Android). Å trykke 'Åpne i kart' åpner standardkartappen din. Ingen Google Maps API-nøkkel kreves.",
     "privacy": "PERSONVERN",
     "privacyTitle": "Ditt personvern",
     "privacyP1": "Denne appen samler ikke inn, overfører eller deler personlige data. Det er ingen analyse, ingen krasjrapportere og ingen reklameprogramvare.",

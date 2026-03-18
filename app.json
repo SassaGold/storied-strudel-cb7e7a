@@ -37,12 +37,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.sassagold.roamly",
-      "versionCode": 1,
-      "config": {
-        "googleMaps": {
-          "apiKey": ""
-        }
-      }
+      "versionCode": 1
     },
     "web": {
       "output": "static",

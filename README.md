@@ -72,11 +72,10 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
 | Step | What | Cost |
 |------|------|------|
 | 1 | Google Play Developer account | US $25 one-time |
-| 2 | Google Maps Android API key (add to `app.json`) | Free quota |
-| 3 | Host privacy policy at a public URL | Free |
-| 4 | Screenshots (min. 2, recommended 5–8) | Free |
-| 5 | Feature graphic 1024×500 px | Free |
-| 6 | Fill in Play Console store listing | Free |
+| 2 | Host privacy policy at a public URL | Free |
+| 3 | Screenshots (min. 2, recommended 5–8) | Free |
+| 4 | Feature graphic 1024×500 px | Free |
+| 5 | Fill in Play Console store listing | Free |
 
 ---
 
@@ -91,26 +90,7 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
    eas login
    ```
 
-#### Step 2 — Add a Google Maps API key for Android
-
-The map on Android works best with a Google Maps API key.
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com).
-2. Create a project → enable **Maps SDK for Android**.
-3. Create an API key → restrict it to your Android package `com.sassagold.roamly`.
-4. Open `app.json` and replace the empty string:
-   ```json
-   "android": {
-     "config": {
-       "googleMaps": {
-         "apiKey": "YOUR_ANDROID_MAPS_KEY_HERE"
-       }
-     }
-   }
-   ```
-5. Save and push the change to GitHub.
-
-#### Step 3 — Build the production Android AAB (App Bundle)
+#### Step 2 — Build the production Android AAB (App Bundle)
 
 An AAB is the file Google Play requires (it's like a ZIP of your app).
 
