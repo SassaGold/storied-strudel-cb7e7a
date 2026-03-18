@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
+import { LOCATION_TASK_NAME, BG_POINTS_KEY, type BgPoint } from "../../lib/locationTask";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
@@ -190,6 +191,10 @@ export default function TripLoggerScreen() {
       return;
     }
 
+    // Request background permission so the trip continues recording while the
+    // screen is locked. If denied we still proceed with foreground-only tracking.
+    await Location.requestBackgroundPermissionsAsync().catch(() => null);
+
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
 
     // Reset state
@@ -203,6 +208,35 @@ export default function TripLoggerScreen() {
     setStartTime(now);
     setCurrentSpeedKmh(null);
     setRecording(true);
+
+    // Clear any stale background points from a previous session.
+    if (AsyncStorage) {
+      try { await AsyncStorage.removeItem(BG_POINTS_KEY); } catch {
+        // Stale data will be deduplicated on stop; not critical.
+      }
+    }
+
+    // Start the background location task (Android foreground service + iOS bg mode).
+    // This ensures GPS points are captured even when the screen is locked.
+    try {
+      const bgGranted = (await Location.getBackgroundPermissionsAsync()).status === "granted";
+      if (bgGranted) {
+        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+          accuracy: Location.Accuracy.BestForNavigation,
+          distanceInterval: 5,
+          timeInterval: 3000,
+          showsBackgroundLocationIndicator: true,
+          foregroundService: {
+            notificationTitle: "Roamly Trip Logger",
+            notificationBody: "Recording your ride in the background.",
+            notificationColor: "#ff6600",
+          },
+        });
+      }
+    } catch {
+      // Background task may not be available in Expo Go or on restricted devices.
+      // Foreground-only tracking (watchPositionAsync below) will still work.
+    }
 
     watchRef.current = await Location.watchPositionAsync(
       {
@@ -256,22 +290,59 @@ export default function TripLoggerScreen() {
       timerRef.current = null;
     }
 
-    const durationMs = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
-    const distKm = distRef.current;
-    const avgSpeed = durationMs > 0 ? distKm / (durationMs / 3_600_000) : 0;
+    // Stop the background location task if it is running.
+    try {
+      const isRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+      if (isRunning) await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+    } catch {
+      // Non-critical: the task will stop automatically when the app is terminated.
+    }
 
+    const durationMs = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
     setRecording(false);
     // Don't clear speed — live watcher will continue updating it after recording stops
 
-    if (distKm > 0.01) {
+    // Merge foreground + background points, deduplicate by timestamp, recalculate distance.
+    let mergedRoute = [...routeRef.current];
+    if (AsyncStorage) {
+      try {
+        const raw = await AsyncStorage.getItem(BG_POINTS_KEY);
+        if (raw) {
+          const bgPoints: BgPoint[] = JSON.parse(raw);
+          const fgTsSet = new Set(routeRef.current.map((p) => p.timestamp));
+          const uniqueBg = bgPoints.filter((p) => !fgTsSet.has(p.timestamp));
+          mergedRoute = [...routeRef.current, ...uniqueBg].sort((a, b) => a.timestamp - b.timestamp);
+        }
+        await AsyncStorage.removeItem(BG_POINTS_KEY);
+      } catch {
+        // Keep foreground-only route if background data cannot be read.
+      }
+    }
+
+    // Recalculate distance from merged route.
+    let mergedDistKm = 0;
+    for (let i = 1; i < mergedRoute.length; i++) {
+      const dist = haversineMeters(
+        mergedRoute[i - 1].latitude,
+        mergedRoute[i - 1].longitude,
+        mergedRoute[i].latitude,
+        mergedRoute[i].longitude,
+      );
+      // Filter GPS jitter: only count movements of ≥ 3 m (same threshold as the foreground watcher).
+      if (dist >= 3) mergedDistKm += dist / 1000;
+    }
+
+    const avgSpeed = durationMs > 0 ? mergedDistKm / (durationMs / 3_600_000) : 0;
+
+    if (mergedDistKm > 0.01) {
       Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => null);
       const ride: SavedRide = {
         id: String(Date.now()),
         date: new Date().toISOString(),
-        distanceKm: Math.round(distKm * 100) / 100,
+        distanceKm: Math.round(mergedDistKm * 100) / 100,
         durationMs,
         avgSpeedKmh: Math.round(avgSpeed * 10) / 10,
-        route: routeRef.current,
+        route: mergedRoute,
       };
       const updated = [ride, ...rides];
       setRides(updated);

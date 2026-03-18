@@ -1,4 +1,6 @@
 import "../lib/i18n";
+// Register background location task before any navigation renders.
+import "../lib/locationTask";
 import { Stack } from "expo-router";
 import { SettingsProvider } from "../lib/settings";
 import { ErrorBoundary } from "../components/ErrorBoundary";
