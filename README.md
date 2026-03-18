@@ -53,7 +53,7 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
 | Item | Status |
 |------|--------|
 | Android package name `com.sassagold.roamly` | ✅ Done |
-| App version `2.0.0` | ✅ Done |
+| App version `1.0.0` | ✅ Done |
 | Android `versionCode: 1` (auto-incremented by EAS) | ✅ Done |
 | Adaptive icon (foreground + background + monochrome) | ✅ Done |
 | Splash screen (light & dark mode) | ✅ Done |

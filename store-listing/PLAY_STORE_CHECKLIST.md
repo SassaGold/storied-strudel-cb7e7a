@@ -7,7 +7,7 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.roamly`
-- [x] App version: `2.0.0`
+- [x] App version: `1.0.0`
 - [x] Android `versionCode`: `1` (in `app.json`; auto-incremented by EAS on each production build)
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
