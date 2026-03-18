@@ -154,7 +154,7 @@ export default function EmergencyScreen() {
       if (Platform.OS === "web") {
         try {
           await navigator.clipboard.writeText(shareText);
-          Alert.alert("📍 Copied!", "Your location link has been copied to the clipboard.");
+          Alert.alert(t("sos.locationCopied"), t("sos.locationCopiedMsg"));
           return;
         } catch {
           // clipboard not available, fall through to Share.share

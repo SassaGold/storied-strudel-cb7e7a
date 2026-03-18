@@ -242,7 +242,8 @@
     },
     "searchPlaceholder": "🔍 Nach Name suchen…",
     "noSearchResults": "Keine Ergebnisse für Ihre Suche.",
-    "searchGoogleMaps": "🗺️ Auf Google Maps suchen"
+    "searchGoogleMaps": "🗺️ Auf Google Maps suchen",
+    "freeParking": "Kostenlos parken"
   },
   "sos": {
     "badge": "🆘 NOTFALL",
@@ -295,7 +296,9 @@
     "instructionsBody": "1. RUHE BEWAHREN — Lage einschätzen.\n\n2. SOFORT 112 ANRUFEN.\n\n3. STANDORT — genau angeben, wo du bist.\n\n4. HELM — nur entfernen wenn Atemweg blockiert.\n\n5. BLUTUNG — festen direkten Druck anwenden.\n\n6. VERLETZTEN NICHT BEWEGEN außer bei unmittelbarer Gefahr.\n\n7. WARM HALTEN — Kleidung oder Rettungsdecke nutzen.\n\n8. VERBINDUNG HALTEN — nicht auflegen bis Hilfe kommt.",
     "quickActionCall": "112 anrufen",
     "quickActionTorch": "Licht",
-    "quickActionInstructions": "Anweisungen"
+    "quickActionInstructions": "Anweisungen",
+    "locationCopied": "📍 Kopiert!",
+    "locationCopiedMsg": "Dein Standortlink wurde in die Zwischenablage kopiert."
   },
   "triplog": {
     "badge": "🏍️ TOUR",
@@ -361,7 +364,11 @@
     "version": "App-Version",
     "openLink": "Öffnen ↗",
     "legal": "RECHTLICHES",
-    "legalBody": "Alle externen Daten werden gemäß den Bedingungen und Lizenzen jeder Quelle verwendet. OpenStreetMap-Daten werden unter der Open Database License (ODbL) verwendet. Wetterdaten von Open-Meteo werden unter CC BY 4.0 verwendet."
+    "legalBody": "Alle externen Daten werden gemäß den Bedingungen und Lizenzen jeder Quelle verwendet. OpenStreetMap-Daten werden unter der Open Database License (ODbL) verwendet. Wetterdaten von Open-Meteo werden unter CC BY 4.0 verwendet.",
+    "updateCheck": "🔄 Nach Update suchen",
+    "updateAvailable": "⬇️ Update verfügbar — wird installiert…",
+    "updateLatest": "✅ Du bist aktuell",
+    "updateError": "❌ Update-Prüfung fehlgeschlagen"
   },
   "settings": {
     "badge": "⚙️ EINSTELLUNGEN",
@@ -374,6 +381,13 @@
     "searchRadius": "SUCHRADIUS",
     "searchRadiusDesc": "Radius für die Suche nach Restaurants, Unterkünften und Sehenswürdigkeiten. Garage- und Notfall-Tabs haben eigene feste Radien.",
     "defaultTab": "STANDARD-TAB",
-    "defaultTabDesc": "Welcher Tab beim Start der App automatisch geöffnet wird."
+    "defaultTabDesc": "Welcher Tab beim Start der App automatisch geöffnet wird.",
+    "language": "SPRACHE",
+    "languageDesc": "Wähle die Sprache, die in der gesamten App verwendet wird.",
+    "clearCache": "CACHE LEEREN",
+    "clearCacheDesc": "Alle zwischengespeicherten Suchergebnisse entfernen. Die nächste Suche holt frische Daten aus dem Netzwerk.",
+    "clearCacheButton": "Gecachte Daten löschen",
+    "clearCacheSuccess": "Cache geleert",
+    "clearCacheSuccessMsg": "Alle zwischengespeicherten Suchergebnisse wurden entfernt."
   }
 }

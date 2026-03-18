@@ -242,7 +242,8 @@
     },
     "searchPlaceholder": "🔍 Søk etter navn…",
     "noSearchResults": "Ingen resultater samsvarer med søket ditt.",
-    "searchGoogleMaps": "🗺️ Søk på Google Maps"
+    "searchGoogleMaps": "🗺️ Søk på Google Maps",
+    "freeParking": "Gratis parkering"
   },
   "sos": {
     "badge": "🆘 NØDSITUASJON",
@@ -295,7 +296,9 @@
     "instructionsBody": "1. HOLD ROEN — vurder situasjonen.\n\n2. RING 112 umiddelbart.\n\n3. POSISJON — fortell nøyaktig hvor du er.\n\n4. HJELM — ikke fjern hjelmen med mindre luftveien er blokkert.\n\n5. BLØDNING — legg fast direkte trykk.\n\n6. IKKE FLYTT den skadde med mindre det er umiddelbar fare.\n\n7. HOLD DEM VARME — bruk klær eller redningsfolie.\n\n8. BLI PÅ LINJEN — ikke legg på før hjelp ankommer.",
     "quickActionCall": "Ring 112",
     "quickActionTorch": "Lommelykt",
-    "quickActionInstructions": "Instruksjoner"
+    "quickActionInstructions": "Instruksjoner",
+    "locationCopied": "📍 Kopiert!",
+    "locationCopiedMsg": "Posisjonslenken din er kopiert til utklippstavlen."
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -361,7 +364,11 @@
     "version": "App-versjon",
     "openLink": "Åpne ↗",
     "legal": "JURIDISK",
-    "legalBody": "Alle eksterne data brukes i samsvar med vilkårene og lisensene til hver respektive kilde. OpenStreetMap-data brukes under Open Database License (ODbL). Værdata fra Open-Meteo brukes under CC BY 4.0."
+    "legalBody": "Alle eksterne data brukes i samsvar med vilkårene og lisensene til hver respektive kilde. OpenStreetMap-data brukes under Open Database License (ODbL). Værdata fra Open-Meteo brukes under CC BY 4.0.",
+    "updateCheck": "🔄 Se etter oppdatering",
+    "updateAvailable": "⬇️ Oppdatering tilgjengelig — installerer…",
+    "updateLatest": "✅ Du er oppdatert",
+    "updateError": "❌ Oppdateringssjekk mislyktes"
   },
   "settings": {
     "badge": "⚙️ INNSTILLINGER",
@@ -374,6 +381,13 @@
     "searchRadius": "SØKERADIUS",
     "searchRadiusDesc": "Radius brukt ved søk etter mat, overnatting og attraksjoner. Garasje og nødfaner bruker sine egne faste radier.",
     "defaultTab": "STANDARD FANE",
-    "defaultTabDesc": "Hvilken fane som åpnes automatisk når appen starter."
+    "defaultTabDesc": "Hvilken fane som åpnes automatisk når appen starter.",
+    "language": "SPRÅK",
+    "languageDesc": "Velg språket som brukes i hele appen.",
+    "clearCache": "TØM HURTIGBUFFER",
+    "clearCacheDesc": "Fjern alle bufrede søkeresultater. Neste søk vil hente ferske data fra nettverket.",
+    "clearCacheButton": "Tøm bufrede data",
+    "clearCacheSuccess": "Hurtigbuffer tømt",
+    "clearCacheSuccessMsg": "Alle bufrede søkeresultater er fjernet."
   }
 }

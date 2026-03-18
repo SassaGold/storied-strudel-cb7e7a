@@ -242,7 +242,8 @@
     },
     "searchPlaceholder": "🔍 Buscar por nombre…",
     "noSearchResults": "No hay resultados para su búsqueda.",
-    "searchGoogleMaps": "🗺️ Buscar en Google Maps"
+    "searchGoogleMaps": "🗺️ Buscar en Google Maps",
+    "freeParking": "Aparcamiento gratuito"
   },
   "sos": {
     "badge": "🆘 EMERGENCIA",
@@ -295,7 +296,9 @@
     "instructionsBody": "1. MANTÉN LA CALMA — evalúa la situación.\n\n2. LLAMA AL 112 inmediatamente.\n\n3. UBICACIÓN — indica exactamente dónde estás.\n\n4. CASCO — no lo retires a menos que la vía aérea esté bloqueada.\n\n5. HEMORRAGIA — aplica presión directa firme.\n\n6. NO MUEVAS al herido salvo peligro inmediato.\n\n7. MANTÉN LO CALIENTE — usa ropa o manta de rescate.\n\n8. NO CUELGUES — quédate en línea hasta que llegue la ayuda.",
     "quickActionCall": "Llamar 112",
     "quickActionTorch": "Linterna",
-    "quickActionInstructions": "Instrucciones"
+    "quickActionInstructions": "Instrucciones",
+    "locationCopied": "📍 ¡Copiado!",
+    "locationCopiedMsg": "El enlace de tu ubicación ha sido copiado al portapapeles."
   },
   "triplog": {
     "badge": "🏍️ VIAJE",
@@ -361,7 +364,11 @@
     "version": "Versión",
     "openLink": "Abrir ↗",
     "legal": "LEGAL",
-    "legalBody": "Todos los datos externos se usan de acuerdo con los términos y licencias de cada fuente. Los datos de OpenStreetMap se usan bajo la Licencia de Base de Datos Abierta (ODbL). Los datos meteorológicos de Open-Meteo se usan bajo CC BY 4.0."
+    "legalBody": "Todos los datos externos se usan de acuerdo con los términos y licencias de cada fuente. Los datos de OpenStreetMap se usan bajo la Licencia de Base de Datos Abierta (ODbL). Los datos meteorológicos de Open-Meteo se usan bajo CC BY 4.0.",
+    "updateCheck": "🔄 Buscar actualización",
+    "updateAvailable": "⬇️ Actualización disponible — instalando…",
+    "updateLatest": "✅ Estás al día",
+    "updateError": "❌ Error al buscar actualización"
   },
   "settings": {
     "badge": "⚙️ AJUSTES",
@@ -374,6 +381,13 @@
     "searchRadius": "RADIO DE BÚSQUEDA",
     "searchRadiusDesc": "Radio para buscar comida, alojamiento y atracciones. Las pestañas de garage y emergencias usan sus propios radios fijos.",
     "defaultTab": "PESTAÑA PREDETERMINADA",
-    "defaultTabDesc": "Qué pestaña se abre automáticamente al iniciar la aplicación."
+    "defaultTabDesc": "Qué pestaña se abre automáticamente al iniciar la aplicación.",
+    "language": "IDIOMA",
+    "languageDesc": "Elige el idioma utilizado en toda la aplicación.",
+    "clearCache": "LIMPIAR CACHÉ",
+    "clearCacheDesc": "Elimina todos los resultados de búsqueda en caché. La próxima búsqueda obtendrá datos frescos de la red.",
+    "clearCacheButton": "Limpiar datos en caché",
+    "clearCacheSuccess": "Caché limpiada",
+    "clearCacheSuccessMsg": "Todos los resultados de búsqueda en caché han sido eliminados."
   }
 }

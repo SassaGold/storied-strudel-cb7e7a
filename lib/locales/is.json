@@ -242,7 +242,8 @@
     },
     "searchPlaceholder": "🔍 Leita eftir nafni…",
     "noSearchResults": "Engar niðurstöður passa við leit þína.",
-    "searchGoogleMaps": "🗺️ Leita á Google Maps"
+    "searchGoogleMaps": "🗺️ Leita á Google Maps",
+    "freeParking": "Ókeypis bílastæði"
   },
   "sos": {
     "badge": "🆘 NEYÐARMÁL",
@@ -295,7 +296,9 @@
     "instructionsBody": "1. HALTU RÓ — mettu ástandið.\n\n2. HRINGDU Í 112 strax.\n\n3. STAÐSETNING — segðu nákvæmlega hvar þú ert.\n\n4. HJÁLMUR — fjarlægðu hann ekki nema loftvegi sé stíflaður.\n\n5. BLÆÐING — beitu þrýstingi beint á sárið.\n\n6. EKKI FÆRA meiddur nema yfirvofandi hætta sé.\n\n7. GEYMDU HLÝJA — notaðu föt eða björgunarfiltu.\n\n8. HALTU LÍNUNNI — leggðu ekki niður þar til hjálp kemur.",
     "quickActionCall": "Hringja 112",
     "quickActionTorch": "Ljós",
-    "quickActionInstructions": "Leiðbeiningar"
+    "quickActionInstructions": "Leiðbeiningar",
+    "locationCopied": "📍 Afritað!",
+    "locationCopiedMsg": "Staðsetningartengilinn þinn hefur verið afritaður á klippiborðið."
   },
   "triplog": {
     "badge": "🏍️ FERÐASKRÁ",
@@ -361,7 +364,11 @@
     "version": "Útgáfa",
     "openLink": "Opna ↗",
     "legal": "LAGALEGT",
-    "legalBody": "Öll ytri gögn eru notuð í samræmi við skilmála og leyfi hverrar heimildar. OpenStreetMap-gögn eru notuð undir Open Database License (ODbL). Veðurgögn frá Open-Meteo eru notuð undir CC BY 4.0."
+    "legalBody": "Öll ytri gögn eru notuð í samræmi við skilmála og leyfi hverrar heimildar. OpenStreetMap-gögn eru notuð undir Open Database License (ODbL). Veðurgögn frá Open-Meteo eru notuð undir CC BY 4.0.",
+    "updateCheck": "🔄 Leita að uppfærslu",
+    "updateAvailable": "⬇️ Uppfærsla tiltæk — setur upp…",
+    "updateLatest": "✅ Þú ert uppfærður",
+    "updateError": "❌ Uppfærsluleit mistókst"
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",
@@ -374,6 +381,13 @@
     "searchRadius": "LEITARRADÍUS",
     "searchRadiusDesc": "Radíus til að leita að mat, gistingu og aðdráttarstöðum. Bílskúr- og neyðarflipar nota sinn eigin fastan radíus.",
     "defaultTab": "SJÁLFGEFINN FLIPI",
-    "defaultTabDesc": "Hvaða flipi opnast sjálfkrafa þegar forritið ræsist."
+    "defaultTabDesc": "Hvaða flipi opnast sjálfkrafa þegar forritið ræsist.",
+    "language": "TUNGUMÁL",
+    "languageDesc": "Veldu tungumálið sem notað er í öllum forritinu.",
+    "clearCache": "HREINSA SKYNDIMINNI",
+    "clearCacheDesc": "Fjarlægðu öll vistuð leitarniðurstöður. Næsta leit mun sækja nýgæðar gögn af netinu.",
+    "clearCacheButton": "Hreinsa vistuð gögn",
+    "clearCacheSuccess": "Skyndiminni hreinsað",
+    "clearCacheSuccessMsg": "Öll vistuð leitarniðurstöður hafa verið fjarlægðar."
   }
 }

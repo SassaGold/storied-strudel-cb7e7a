@@ -124,7 +124,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
 
       const sorted = mapped
         .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-        .slice(0, 20);
+        .slice(0, 30);
 
       setPlaces(sorted);
       setFromCache(false);
