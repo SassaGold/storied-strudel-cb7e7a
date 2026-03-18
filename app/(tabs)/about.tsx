@@ -199,16 +199,16 @@ export default function AboutScreen() {
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); checkForUpdate(); }}
           disabled={updateStatus === "checking"}
           accessibilityRole="button"
-          accessibilityLabel="Check for app update"
+          accessibilityLabel={t("about.updateCheck")}
         >
           {updateStatus === "checking" ? (
             <ActivityIndicator size="small" color="#ff6600" />
           ) : (
             <Text style={styles.updateBtnText}>
-              {updateStatus === "available" ? "⬇️ Update available — installing…" :
-               updateStatus === "latest"    ? "✅ You're up to date" :
-               updateStatus === "error"     ? "❌ Update check failed" :
-               "🔄 Check for Update"}
+              {updateStatus === "available" ? t("about.updateAvailable") :
+               updateStatus === "latest"    ? t("about.updateLatest") :
+               updateStatus === "error"     ? t("about.updateError") :
+               t("about.updateCheck")}
             </Text>
           )}
         </Pressable>

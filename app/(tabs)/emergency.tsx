@@ -15,8 +15,8 @@ import {
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
 import { useSettings, fmtDistShort } from "../../lib/settings";
+import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyPlaces";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -29,39 +29,9 @@ try { rnMaps = require("react-native-maps"); } catch {}
 const MapView: any = rnMaps?.default;
 const Marker: any = rnMaps?.Marker;
 const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
-// Safely load AsyncStorage: the native implementation throws at module-evaluation
-// time when "RNCAsyncStorage" isn't registered (Expo Go / older dev builds).
-// Using require() in try/catch means the screen still loads; the existing
-// try/catch wrappers inside loadPlaces already handle AsyncStorage === null.
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
-type OverpassElement = {
-  id: number;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: Record<string, string>;
-};
-
-/** Maximum results to fetch from Overpass API (balances response time vs. coverage) */
-const MAX_RESULTS = 80;
-
-type Place = {
-  id: string;
-  name: string;
-  category: string;
-  distanceMeters?: number;
-  latitude: number;
-  longitude: number;
-  website?: string;
-  phone?: string;
-  address?: string;
-  openingHours?: string;
-};
-
-const AMENITY_TYPES =
-  "hospital|police|fire_station|pharmacy|clinic|doctors|ambulance_station";
+/** Alias so the rest of this file keeps using the shorter `Place` name. */
+type Place = EmergencyPlace;
 
 const CATEGORY_FILTER_KEYS = ["all", "hospital", "police", "fire_station", "pharmacy"] as const;
 
@@ -110,14 +80,15 @@ export default function EmergencyScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [places, setPlaces] = useState<Place[]>([]);
+
+  // Data from hook (loading, error, places, fromCache, cacheTs, userLocation, loadPlaces)
+  const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces } =
+    useEmergencyPlaces();
+
+  // UI state
   const [selected, setSelected] = useState("all");
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [fromCache, setFromCache] = useState(false);
   // Quick action state
   const [torchOn, setTorchOn] = useState(false);
   const [instructionsVisible, setInstructionsVisible] = useState(false);
@@ -154,7 +125,7 @@ export default function EmergencyScreen() {
       if (Platform.OS === "web") {
         try {
           await navigator.clipboard.writeText(shareText);
-          Alert.alert("📍 Copied!", "Your location link has been copied to the clipboard.");
+          Alert.alert(t("sos.locationCopied"), t("sos.locationCopiedMsg"));
           return;
         } catch {
           // clipboard not available, fall through to Share.share
@@ -164,103 +135,6 @@ export default function EmergencyScreen() {
       await Share.share({ message: shareText });
     } catch {
       Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
-    }
-  }, [t]);
-
-  const loadPlaces = useCallback(async () => {
-    // Load cache so user sees last-known results immediately while fetching
-    try {
-      const raw = await AsyncStorage?.getItem(CACHE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const ts: number = parsed?.ts;
-        const data: Place[] = parsed?.data;
-        if (Array.isArray(data) && data.length > 0 && typeof ts === "number" && Date.now() - ts < CACHE_TTL_MS) {
-          setPlaces(data);
-          setFromCache(true);
-        }
-      }
-    } catch {}
-    setLoading(true);
-    setError(null);
-    try {
-      const perm = await Location.requestForegroundPermissionsAsync();
-      if (perm.status !== "granted") {
-        setError(t("sos.locationError"));
-        return;
-      }
-
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
-      const { latitude, longitude } = pos.coords;
-      setUserLocation({ latitude, longitude });
-
-      const overpassQuery = `
-[out:json][timeout:30];
-(
-  node(around:10000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
-  way(around:10000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
-  relation(around:10000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
-);
-out center ${MAX_RESULTS};`;
-
-      // Overpass API (OpenStreetMap) — free POI data, no API key required
-      const data = await fetchOverpass(overpassQuery);
-
-      if (!data.elements) {
-        setPlaces([]);
-        return;
-      }
-
-      const mapped = (data.elements as OverpassElement[])
-        .map((el: OverpassElement) => {
-          const lat = el.lat ?? el.center?.lat;
-          const lon = el.lon ?? el.center?.lon;
-          if (lat === undefined || lon === undefined) return null;
-          const tags = el.tags ?? {};
-          const name = tags.name || tags.amenity || "Emergency Service";
-          return {
-            id: String(el.id),
-            name,
-            category: tags.amenity || "other",
-            latitude: lat,
-            longitude: lon,
-            distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-            phone:
-              (
-                tags.phone ||
-                tags["contact:phone"] ||
-                tags["contact:mobile"] ||
-                ""
-              ).trim() || undefined,
-            address:
-              [
-                tags["addr:housenumber"],
-                tags["addr:street"],
-                tags["addr:city"],
-              ]
-                .filter(Boolean)
-                .join(" ") || undefined,
-            openingHours: (tags.opening_hours || "").trim() || undefined,
-            website:
-              (tags.website || tags["contact:website"] || "").trim() ||
-              undefined,
-          } as Place;
-        })
-        .filter(Boolean) as Place[];
-
-      const sorted = mapped
-        .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-        .slice(0, 40);
-      setPlaces(sorted);
-      setFromCache(false);
-      try { await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
-    } catch (err) {
-      const isNetwork = err instanceof TypeError && String(err).includes("fetch");
-      setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
-    } finally {
-      setLoading(false);
     }
   }, [t]);
 
@@ -521,7 +395,12 @@ out center ${MAX_RESULTS};`;
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>
+            {t("common.cachedResults")}
+            {cacheTs != null && (
+              ` · ${t("common.cacheAge", { count: Math.round((Date.now() - cacheTs) / 60000) })}`
+            )}
+          </Text>
         </View>
       )}
 

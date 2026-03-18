@@ -111,7 +111,7 @@ const mapMcElement = (
   if (lat === undefined || lon === undefined) return null;
   const tags = element.tags ?? {};
   const name = tags.name || tags.brand || tags.operator || fallbackCategory;
-  const note = tags.fee === "no" ? "Free parking" : undefined;
+  const note = tags.fee === "no" ? "FREE_PARKING" : undefined;
   const category =
     tags.shop || tags.amenity || tags.tourism || tags.club || tags.leisure || tags.craft || fallbackCategory;
   const fuelTypes: string[] = [];
@@ -263,6 +263,7 @@ export default function McScreen() {
     error,
     places,
     fromCache,
+    cacheTs,
     userLocation,
     infoPlace,
     wikiExtract,
@@ -326,7 +327,7 @@ export default function McScreen() {
             {infoPlace?.note && (
               <View style={styles.modalRow}>
                 <Text style={styles.modalLabel}>{t("common.note")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.note}</Text>
+                <Text style={styles.modalValue}>{infoPlace.note === "FREE_PARKING" ? t("garage.freeParking") : infoPlace.note}</Text>
               </View>
             )}
             {infoPlace?.phone && (
@@ -492,7 +493,12 @@ export default function McScreen() {
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>
+            {t("common.cachedResults")}
+            {cacheTs != null && (
+              ` · ${t("common.cacheAge", { count: Math.round((Date.now() - cacheTs) / 60000) })}`
+            )}
+          </Text>
         </View>
       )}
 
@@ -587,7 +593,7 @@ export default function McScreen() {
                   <View style={styles.tagRow}>
                     <Text style={styles.metaText}>{place.category}</Text>
                     {place.note && (
-                      <Text style={styles.highlightTag}>{place.note}</Text>
+                      <Text style={styles.highlightTag}>{place.note === "FREE_PARKING" ? t("garage.freeParking") : place.note}</Text>
                     )}
                   </View>
                   {selected === "fuel" && place.fuelTypes && place.fuelTypes.length > 0 && (

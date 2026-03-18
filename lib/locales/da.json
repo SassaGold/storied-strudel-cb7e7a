@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Tjek brændstofpriser",
     "readWikipedia": "📖 Læs på Wikipedia",
     "cachedResults": "📡 Viser cachelagrede resultater — tryk opdater for seneste",
-    "fuelTypes": "⛽ Brændstoftyper"
+    "fuelTypes": "⛽ Brændstoftyper",
+    "cacheAge": "Data fra {{count}} min siden"
   },
   "language": {
     "label": "🌍 Sprog",
@@ -242,7 +243,8 @@
     },
     "searchPlaceholder": "🔍 Søg efter navn…",
     "noSearchResults": "Ingen resultater matcher din søgning.",
-    "searchGoogleMaps": "🗺️ Søg på Google Maps"
+    "searchGoogleMaps": "🗺️ Søg på Google Maps",
+    "freeParking": "Gratis parkering"
   },
   "sos": {
     "badge": "🆘 NØDSITUATION",
@@ -295,7 +297,9 @@
     "instructionsBody": "1. FORBLIV ROLIG — vurder situationen.\n\n2. RING 112 med det samme.\n\n3. PLACERING — fortæl præcis, hvor du er.\n\n4. HJELM — fjern ikke hjelmen, medmindre luftvejen er blokeret.\n\n5. BLØDNING — anvend fast direkte tryk.\n\n6. FLYT IKKE den tilskadekomne, medmindre der er umiddelbar fare.\n\n7. HOLD DEM VARM — brug tøj eller redningsfolie.\n\n8. BLIV PÅ LINJEN — læg ikke røret på, før hjælp ankommer.",
     "quickActionCall": "Ring 112",
     "quickActionTorch": "Lommelygte",
-    "quickActionInstructions": "Instruktioner"
+    "quickActionInstructions": "Instruktioner",
+    "locationCopied": "📍 Kopieret!",
+    "locationCopiedMsg": "Dit placeringlink er kopieret til udklipsholderen."
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -361,7 +365,11 @@
     "version": "App-version",
     "openLink": "Åbn ↗",
     "legal": "JURIDISK",
-    "legalBody": "Alle eksterne data bruges i overensstemmelse med vilkårene og licenserne for hver respektiv kilde. OpenStreetMap-data bruges under Open Database License (ODbL). Vejrdata fra Open-Meteo bruges under CC BY 4.0."
+    "legalBody": "Alle eksterne data bruges i overensstemmelse med vilkårene og licenserne for hver respektiv kilde. OpenStreetMap-data bruges under Open Database License (ODbL). Vejrdata fra Open-Meteo bruges under CC BY 4.0.",
+    "updateCheck": "🔄 Søg efter opdatering",
+    "updateAvailable": "⬇️ Opdatering tilgængelig — installerer…",
+    "updateLatest": "✅ Du er opdateret",
+    "updateError": "❌ Opdateringstjek mislykkedes"
   },
   "settings": {
     "badge": "⚙️ INDSTILLINGER",
@@ -374,6 +382,13 @@
     "searchRadius": "SØGERADIUS",
     "searchRadiusDesc": "Radius brugt ved søgning efter mad, overnatning og attraktioner. Garagen og nødfanen bruger deres egne faste radier.",
     "defaultTab": "STANDARDFANE",
-    "defaultTabDesc": "Hvilken fane der åbnes automatisk, når appen starter."
+    "defaultTabDesc": "Hvilken fane der åbnes automatisk, når appen starter.",
+    "language": "SPROG",
+    "languageDesc": "Vælg det sprog, der bruges i hele appen.",
+    "clearCache": "RYD CACHE",
+    "clearCacheDesc": "Fjern alle cachelagrede søgeresultater. Den næste søgning henter friske data fra netværket.",
+    "clearCacheButton": "Ryd cachelagret data",
+    "clearCacheSuccess": "Cache ryddet",
+    "clearCacheSuccessMsg": "Alle cachelagrede søgeresultater er fjernet."
   }
 }

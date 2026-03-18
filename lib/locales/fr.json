@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Vérifier les prix du carburant",
     "readWikipedia": "📖 Lire sur Wikipédia",
     "cachedResults": "📡 Résultats en cache — actualiser pour les derniers",
-    "fuelTypes": "⛽ Types de carburant"
+    "fuelTypes": "⛽ Types de carburant",
+    "cacheAge": "Données d'il y a {{count}} min"
   },
   "language": {
     "label": "🌍 Langue",
@@ -242,7 +243,8 @@
     },
     "searchPlaceholder": "🔍 Rechercher par nom…",
     "noSearchResults": "Aucun résultat ne correspond à votre recherche.",
-    "searchGoogleMaps": "🗺️ Rechercher sur Google Maps"
+    "searchGoogleMaps": "🗺️ Rechercher sur Google Maps",
+    "freeParking": "Parking gratuit"
   },
   "sos": {
     "badge": "🆘 URGENCE",
@@ -295,7 +297,9 @@
     "instructionsBody": "1. RESTEZ CALME — évaluez la situation.\n\n2. APPELEZ LE 112 immédiatement.\n\n3. LOCALISATION — indiquez exactement où vous êtes.\n\n4. CASQUE — ne le retirez pas sauf obstruction des voies respiratoires.\n\n5. SAIGNEMENT — appliquez une pression directe ferme.\n\n6. NE BOUGEZ PAS le blessé sauf danger immédiat.\n\n7. GARDEZ-LE AU CHAUD — utilisez vêtements ou couverture de survie.\n\n8. RESTEZ EN LIGNE — ne raccrochez pas avant l'arrivée des secours.",
     "quickActionCall": "Appeler 112",
     "quickActionTorch": "Torche",
-    "quickActionInstructions": "Instructions"
+    "quickActionInstructions": "Instructions",
+    "locationCopied": "📍 Copié !",
+    "locationCopiedMsg": "Le lien de votre position a été copié dans le presse-papiers."
   },
   "triplog": {
     "badge": "🏍️ TRAJET",
@@ -361,7 +365,11 @@
     "version": "Version",
     "openLink": "Ouvrir ↗",
     "legal": "MENTIONS LÉGALES",
-    "legalBody": "Toutes les données externes sont utilisées conformément aux conditions et licences de chaque source. Les données OpenStreetMap sont utilisées sous la licence Open Database License (ODbL). Les données météo d'Open-Meteo sont utilisées sous CC BY 4.0."
+    "legalBody": "Toutes les données externes sont utilisées conformément aux conditions et licences de chaque source. Les données OpenStreetMap sont utilisées sous la licence Open Database License (ODbL). Les données météo d'Open-Meteo sont utilisées sous CC BY 4.0.",
+    "updateCheck": "🔄 Vérifier les mises à jour",
+    "updateAvailable": "⬇️ Mise à jour disponible — installation…",
+    "updateLatest": "✅ Vous êtes à jour",
+    "updateError": "❌ Échec de la vérification"
   },
   "settings": {
     "badge": "⚙️ PARAMÈTRES",
@@ -374,6 +382,13 @@
     "searchRadius": "RAYON DE RECHERCHE",
     "searchRadiusDesc": "Rayon utilisé pour rechercher restaurants, hébergements et attractions. Les onglets Garage et Urgences utilisent leurs propres rayons fixes.",
     "defaultTab": "ONGLET PAR DÉFAUT",
-    "defaultTabDesc": "L'onglet qui s'ouvre automatiquement au lancement de l'application."
+    "defaultTabDesc": "L'onglet qui s'ouvre automatiquement au lancement de l'application.",
+    "language": "LANGUE",
+    "languageDesc": "Choisissez la langue utilisée dans toute l'application.",
+    "clearCache": "VIDER LE CACHE",
+    "clearCacheDesc": "Supprimez tous les résultats de recherche en cache. La prochaine recherche récupérera des données fraîches.",
+    "clearCacheButton": "Vider les données en cache",
+    "clearCacheSuccess": "Cache vidé",
+    "clearCacheSuccessMsg": "Tous les résultats de recherche en cache ont été supprimés."
   }
 }

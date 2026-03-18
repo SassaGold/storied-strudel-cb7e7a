@@ -8,6 +8,7 @@ import { useCallback, useRef, useState } from "react";
 import { Linking } from "react-native";
 import * as Location from "expo-location";
 import { fetchOverpass, CACHE_TTL_MS, parseWikiTag } from "./overpass";
+import { WIKIPEDIA_SUMMARY_URL, POI_MAX_DISPLAY, OVERPASS_DEFAULT_TIMEOUT_MS } from "./config";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
@@ -67,6 +68,8 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  /** Unix timestamp (ms) of the cache hit, or null if data is fresh. */
+  const [cacheTs, setCacheTs] = useState<number | null>(null);
 
   // Keep a stable ref to the latest options so loadPlaces never becomes stale.
   const optionsRef = useRef(options);
@@ -80,7 +83,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       locationErrorMsg,
       loadErrorMsg,
       searchRadiusKm,
-      fetchTimeoutMs = 40_000,
+      fetchTimeoutMs = OVERPASS_DEFAULT_TIMEOUT_MS,
     } = optionsRef.current;
 
     // Serve cached data immediately so the user sees something while refreshing.
@@ -93,6 +96,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
         if (Array.isArray(data) && data.length > 0 && typeof ts === "number" && Date.now() - ts < CACHE_TTL_MS) {
           setPlaces(data);
           setFromCache(true);
+          setCacheTs(ts);
         }
       }
     } catch {}
@@ -124,10 +128,11 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
 
       const sorted = mapped
         .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-        .slice(0, 20);
+        .slice(0, POI_MAX_DISPLAY);
 
       setPlaces(sorted);
       setFromCache(false);
+      setCacheTs(null);
       try {
         await AsyncStorage?.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted }));
       } catch {}
@@ -152,7 +157,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       setWikiLoading(true);
       const { lang, title } = parseWikiTag(place.wikipedia);
       // Wikipedia REST API — free, no API key required
-      fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`)
+      fetch(WIKIPEDIA_SUMMARY_URL(lang, title))
         .then((r) => r.json())
         .then((d) => setWikiExtract((d.extract || "").trim() || null))
         .catch(() => setWikiExtract(null))
@@ -165,6 +170,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     error,
     places,
     fromCache,
+    cacheTs,
     userLocation,
     infoPlace,
     wikiExtract,

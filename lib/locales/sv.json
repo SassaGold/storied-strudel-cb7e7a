@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Kontrollera bränslepriser",
     "readWikipedia": "📖 Läs på Wikipedia",
     "cachedResults": "📡 Visar cachade resultat — tryck uppdatera för senaste",
-    "fuelTypes": "⛽ Bränsletyper"
+    "fuelTypes": "⛽ Bränsletyper",
+    "cacheAge": "Data från {{count}} min sedan"
   },
   "language": {
     "label": "🌍 Språk",
@@ -242,7 +243,8 @@
     },
     "searchPlaceholder": "🔍 Sök efter namn…",
     "noSearchResults": "Inga resultat matchar din sökning.",
-    "searchGoogleMaps": "🗺️ Sök på Google Maps"
+    "searchGoogleMaps": "🗺️ Sök på Google Maps",
+    "freeParking": "Gratis parkering"
   },
   "sos": {
     "badge": "🆘 NÖDSITUATION",
@@ -295,7 +297,9 @@
     "instructionsBody": "1. HÅLL LUGNET — bedöm situationen.\n\n2. RING 112 omedelbart.\n\n3. POSITION — berätta exakt var du är.\n\n4. HJÄLM — ta inte av hjälmen om inte luftvägen är blockerad.\n\n5. BLÖDNING — tryck hårt direkt mot såret.\n\n6. FLYTTA INTE den skadade om det inte är omedelbar fara.\n\n7. HÅLL DEM VARMA — använd kläder eller räddningsfilt.\n\n8. HÅLL LINJEN — lägg inte på förrän hjälp anländer.",
     "quickActionCall": "Ring 112",
     "quickActionTorch": "Ficklampa",
-    "quickActionInstructions": "Instruktioner"
+    "quickActionInstructions": "Instruktioner",
+    "locationCopied": "📍 Kopierat!",
+    "locationCopiedMsg": "Din platslänk har kopierats till urklippet."
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -361,7 +365,11 @@
     "version": "App-version",
     "openLink": "Öppna ↗",
     "legal": "JURIDISKT",
-    "legalBody": "All extern data används i enlighet med villkoren och licenserna för varje respektive källa. OpenStreetMap-data används under Open Database License (ODbL). Väderdata från Open-Meteo används under CC BY 4.0."
+    "legalBody": "All extern data används i enlighet med villkoren och licenserna för varje respektive källa. OpenStreetMap-data används under Open Database License (ODbL). Väderdata från Open-Meteo används under CC BY 4.0.",
+    "updateCheck": "🔄 Sök efter uppdatering",
+    "updateAvailable": "⬇️ Uppdatering tillgänglig — installerar…",
+    "updateLatest": "✅ Du är uppdaterad",
+    "updateError": "❌ Uppdateringskontroll misslyckades"
   },
   "settings": {
     "badge": "⚙️ INSTÄLLNINGAR",
@@ -374,6 +382,13 @@
     "searchRadius": "SÖKRADIUS",
     "searchRadiusDesc": "Radius som används vid sökning efter mat, boende och attraktioner. Garaget och nödfliken använder sina egna fasta radier.",
     "defaultTab": "STANDARDFLIK",
-    "defaultTabDesc": "Vilken flik som öppnas automatiskt när appen startar."
+    "defaultTabDesc": "Vilken flik som öppnas automatiskt när appen startar.",
+    "language": "SPRÅK",
+    "languageDesc": "Välj det språk som används i hela appen.",
+    "clearCache": "RENSA CACHE",
+    "clearCacheDesc": "Ta bort alla cachade sökresultat. Nästa sökning hämtar färska data från nätverket.",
+    "clearCacheButton": "Rensa cachad data",
+    "clearCacheSuccess": "Cache rensad",
+    "clearCacheSuccessMsg": "Alla cachade sökresultat har tagits bort."
   }
 }

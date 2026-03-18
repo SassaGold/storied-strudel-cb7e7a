@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Check Fuel Prices",
     "readWikipedia": "📖 Read on Wikipedia",
     "cachedResults": "📡 Showing cached results — tap refresh for latest",
-    "fuelTypes": "⛽ Fuel Types"
+    "fuelTypes": "⛽ Fuel Types",
+    "cacheAge": "Data from {{count}} min ago"
   },
   "language": {
     "label": "🌍 Language",
@@ -242,7 +243,8 @@
     },
     "searchPlaceholder": "🔍 Search by name…",
     "noSearchResults": "No results match your search.",
-    "searchGoogleMaps": "🗺️ Search on Google Maps"
+    "searchGoogleMaps": "🗺️ Search on Google Maps",
+    "freeParking": "Free parking"
   },
   "sos": {
     "badge": "🆘 EMERGENCY",
@@ -295,7 +297,9 @@
     "instructionsBody": "1. STAY CALM — assess the situation.\n\n2. CALL 112 (EU/Intl) or 911 (USA) immediately.\n\n3. LOCATION — tell them exactly where you are.\n\n4. HELMET — do not remove unless airway is blocked.\n\n5. BLEEDING — apply firm direct pressure.\n\n6. DO NOT MOVE an injured rider unless in immediate danger.\n\n7. KEEP THEM WARM — use spare clothing or foil blanket.\n\n8. STAY ON LINE — do not hang up until help arrives.",
     "quickActionCall": "Call 112",
     "quickActionTorch": "Torch",
-    "quickActionInstructions": "Instructions"
+    "quickActionInstructions": "Instructions",
+    "locationCopied": "📍 Copied!",
+    "locationCopiedMsg": "Your location link has been copied to the clipboard."
   },
   "triplog": {
     "badge": "🏍️ TRIP LOGGER",
@@ -361,7 +365,11 @@
     "version": "App Version",
     "openLink": "Open ↗",
     "legal": "LEGAL",
-    "legalBody": "All external data is used in accordance with the terms and licenses of each respective source. OpenStreetMap data is used under the Open Database License (ODbL). Weather data from Open-Meteo is used under CC BY 4.0."
+    "legalBody": "All external data is used in accordance with the terms and licenses of each respective source. OpenStreetMap data is used under the Open Database License (ODbL). Weather data from Open-Meteo is used under CC BY 4.0.",
+    "updateCheck": "🔄 Check for Update",
+    "updateAvailable": "⬇️ Update available — installing…",
+    "updateLatest": "✅ You're up to date",
+    "updateError": "❌ Update check failed"
   },
   "settings": {
     "badge": "⚙️ SETTINGS",
@@ -374,6 +382,13 @@
     "searchRadius": "SEARCH RADIUS",
     "searchRadiusDesc": "Radius used when searching for food, accommodation and attractions. Garage & emergency tabs use their own fixed radii.",
     "defaultTab": "DEFAULT TAB",
-    "defaultTabDesc": "Which tab opens automatically when the app launches."
+    "defaultTabDesc": "Which tab opens automatically when the app launches.",
+    "language": "LANGUAGE",
+    "languageDesc": "Choose the language used throughout the app.",
+    "clearCache": "CLEAR CACHE",
+    "clearCacheDesc": "Remove all cached search results. The next search will fetch fresh data from the network.",
+    "clearCacheButton": "Clear Cached Data",
+    "clearCacheSuccess": "Cache Cleared",
+    "clearCacheSuccessMsg": "All cached search results have been removed."
   }
 }

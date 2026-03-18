@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Controleer brandstofprijzen",
     "readWikipedia": "📖 Lees op Wikipedia",
     "cachedResults": "📡 Gecachede resultaten — tik op vernieuwen voor nieuwste",
-    "fuelTypes": "⛽ Brandstofsoorten"
+    "fuelTypes": "⛽ Brandstofsoorten",
+    "cacheAge": "Gegevens van {{count}} min geleden"
   },
   "language": {
     "label": "🌍 Taal",
@@ -242,7 +243,8 @@
     },
     "searchPlaceholder": "🔍 Zoek op naam…",
     "noSearchResults": "Geen resultaten voor jouw zoekopdracht.",
-    "searchGoogleMaps": "🗺️ Zoek op Google Maps"
+    "searchGoogleMaps": "🗺️ Zoek op Google Maps",
+    "freeParking": "Gratis parkeren"
   },
   "sos": {
     "badge": "🆘 NOODGEVAL",
@@ -295,7 +297,9 @@
     "instructionsBody": "1. BLIJF KALM — beoordeel de situatie.\n\n2. BEL 112 onmiddellijk.\n\n3. LOCATIE — geef exact aan waar je bent.\n\n4. HELM — niet verwijderen tenzij luchtweg geblokkeerd is.\n\n5. BLOEDEN — oefen stevige directe druk uit.\n\n6. BEWEEG een gewonde rijder NIET tenzij in direct gevaar.\n\n7. HOUD HEM WARM — gebruik reservekleding of foliedeken.\n\n8. BLIJF AAN DE LIJN — hang niet op tot hulp arriveert.",
     "quickActionCall": "Bel 112",
     "quickActionTorch": "Zaklamp",
-    "quickActionInstructions": "Instructies"
+    "quickActionInstructions": "Instructies",
+    "locationCopied": "📍 Gekopieerd!",
+    "locationCopiedMsg": "Jouw locatielink is naar het klembord gekopieerd."
   },
   "triplog": {
     "badge": "🏍️ RITLOGGER",
@@ -361,7 +365,11 @@
     "version": "App-versie",
     "openLink": "Openen ↗",
     "legal": "JURIDISCH",
-    "legalBody": "Alle externe gegevens worden gebruikt in overeenstemming met de voorwaarden en licenties van elke respectieve bron. OpenStreetMap-gegevens worden gebruikt onder de Open Database-licentie (ODbL). Weerdata van Open-Meteo valt onder CC BY 4.0."
+    "legalBody": "Alle externe gegevens worden gebruikt in overeenstemming met de voorwaarden en licenties van elke respectieve bron. OpenStreetMap-gegevens worden gebruikt onder de Open Database-licentie (ODbL). Weerdata van Open-Meteo valt onder CC BY 4.0.",
+    "updateCheck": "🔄 Controleer op update",
+    "updateAvailable": "⬇️ Update beschikbaar — installeren…",
+    "updateLatest": "✅ Je bent up-to-date",
+    "updateError": "❌ Update-controle mislukt"
   },
   "settings": {
     "badge": "⚙️ INSTELLINGEN",
@@ -374,6 +382,13 @@
     "searchRadius": "ZOEKRADIUS",
     "searchRadiusDesc": "Radius voor het zoeken naar eten, accommodatie en attracties.",
     "defaultTab": "STANDAARD TABBLAD",
-    "defaultTabDesc": "Welk tabblad automatisch opent bij het starten van de app."
+    "defaultTabDesc": "Welk tabblad automatisch opent bij het starten van de app.",
+    "language": "TAAL",
+    "languageDesc": "Kies de taal die in de hele app wordt gebruikt.",
+    "clearCache": "CACHE WISSEN",
+    "clearCacheDesc": "Verwijder alle gecachte zoekresultaten. De volgende zoekopdracht haalt verse gegevens op uit het netwerk.",
+    "clearCacheButton": "Gecachte gegevens wissen",
+    "clearCacheSuccess": "Cache gewist",
+    "clearCacheSuccessMsg": "Alle gecachte zoekresultaten zijn verwijderd."
   }
 }

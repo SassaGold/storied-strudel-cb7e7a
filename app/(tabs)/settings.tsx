@@ -1,12 +1,15 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
+import i18n, { saveLanguage, SUPPORTED_LANGS } from "../../lib/i18n";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
 const RADIUS_OPTIONS = [2, 5, 10, 15, 20] as const;
 
@@ -25,6 +28,20 @@ export default function SettingsScreen() {
   const { settings, setSetting } = useSettings();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const clearCache = async () => {
+    try {
+      if (!AsyncStorage) return;
+      const keys = await AsyncStorage.getAllKeys();
+      const cacheKeys = keys.filter((k: string) => k.startsWith("cache_"));
+      if (cacheKeys.length > 0) {
+        await AsyncStorage.multiRemove(cacheKeys);
+      }
+      Alert.alert(t("settings.clearCacheSuccess"), t("settings.clearCacheSuccessMsg"));
+    } catch {
+      // silently ignore
+    }
+  };
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
@@ -121,6 +138,48 @@ export default function SettingsScreen() {
             </Pressable>
           ))}
         </View>
+      </View>
+      {/* ── Language ── */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
+        <Text style={styles.sectionDesc}>{t("settings.languageDesc")}</Text>
+        <View style={styles.chipRow}>
+          {SUPPORTED_LANGS.map((lang) => (
+            <Pressable
+              key={lang}
+              style={({ pressed }) => [
+                styles.chip,
+                i18n.language === lang && styles.chipActive,
+                pressed && styles.chipPressed,
+              ]}
+              onPress={() => {
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+                i18n.changeLanguage(lang);
+                saveLanguage(lang);
+              }}
+              accessibilityRole="button"
+              accessibilityState={{ selected: i18n.language === lang }}
+            >
+              <Text style={[styles.chipText, i18n.language === lang && styles.chipTextActive]}>
+                {t(`language.${lang}`)}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      {/* ── Clear Cache ── */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t("settings.clearCache")}</Text>
+        <Text style={styles.sectionDesc}>{t("settings.clearCacheDesc")}</Text>
+        <Pressable
+          style={({ pressed }) => [styles.clearCacheButton, pressed && styles.clearCacheButtonPressed]}
+          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); clearCache(); }}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.clearCacheButton")}
+        >
+          <Text style={styles.clearCacheButtonText}>{t("settings.clearCacheButton")}</Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -268,5 +327,23 @@ const styles = StyleSheet.create({
   },
   tabChipEmoji: {
     fontSize: 14,
+  },
+  clearCacheButton: {
+    paddingVertical: 11,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.5)",
+    backgroundColor: "rgba(255,102,0,0.12)",
+    alignSelf: "flex-start",
+  },
+  clearCacheButtonPressed: {
+    opacity: 0.7,
+  },
+  clearCacheButtonText: {
+    color: "#ff6600",
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
 });
