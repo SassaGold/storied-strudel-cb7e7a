@@ -69,6 +69,35 @@ export async function fetchOverpass(
 export const CACHE_TTL_MS = 30 * 60 * 1_000;
 
 /**
+ * Retry a promise-returning function with exponential back-off.
+ *
+ * @param fn             Function returning a Promise. Called up to `maxAttempts` times.
+ * @param maxAttempts    Total number of attempts (default 3).
+ * @param initialDelayMs Milliseconds before the first retry (default 500).
+ *                       Each subsequent retry doubles the delay.
+ */
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts = 3,
+  initialDelayMs = 500,
+): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastErr = err;
+      if (attempt < maxAttempts - 1) {
+        await new Promise<void>((resolve) =>
+          setTimeout(resolve, initialDelayMs * 2 ** attempt)
+        );
+      }
+    }
+  }
+  throw lastErr;
+}
+
+/**
  * Parse an OpenStreetMap `wikipedia` tag (e.g. "en:Eiffel_Tower" or just "Paris")
  * into a { lang, title } pair suitable for the Wikipedia REST API.
  */

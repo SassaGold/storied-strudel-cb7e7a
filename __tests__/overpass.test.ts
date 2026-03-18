@@ -1,6 +1,6 @@
 // Tests for lib/overpass.ts — pure utility functions only, no network calls.
 
-import { haversineMeters, parseWikiTag } from "../lib/overpass";
+import { haversineMeters, parseWikiTag, withRetry } from "../lib/overpass";
 
 // ── haversineMeters ───────────────────────────────────────────────────────────
 
@@ -78,5 +78,52 @@ describe("parseWikiTag", () => {
     const result = parseWikiTag("fr:Tour_Eiffel");
     expect(result.lang).toBe("fr");
     expect(result.title).toBe("Tour_Eiffel");
+  });
+});
+
+// ── withRetry ─────────────────────────────────────────────────────────────────
+
+describe("withRetry", () => {
+  it("resolves immediately when fn succeeds on the first attempt", async () => {
+    const fn = jest.fn().mockResolvedValue("ok");
+    const result = await withRetry(fn, 3, 0);
+    expect(result).toBe("ok");
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries and resolves after initial failures", async () => {
+    const fn = jest.fn()
+      .mockRejectedValueOnce(new Error("fail1"))
+      .mockRejectedValueOnce(new Error("fail2"))
+      .mockResolvedValue("ok");
+    const result = await withRetry(fn, 3, 0);
+    expect(result).toBe("ok");
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+
+  it("throws the last error after exhausting all attempts", async () => {
+    const fn = jest.fn().mockRejectedValue(new Error("always fails"));
+    await expect(withRetry(fn, 3, 0)).rejects.toThrow("always fails");
+    expect(fn).toHaveBeenCalledTimes(3);
+  });
+
+  it("maxAttempts=1 means no retry (fails immediately)", async () => {
+    const fn = jest.fn().mockRejectedValue(new Error("fail"));
+    await expect(withRetry(fn, 1, 0)).rejects.toThrow("fail");
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns the value on the last allowed attempt", async () => {
+    const fn = jest.fn()
+      .mockRejectedValueOnce(new Error("fail"))
+      .mockResolvedValue("last-chance");
+    const result = await withRetry(fn, 2, 0);
+    expect(result).toBe("last-chance");
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it("passes through non-Error rejections", async () => {
+    const fn = jest.fn().mockRejectedValue("string error");
+    await expect(withRetry(fn, 1, 0)).rejects.toBe("string error");
   });
 });
