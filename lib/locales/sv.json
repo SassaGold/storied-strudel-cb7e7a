@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Kontrollera bränslepriser",
     "readWikipedia": "📖 Läs på Wikipedia",
     "cachedResults": "📡 Visar cachade resultat — tryck uppdatera för senaste",
-    "fuelTypes": "⛽ Bränsletyper"
+    "fuelTypes": "⛽ Bränsletyper",
+    "cacheAge": "Data från {{count}} min sedan"
   },
   "language": {
     "label": "🌍 Språk",

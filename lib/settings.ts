@@ -1,5 +1,14 @@
 import { createContext, createElement, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import {
+  C_TO_F_FACTOR,
+  C_TO_F_OFFSET,
+  KM_TO_MILES,
+  KMH_TO_MPH,
+  METRES_PER_MILE,
+  M_TO_FEET,
+  SHORT_DISTANCE_THRESHOLD_MILES,
+} from "./config";
 
 const AsyncStorage: any = (() => {
   try {
@@ -86,7 +95,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
 export function fmtTemp(tempC: number, unit: UnitSystem, round = false): string {
   if (unit === "imperial") {
-    const f = tempC * 1.8 + 32;
+    const f = tempC * C_TO_F_FACTOR + C_TO_F_OFFSET;
     return round ? `${Math.round(f)}°F` : `${f.toFixed(1)}°F`;
   }
   return round ? `${Math.round(tempC)}°C` : `${tempC.toFixed(1)}°C`;
@@ -94,22 +103,22 @@ export function fmtTemp(tempC: number, unit: UnitSystem, round = false): string 
 
 export function fmtDist(km: number, unit: UnitSystem): string {
   if (unit === "imperial") {
-    return `${(km * 0.621371).toFixed(2)} mi`;
+    return `${(km * KM_TO_MILES).toFixed(2)} mi`;
   }
   return `${km.toFixed(2)} km`;
 }
 
 export function fmtSpeed(kmh: number, unit: UnitSystem): string {
   if (unit === "imperial") {
-    return `${(kmh * 0.621371).toFixed(0)} mph`;
+    return `${(kmh * KMH_TO_MPH).toFixed(0)} mph`;
   }
   return `${kmh.toFixed(0)} km/h`;
 }
 
 export function fmtDistShort(meters: number, unit: UnitSystem): string {
   if (unit === "imperial") {
-    const miles = meters / 1609.34;
-    if (miles < 0.1) return `${Math.round(meters * 3.28084)} ft`;
+    const miles = meters / METRES_PER_MILE;
+    if (miles < SHORT_DISTANCE_THRESHOLD_MILES) return `${Math.round(meters * M_TO_FEET)} ft`;
     return `${miles.toFixed(1)} mi`;
   }
   if (meters < 1000) return `${Math.round(meters)} m`;

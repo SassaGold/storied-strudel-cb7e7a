@@ -81,8 +81,8 @@ export default function EmergencyScreen() {
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
 
-  // Data from hook (loading, error, places, fromCache, userLocation, loadPlaces)
-  const { loading, error, places, fromCache, userLocation, loadPlaces } =
+  // Data from hook (loading, error, places, fromCache, cacheTs, userLocation, loadPlaces)
+  const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces } =
     useEmergencyPlaces();
 
   // UI state
@@ -395,7 +395,12 @@ export default function EmergencyScreen() {
       {/* Cache banner */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>
+            {t("common.cachedResults")}
+            {cacheTs != null && (
+              ` · ${t("common.cacheAge", { count: Math.round((Date.now() - cacheTs) / 60000) })}`
+            )}
+          </Text>
         </View>
       )}
 

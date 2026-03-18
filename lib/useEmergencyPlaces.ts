@@ -6,6 +6,12 @@ import { useCallback, useState } from "react";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "./overpass";
+import {
+  EMERGENCY_SEARCH_RADIUS_M,
+  EMERGENCY_MAX_RESULTS,
+  EMERGENCY_MAX_DISPLAY,
+  EMERGENCY_AMENITY_TYPES,
+} from "./config";
 
 // ── AsyncStorage — safe require ───────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -20,9 +26,6 @@ const AsyncStorage: any = (() => {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CACHE_KEY = "cache_emergency_v2";
-const MAX_RESULTS = 80;
-const AMENITY_TYPES =
-  "hospital|police|fire_station|pharmacy|clinic|doctors|ambulance_station";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -60,6 +63,8 @@ export function useEmergencyPlaces() {
   const [error, setError] = useState<string | null>(null);
   const [places, setPlaces] = useState<EmergencyPlace[]>([]);
   const [fromCache, setFromCache] = useState(false);
+  /** Unix timestamp (ms) of the cache hit, or null if data is fresh. */
+  const [cacheTs, setCacheTs] = useState<number | null>(null);
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -81,6 +86,7 @@ export function useEmergencyPlaces() {
         ) {
           setPlaces(data);
           setFromCache(true);
+          setCacheTs(ts);
         }
       }
     } catch {}
@@ -103,11 +109,11 @@ export function useEmergencyPlaces() {
       const overpassQuery = `
 [out:json][timeout:30];
 (
-  node(around:10000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
-  way(around:10000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
-  relation(around:10000,${latitude},${longitude})[amenity~"${AMENITY_TYPES}"];
+  node(around:${EMERGENCY_SEARCH_RADIUS_M},${latitude},${longitude})[amenity~"${EMERGENCY_AMENITY_TYPES}"];
+  way(around:${EMERGENCY_SEARCH_RADIUS_M},${latitude},${longitude})[amenity~"${EMERGENCY_AMENITY_TYPES}"];
+  relation(around:${EMERGENCY_SEARCH_RADIUS_M},${latitude},${longitude})[amenity~"${EMERGENCY_AMENITY_TYPES}"];
 );
-out center ${MAX_RESULTS};`;
+out center ${EMERGENCY_MAX_RESULTS};`;
 
       const data = await fetchOverpass(overpassQuery);
 
@@ -154,10 +160,11 @@ out center ${MAX_RESULTS};`;
 
       const sorted = mapped
         .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
-        .slice(0, 40);
+        .slice(0, EMERGENCY_MAX_DISPLAY);
 
       setPlaces(sorted);
       setFromCache(false);
+      setCacheTs(null);
       try {
         await AsyncStorage?.setItem(
           CACHE_KEY,
@@ -172,5 +179,5 @@ out center ${MAX_RESULTS};`;
     }
   }, [t]);
 
-  return { loading, error, places, fromCache, userLocation, loadPlaces };
+  return { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces };
 }

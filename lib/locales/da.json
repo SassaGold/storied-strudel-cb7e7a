@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Tjek brændstofpriser",
     "readWikipedia": "📖 Læs på Wikipedia",
     "cachedResults": "📡 Viser cachelagrede resultater — tryk opdater for seneste",
-    "fuelTypes": "⛽ Brændstoftyper"
+    "fuelTypes": "⛽ Brændstoftyper",
+    "cacheAge": "Data fra {{count}} min siden"
   },
   "language": {
     "label": "🌍 Sprog",

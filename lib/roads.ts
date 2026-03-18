@@ -1,6 +1,8 @@
 // ── Road-condition utilities ──────────────────────────────────────────────────
 // Pure, side-effect-free helpers used by the RIDER HQ screen.
 
+import { EARTH_RADIUS_KM } from "./config";
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type RoadAlert = {
@@ -41,7 +43,7 @@ export function haversineKm(
   lat2: number,
   lon2: number
 ): number {
-  const R = 6371;
+  const R = EARTH_RADIUS_KM;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
   const a =

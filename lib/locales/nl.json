@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Controleer brandstofprijzen",
     "readWikipedia": "📖 Lees op Wikipedia",
     "cachedResults": "📡 Gecachede resultaten — tik op vernieuwen voor nieuwste",
-    "fuelTypes": "⛽ Brandstofsoorten"
+    "fuelTypes": "⛽ Brandstofsoorten",
+    "cacheAge": "Gegevens van {{count}} min geleden"
   },
   "language": {
     "label": "🌍 Taal",

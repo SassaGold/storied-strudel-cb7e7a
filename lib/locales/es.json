@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Ver precios de combustible",
     "readWikipedia": "📖 Leer en Wikipedia",
     "cachedResults": "📡 Resultados en caché — actualizar para ver los últimos",
-    "fuelTypes": "⛽ Tipos de combustible"
+    "fuelTypes": "⛽ Tipos de combustible",
+    "cacheAge": "Datos de hace {{count}} min"
   },
   "language": {
     "label": "🌍 Idioma",

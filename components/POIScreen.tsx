@@ -86,6 +86,7 @@ export default function POIScreen({
     error,
     places,
     fromCache,
+    cacheTs,
     userLocation,
     infoPlace,
     wikiExtract,
@@ -272,7 +273,12 @@ export default function POIScreen({
       {/* ── Cache banner ── */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
-          <Text style={styles.cacheBannerText}>{t("common.cachedResults")}</Text>
+          <Text style={styles.cacheBannerText}>
+            {t("common.cachedResults")}
+            {cacheTs != null && (
+              ` · ${t("common.cacheAge", { count: Math.round((Date.now() - cacheTs) / 60000) })}`
+            )}
+          </Text>
         </View>
       )}
 

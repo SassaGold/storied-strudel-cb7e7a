@@ -320,3 +320,147 @@ describe("buildRecommendations", () => {
     }
   });
 });
+
+// ── formatWeatherCode ─────────────────────────────────────────────────────────
+
+describe("formatWeatherCode", () => {
+  it("returns empty string for undefined", () => {
+    expect(formatWeatherCode(undefined)).toBe("");
+  });
+
+  it("strips _day suffix and formats clearsky_day", () => {
+    const result = formatWeatherCode("clearsky_day");
+    expect(result).toBeTruthy();
+    expect(result).not.toContain("_day");
+  });
+
+  it("strips _night suffix", () => {
+    const result = formatWeatherCode("fair_night");
+    expect(result).not.toContain("_night");
+  });
+
+  it("handles plain symbol without suffix", () => {
+    const result = formatWeatherCode("cloudy");
+    expect(result).toBeTruthy();
+  });
+
+  it("returns a non-empty string for known symbols", () => {
+    const known = [
+      "clearsky_day",
+      "fair_day",
+      "partlycloudy_day",
+      "cloudy",
+      "fog",
+      "rain",
+      "snow",
+      "rainandthunder",
+    ];
+    for (const sym of known) {
+      expect(formatWeatherCode(sym).length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ── weatherEmoji ──────────────────────────────────────────────────────────────
+
+describe("weatherEmoji", () => {
+  it("returns a string emoji for undefined (fallback)", () => {
+    const result = weatherEmoji(undefined);
+    expect(typeof result).toBe("string");
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it("returns ☀️ or similar for clear sky", () => {
+    const result = weatherEmoji("clearsky_day");
+    expect(typeof result).toBe("string");
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it("returns 🌧️ or similar for rain", () => {
+    const result = weatherEmoji("rain");
+    expect(typeof result).toBe("string");
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it("returns 🌨️ or similar for snow", () => {
+    const result = weatherEmoji("snow");
+    expect(typeof result).toBe("string");
+    expect(result.length).toBeGreaterThan(0);
+  });
+
+  it("returns something for every WMO code in the table", () => {
+    const { WMO_TO_SYMBOL } = require("../lib/weather");
+    for (const code of Object.keys(WMO_TO_SYMBOL)) {
+      const sym = WMO_TO_SYMBOL[Number(code)];
+      const emoji = weatherEmoji(sym);
+      expect(typeof emoji).toBe("string");
+      expect(emoji.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+// ── wmoToSymbol ───────────────────────────────────────────────────────────────
+
+describe("wmoToSymbol", () => {
+  it("maps code 0 (clear sky) correctly", () => {
+    expect(wmoToSymbol(0)).toBe("clearsky_day");
+  });
+
+  it("maps code 3 (overcast) to cloudy", () => {
+    expect(wmoToSymbol(3)).toBe("cloudy");
+  });
+
+  it("maps code 61 (slight rain) to lightrain", () => {
+    expect(wmoToSymbol(61)).toBe("lightrain");
+  });
+
+  it("maps code 71 (slight snow) to lightsnow", () => {
+    expect(wmoToSymbol(71)).toBe("lightsnow");
+  });
+
+  it("maps code 95 (thunderstorm) to rainandthunder", () => {
+    expect(wmoToSymbol(95)).toBe("rainandthunder");
+  });
+
+  it("falls back to 'cloudy' for unknown codes", () => {
+    expect(wmoToSymbol(999)).toBe("cloudy");
+    expect(wmoToSymbol(-1)).toBe("cloudy");
+  });
+});
+
+// ── buildAlerts — additional edge cases ───────────────────────────────────────
+
+describe("buildAlerts edge cases", () => {
+  it("no alert for moderate conditions", () => {
+    expect(buildAlerts({
+      temperatureC: 20,
+      windSpeed: 5,
+      precipitation: 0,
+      precipitationProbability: 10,
+    })).toHaveLength(0);
+  });
+
+  it("all returned keys have entries in ALERT_ICONS", () => {
+    const alerts = buildAlerts({
+      temperatureC: -10,
+      windSpeed: 20,
+      precipitation: 15,
+      precipitationProbability: 95,
+    });
+    for (const key of alerts) {
+      expect(key in ALERT_ICONS).toBe(true);
+    }
+  });
+
+  it("issues veryCold alert below 0°C", () => {
+    expect(buildAlerts({ temperatureC: -5 })).toContain("home.alerts.veryCold");
+  });
+
+  it("issues highHeat alert at 30°C", () => {
+    expect(buildAlerts({ temperatureC: 30 })).toContain("home.alerts.highHeat");
+  });
+
+  it("issues extremeHeat alert at 35°C", () => {
+    expect(buildAlerts({ temperatureC: 35 })).toContain("home.alerts.extremeHeat");
+  });
+});

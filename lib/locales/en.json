@@ -35,7 +35,8 @@
     "checkFuelPrices": "⛽ Check Fuel Prices",
     "readWikipedia": "📖 Read on Wikipedia",
     "cachedResults": "📡 Showing cached results — tap refresh for latest",
-    "fuelTypes": "⛽ Fuel Types"
+    "fuelTypes": "⛽ Fuel Types",
+    "cacheAge": "Data from {{count}} min ago"
   },
   "language": {
     "label": "🌍 Language",
