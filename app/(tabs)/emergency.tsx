@@ -172,8 +172,10 @@ export default function EmergencyScreen() {
     try {
       const raw = await AsyncStorage?.getItem(CACHE_KEY);
       if (raw) {
-        const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
-        if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
+        const parsed = JSON.parse(raw);
+        const ts: number = parsed?.ts;
+        const data: Place[] = parsed?.data;
+        if (Array.isArray(data) && data.length > 0 && typeof ts === "number" && Date.now() - ts < CACHE_TTL_MS) {
           setPlaces(data);
           setFromCache(true);
         }

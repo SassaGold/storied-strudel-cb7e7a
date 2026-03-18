@@ -10,8 +10,8 @@ const Haptics: typeof import("expo-haptics") | null = (() => { try { return requ
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Updates: typeof import("expo-updates") | null = (() => { try { return require("expo-updates"); } catch { return null; } })();
 
-const APP_VERSION: string =
-  (Constants.expoConfig?.version ?? "2.0.0") as string;
+const APP_VERSION =
+  Constants.expoConfig?.version ?? "2.0.0";
 
 type LinkRowProps = { label: string; url: string; openLabel: string };
 

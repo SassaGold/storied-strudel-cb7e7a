@@ -139,7 +139,10 @@ export default function TripLoggerScreen() {
     if (!AsyncStorage) return;
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      if (raw) setRides(JSON.parse(raw));
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) setRides(parsed);
+      }
     } catch {}
   };
 
