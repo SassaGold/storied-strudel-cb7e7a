@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Vérifier les mises à jour",
     "updateAvailable": "⬇️ Mise à jour disponible — installation…",
     "updateLatest": "✅ Vous êtes à jour",
-    "updateError": "❌ Échec de la vérification"
+    "updateError": "❌ Échec de la vérification",
+    "privacyPolicyLink": "📄 Politique de confidentialité"
   },
   "settings": {
     "badge": "⚙️ PARAMÈTRES",

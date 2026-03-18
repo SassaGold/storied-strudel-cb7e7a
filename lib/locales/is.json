@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Leita að uppfærslu",
     "updateAvailable": "⬇️ Uppfærsla tiltæk — setur upp…",
     "updateLatest": "✅ Þú ert uppfærður",
-    "updateError": "❌ Uppfærsluleit mistókst"
+    "updateError": "❌ Uppfærsluleit mistókst",
+    "privacyPolicyLink": "📄 Persónuverndarstefna"
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",

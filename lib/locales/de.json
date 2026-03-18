@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Nach Update suchen",
     "updateAvailable": "⬇️ Update verfügbar — wird installiert…",
     "updateLatest": "✅ Du bist aktuell",
-    "updateError": "❌ Update-Prüfung fehlgeschlagen"
+    "updateError": "❌ Update-Prüfung fehlgeschlagen",
+    "privacyPolicyLink": "📄 Datenschutzerklärung"
   },
   "settings": {
     "badge": "⚙️ EINSTELLUNGEN",

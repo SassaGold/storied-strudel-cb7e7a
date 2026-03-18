@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Controleer op update",
     "updateAvailable": "⬇️ Update beschikbaar — installeren…",
     "updateLatest": "✅ Je bent up-to-date",
-    "updateError": "❌ Update-controle mislukt"
+    "updateError": "❌ Update-controle mislukt",
+    "privacyPolicyLink": "📄 Privacybeleid"
   },
   "settings": {
     "badge": "⚙️ INSTELLINGEN",

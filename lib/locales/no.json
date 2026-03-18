@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Se etter oppdatering",
     "updateAvailable": "⬇️ Oppdatering tilgjengelig — installerer…",
     "updateLatest": "✅ Du er oppdatert",
-    "updateError": "❌ Oppdateringssjekk mislyktes"
+    "updateError": "❌ Oppdateringssjekk mislyktes",
+    "privacyPolicyLink": "📄 Personvernregler"
   },
   "settings": {
     "badge": "⚙️ INNSTILLINGER",

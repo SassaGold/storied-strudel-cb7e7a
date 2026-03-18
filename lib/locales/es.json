@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Buscar actualización",
     "updateAvailable": "⬇️ Actualización disponible — instalando…",
     "updateLatest": "✅ Estás al día",
-    "updateError": "❌ Error al buscar actualización"
+    "updateError": "❌ Error al buscar actualización",
+    "privacyPolicyLink": "📄 Política de privacidad"
   },
   "settings": {
     "badge": "⚙️ AJUSTES",

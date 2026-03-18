@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Sök efter uppdatering",
     "updateAvailable": "⬇️ Uppdatering tillgänglig — installerar…",
     "updateLatest": "✅ Du är uppdaterad",
-    "updateError": "❌ Uppdateringskontroll misslyckades"
+    "updateError": "❌ Uppdateringskontroll misslyckades",
+    "privacyPolicyLink": "📄 Integritetspolicy"
   },
   "settings": {
     "badge": "⚙️ INSTÄLLNINGAR",

@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Check for Update",
     "updateAvailable": "⬇️ Update available — installing…",
     "updateLatest": "✅ You're up to date",
-    "updateError": "❌ Update check failed"
+    "updateError": "❌ Update check failed",
+    "privacyPolicyLink": "📄 Privacy Policy"
   },
   "settings": {
     "badge": "⚙️ SETTINGS",
