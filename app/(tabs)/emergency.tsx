@@ -16,6 +16,7 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "../../lib/overpass";
+import { useSettings, fmtDistShort } from "../../lib/settings";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -81,11 +82,6 @@ const formatCategory = (cat: string) =>
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ")}`;
 
-const formatDistance = (d?: number) => {
-  if (d === undefined) return "";
-  return d < 1000 ? `${Math.round(d)} m` : `${(d / 1000).toFixed(1)} km`;
-};
-
 const EMERGENCY_NUMBERS = [
   { region: "EU / Intl", number: "112", emoji: "🌍" },
   { region: "USA / CA", number: "911", emoji: "🇺🇸" },
@@ -112,6 +108,7 @@ const CACHE_KEY = "cache_emergency_v2";
 
 export default function EmergencyScreen() {
   const { t } = useTranslation();
+  const { settings } = useSettings();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -151,9 +148,20 @@ export default function EmergencyScreen() {
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const { latitude, longitude } = pos.coords;
       const mapsLink = `https://maps.google.com/?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
-      await Share.share({
-        message: `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
-      });
+      const shareText = `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+
+      // On web, Share API is limited — copy to clipboard as fallback
+      if (Platform.OS === "web") {
+        try {
+          await navigator.clipboard.writeText(shareText);
+          Alert.alert("📍 Copied!", "Your location link has been copied to the clipboard.");
+          return;
+        } catch {
+          // clipboard not available, fall through to Share.share
+        }
+      }
+
+      await Share.share({ message: shareText });
     } catch {
       Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
     }
@@ -162,10 +170,12 @@ export default function EmergencyScreen() {
   const loadPlaces = useCallback(async () => {
     // Load cache so user sees last-known results immediately while fetching
     try {
-      const raw = await AsyncStorage.getItem(CACHE_KEY);
+      const raw = await AsyncStorage?.getItem(CACHE_KEY);
       if (raw) {
-        const { ts, data }: { ts: number; data: Place[] } = JSON.parse(raw);
-        if (data?.length > 0 && Date.now() - ts < CACHE_TTL_MS) {
+        const parsed = JSON.parse(raw);
+        const ts: number = parsed?.ts;
+        const data: Place[] = parsed?.data;
+        if (Array.isArray(data) && data.length > 0 && typeof ts === "number" && Date.now() - ts < CACHE_TTL_MS) {
           setPlaces(data);
           setFromCache(true);
         }
@@ -245,7 +255,7 @@ out center ${MAX_RESULTS};`;
         .slice(0, 40);
       setPlaces(sorted);
       setFromCache(false);
-      try { await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
+      try { await AsyncStorage?.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: sorted })); } catch {}
     } catch (err) {
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
       setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
@@ -311,7 +321,7 @@ out center ${MAX_RESULTS};`;
               <View style={styles.modalRow}>
                 <Text style={styles.modalLabel}>{t("common.distance")}</Text>
                 <Text style={styles.modalValue}>
-                  {formatDistance(infoPlace.distanceMeters)}
+                  {fmtDistShort(infoPlace.distanceMeters ?? 0, settings.unitSystem)}
                 </Text>
               </View>
             )}
@@ -428,6 +438,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.quickActionCall")}
           >
             <Text style={styles.quickActionEmoji}>📞</Text>
             <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")}</Text>
@@ -436,6 +448,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null); shareLocation(); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.shareLocation")}
           >
             <Text style={styles.quickActionEmoji}>📍</Text>
             <Text style={styles.quickActionLabel}>{t("sos.shareLocation").replace("📍 ", "")}</Text>
@@ -444,6 +458,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={[styles.quickActionBtn, torchOn && styles.quickActionBtnActive]}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.torchScreen")}
           >
             <Text style={styles.quickActionEmoji}>🔦</Text>
             <Text style={styles.quickActionLabel}>{t("sos.quickActionTorch")}</Text>
@@ -452,6 +468,8 @@ out center ${MAX_RESULTS};`;
           <Pressable
             style={styles.quickActionBtn}
             onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(true); }}
+            accessibilityRole="button"
+            accessibilityLabel={t("sos.emergencyInstructions")}
           >
             <Text style={styles.quickActionEmoji}>📋</Text>
             <Text style={styles.quickActionLabel}>{t("sos.quickActionInstructions")}</Text>
@@ -623,7 +641,7 @@ out center ${MAX_RESULTS};`;
                     </View>
                     <View style={styles.placeRight}>
                       <Text style={styles.distanceText}>
-                        {formatDistance(place.distanceMeters)}
+                        {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
                       </Text>
                       <Pressable
                         style={styles.infoButton}

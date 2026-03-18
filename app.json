@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sassagold.roamly",
+      "buildNumber": "1",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked.",
@@ -28,11 +29,6 @@
         "FOREGROUND_SERVICE",
         "FOREGROUND_SERVICE_LOCATION"
       ],
-      "config": {
-        "googleMaps": {
-          "apiKey": ""
-        }
-      },
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -40,7 +36,6 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
       "package": "com.sassagold.roamly"
     },
     "web": {
@@ -69,7 +64,6 @@
     },
     "extra": {
       "router": {},
-      "googleMapsStaticKey": "",
       "eas": {
         "projectId": "625b8a7c-5d22-4ebc-a8a6-d0a47451870e"
       }
@@ -79,7 +73,9 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/625b8a7c-5d22-4ebc-a8a6-d0a47451870e"
+      "url": "https://u.expo.dev/625b8a7c-5d22-4ebc-a8a6-d0a47451870e",
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD"
     }
   }
 }

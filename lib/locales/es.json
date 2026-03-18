@@ -46,7 +46,8 @@
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA"
+    "da": "🇩🇰 DA",
+    "nl": "🇳🇱 NL"
   },
   "home": {
     "quickNav": "NAVEGAR",
@@ -79,9 +80,24 @@
     "lastUpdated": "Actualizado {{time}}",
     "roadConditions": "🚧 Condiciones de la carretera",
     "roadConditionsLoading": "Comprobando condiciones de la vía…",
-    "roadConditionsNone": "✅ No se detectan obras en 10 km.",
-    "roadConditionsCount": "{{count}} obra(s) detectada(s) en 10 km",
+    "roadConditionsNone": "✅ No se detectan obras en {{radius}} km.",
+    "roadConditionsCount": "{{count}} obra(s) detectada(s) en {{radius}} km",
     "openTrafficMap": "MAPA DE TRÁFICO EN VIVO",
+    "roadTypes": {
+      "service": "Vía de Servicio",
+      "residential": "Calle Residencial",
+      "primary": "Vía Principal",
+      "secondary": "Vía Secundaria",
+      "tertiary": "Vía Terciaria",
+      "unclassified": "Vía sin Clasificar",
+      "trunk": "Carretera Nacional",
+      "motorway": "Autopista",
+      "road": "Carretera",
+      "living_street": "Zona Residencial",
+      "construction": "Obras en la Carretera",
+      "bridge": "Obras en Puente",
+      "tunnel": "Obras en Túnel"
+    },
     "suitability": {
       "great": "EXCELENTE",
       "good": "BUENO",

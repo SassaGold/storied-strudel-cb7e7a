@@ -56,7 +56,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       try {
         const raw = await AsyncStorage?.getItem(STORAGE_KEY);
         if (raw) {
-          setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(raw) });
+          const parsed = JSON.parse(raw);
+          if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
+            setSettings({ ...DEFAULT_SETTINGS, ...parsed });
+          }
         }
       } catch {}
     })();

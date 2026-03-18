@@ -46,7 +46,8 @@
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA"
+    "da": "🇩🇰 DA",
+    "nl": "🇳🇱 NL"
   },
   "home": {
     "quickNav": "QUICK NAVIGATE",
@@ -79,9 +80,24 @@
     "lastUpdated": "Last updated {{time}}",
     "roadConditions": "🚧 Road Conditions",
     "roadConditionsLoading": "Checking road conditions…",
-    "roadConditionsNone": "✅ No roadworks detected within 10 km.",
-    "roadConditionsCount": "{{count}} roadwork(s) detected within 10 km",
+    "roadConditionsNone": "✅ No roadworks detected within {{radius}} km.",
+    "roadConditionsCount": "{{count}} roadwork(s) detected within {{radius}} km",
     "openTrafficMap": "LIVE TRAFFIC MAP",
+    "roadTypes": {
+      "service": "Service Road",
+      "residential": "Residential Road",
+      "primary": "Primary Road",
+      "secondary": "Secondary Road",
+      "tertiary": "Tertiary Road",
+      "unclassified": "Unclassified Road",
+      "trunk": "Trunk Road",
+      "motorway": "Motorway",
+      "road": "Road",
+      "living_street": "Living Street",
+      "construction": "Road Construction",
+      "bridge": "Bridge Works",
+      "tunnel": "Tunnel Works"
+    },
     "suitability": {
       "great": "GREAT",
       "good": "GOOD",

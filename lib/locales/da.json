@@ -46,7 +46,8 @@
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA"
+    "da": "🇩🇰 DA",
+    "nl": "🇳🇱 NL"
   },
   "home": {
     "quickNav": "HURTIG NAVIGATION",
@@ -79,9 +80,24 @@
     "lastUpdated": "Sidst opdateret {{time}}",
     "roadConditions": "🚧 Vejforhold",
     "roadConditionsLoading": "Tjekker vejforhold…",
-    "roadConditionsNone": "✅ Ingen vejarbejde inden for 10 km.",
-    "roadConditionsCount": "{{count}} vejarbejde inden for 10 km",
+    "roadConditionsNone": "✅ Ingen vejarbejde inden for {{radius}} km.",
+    "roadConditionsCount": "{{count}} vejarbejde inden for {{radius}} km",
     "openTrafficMap": "LIVE TRAFIIKKORT",
+    "roadTypes": {
+      "service": "Servicevej",
+      "residential": "Boliggade",
+      "primary": "Primærvej",
+      "secondary": "Sekundærvej",
+      "tertiary": "Tertiærvej",
+      "unclassified": "Uklassificeret Vej",
+      "trunk": "Motortrafikvej",
+      "motorway": "Motorvej",
+      "road": "Vej",
+      "living_street": "Opholdsgade",
+      "construction": "Vejarbejde",
+      "bridge": "Broarbejde",
+      "tunnel": "Tunnelarbejde"
+    },
     "suitability": {
       "great": "FREMRAGENDE",
       "good": "GOD",
@@ -268,7 +284,18 @@
       "clinic": "🏨 Klinik",
       "doctors": "👨‍⚕️ Læge",
       "ambulance_station": "🚑 Ambulance"
-    }
+    },
+    "callSos": "RING SOS (112)",
+    "quickActions": "HURTIGE HANDLINGER",
+    "torchScreen": "🔦 Lommelygte",
+    "torchScreenOff": "🔦 Sluk",
+    "emergencyInstructions": "📋 Instruktioner",
+    "instructionsTitle": "Nødinstruktioner",
+    "instructionsClose": "Luk",
+    "instructionsBody": "1. FORBLIV ROLIG — vurder situationen.\n\n2. RING 112 med det samme.\n\n3. PLACERING — fortæl præcis, hvor du er.\n\n4. HJELM — fjern ikke hjelmen, medmindre luftvejen er blokeret.\n\n5. BLØDNING — anvend fast direkte tryk.\n\n6. FLYT IKKE den tilskadekomne, medmindre der er umiddelbar fare.\n\n7. HOLD DEM VARM — brug tøj eller redningsfolie.\n\n8. BLIV PÅ LINJEN — læg ikke røret på, før hjælp ankommer.",
+    "quickActionCall": "Ring 112",
+    "quickActionTorch": "Lommelygte",
+    "quickActionInstructions": "Instruktioner"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
@@ -301,7 +328,9 @@
     "points": "{{count}} GPS-punkter",
     "mapUnavailable": "Kort ikke tilgængeligt",
     "tooShortTitle": "Tur ikke gemt",
-    "tooShortMsg": "Turen var under 10 m — ikke gemt."
+    "tooShortMsg": "Turen var under 10 m — ikke gemt.",
+    "speedLabel": "FART",
+    "viewMapShort": "Rute"
   },
   "about": {
     "badge": "ℹ️ OM",

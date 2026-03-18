@@ -2,7 +2,7 @@
 
 ## v2.0.0 — Version 2 (2026-03-13)
 
-Second major release of **Roamly**. Expanded to 9 tabs and added Trip Logger, SOS/Emergency, Settings, and About screens, plus multilingual support for 8 languages.
+Second major release of **Roamly**. Expanded to 9 tabs and added Trip Logger, SOS/Emergency, Settings, and About screens, plus multilingual support for 9 languages.
 
 ### New in v2
 
@@ -28,8 +28,8 @@ Second major release of **Roamly**. Expanded to 9 tabs and added Trip Logger, SO
 #### ℹ️ About tab (new)
 - App name, version, description, and credits
 
-#### i18n expanded to 8 languages
-- English, Spanish, German, French, Dutch, Norwegian, Swedish, Danish
+#### i18n expanded to 9 languages
+- English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, Dutch
 
 #### Header / UI polish
 - All POI tabs use safe-area insets

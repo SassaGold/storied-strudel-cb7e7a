@@ -46,7 +46,8 @@
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA"
+    "da": "🇩🇰 DA",
+    "nl": "🇳🇱 NL"
   },
   "home": {
     "quickNav": "NAVIGATION RAPIDE",
@@ -79,9 +80,24 @@
     "lastUpdated": "Mis à jour {{time}}",
     "roadConditions": "🚧 État des routes",
     "roadConditionsLoading": "Vérification des conditions routières…",
-    "roadConditionsNone": "✅ Aucun chantier détecté dans un rayon de 10 km.",
-    "roadConditionsCount": "{{count}} chantier(s) détecté(s) dans 10 km",
+    "roadConditionsNone": "✅ Aucun chantier détecté dans un rayon de {{radius}} km.",
+    "roadConditionsCount": "{{count}} chantier(s) détecté(s) dans {{radius}} km",
     "openTrafficMap": "CARTE TRAFIC EN DIRECT",
+    "roadTypes": {
+      "service": "Voie de Service",
+      "residential": "Rue Résidentielle",
+      "primary": "Route Principale",
+      "secondary": "Route Secondaire",
+      "tertiary": "Route Tertiaire",
+      "unclassified": "Route non Classée",
+      "trunk": "Route Nationale",
+      "motorway": "Autoroute",
+      "road": "Route",
+      "living_street": "Zone de Rencontre",
+      "construction": "Travaux Routiers",
+      "bridge": "Travaux de Pont",
+      "tunnel": "Travaux de Tunnel"
+    },
     "suitability": {
       "great": "EXCELLENT",
       "good": "BON",
