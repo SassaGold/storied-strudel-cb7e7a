@@ -353,7 +353,7 @@
     "wikipediaDesc": "Stedsbeskrivelser hentes fra Wikipedia REST API, hvor et Wikipedia-tag er tilgængeligt i OpenStreetMap-data. Wikipedia-indhold er licenseret under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia-bidragsydere · CC BY-SA",
     "maps": "Kort og navigation",
-    "mapsDesc": "Kortet i appen bruger react-native-maps (Apple Maps på iOS, Google Maps på Android). At trykke 'Åbn i kort' åbner din standardkortapp. Ingen Google Maps API-nøgle kræves til dyblinks.",
+    "mapsDesc": "Kortet i appen bruger react-native-maps (Apple Maps på iOS, OpenStreetMap på Android). At trykke 'Åbn i kort' åbner din standardkortapp. Ingen Google Maps API-nøgle kræves.",
     "privacy": "PRIVATLIV",
     "privacyTitle": "Dit privatliv",
     "privacyP1": "Denne app indsamler, overfører eller deler ikke personlige data. Der er ingen analyse, ingen crash-reportere og ingen reklameprogrammer.",
@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Søg efter opdatering",
     "updateAvailable": "⬇️ Opdatering tilgængelig — installerer…",
     "updateLatest": "✅ Du er opdateret",
-    "updateError": "❌ Opdateringstjek mislykkedes"
+    "updateError": "❌ Opdateringstjek mislykkedes",
+    "privacyPolicyLink": "📄 Privatlivspolitik"
   },
   "settings": {
     "badge": "⚙️ INDSTILLINGER",

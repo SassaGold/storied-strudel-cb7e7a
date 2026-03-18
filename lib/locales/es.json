@@ -353,7 +353,7 @@
     "wikipediaDesc": "Las descripciones de lugares se obtienen de la API REST de Wikipedia cuando hay una etiqueta de Wikipedia disponible en los datos de OpenStreetMap.",
     "wikiLicense": "© Colaboradores de Wikipedia · CC BY-SA",
     "maps": "Mapas y Navegación",
-    "mapsDesc": "El mapa en la aplicación usa react-native-maps. Al tocar 'Abrir en Mapas' se abre tu aplicación de mapas predeterminada.",
+    "mapsDesc": "El mapa en la aplicación usa react-native-maps (Apple Maps en iOS, OpenStreetMap en Android). Al tocar 'Abrir en Mapas' se abre tu aplicación de mapas predeterminada. No se requiere clave de API de Google Maps.",
     "privacy": "PRIVACIDAD",
     "privacyTitle": "Tu Privacidad",
     "privacyP1": "Esta aplicación no recopila, transmite ni comparte ningún dato personal. No hay análisis, ni informes de fallos, ni SDK publicitarios.",
@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Buscar actualización",
     "updateAvailable": "⬇️ Actualización disponible — instalando…",
     "updateLatest": "✅ Estás al día",
-    "updateError": "❌ Error al buscar actualización"
+    "updateError": "❌ Error al buscar actualización",
+    "privacyPolicyLink": "📄 Política de privacidad"
   },
   "settings": {
     "badge": "⚙️ AJUSTES",

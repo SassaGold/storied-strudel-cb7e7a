@@ -24,7 +24,7 @@ let rnMaps: any = null;
 try { rnMaps = require("react-native-maps"); } catch {}
 const MapView: any = rnMaps?.default;
 const Polyline: any = rnMaps?.Polyline;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
+const UrlTile: any = rnMaps?.UrlTile ?? null;
 
 // Safely load AsyncStorage
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -407,7 +407,7 @@ export default function TripLoggerScreen() {
             <View style={styles.inlineMap}>
               <MapView
                 style={StyleSheet.absoluteFill}
-                provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+                mapType={Platform.OS === "android" ? "none" : "standard"}
                 region={(() => {
                   const lats = route.map((p) => p.latitude);
                   const lons = route.map((p) => p.longitude);
@@ -423,8 +423,10 @@ export default function TripLoggerScreen() {
                 })()}
                 scrollEnabled={false}
                 zoomEnabled={false}
-                mapType="standard"
               >
+                {Platform.OS === "android" && UrlTile && (
+                  <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
+                )}
                 {Polyline && route.length > 1 && (
                   <Polyline
                     coordinates={route}
@@ -538,10 +540,12 @@ export default function TripLoggerScreen() {
           {mapRide && mapRegion && MapView ? (
             <MapView
               style={styles.fullMap}
-              provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+              mapType={Platform.OS === "android" ? "none" : "standard"}
               initialRegion={mapRegion}
-              mapType="standard"
             >
+              {Platform.OS === "android" && UrlTile && (
+                <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
+              )}
               {Polyline && (
                 <Polyline
                   coordinates={mapRide.route}

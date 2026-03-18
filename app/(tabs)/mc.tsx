@@ -23,7 +23,7 @@ let rnMaps: any = null;
 try { rnMaps = require("react-native-maps"); } catch {}
 const MapView: any = rnMaps?.default;
 const Marker: any = rnMaps?.Marker;
-const PROVIDER_GOOGLE = rnMaps?.PROVIDER_GOOGLE ?? null;
+const UrlTile: any = rnMaps?.UrlTile ?? null;
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -524,7 +524,7 @@ export default function McScreen() {
       {viewMode === "map" && userLocation && MapView && (
         <MapView
           style={styles.mapView}
-          provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
+          mapType={Platform.OS === "android" ? "none" : "standard"}
           showsUserLocation
           initialRegion={{
             latitude: userLocation.latitude,
@@ -533,6 +533,9 @@ export default function McScreen() {
             longitudeDelta: 0.06,
           }}
         >
+          {Platform.OS === "android" && UrlTile && (
+            <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
+          )}
           {filteredPlaces.map((place) => (
             <Marker
               key={place.id}

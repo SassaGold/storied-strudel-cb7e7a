@@ -353,7 +353,7 @@
     "wikipediaDesc": "Les descriptions de lieux sont récupérées depuis l'API REST Wikipedia lorsqu'un tag Wikipedia est disponible dans les données OpenStreetMap.",
     "wikiLicense": "© Contributeurs Wikipedia · CC BY-SA",
     "maps": "Cartes & Navigation",
-    "mapsDesc": "La carte intégrée utilise react-native-maps. Appuyer sur 'Ouvrir dans Maps' ouvre votre application de cartes par défaut.",
+    "mapsDesc": "La carte intégrée utilise react-native-maps (Apple Maps sur iOS, OpenStreetMap sur Android). Appuyer sur 'Ouvrir dans Maps' ouvre votre application de cartes par défaut. Aucune clé API Google Maps n'est requise.",
     "privacy": "CONFIDENTIALITÉ",
     "privacyTitle": "Votre Vie Privée",
     "privacyP1": "Cette application ne collecte, ne transmet ni ne partage aucune donnée personnelle. Pas d'analyses, pas de rapports de plantage, pas de SDK publicitaires.",
@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Vérifier les mises à jour",
     "updateAvailable": "⬇️ Mise à jour disponible — installation…",
     "updateLatest": "✅ Vous êtes à jour",
-    "updateError": "❌ Échec de la vérification"
+    "updateError": "❌ Échec de la vérification",
+    "privacyPolicyLink": "📄 Politique de confidentialité"
   },
   "settings": {
     "badge": "⚙️ PARAMÈTRES",

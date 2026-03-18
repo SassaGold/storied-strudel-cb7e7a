@@ -44,24 +44,38 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
 
 ## Publishing to Google Play Store
 
-### Is the app ready?
+### Play Store Readiness — Full Checklist
 
-**Yes — the technical foundation is ready.** The app already has:
+> See [`store-listing/PLAY_STORE_CHECKLIST.md`](store-listing/PLAY_STORE_CHECKLIST.md) for the full step-by-step checklist.
 
-- ✅ Android package name: `com.sassagold.roamly`
-- ✅ Adaptive icon set (foreground, background, monochrome)
-- ✅ Required permissions declared (location, background location)
-- ✅ EAS Build configured (`eas.json`) with a production profile
-- ✅ EAS project ID linked (`625b8a7c-5d22-4ebc-a8a6-d0a47451870e`)
+#### ✅ Already done (in-code)
 
-**What you still need to do** (none of this is code — it's account setup):
+| Item | Status |
+|------|--------|
+| Android package name `com.sassagold.roamly` | ✅ Done |
+| App version `1.0.0` | ✅ Done |
+| Android `versionCode: 1` (auto-incremented by EAS) | ✅ Done |
+| Adaptive icon (foreground + background + monochrome) | ✅ Done |
+| Splash screen (light & dark mode) | ✅ Done |
+| Required permissions (`FINE_LOCATION`, `BACKGROUND_LOCATION`, `FOREGROUND_SERVICE`) | ✅ Done |
+| iOS & Android permission usage descriptions | ✅ Done |
+| EAS Build configured with production profile + `autoIncrement` | ✅ Done |
+| Error boundaries wrapping the full app tree | ✅ Done |
+| No hardcoded API keys or secrets | ✅ Done |
+| No analytics, crash reporters, or ad SDKs | ✅ Done |
+| 9-language i18n (EN/ES/DE/FR/IS/NO/SV/DA/NL) | ✅ Done |
+| Privacy statement in About screen with Privacy Policy link | ✅ Done |
+| Store listing files created (`store-listing/`) | ✅ Done |
+
+#### ⚠️ Still needed (account & asset setup — no code required)
 
 | Step | What | Cost |
 |------|------|------|
 | 1 | Google Play Developer account | US $25 one-time |
-| 2 | Expo account (free) | Free |
-| 3 | Google Maps Android API key | Free quota / pay-as-you-go |
-| 4 | App store listing (screenshots, description, privacy policy) | Free |
+| 2 | Host privacy policy at a public URL | Free |
+| 3 | Screenshots (min. 2, recommended 5–8) | Free |
+| 4 | Feature graphic 1024×500 px | Free |
+| 5 | Fill in Play Console store listing | Free |
 
 ---
 
@@ -76,26 +90,7 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
    eas login
    ```
 
-#### Step 2 — Add a Google Maps API key for Android
-
-The map on Android works best with a Google Maps API key.
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com).
-2. Create a project → enable **Maps SDK for Android**.
-3. Create an API key → restrict it to your Android package `com.sassagold.roamly`.
-4. Open `app.json` and replace the empty string:
-   ```json
-   "android": {
-     "config": {
-       "googleMaps": {
-         "apiKey": "YOUR_ANDROID_MAPS_KEY_HERE"
-       }
-     }
-   }
-   ```
-5. Save and push the change to GitHub.
-
-#### Step 3 — Build the production Android AAB (App Bundle)
+#### Step 2 — Build the production Android AAB (App Bundle)
 
 An AAB is the file Google Play requires (it's like a ZIP of your app).
 

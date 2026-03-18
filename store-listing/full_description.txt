@@ -1,0 +1,71 @@
+Roamly — The Motorcycle Rider's Companion 🏍️
+
+Everything you need on the road, in one app. Roamly is built for motorcyclists who want live local information, smart trip logging, and peace of mind in emergencies — all without an account, subscription, or data collection.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧭 RIDER HQ (Home)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Your live dashboard while riding. See your current address, live weather with a 3-day forecast, sunrise and sunset times, and real-time road construction alerts — all from your current GPS position.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🍽️ FOOD STOPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Find restaurants, cafés, bars, bakeries and fast food joints nearby. Tap any result to get directions, view contact info, or open their website.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛏️ CRASH PADS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Locate hotels, hostels, campsites and other accommodation near your current position — sorted by distance.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏁 ROADSIDE STOPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Discover museums, viewpoints, landmarks and other interesting stops along your route.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 THE GARAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Find what you need to keep riding:
+• Motorcycle dealers, repair workshops & parts shops
+• Fuel / petrol stations (with fuel type info)
+• Parking — general and motorcycle-specific
+• MC clubs & racing tracks
+• ATMs & bank branches
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📏 TRIP LOGGER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Record your rides with a live animated speed gauge, real-time distance counter, and GPS route tracking. All ride history is saved on your device — never uploaded anywhere.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🆘 SOS / EMERGENCY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A dedicated emergency screen with:
+• One-tap call to 112 (international emergency)
+• Nearest hospitals, police stations, fire stations and pharmacies
+• Location sharing via SMS or WhatsApp
+• Torch / flash screen for signalling
+• Step-by-step first-aid instructions for motorcycle accidents
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌍 9 LANGUAGES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Full interface in: English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, Dutch.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔒 PRIVACY — NO DATA COLLECTED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• No account required
+• No analytics or tracking
+• No advertising
+• Your location is used only on-device
+• Ride logs stored only on your device
+• All POI data from OpenStreetMap (open, free, community-maintained)
+• Weather from Open-Meteo (free, open-source)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️ SETTINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Switch between metric (km, °C) and imperial (mi, °F). Adjust your search radius. Set your default start tab. Clear cached data.
+
+Roamly is open-source and built with Expo / React Native. All data sources are free and open: OpenStreetMap, Overpass API, Open-Meteo, and Wikipedia.

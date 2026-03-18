@@ -353,7 +353,7 @@
     "wikipediaDesc": "Staðarlýsingar eru sóttar frá Wikipedia REST API þegar Wikipedia-merki er tiltækt í OpenStreetMap-gögnum.",
     "wikiLicense": "© Wikipedia-framleggjendur · CC BY-SA",
     "maps": "Kort & Leiðsögn",
-    "mapsDesc": "Kortin í forritinu nota react-native-maps. Að ýta á 'Opna á korti' opnar sjálfgefið kortsforrit þitt.",
+    "mapsDesc": "Kortin í forritinu nota react-native-maps (Apple Maps á iOS, OpenStreetMap á Android). Að ýta á 'Opna á korti' opnar sjálfgefið kortsforrit þitt. Engin Google Maps API-lykill er nauðsynlegur.",
     "privacy": "FRIÐHELGI",
     "privacyTitle": "Friðhelgi þín",
     "privacyP1": "Þetta forrit safnar ekki, sendir ekki eða deilir persónulegum gögnum. Engar greiningar, engar hrunaskýrslur, engin auglýsinga-SDK.",
@@ -369,7 +369,8 @@
     "updateCheck": "🔄 Leita að uppfærslu",
     "updateAvailable": "⬇️ Uppfærsla tiltæk — setur upp…",
     "updateLatest": "✅ Þú ert uppfærður",
-    "updateError": "❌ Uppfærsluleit mistókst"
+    "updateError": "❌ Uppfærsluleit mistókst",
+    "privacyPolicyLink": "📄 Persónuverndarstefna"
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",

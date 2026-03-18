@@ -2,7 +2,7 @@
   "expo": {
     "name": "Roamly",
     "slug": "roamly",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "roamly",
@@ -36,7 +36,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.sassagold.roamly"
+      "package": "com.sassagold.roamly",
+      "versionCode": 1
     },
     "web": {
       "output": "static",
