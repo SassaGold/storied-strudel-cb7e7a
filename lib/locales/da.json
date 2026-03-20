@@ -370,15 +370,7 @@
     "updateAvailable": "⬇️ Opdatering tilgængelig — installerer…",
     "updateLatest": "✅ Du er opdateret",
     "updateError": "❌ Opdateringstjek mislykkedes",
-    "privacyPolicyLink": "📄 Privatlivspolitik",
-    "githubSection": "KILDEKODE",
-    "githubDesc": "Roamly er open source. Gennemse kildekoden, rapporter problemer eller download din egen kopi.",
-    "githubLink": "Se på GitHub ↗",
-    "changelogSection": "NYHEDER",
-    "changelogBtn": "📋 Se ændringslog",
-    "changelogLoading": "Indlæser ændringslog…",
-    "changelogError": "Kunne ikke indlæse ændringsloggen. Tjek din internetforbindelse.",
-    "changelogClose": "Luk"
+    "privacyPolicyLink": "📄 Privatlivspolitik"
   },
   "settings": {
     "badge": "⚙️ INDSTILLINGER",

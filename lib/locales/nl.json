@@ -370,15 +370,7 @@
     "updateAvailable": "⬇️ Update beschikbaar — installeren…",
     "updateLatest": "✅ Je bent up-to-date",
     "updateError": "❌ Update-controle mislukt",
-    "privacyPolicyLink": "📄 Privacybeleid",
-    "githubSection": "BRONCODE",
-    "githubDesc": "Roamly is open source. Blader door de volledige broncode, meld problemen of download je eigen kopie.",
-    "githubLink": "Bekijk op GitHub ↗",
-    "changelogSection": "NIEUW",
-    "changelogBtn": "📋 Bekijk changelog",
-    "changelogLoading": "Changelog laden…",
-    "changelogError": "Changelog kon niet worden geladen. Controleer je internetverbinding.",
-    "changelogClose": "Sluiten"
+    "privacyPolicyLink": "📄 Privacybeleid"
   },
   "settings": {
     "badge": "⚙️ INSTELLINGEN",

@@ -1,4 +1,4 @@
-import { ActivityIndicator, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Constants from "expo-constants";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
@@ -12,9 +12,6 @@ const Updates: typeof import("expo-updates") | null = (() => { try { return requ
 
 const APP_VERSION =
   Constants.expoConfig?.version ?? "2.0.0";
-
-const GITHUB_REPO_URL = "https://github.com/SassaGold/storied-strudel-cb7e7a";
-const CHANGELOG_URL = "https://raw.githubusercontent.com/SassaGold/storied-strudel-cb7e7a/main/CHANGELOG.md";
 
 type LinkRowProps = { label: string; url: string; openLabel: string };
 
@@ -49,37 +46,6 @@ export default function AboutScreen() {
   const insets = useSafeAreaInsets();
 
   const [updateStatus, setUpdateStatus] = useState<"idle" | "checking" | "available" | "latest" | "error">("idle");
-  const [changelogVisible, setChangelogVisible] = useState(false);
-  const [changelogText, setChangelogText] = useState<string | null>(null);
-  const [changelogLoading, setChangelogLoading] = useState(false);
-  const [changelogError, setChangelogError] = useState(false);
-
-  async function openChangelog() {
-    setChangelogVisible(true);
-    if (changelogText !== null) return;
-    setChangelogLoading(true);
-    setChangelogError(false);
-    try {
-      const res = await fetch(CHANGELOG_URL);
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-      setChangelogText(text);
-    } catch {
-      setChangelogError(true);
-    } finally {
-      setChangelogLoading(false);
-    }
-  }
-
-  function handleChangelogPress() {
-    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-    openChangelog();
-  }
-
-  function handleChangelogClose() {
-    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
-    setChangelogVisible(false);
-  }
 
   async function checkForUpdate() {
     if (!Updates || typeof Updates.checkForUpdateAsync !== "function") {
@@ -226,31 +192,6 @@ export default function AboutScreen() {
           </View>
         </Section>
 
-        {/* Source Code (GitHub) */}
-        <Section title={t("about.githubSection")}>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>🐙 GitHub</Text>
-            <Text style={styles.cardBody}>{t("about.githubDesc")}</Text>
-            <LinkRow
-              label="github.com/SassaGold/storied-strudel-cb7e7a"
-              url={GITHUB_REPO_URL}
-              openLabel={t("about.githubLink")}
-            />
-          </View>
-        </Section>
-
-        {/* What's New (Changelog) */}
-        <Section title={t("about.changelogSection")}>
-          <Pressable
-            style={({ pressed }) => [styles.updateBtn, pressed && styles.updateBtnPressed]}
-            onPress={handleChangelogPress}
-            accessibilityRole="button"
-            accessibilityLabel={t("about.changelogBtn")}
-          >
-            <Text style={styles.updateBtnText}>{t("about.changelogBtn")}</Text>
-          </Pressable>
-        </Section>
-
         {/* Version */}
         <View style={styles.versionRow}>
           <Text style={styles.versionLabel}>{t("about.version")}</Text>
@@ -279,43 +220,6 @@ export default function AboutScreen() {
 
         <View style={styles.bottomPad} />
       </ScrollView>
-
-      {/* Changelog Modal */}
-      <Modal
-        visible={changelogVisible}
-        animationType="slide"
-        transparent={false}
-        onRequestClose={handleChangelogClose}
-      >
-        <View style={styles.modalContainer}>
-          <View style={[styles.modalHeader, { paddingTop: insets.top + 16 }]}>
-            <Text style={styles.modalTitle}>{t("about.changelogSection")}</Text>
-            <Pressable
-              style={({ pressed }) => [styles.modalCloseBtn, pressed && styles.backBtnPressed]}
-              onPress={handleChangelogClose}
-              accessibilityRole="button"
-              accessibilityLabel={t("about.changelogClose")}
-            >
-              <Ionicons name="close" size={18} color="#ff6600" />
-              <Text style={styles.backBtnLabel}>{t("about.changelogClose")}</Text>
-            </Pressable>
-          </View>
-          <ScrollView style={styles.modalScroll} contentContainerStyle={styles.modalScrollContent}>
-            {changelogLoading ? (
-              <View style={styles.modalCenter}>
-                <ActivityIndicator size="large" color="#ff6600" />
-                <Text style={styles.modalStatusText}>{t("about.changelogLoading")}</Text>
-              </View>
-            ) : changelogError ? (
-              <View style={styles.modalCenter}>
-                <Text style={styles.modalErrorText}>{t("about.changelogError")}</Text>
-              </View>
-            ) : changelogText !== null ? (
-              <Text style={styles.changelogText}>{changelogText}</Text>
-            ) : null}
-          </ScrollView>
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -498,60 +402,5 @@ const styles = StyleSheet.create({
     color: "#ff6600",
     fontWeight: "700",
     fontSize: 14,
-  },
-
-  modalContainer: { flex: 1, backgroundColor: "#0a0a0a" },
-  modalHeader: {
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: "#111",
-    borderBottomWidth: 2,
-    borderBottomColor: "#ff6600",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-  },
-  modalTitle: {
-    color: "#ff6600",
-    fontWeight: "900",
-    fontSize: 16,
-    letterSpacing: 2,
-  },
-  modalCloseBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,102,0,0.15)",
-    borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
-  },
-  modalScroll: { flex: 1 },
-  modalScrollContent: { padding: 16, paddingBottom: 40 },
-  modalCenter: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 60,
-    gap: 16,
-  },
-  modalStatusText: {
-    color: "#888",
-    fontSize: 14,
-    marginTop: 12,
-  },
-  modalErrorText: {
-    color: "#ff6600",
-    fontSize: 14,
-    textAlign: "center",
-    paddingHorizontal: 20,
-  },
-  changelogText: {
-    color: "#ccc",
-    fontSize: 13,
-    lineHeight: 22,
-    fontFamily: "monospace" as const,
   },
 });
