@@ -1,4 +1,4 @@
-# Play Store Submission Checklist — Roamly
+# Play Store Submission Checklist — Where Am I
 
 Use this checklist before submitting to Google Play.
 
@@ -6,7 +6,7 @@ Use this checklist before submitting to Google Play.
 
 ## ✅ Already Done (in-code)
 
-- [x] Android package name: `com.sassagold.roamly`
+- [x] Android package name: `com.sassagold.whereami`
 - [x] App version: `2.0.0`
 - [x] Android `versionCode`: `2` (in `app.json`; auto-incremented by EAS on each production build via `autoIncrement: true`)
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
@@ -66,14 +66,14 @@ Take screenshots using an Android emulator or physical device.
 ### 3. Feature Graphic (Required)
 - Dimensions: **1024 × 500 px** PNG or JPEG
 - Shown at the top of your Play Store listing
-- Design with Roamly branding (`#ff6600` orange accent, dark background)
+- Design with Where Am I branding (`#ff6600` orange accent, dark background)
 
 ### 4. Store Listing Entry
 In Google Play Console → Store Presence → Main Store Listing:
 
 | Field | Value |
 |-------|-------|
-| App name | `Roamly` |
+| App name | `Where Am I` |
 | Short description | Copy from `store-listing/short_description.txt` |
 | Full description | Copy from `store-listing/full_description.txt` |
 | App icon | Upload `assets/images/icon.png` (1024×1024 px) |
@@ -91,7 +91,7 @@ Expected rating: **Everyone (3+)** — no violence, no adult content, no user in
 In Play Console → App Content, declare:
 - **Ads:** No ads
 - **Data Safety:**
-  - Location: used on-device and anonymised coordinates sent to third-party open APIs (Nominatim, Overpass, Open-Meteo). Not shared with Roamly servers.
+  - Location: used on-device and anonymised coordinates sent to third-party open APIs (Nominatim, Overpass, Open-Meteo). Not shared with Where Am I servers.
   - Trip data: stored only on-device, never uploaded.
 - **Target Audience:** All ages (no children-targeted content)
 - **Background Location:** Used only while a trip is actively being recorded in the Trip Logger. Not used at any other time.

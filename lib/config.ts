@@ -1,5 +1,5 @@
 // ── lib/config.ts ─────────────────────────────────────────────────────────────
-// Central configuration constants for the Roamly app.
+// Central configuration constants for the Where Am I app.
 // All magic numbers, API base URLs, timeouts and cache parameters live here.
 // Import from this file instead of hardcoding values in feature modules.
 

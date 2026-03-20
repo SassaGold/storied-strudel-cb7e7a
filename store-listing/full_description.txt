@@ -1,6 +1,6 @@
-Roamly — The Motorcycle Rider's Companion 🏍️
+Where Am I — The Motorcycle Rider's Companion 🏍️
 
-Everything you need on the road, in one app. Roamly is built for motorcyclists who want live local information, smart trip logging, and peace of mind in emergencies — all without an account, subscription, or data collection.
+Everything you need on the road, in one app. Where Am I is built for motorcyclists who want live local information, smart trip logging, and peace of mind in emergencies — all without an account, subscription, or data collection.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🧭 RIDER HQ (Home)
@@ -68,4 +68,4 @@ Full interface in: English, Spanish, German, French, Icelandic, Norwegian, Swedi
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Switch between metric (km, °C) and imperial (mi, °F). Adjust your search radius. Set your default start tab. Clear cached data.
 
-Roamly is open-source and built with Expo / React Native. All data sources are free and open: OpenStreetMap, Overpass API, Open-Meteo, and Wikipedia.
+Where Am I is open-source and built with Expo / React Native. All data sources are free and open: OpenStreetMap, Overpass API, Open-Meteo, and Wikipedia.

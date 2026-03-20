@@ -227,7 +227,7 @@ export default function TripLoggerScreen() {
           timeInterval: 3000,
           showsBackgroundLocationIndicator: true,
           foregroundService: {
-            notificationTitle: "Roamly Trip Logger",
+            notificationTitle: "Where Am I Trip Logger",
             notificationBody: "Recording your ride in the background.",
             notificationColor: "#ff6600",
           },

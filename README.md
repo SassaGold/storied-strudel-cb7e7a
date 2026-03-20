@@ -1,4 +1,4 @@
-# Roamly — Biker Companion App 🏍️
+# Where Am I — Biker Companion App 🏍️
 
 A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, emergency services), log your trips, and more. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, and Dutch.
 
@@ -35,7 +35,7 @@ A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, at
 # After cloning, zip the whole folder:
 # Windows — right-click the folder → "Send to" → "Compressed (zipped) folder"
 # Mac     — right-click → "Compress"
-# Linux   — zip -r roamly-backup.zip storied-strudel-cb7e7a/
+# Linux   — zip -r whereami-backup.zip storied-strudel-cb7e7a/
 ```
 
 Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra safety.
@@ -52,7 +52,7 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
 
 | Item | Status |
 |------|--------|
-| Android package name `com.sassagold.roamly` | ✅ Done |
+| Android package name `com.sassagold.whereami` | ✅ Done |
 | App version `1.0.0` | ✅ Done |
 | Android `versionCode: 1` (auto-incremented by EAS) | ✅ Done |
 | Adaptive icon (foreground + background + monochrome) | ✅ Done |
@@ -113,7 +113,7 @@ eas build --profile production --platform android
 
 1. Click **"Create app"**.
 2. Fill in:
-   - App name: `Roamly`
+   - App name: `Where Am I`
    - Default language: English
    - App or game: **App**
    - Free or paid: **Free**

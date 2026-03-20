@@ -2,7 +2,7 @@
 
 ## v2.0.0 — Version 2 (2026-03-13)
 
-Second major release of **Roamly**. Expanded to 9 tabs and added Trip Logger, SOS/Emergency, Settings, and About screens, plus multilingual support for 9 languages.
+Second major release of **Where Am I**. Expanded to 9 tabs and added Trip Logger, SOS/Emergency, Settings, and About screens, plus multilingual support for 9 languages.
 
 ### New in v2
 
@@ -48,7 +48,7 @@ Second major release of **Roamly**. Expanded to 9 tabs and added Trip Logger, SO
 
 ## v1.0.0 — Version 1 (2026-03-13)
 
-Initial complete release of **Roamly** — the biker companion app.
+Initial complete release of **Where Am I** — the biker companion app.
 
 ### Features
 

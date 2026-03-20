@@ -8,7 +8,7 @@
 import * as TaskManager from "expo-task-manager";
 import * as Location from "expo-location";
 
-export const LOCATION_TASK_NAME = "roamly-bg-location";
+export const LOCATION_TASK_NAME = "whereami-bg-location";
 /** AsyncStorage key where background GPS points are accumulated during a trip. */
 export const BG_POINTS_KEY = "triplogger_bg_points_v1";
 
