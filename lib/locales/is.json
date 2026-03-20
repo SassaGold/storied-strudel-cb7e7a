@@ -370,7 +370,15 @@
     "updateAvailable": "⬇️ Uppfærsla tiltæk — setur upp…",
     "updateLatest": "✅ Þú ert uppfærður",
     "updateError": "❌ Uppfærsluleit mistókst",
-    "privacyPolicyLink": "📄 Persónuverndarstefna"
+    "privacyPolicyLink": "📄 Persónuverndarstefna",
+    "githubSection": "FRUMKÓÐI",
+    "githubDesc": "Roamly er opinn hugbúnaður. Skoðaðu allan frumkóðann, tilkynntu villur eða sæktu þitt eigið eintak.",
+    "githubLink": "Skoða á GitHub ↗",
+    "changelogSection": "HVAÐ ER NÝTT",
+    "changelogBtn": "📋 Skoða breytingaskrá",
+    "changelogLoading": "Hleður breytingaskrá…",
+    "changelogError": "Gat ekki hlaðið breytingaskrá. Athugaðu netsamband þitt.",
+    "changelogClose": "Loka"
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",

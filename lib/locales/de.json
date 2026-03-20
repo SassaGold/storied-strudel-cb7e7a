@@ -370,7 +370,15 @@
     "updateAvailable": "⬇️ Update verfügbar — wird installiert…",
     "updateLatest": "✅ Du bist aktuell",
     "updateError": "❌ Update-Prüfung fehlgeschlagen",
-    "privacyPolicyLink": "📄 Datenschutzerklärung"
+    "privacyPolicyLink": "📄 Datenschutzerklärung",
+    "githubSection": "QUELLCODE",
+    "githubDesc": "Roamly ist Open Source. Sieh dir den vollständigen Quellcode an, melde Probleme oder lade eine eigene Kopie herunter.",
+    "githubLink": "Auf GitHub ansehen ↗",
+    "changelogSection": "NEUIGKEITEN",
+    "changelogBtn": "📋 Changelog anzeigen",
+    "changelogLoading": "Changelog wird geladen…",
+    "changelogError": "Changelog konnte nicht geladen werden. Überprüfe deine Internetverbindung.",
+    "changelogClose": "Schließen"
   },
   "settings": {
     "badge": "⚙️ EINSTELLUNGEN",

@@ -370,7 +370,15 @@
     "updateAvailable": "⬇️ Uppdatering tillgänglig — installerar…",
     "updateLatest": "✅ Du är uppdaterad",
     "updateError": "❌ Uppdateringskontroll misslyckades",
-    "privacyPolicyLink": "📄 Integritetspolicy"
+    "privacyPolicyLink": "📄 Integritetspolicy",
+    "githubSection": "KÄLLKOD",
+    "githubDesc": "Roamly är öppen källkod. Bläddra i källkoden, rapportera problem eller ladda ner din egen kopia.",
+    "githubLink": "Visa på GitHub ↗",
+    "changelogSection": "NYHETER",
+    "changelogBtn": "📋 Visa ändringslogg",
+    "changelogLoading": "Laddar ändringslogg…",
+    "changelogError": "Kunde inte ladda ändringsloggen. Kontrollera din internetanslutning.",
+    "changelogClose": "Stäng"
   },
   "settings": {
     "badge": "⚙️ INSTÄLLNINGAR",
