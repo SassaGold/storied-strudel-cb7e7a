@@ -101,7 +101,7 @@ export function useRiderHQ(): RiderHQState {
       const addressPromise = withRetry(() =>
         fetch(
           `${NOMINATIM_BASE_URL}&lat=${latitude}&lon=${longitude}`,
-          { headers: { "User-Agent": "roamly-app" } }
+          { headers: { "User-Agent": "where-am-i-app" } }
         )
           .then((r) => {
             if (!r.ok) throw new Error(`Nominatim ${r.status}`);
