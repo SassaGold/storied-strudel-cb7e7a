@@ -5,6 +5,8 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
+import { useGithubData } from "../../lib/useGithubData";
+import { GITHUB_HTML_URL } from "../../lib/config";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -46,6 +48,7 @@ export default function AboutScreen() {
   const insets = useSafeAreaInsets();
 
   const [updateStatus, setUpdateStatus] = useState<"idle" | "checking" | "available" | "latest" | "error">("idle");
+  const github = useGithubData();
 
   async function checkForUpdate() {
     if (!Updates || typeof Updates.checkForUpdateAsync !== "function") {
@@ -190,6 +193,118 @@ export default function AboutScreen() {
           <View style={styles.card}>
             <Text style={styles.cardBody}>{t("about.legalBody")}</Text>
           </View>
+        </Section>
+
+        {/* GitHub */}
+        <Section title={t("about.github")}>
+          {github.loading ? (
+            <View style={styles.githubLoadingRow}>
+              <ActivityIndicator size="small" color="#ff6600" />
+              <Text style={styles.githubLoadingText}>{t("about.githubLoading")}</Text>
+            </View>
+          ) : github.error ? (
+            <View style={styles.card}>
+              <Text style={styles.cardBody}>{t("about.githubError")}</Text>
+            </View>
+          ) : (
+            <>
+              {/* Repo meta */}
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>🐙 {t("about.githubRepo")}</Text>
+                <Text style={styles.cardBody}>{t("about.githubRepoDesc")}</Text>
+                {github.meta && (
+                  <View style={styles.githubStatsRow}>
+                    <View style={styles.githubStat}>
+                      <Text style={styles.githubStatValue}>{github.meta.stargazers_count}</Text>
+                      <Text style={styles.githubStatLabel}>{t("about.githubStars")}</Text>
+                    </View>
+                    <View style={styles.githubStatDivider} />
+                    <View style={styles.githubStat}>
+                      <Text style={styles.githubStatValue}>{github.meta.forks_count}</Text>
+                      <Text style={styles.githubStatLabel}>{t("about.githubForks")}</Text>
+                    </View>
+                    <View style={styles.githubStatDivider} />
+                    <View style={styles.githubStat}>
+                      <Text style={styles.githubStatValue}>{github.meta.open_issues_count}</Text>
+                      <Text style={styles.githubStatLabel}>{t("about.githubIssues")}</Text>
+                    </View>
+                  </View>
+                )}
+                <Pressable
+                  style={({ pressed }) => [styles.githubViewBtn, pressed && styles.githubViewBtnPressed]}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(GITHUB_HTML_URL); }}
+                  accessibilityRole="link"
+                  accessibilityLabel={t("about.githubViewRepo")}
+                >
+                  <Text style={styles.githubViewBtnText}>{t("about.githubViewRepo")}</Text>
+                </Pressable>
+              </View>
+
+              {/* Releases */}
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>🏷️ {t("about.githubReleases")}</Text>
+                {github.releases.length === 0 ? (
+                  <Text style={styles.cardBody}>{t("about.githubNoReleases")}</Text>
+                ) : (
+                  github.releases.slice(0, 5).map((release) => (
+                    <View key={release.id} style={styles.githubReleaseRow}>
+                      <View style={styles.githubReleaseHeader}>
+                        <Text style={styles.githubReleaseTag}>{release.tag_name}</Text>
+                        {release.prerelease && (
+                          <View style={styles.githubPrereleaseBadge}>
+                            <Text style={styles.githubPrereleaseBadgeText}>{t("about.githubPrerelease")}</Text>
+                          </View>
+                        )}
+                        <Text style={styles.githubReleaseDate}>
+                          {new Date(release.published_at).toLocaleDateString()}
+                        </Text>
+                      </View>
+                      {release.name && release.name !== release.tag_name && (
+                        <Text style={styles.githubReleaseName}>{release.name}</Text>
+                      )}
+                      {release.body ? (
+                        <Text style={styles.githubReleaseBody} numberOfLines={4}>
+                          {release.body.trim()}
+                        </Text>
+                      ) : null}
+                    </View>
+                  ))
+                )}
+              </View>
+
+              {/* Recent commits */}
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>📝 {t("about.githubCommits")}</Text>
+                {github.commits.length === 0 ? (
+                  <Text style={styles.cardBody}>{t("about.githubNoCommits")}</Text>
+                ) : (
+                  github.commits.slice(0, 8).map((commit) => (
+                    <View key={commit.sha} style={styles.githubCommitRow}>
+                      <Text style={styles.githubCommitSha}>{commit.sha.slice(0, 7)}</Text>
+                      <View style={styles.githubCommitInfo}>
+                        <Text style={styles.githubCommitMsg} numberOfLines={2}>
+                          {commit.commit.message.split("\n")[0]}
+                        </Text>
+                        <Text style={styles.githubCommitDate}>
+                          {new Date(commit.commit.author.date).toLocaleDateString()}
+                        </Text>
+                      </View>
+                    </View>
+                  ))
+                )}
+              </View>
+
+              {/* Changelog */}
+              <View style={styles.card}>
+                <Text style={styles.cardTitle}>📋 {t("about.githubChangelog")}</Text>
+                {github.changelog ? (
+                  <Text style={styles.githubChangelogText}>{github.changelog}</Text>
+                ) : (
+                  <Text style={styles.cardBody}>{t("about.githubNoChangelog")}</Text>
+                )}
+              </View>
+            </>
+          )}
         </Section>
 
         {/* Version */}
@@ -402,5 +517,149 @@ const styles = StyleSheet.create({
     color: "#ff6600",
     fontWeight: "700",
     fontSize: 14,
+  },
+
+  // ── GitHub section ────────────────────────────────────────────────────────
+  githubLoadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 12,
+  },
+  githubLoadingText: {
+    color: "#888",
+    fontSize: 13,
+  },
+  githubStatsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 14,
+    marginBottom: 4,
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "#2a2a2a",
+  },
+  githubStat: {
+    alignItems: "center",
+    flex: 1,
+  },
+  githubStatValue: {
+    color: "#ff6600",
+    fontSize: 20,
+    fontWeight: "900",
+  },
+  githubStatLabel: {
+    color: "#666",
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    marginTop: 2,
+  },
+  githubStatDivider: {
+    width: 1,
+    backgroundColor: "#2a2a2a",
+  },
+  githubViewBtn: {
+    marginTop: 12,
+    alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.4)",
+    backgroundColor: "rgba(255,102,0,0.08)",
+  },
+  githubViewBtnPressed: { opacity: 0.6 },
+  githubViewBtnText: {
+    color: "#ff6600",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  githubReleaseRow: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#2a2a2a",
+  },
+  githubReleaseHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  githubReleaseTag: {
+    color: "#ff6600",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily: "monospace" as const,
+  },
+  githubReleaseName: {
+    color: "#ccc",
+    fontSize: 12,
+    marginTop: 2,
+  },
+  githubReleaseDate: {
+    color: "#555",
+    fontSize: 11,
+    marginLeft: "auto" as const,
+  },
+  githubReleaseBody: {
+    color: "#888",
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 6,
+  },
+  githubPrereleaseBadge: {
+    backgroundColor: "rgba(255,200,0,0.15)",
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: "rgba(255,200,0,0.3)",
+  },
+  githubPrereleaseBadgeText: {
+    color: "#ffd700",
+    fontSize: 9,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  githubCommitRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#2a2a2a",
+  },
+  githubCommitSha: {
+    color: "#ff6600",
+    fontSize: 11,
+    fontFamily: "monospace" as const,
+    fontWeight: "700",
+    minWidth: 48,
+    paddingTop: 2,
+  },
+  githubCommitInfo: {
+    flex: 1,
+  },
+  githubCommitMsg: {
+    color: "#ccc",
+    fontSize: 12,
+    lineHeight: 17,
+  },
+  githubCommitDate: {
+    color: "#555",
+    fontSize: 10,
+    marginTop: 2,
+  },
+  githubChangelogText: {
+    color: "#888",
+    fontSize: 12,
+    lineHeight: 19,
+    fontFamily: "monospace" as const,
+    marginTop: 4,
   },
 });

@@ -34,6 +34,12 @@ import {
   ROAD_OVERPASS_TIMEOUT_S,
   ROAD_MAX_RESULTS,
   TRIP_LOCATION_INTERVAL_MS,
+  GITHUB_REPO,
+  GITHUB_API_REPO_URL,
+  GITHUB_API_RELEASES_URL,
+  GITHUB_API_COMMITS_URL,
+  GITHUB_RAW_CHANGELOG_URL,
+  GITHUB_HTML_URL,
 } from "../lib/config";
 
 // ── URL constants ─────────────────────────────────────────────────────────────
@@ -211,5 +217,40 @@ describe("forecast and road constants", () => {
 describe("trip logger constants", () => {
   it("TRIP_LOCATION_INTERVAL_MS is positive", () => {
     expect(TRIP_LOCATION_INTERVAL_MS).toBeGreaterThan(0);
+  });
+});
+
+// ── GitHub constants ──────────────────────────────────────────────────────────
+
+describe("GitHub constants", () => {
+  it("GITHUB_REPO is a valid owner/repo string", () => {
+    expect(typeof GITHUB_REPO).toBe("string");
+    expect(GITHUB_REPO).toMatch(/^[^/]+\/[^/]+$/);
+  });
+
+  it("GITHUB_API_REPO_URL is a valid GitHub API HTTPS URL", () => {
+    expect(GITHUB_API_REPO_URL).toMatch(/^https:\/\/api\.github\.com\/repos\//);
+    expect(GITHUB_API_REPO_URL).toContain(GITHUB_REPO);
+  });
+
+  it("GITHUB_API_RELEASES_URL extends GITHUB_API_REPO_URL", () => {
+    expect(GITHUB_API_RELEASES_URL).toMatch(/^https:\/\/api\.github\.com\/repos\//);
+    expect(GITHUB_API_RELEASES_URL).toContain("/releases");
+  });
+
+  it("GITHUB_API_COMMITS_URL extends GITHUB_API_REPO_URL", () => {
+    expect(GITHUB_API_COMMITS_URL).toMatch(/^https:\/\/api\.github\.com\/repos\//);
+    expect(GITHUB_API_COMMITS_URL).toContain("/commits");
+  });
+
+  it("GITHUB_RAW_CHANGELOG_URL points to the raw CHANGELOG.md", () => {
+    expect(GITHUB_RAW_CHANGELOG_URL).toMatch(/^https:\/\/raw\.githubusercontent\.com\//);
+    expect(GITHUB_RAW_CHANGELOG_URL).toContain("CHANGELOG.md");
+    expect(GITHUB_RAW_CHANGELOG_URL).toContain(GITHUB_REPO);
+  });
+
+  it("GITHUB_HTML_URL is a valid github.com URL", () => {
+    expect(GITHUB_HTML_URL).toMatch(/^https:\/\/github\.com\//);
+    expect(GITHUB_HTML_URL).toContain(GITHUB_REPO);
   });
 });

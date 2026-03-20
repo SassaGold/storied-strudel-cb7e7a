@@ -22,6 +22,26 @@ export const YR_NO_FALLBACK_URL = "https://www.yr.no";
 export const WIKIPEDIA_SUMMARY_URL = (lang: string, title: string) =>
   `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
 
+// ── GitHub API ────────────────────────────────────────────────────────────────
+
+/** GitHub repository identifier (owner/repo). */
+export const GITHUB_REPO = "SassaGold/storied-strudel-cb7e7a";
+
+/** GitHub REST API base URL for this repository. */
+export const GITHUB_API_REPO_URL = `https://api.github.com/repos/${GITHUB_REPO}`;
+
+/** GitHub REST API URL for releases. */
+export const GITHUB_API_RELEASES_URL = `${GITHUB_API_REPO_URL}/releases`;
+
+/** GitHub REST API URL for commits. */
+export const GITHUB_API_COMMITS_URL = `${GITHUB_API_REPO_URL}/commits`;
+
+/** GitHub raw content URL for CHANGELOG.md (master branch). */
+export const GITHUB_RAW_CHANGELOG_URL = `https://raw.githubusercontent.com/${GITHUB_REPO}/master/CHANGELOG.md`;
+
+/** GitHub HTML URL for browsing this repository. */
+export const GITHUB_HTML_URL = `https://github.com/${GITHUB_REPO}`;
+
 // ── Overpass API ──────────────────────────────────────────────────────────────
 
 /** Overpass API mirrors — free OpenStreetMap data, no API key required. */
