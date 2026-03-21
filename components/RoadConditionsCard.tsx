@@ -13,9 +13,9 @@ import { useTranslation } from "react-i18next";
 import type * as Location from "expo-location";
 import { type RoadAlert, humanizeConstructionType } from "../lib/roads";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require("expo-haptics");
   } catch {
     return null;

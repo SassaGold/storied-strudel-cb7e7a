@@ -21,9 +21,9 @@ import {
 } from "../lib/weather";
 import { formatForecastDate } from "../lib/sun";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require("expo-haptics");
   } catch {
     return null;

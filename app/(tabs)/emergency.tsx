@@ -74,8 +74,6 @@ const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: stri
     });
 };
 
-const CACHE_KEY = "cache_emergency_v2";
-
 export default function EmergencyScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
