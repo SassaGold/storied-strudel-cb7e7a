@@ -20,9 +20,9 @@ import { WeatherCard } from "../../components/WeatherCard";
 import { SunCard } from "../../components/SunCard";
 import { RoadConditionsCard } from "../../components/RoadConditionsCard";
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     return require("expo-haptics");
   } catch {
     return null;
