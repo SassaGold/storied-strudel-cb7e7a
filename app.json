@@ -36,8 +36,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.sassagold.whereami",
-      "versionCode": 2
+      "package": "com.sassagold.whereami"
     },
     "web": {
       "output": "static",
