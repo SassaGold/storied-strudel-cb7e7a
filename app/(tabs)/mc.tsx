@@ -301,6 +301,8 @@ export default function McScreen() {
 
   // On mount: restore the last selected category and its cached results so the
   // user sees the same state they left, without having to press "Find" again.
+  // All AsyncStorage reads are completed first, then all state updates are
+  // applied in one synchronous block so React batches them into a single render.
   useEffect(() => {
     (async () => {
       try {
@@ -310,13 +312,16 @@ export default function McScreen() {
             ? (savedSelected as Category)
             : "services";
 
-        if (restoredCategory !== "services") {
-          setSelected(restoredCategory);
-        }
-
         // Populate places from cache (valid entries only — no network request).
         const cacheKey = `cache_mc_v2_${restoredCategory}`;
         const raw = await AsyncStorage?.getItem(cacheKey);
+
+        // Apply all state updates in one synchronous block so that React
+        // batches them into a single render, preventing an intermediate render
+        // with the correct category but an empty places list.
+        if (restoredCategory !== "services") {
+          setSelected(restoredCategory);
+        }
         if (raw) {
           const parsed = JSON.parse(raw);
           const ts: number = parsed?.ts;
