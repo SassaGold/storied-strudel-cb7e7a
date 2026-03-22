@@ -12,6 +12,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -80,8 +81,15 @@ export default function EmergencyScreen() {
   const insets = useSafeAreaInsets();
 
   // Data from hook (loading, error, places, fromCache, cacheTs, userLocation, loadPlaces)
-  const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces } =
+  const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch } =
     useEmergencyPlaces();
+
+  // Cancel any in-progress search when the user navigates away from this tab.
+  useFocusEffect(
+    useCallback(() => {
+      return () => { cancelSearch(); };
+    }, [cancelSearch])
+  );
 
   // UI state
   const [selected, setSelected] = useState("all");

@@ -4,7 +4,7 @@
 // cache banner, map/list toggle, map view, list view, and info modal.
 // Screen-specific behaviour is injected via props.
 
-import { type ReactNode } from "react";
+import { useCallback, type ReactNode } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -16,6 +16,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../lib/settings";
@@ -96,6 +97,7 @@ export default function POIScreen({
     setInfoPlace,
     setWikiExtract,
     loadPlaces,
+    cancelSearch,
     openInMaps,
     openInfo,
   } = usePOIFetch({
@@ -106,6 +108,13 @@ export default function POIScreen({
     loadErrorMsg: t(`${i18nPrefix}.loadError`),
     searchRadiusKm: settings.searchRadiusKm,
   });
+
+  // Cancel any in-progress search when the user navigates away from this tab.
+  useFocusEffect(
+    useCallback(() => {
+      return () => { cancelSearch(); };
+    }, [cancelSearch])
+  );
 
   const hapticLight = () =>
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);

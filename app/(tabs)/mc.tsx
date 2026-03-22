@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -11,6 +11,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
@@ -283,6 +284,7 @@ export default function McScreen() {
     setCacheTs,
     setError,
     loadPlaces,
+    cancelSearch,
     openInMaps,
     openInfo,
   } = usePOIFetch({
@@ -294,6 +296,13 @@ export default function McScreen() {
     searchRadiusKm: settings.searchRadiusKm,
     fetchTimeoutMs: CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000,
   });
+
+  // Cancel any in-progress search when the user navigates away from this tab.
+  useFocusEffect(
+    useCallback(() => {
+      return () => { cancelSearch(); };
+    }, [cancelSearch])
+  );
 
   // Track whether the initial AsyncStorage restore is complete so that the
   // save effects below don't overwrite persisted values during startup.

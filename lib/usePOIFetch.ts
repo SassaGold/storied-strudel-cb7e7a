@@ -75,7 +75,18 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
+  // Generation counter — incremented on each new call and on cancel.
+  // Allows in-flight calls to detect they've been superseded and bail out early.
+  const activeCallRef = useRef(0);
+
+  const cancelSearch = useCallback(() => {
+    activeCallRef.current += 1;
+    setLoading(false);
+  }, []);
+
   const loadPlaces = useCallback(async () => {
+    const callId = (activeCallRef.current += 1);
+
     const {
       cacheKey,
       buildOverpassQuery,
@@ -89,6 +100,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     // Serve cached data immediately so the user sees something while refreshing.
     try {
       const raw = await AsyncStorage?.getItem(cacheKey);
+      if (activeCallRef.current !== callId) return;
       if (raw) {
         const parsed = JSON.parse(raw);
         const ts: number = parsed?.ts;
@@ -101,11 +113,13 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       }
     } catch {}
 
+    if (activeCallRef.current !== callId) return;
     setLoading(true);
     setError(null);
 
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
+      if (activeCallRef.current !== callId) return;
       if (permission.status !== "granted") {
         setError(locationErrorMsg);
         return;
@@ -114,6 +128,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
+      if (activeCallRef.current !== callId) return;
 
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
@@ -121,6 +136,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       const radiusM = searchRadiusKm * 1000;
       const query = buildOverpassQuery(latitude, longitude, radiusM);
       const data = await fetchOverpass(query, fetchTimeoutMs);
+      if (activeCallRef.current !== callId) return;
 
       const mapped = ((data.elements ?? []) as any[])
         .map((el) => mapElement(el, latitude, longitude))
@@ -137,10 +153,11 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
         await AsyncStorage?.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted }));
       } catch {}
     } catch (err) {
+      if (activeCallRef.current !== callId) return;
       const suffix = err instanceof Error && err.message ? ` (${err.message})` : "";
       setError(loadErrorMsg + suffix);
     } finally {
-      setLoading(false);
+      if (activeCallRef.current === callId) setLoading(false);
     }
   }, []);
 
@@ -184,6 +201,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     setCacheTs,
     setError,
     loadPlaces,
+    cancelSearch,
     openInMaps,
     openInfo,
   };

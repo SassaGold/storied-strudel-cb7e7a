@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "../../lib/settings";
@@ -55,12 +56,20 @@ export default function Index() {
     sunTimes,
     weatherUrl,
     loadData,
+    cancelSearch,
   } = useRiderHQ();
 
   // Auto-load on mount
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Cancel any in-progress data fetch when the user navigates away from this tab.
+  useFocusEffect(
+    useCallback(() => {
+      return () => { cancelSearch(); };
+    }, [cancelSearch])
+  );
 
   // Navigate to default tab once
   useEffect(() => {

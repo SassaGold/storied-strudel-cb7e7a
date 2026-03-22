@@ -2,7 +2,7 @@
 // Data-fetching hook for the RIDER HQ (index) screen.
 // Encapsulates all async I/O, derived-value memos, and state management.
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { withRetry, fetchOverpass } from "./overpass";
@@ -57,6 +57,7 @@ export type RiderHQState = {
   /** Deep-link URL to yr.no forecast for current location */
   weatherUrl: string;
   loadData: () => Promise<void>;
+  cancelSearch: () => void;
 };
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -79,11 +80,22 @@ export function useRiderHQ(): RiderHQState {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [roadAlerts, setRoadAlerts] = useState<RoadAlert[]>([]);
 
+  // Generation counter — incremented on each new call and on cancel.
+  const activeCallRef = useRef(0);
+
+  const cancelSearch = useCallback(() => {
+    activeCallRef.current += 1;
+    setLoading(false);
+  }, []);
+
   const loadData = useCallback(async () => {
+    const callId = (activeCallRef.current += 1);
+
     setLoading(true);
     setError(null);
     try {
       const permission = await Location.requestForegroundPermissionsAsync();
+      if (activeCallRef.current !== callId) return;
       // Only bail out on explicit denial; 'undetermined' triggers the browser dialog.
       if (permission.status === "denied") {
         setError(t("home.locationError"));
@@ -93,6 +105,7 @@ export function useRiderHQ(): RiderHQState {
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.High,
       });
+      if (activeCallRef.current !== callId) return;
       setLocation(position);
 
       const { latitude, longitude } = position.coords;
@@ -242,14 +255,16 @@ export function useRiderHQ(): RiderHQState {
         roadPromise,
       ]);
 
+      if (activeCallRef.current !== callId) return;
       setAddress(addressResult);
       setWeather(weatherResult);
       setRoadAlerts(roadResult);
       setLastUpdated(new Date());
     } catch {
+      if (activeCallRef.current !== callId) return;
       setError(t("home.dataError"));
     } finally {
-      setLoading(false);
+      if (activeCallRef.current === callId) setLoading(false);
     }
   }, [t, searchRadiusKm]);
 
@@ -287,5 +302,6 @@ export function useRiderHQ(): RiderHQState {
     sunTimes,
     weatherUrl,
     loadData,
+    cancelSearch,
   };
 }
