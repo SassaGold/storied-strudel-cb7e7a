@@ -2,7 +2,7 @@
 // Data-fetching hook for the Emergency (SOS) screen.
 // Encapsulates location, Overpass POI query, caching and state management.
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "./overpass";
@@ -70,10 +70,21 @@ export function useEmergencyPlaces() {
     longitude: number;
   } | null>(null);
 
+  // Generation counter — incremented on each new call and on cancel.
+  const activeCallRef = useRef(0);
+
+  const cancelSearch = useCallback(() => {
+    activeCallRef.current += 1;
+    setLoading(false);
+  }, []);
+
   const loadPlaces = useCallback(async () => {
+    const callId = (activeCallRef.current += 1);
+
     // Show cached results immediately while fetching fresh data
     try {
       const raw = await AsyncStorage?.getItem(CACHE_KEY);
+      if (activeCallRef.current !== callId) return;
       if (raw) {
         const parsed = JSON.parse(raw);
         const ts: number = parsed?.ts;
@@ -91,10 +102,12 @@ export function useEmergencyPlaces() {
       }
     } catch {}
 
+    if (activeCallRef.current !== callId) return;
     setLoading(true);
     setError(null);
     try {
       const perm = await Location.requestForegroundPermissionsAsync();
+      if (activeCallRef.current !== callId) return;
       if (perm.status !== "granted") {
         setError(t("sos.locationError"));
         return;
@@ -103,6 +116,7 @@ export function useEmergencyPlaces() {
       const pos = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
+      if (activeCallRef.current !== callId) return;
       const { latitude, longitude } = pos.coords;
       setUserLocation({ latitude, longitude });
 
@@ -116,6 +130,7 @@ export function useEmergencyPlaces() {
 out center ${EMERGENCY_MAX_RESULTS};`;
 
       const data = await fetchOverpass(overpassQuery);
+      if (activeCallRef.current !== callId) return;
 
       if (!data.elements) {
         setPlaces([]);
@@ -172,12 +187,13 @@ out center ${EMERGENCY_MAX_RESULTS};`;
         );
       } catch {}
     } catch (err) {
+      if (activeCallRef.current !== callId) return;
       const isNetwork = err instanceof TypeError && String(err).includes("fetch");
       setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
     } finally {
-      setLoading(false);
+      if (activeCallRef.current === callId) setLoading(false);
     }
   }, [t]);
 
-  return { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces };
+  return { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch };
 }
