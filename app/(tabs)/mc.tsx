@@ -523,6 +523,7 @@ export default function McScreen() {
               ]}
               onPress={() => {
                 hapticLight();
+                cancelSearch();
                 setSelected(key);
                 setPlaces([]);
                 setError(null);
