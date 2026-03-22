@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -14,7 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
-import { haversineMeters, parseWikiTag } from "../../lib/overpass";
+import { haversineMeters, parseWikiTag, CACHE_TTL_MS } from "../../lib/overpass";
 import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
 
 // Safely load react-native-maps: requires a custom dev/production build.
@@ -28,7 +28,13 @@ const UrlTile: any = rnMaps?.UrlTile ?? null;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
+
 // ── MC-specific constants ─────────────────────────────────────────────────────
+
+/** AsyncStorage key for the last selected category — persists across restarts. */
+const MC_SELECTED_KEY = "mc_selected_v1";
 
 // OSM tags that indicate which fuel types a station carries
 const FUEL_TYPE_TAGS: [string, string][] = [
@@ -286,6 +292,53 @@ export default function McScreen() {
     searchRadiusKm: settings.searchRadiusKm,
     fetchTimeoutMs: CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000,
   });
+
+  // Track whether the initial AsyncStorage restore is complete so that the
+  // save effects below don't overwrite persisted values during startup.
+  const initDoneRef = useRef(false);
+
+  // On mount: restore the last selected category and its cached results so the
+  // user sees the same state they left, without having to press "Find" again.
+  useEffect(() => {
+    (async () => {
+      try {
+        const savedSelected = await AsyncStorage?.getItem(MC_SELECTED_KEY);
+        const restoredCategory: Category =
+          savedSelected && (CATEGORY_KEYS as readonly string[]).includes(savedSelected)
+            ? (savedSelected as Category)
+            : "services";
+
+        if (restoredCategory !== "services") {
+          setSelected(restoredCategory);
+        }
+
+        // Populate places from cache (valid entries only — no network request).
+        const cacheKey = `cache_mc_v2_${restoredCategory}`;
+        const raw = await AsyncStorage?.getItem(cacheKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const ts: number = parsed?.ts;
+          const data: Place[] = parsed?.data;
+          if (
+            Array.isArray(data) &&
+            data.length > 0 &&
+            typeof ts === "number" &&
+            Date.now() - ts < CACHE_TTL_MS
+          ) {
+            setPlaces(data);
+          }
+        }
+      } catch {}
+      initDoneRef.current = true;
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist selected category whenever it changes (skip during initial restore).
+  useEffect(() => {
+    if (!initDoneRef.current) return;
+    AsyncStorage?.setItem(MC_SELECTED_KEY, selected)?.catch(() => null);
+  }, [selected]);
 
   const sectionTitle = t(`garage.titles.${selected}`);
   const sectionDescription = t(`garage.descriptions.${selected}`);
