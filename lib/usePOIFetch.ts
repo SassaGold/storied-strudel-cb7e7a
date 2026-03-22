@@ -180,6 +180,8 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     setInfoPlace,
     setWikiExtract,
     setPlaces,
+    setFromCache,
+    setCacheTs,
     setError,
     loadPlaces,
     openInMaps,

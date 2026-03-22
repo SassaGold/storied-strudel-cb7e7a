@@ -279,6 +279,8 @@ export default function McScreen() {
     setInfoPlace,
     setWikiExtract,
     setPlaces,
+    setFromCache,
+    setCacheTs,
     setError,
     loadPlaces,
     openInMaps,
@@ -326,6 +328,8 @@ export default function McScreen() {
             Date.now() - ts < CACHE_TTL_MS
           ) {
             setPlaces(data);
+            setFromCache(true);
+            setCacheTs(ts);
           }
         }
       } catch {}
