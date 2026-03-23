@@ -7,8 +7,8 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.whereami`
-- [x] App version: `2.0.0`
-- [x] Android `versionCode`: `2` (in `app.json`; auto-incremented by EAS on each production build via `autoIncrement: true`)
+- [x] App version: `2.0.0` (in `app.json` and `package.json`)
+- [x] Android `versionCode`: auto-incremented by EAS on each production build via `autoIncrement: true` in `eas.json`
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
 - [x] Required permissions declared and used:
@@ -22,7 +22,7 @@ Use this checklist before submitting to Google Play.
 - [x] Trip Logger requests background permission and starts `Location.startLocationUpdatesAsync` during a recording session
 - [x] iOS & Android permission usage descriptions written (in `app.json` `ios.infoPlist` and via `expo-location` plugin config)
 - [x] iOS background mode `location` declared in `app.json` → `ios.backgroundModes`
-- [x] EAS project linked (`eas.json`, project ID `625b8a7c-5d22-4ebc-a8a6-d0a47451870e`)
+- [x] EAS project linked (`eas.json`, project ID `c4cd3804-55c8-43d6-84cf-62d30b0fb6e2`)
 - [x] Production EAS build profile with `autoIncrement: true`
 - [x] Error boundaries wrapping the full app tree
 - [x] No hardcoded API keys or secrets in source code
@@ -42,9 +42,17 @@ Use this checklist before submitting to Google Play.
 ### 1. Privacy Policy — Hosted URL
 Google Play requires a **publicly accessible URL** for your privacy policy.
 
-Options:
-- **GitHub Pages** — enable GitHub Pages for this repo; the URL will be:
-  `https://sassagold.github.io/storied-strudel-cb7e7a/store-listing/privacy_policy`
+**Recommended — GitHub Pages (free, uses this repo):**
+
+1. Go to your repository on GitHub → **Settings → Pages**.
+2. Under **Source**, select **Deploy from a branch**, choose `main`, and set the folder to `/docs`.
+3. Click **Save**. After a minute the policy will be live at:
+   `https://sassagold.github.io/storied-strudel-cb7e7a/privacy-policy.html`
+4. This URL is already set in `app.json` (`privacyPolicyUrl`) and in the About screen.
+
+The HTML privacy policy file is at `docs/privacy-policy.html` in this repository.
+
+**Alternative options:**
 - **Free generators** — [privacypolicytemplate.net](https://privacypolicytemplate.net), [app-privacy-policy-generator.firebaseapp.com](https://app-privacy-policy-generator.firebaseapp.com)
 - Host the `store-listing/privacy_policy.md` on any free static host.
 

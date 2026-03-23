@@ -2,7 +2,8 @@
   "expo": {
     "name": "Where Am I – Explore. Ride. Discover",
     "slug": "where-am-i",
-    "version": "1.0.0",
+    "version": "2.0.0",
+    "privacyPolicyUrl": "https://sassagold.github.io/storied-strudel-cb7e7a/privacy-policy.html",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "whereami",
