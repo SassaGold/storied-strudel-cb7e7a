@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Where Am I</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+      background: #fff;
+      color: #222;
+      line-height: 1.7;
+    }
+    h1 { font-size: 2rem; margin-bottom: 4px; }
+    h2 { font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    .updated { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #f5f5f5; font-weight: 600; }
+    a { color: #e65c00; }
+    ul { padding-left: 1.4rem; }
+    li { margin-bottom: 4px; }
+    .no-collect li::before { content: "✗ "; color: #c00; font-weight: bold; }
+    .no-collect { list-style: none; padding-left: 0; }
+  </style>
+</head>
+<body>
+
+<h1>Privacy Policy — Where Am I</h1>
+<p class="updated">Last updated: 2026-03-18</p>
+
+<p>
+  <strong>Where Am I</strong> ("the app", "we", "our") is a free motorcycle companion app.
+  This policy explains what data the app accesses, how it is used, and how your privacy is protected.
+</p>
+
+<hr />
+
+<h2>1. Data We Do NOT Collect</h2>
+<p>Where Am I does <strong>not</strong> collect, store, transmit, or share any personal data. Specifically:</p>
+<ul class="no-collect">
+  <li>No user accounts or registration</li>
+  <li>No analytics or usage tracking</li>
+  <li>No crash reporting sent to external servers</li>
+  <li>No advertising SDKs or third-party trackers</li>
+  <li>No data is ever sent to servers operated by this app</li>
+</ul>
+
+<hr />
+
+<h2>2. Location Data</h2>
+<p>The app requests access to your device's GPS location for the following purposes:</p>
+<table>
+  <thead><tr><th>Feature</th><th>When location is used</th></tr></thead>
+  <tbody>
+    <tr><td>Rider HQ (Home tab)</td><td>Reverse geocoding your current address; fetching nearby weather and road conditions</td></tr>
+    <tr><td>Food / Hotels / Attractions / Garage tabs</td><td>Finding nearby points of interest</td></tr>
+    <tr><td>SOS / Emergency tab</td><td>Finding nearest emergency services; sharing your coordinates via your device's share sheet</td></tr>
+    <tr><td>Trip Logger tab</td><td>Recording GPS route and calculating distance while riding</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Your location is never sent to any server operated by Where Am I.</strong></p>
+
+<p>
+  When location is used for POI searches, anonymised coordinates are sent to these
+  <strong>third-party open APIs</strong>:
+</p>
+<ul>
+  <li><strong>Nominatim (OpenStreetMap)</strong> — reverse geocoding: <a href="https://nominatim.openstreetmap.org">nominatim.openstreetmap.org</a> — <a href="https://osmfoundation.org/wiki/Privacy_Policy">Privacy Policy</a></li>
+  <li><strong>Overpass API</strong> — POI queries: <a href="https://overpass-api.de">overpass-api.de</a> — <a href="https://wiki.openstreetmap.org/wiki/Overpass_API">Privacy Policy</a></li>
+  <li><strong>Open-Meteo</strong> — weather data: <a href="https://open-meteo.com">open-meteo.com</a> — <a href="https://open-meteo.com/en/terms">Privacy Policy</a></li>
+</ul>
+<p>These are anonymous, keyless public APIs. They receive coordinates but no user identifiers.</p>
+
+<hr />
+
+<h2>3. Trip Logger Data</h2>
+<p>
+  GPS coordinates recorded by the Trip Logger are stored <strong>only on your device</strong>
+  using local storage (AsyncStorage). This data:
+</p>
+<ul>
+  <li>Is never uploaded or transmitted anywhere</li>
+  <li>Can be deleted at any time from within the app (Settings → Clear Cache, or per-ride delete)</li>
+  <li>Is lost if you uninstall the app</li>
+</ul>
+
+<hr />
+
+<h2>4. Cache Storage</h2>
+<p>
+  POI search results (restaurants, hotels, etc.) are cached <strong>locally on your device</strong>
+  for 30 minutes to reduce network requests. This cache:
+</p>
+<ul>
+  <li>Contains only OpenStreetMap POI data (place names, coordinates, contact info)</li>
+  <li>Contains no personal data</li>
+  <li>Can be cleared at any time via Settings → Clear Cached Data</li>
+</ul>
+
+<hr />
+
+<h2>5. Background Location</h2>
+<p>
+  The app uses background location access <strong>only when a trip is actively being recorded</strong>
+  in the Trip Logger. Background location is used solely to track GPS points while the screen is
+  locked. The app does not access location in the background at any other time.
+</p>
+
+<hr />
+
+<h2>6. Third-Party Services</h2>
+<p>The app uses the following third-party services. No personal data is sent to any of them beyond what is listed above.</p>
+<table>
+  <thead><tr><th>Service</th><th>Purpose</th><th>Privacy Policy</th></tr></thead>
+  <tbody>
+    <tr><td>OpenStreetMap / Nominatim</td><td>Address lookup &amp; POI data</td><td><a href="https://osmfoundation.org/wiki/Privacy_Policy">osmfoundation.org</a></td></tr>
+    <tr><td>Overpass API</td><td>POI queries</td><td><a href="https://wiki.openstreetmap.org/wiki/Overpass_API">wiki.openstreetmap.org</a></td></tr>
+    <tr><td>Open-Meteo</td><td>Weather forecasts</td><td><a href="https://open-meteo.com/en/terms">open-meteo.com</a></td></tr>
+    <tr><td>Wikipedia REST API</td><td>Place descriptions</td><td><a href="https://foundation.wikimedia.org/wiki/Privacy_policy">wikimedia.org</a></td></tr>
+    <tr><td>Expo Updates</td><td>Over-the-air app updates</td><td><a href="https://expo.dev/privacy">expo.dev/privacy</a></td></tr>
+  </tbody>
+</table>
+
+<hr />
+
+<h2>7. Children's Privacy</h2>
+<p>
+  Where Am I does not knowingly collect any data from children under the age of 13.
+  The app contains no features targeting children.
+</p>
+
+<hr />
+
+<h2>8. Changes to This Policy</h2>
+<p>
+  If this policy is updated, the "Last updated" date at the top of this document will be changed.
+  Significant changes will be noted in the app's CHANGELOG.
+</p>
+
+<hr />
+
+<h2>9. Contact</h2>
+<p>
+  If you have questions about this privacy policy, please open an issue at:<br />
+  <a href="https://github.com/SassaGold/storied-strudel-cb7e7a/issues">https://github.com/SassaGold/storied-strudel-cb7e7a/issues</a>
+</p>
+
+</body>
+</html>
