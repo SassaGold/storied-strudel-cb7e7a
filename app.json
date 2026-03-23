@@ -27,7 +27,12 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
         "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_LOCATION"
+        "FOREGROUND_SERVICE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -55,6 +60,15 @@
           "isAndroidBackgroundLocationEnabled": true
         }
       ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "enableShrinkResourcesInReleaseBuilds": true
+          }
+        }
+      ],
       "react-native-maps",
       [
         "expo-splash-screen",
@@ -76,7 +90,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "625b8a7c-5d22-4ebc-a8a6-d0a47451870e"
+        "projectId": "c4cd3804-55c8-43d6-84cf-62d30b0fb6e2"
       }
     },
     "owner": "sassagold",
@@ -84,7 +98,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/625b8a7c-5d22-4ebc-a8a6-d0a47451870e",
+      "url": "https://u.expo.dev/c4cd3804-55c8-43d6-84cf-62d30b0fb6e2",
       "enabled": true,
       "checkAutomatically": "ON_LOAD"
     }
