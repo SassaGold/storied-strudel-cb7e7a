@@ -42,19 +42,10 @@ Use this checklist before submitting to Google Play.
 ### 1. Privacy Policy — Hosted URL
 Google Play requires a **publicly accessible URL** for your privacy policy.
 
-**Recommended — GitHub Pages (free, uses this repo):**
+**✅ Using custom domain:** `https://sassagold.com/privacy`
 
-1. Go to your repository on GitHub → **Settings → Pages**.
-2. Under **Source**, select **Deploy from a branch**, choose `main`, and set the folder to `/docs`.
-3. Click **Save**. After a minute the policy will be live at:
-   `https://sassagold.github.io/storied-strudel-cb7e7a/privacy-policy.html`
-4. This URL is already set in `app.json` (`privacyPolicyUrl`) and in the About screen.
-
-The HTML privacy policy file is at `docs/privacy-policy.html` in this repository.
-
-**Alternative options:**
-- **Free generators** — [privacypolicytemplate.net](https://privacypolicytemplate.net), [app-privacy-policy-generator.firebaseapp.com](https://app-privacy-policy-generator.firebaseapp.com)
-- Host the `store-listing/privacy_policy.md` on any free static host.
+This URL is already set in `app.json` (`privacyPolicyUrl`) and in the About screen.
+Paste it into Google Play Console → App Content → Privacy Policy.
 
 ### 2. Screenshots (Required)
 Google Play requires **at least 2 screenshots** per device type.

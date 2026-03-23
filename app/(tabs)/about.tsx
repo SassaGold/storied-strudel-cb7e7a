@@ -158,7 +158,7 @@ export default function AboutScreen() {
             <Text style={styles.cardBody}>{t("about.privacyP4")}</Text>
             <LinkRow
               label={t("about.privacyPolicyLink")}
-              url="https://sassagold.github.io/storied-strudel-cb7e7a/privacy-policy.html"
+              url="https://sassagold.com/privacy"
               openLabel={t("about.openLink")}
             />
           </View>
