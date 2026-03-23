@@ -2,7 +2,7 @@
   "expo": {
     "name": "Where Am I – Explore. Ride. Discover",
     "slug": "where-am-i",
-    "version": "2.0.0",
+    "version": "1.0.0",
     "privacyPolicyUrl": "https://sassagold.com/privacy",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
