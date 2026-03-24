@@ -1,0 +1,66 @@
+name: EAS Build
+
+# Trigger a full native EAS build:
+#   • Automatically on version tags (v1.2.3)
+#   • On demand via workflow_dispatch (choose platform + profile)
+#
+# Requires an EXPO_TOKEN repository secret with a personal access token
+# that has permission to build the project on Expo's servers.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - ios
+          - android
+      profile:
+        description: 'EAS build profile'
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - preview
+          - development
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: EAS Build (${{ github.event.inputs.platform || 'all' }} / ${{ github.event.inputs.profile || 'production' }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository at the triggering commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Expo / EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Run EAS Build
+        run: |
+          eas build \
+            --platform ${{ github.event.inputs.platform || 'all' }} \
+            --profile ${{ github.event.inputs.profile || 'production' }} \
+            --non-interactive

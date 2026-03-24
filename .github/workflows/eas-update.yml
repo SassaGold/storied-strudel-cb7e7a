@@ -1,0 +1,40 @@
+name: EAS Update (OTA)
+
+# Publish an Over-the-Air JavaScript update to the "production" channel
+# every time new code lands on the main branch. Native builds that already
+# have the matching runtimeVersion will receive the update automatically the
+# next time the app is opened (checkAutomatically: "ON_LOAD" in app.json).
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: Publish OTA update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Expo / EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Publish EAS Update
+        run: eas update --auto --non-interactive
