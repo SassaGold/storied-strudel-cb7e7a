@@ -651,7 +651,6 @@ export default function McScreen() {
                 </View>
               </Pressable>
             ))
-          )
         )}
       </View>
     </ScrollView>

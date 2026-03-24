@@ -326,7 +326,6 @@ export default function POIScreen({
               </View>
             </Pressable>
           ))
-        )
       )}
     </ScrollView>
   );

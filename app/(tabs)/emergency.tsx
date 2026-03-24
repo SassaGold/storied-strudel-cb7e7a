@@ -497,8 +497,7 @@ export default function EmergencyScreen() {
                     </View>
                   </Pressable>
                 ))
-              )
-            )}
+              )}
           </View>
         </>
       )}
