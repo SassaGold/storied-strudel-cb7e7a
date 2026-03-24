@@ -45,3 +45,6 @@ app-example
 
 # Local Netlify folder
 .netlify
+
+# Google Play service account key (never commit — decoded at CI runtime)
+google-service-account.json

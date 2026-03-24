@@ -1,0 +1,88 @@
+name: EAS Submit — Android (Play Store)
+
+# Submits the latest Android production build to the Google Play Store.
+#
+# Triggers:
+#   1. Automatically after the "EAS Build" workflow completes successfully
+#      (e.g. when a v* tag is pushed).
+#   2. On-demand via workflow_dispatch — choose the Play Store track.
+#
+# Required repository secrets:
+#   EXPO_TOKEN                    — Expo personal access token (same as eas-build.yml)
+#   GOOGLE_SERVICE_ACCOUNT_KEY_JSON — Base64-encoded Google Play service account JSON
+#                                    (Project → IAM → Service Accounts, with "Release
+#                                     Manager" role on the Play Console app)
+
+on:
+  workflow_run:
+    workflows: ["EAS Build"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Play Store track to submit to'
+        required: true
+        default: internal
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    name: Submit Android to Play Store (${{ github.event.inputs.track || 'internal' }})
+    runs-on: ubuntu-latest
+
+    # For workflow_run: only proceed when the upstream build succeeded.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set up Expo / EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Write Google Play service account key
+        # Decode the base64 secret and write it to the path referenced in eas.json.
+        # The file is written inside the workspace so EAS CLI can resolve the relative path.
+        env:
+          GOOGLE_SERVICE_ACCOUNT_KEY_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICE_ACCOUNT_KEY_JSON" | base64 --decode > google-service-account.json
+
+      - name: Submit to Play Store
+        run: |
+          eas submit \
+            --platform android \
+            --profile production \
+            --latest \
+            --non-interactive
+        env:
+          # Pass the desired track when running manually; fall back to the
+          # value configured in eas.json when triggered by workflow_run.
+          EAS_SUBMIT_ANDROID_TRACK: ${{ github.event.inputs.track || '' }}
+
+      - name: Remove service account key
+        if: always()
+        run: rm -f google-service-account.json
