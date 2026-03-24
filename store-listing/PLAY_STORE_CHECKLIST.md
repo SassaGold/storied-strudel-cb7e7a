@@ -107,6 +107,68 @@ In Play Console → App Content → Sensitive app permissions, provide:
 
 ## 🚀 Building & Submitting
 
+### Automated (recommended)
+
+Submission is fully automated via GitHub Actions:
+
+| Step | Trigger | Workflow |
+|------|---------|----------|
+| 1. Build production AAB | Push a `v*` tag **or** run "EAS Build" manually | `.github/workflows/eas-build.yml` |
+| 2. Submit to Play Store (internal track) | Runs automatically after "EAS Build" succeeds | `.github/workflows/eas-submit-android.yml` |
+
+To release a new version end-to-end:
+
+```bash
+# 1. Bump the version (updates app.json + package.json)
+npm run version:patch   # or version:minor / version:major
+
+# 2. Commit the version bump
+git add app.json package.json
+git commit -m "chore: bump version to $(node -p "require('./package.json').version")"
+
+# 3. Tag and push — this triggers EAS Build, which then triggers EAS Submit
+git tag v$(node -p "require('./package.json').version")
+git push && git push --tags
+```
+
+After CI submits the build, open **Google Play Console → Testing → Internal testing** and promote the release to the desired track (alpha → beta → production).
+
+#### Required repository secrets
+
+Set these under **Settings → Secrets → Actions** in your GitHub repository:
+
+| Secret | Description |
+|--------|-------------|
+| `EXPO_TOKEN` | Expo personal access token (already needed for EAS Build) |
+| `GOOGLE_SERVICE_ACCOUNT_KEY_JSON` | Base64-encoded Google Play service account JSON key (see below) |
+
+**How to create `GOOGLE_SERVICE_ACCOUNT_KEY_JSON`:**
+
+1. Go to [Google Play Console](https://play.google.com/console) → **Setup → API access**
+2. Link to a Google Cloud project (or create one)
+3. Create a service account with the **Release Manager** role
+4. Download the JSON key file
+5. Base64-encode it and save as a GitHub secret:
+
+```bash
+base64 -w 0 your-service-account-key.json
+# Copy the output and paste it as the GOOGLE_SERVICE_ACCOUNT_KEY_JSON secret value
+```
+
+#### Manual trigger
+
+You can also submit to a specific track without waiting for a build:
+
+1. Go to **Actions → EAS Submit — Android (Play Store)**
+2. Click **Run workflow**
+3. Choose the target track: `internal`, `alpha`, `beta`, or `production`
+
+---
+
+### Manual (fallback)
+
+If you prefer to submit manually:
+
 ```bash
 # 1. Install EAS CLI
 npm install -g eas-cli
@@ -117,8 +179,8 @@ eas login
 # 3. Build production AAB (Android App Bundle)
 eas build --profile production --platform android
 
-# 4. Download the .aab file from the EAS dashboard
-# 5. Upload to Google Play Console → Production → Create release
+# 4. Submit the latest build to the internal track
+eas submit --platform android --profile production --latest
 ```
 
 ---
@@ -127,10 +189,10 @@ eas build --profile production --platform android
 
 After first submission, for each new version:
 
-1. Update `"version"` in `app.json` (e.g. `"2.1.0"`)
-2. Commit and push to GitHub
-3. Run `eas build --profile production --platform android`
-4. Upload new `.aab` in Play Console
+1. Run `npm run version:patch` (or `minor`/`major`) to bump `app.json` + `package.json`
+2. Commit the version bump
+3. Push a `v*` tag — GitHub Actions builds and submits automatically
+4. Promote the internal release to production in Play Console
 
 > **Note:** `"autoIncrement": true` in `eas.json` automatically increments `versionCode` on each EAS production build.
 
