@@ -410,51 +410,6 @@ export default function EmergencyScreen() {
         </View>
       )}
 
-      {/* View mode toggle — only shown when the map is available */}
-      {places.length > 0 && MapView && (
-        <View style={styles.viewToggleRow}>
-          <Pressable
-            style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
-            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("list"); }}
-          >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-            onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setViewMode("map"); }}
-          >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
-          </Pressable>
-        </View>
-      )}
-
-      {/* Map view */}
-      {viewMode === "map" && userLocation && MapView && (
-        <MapView
-          style={styles.mapView}
-          mapType={Platform.OS === "android" ? "none" : "standard"}
-          showsUserLocation
-          initialRegion={{
-            latitude: userLocation.latitude,
-            longitude: userLocation.longitude,
-            latitudeDelta: 0.06,
-            longitudeDelta: 0.06,
-          }}
-        >
-          {Platform.OS === "android" && UrlTile && (
-            <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
-          )}
-          {filtered.map((place) => (
-            <Marker
-              key={place.id}
-              coordinate={{ latitude: place.latitude, longitude: place.longitude }}
-              title={place.name}
-              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(place); }}
-            />
-          ))}
-        </MapView>
-      )}
-
       {places.length > 0 && (
         <>
           {/* Category filter */}
@@ -490,8 +445,7 @@ export default function EmergencyScreen() {
             <Text style={styles.cardDescription}>
               {t("sos.sortedBy")}
             </Text>
-            {viewMode === "list" && (
-              filtered.length === 0 ? (
+            {filtered.length === 0 ? (
                 <Text style={styles.bodyText}>
                   {t("sos.noneInCategory")}
                 </Text>
