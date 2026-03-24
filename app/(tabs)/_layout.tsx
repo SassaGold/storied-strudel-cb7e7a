@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 /** Wraps each tab icon to add a coloured top-bar indicator when focused */
 function TabIcon({
@@ -38,6 +39,7 @@ function TabIcon({
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
@@ -48,8 +50,8 @@ export default function TabLayout() {
           backgroundColor: "#0a0a0a",
           borderTopColor: "#ff6600",
           borderTopWidth: 2,
-          height: 64,
-          paddingBottom: 8,
+          height: 64 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 4,
         },
         tabBarLabelStyle: {

@@ -328,23 +328,22 @@ export default function Index() {
             <Text style={styles.quickNavText}>{t(key)}</Text>
           </Pressable>
         ))}
+        <Pressable
+          style={({ pressed }) => [
+            styles.quickNavBtnSos,
+            pressed && styles.quickNavBtnSosPressed,
+          ]}
+          onPress={() => {
+            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(
+              () => null
+            );
+            router.navigate("/emergency");
+          }}
+        >
+          <Text style={styles.quickNavEmoji}>🆘</Text>
+          <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>
+        </Pressable>
       </View>
-
-      <Pressable
-        style={({ pressed }) => [
-          styles.quickNavBtnSos,
-          pressed && styles.quickNavBtnSosPressed,
-        ]}
-        onPress={() => {
-          Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(
-            () => null
-          );
-          router.navigate("/emergency");
-        }}
-      >
-        <Text style={styles.quickNavEmoji}>🆘</Text>
-        <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>
-      </Pressable>
     </ScrollView>
   );
 }
@@ -545,7 +544,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   quickNavBtn: {
     flex: 1,
@@ -571,16 +570,16 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   quickNavBtnSos: {
-    flexDirection: "row",
+    flex: 1,
+    minWidth: "45%",
     backgroundColor: "rgba(239,68,68,0.12)",
     borderWidth: 2,
     borderColor: "#ef4444",
     borderRadius: 14,
-    paddingVertical: 22,
+    paddingVertical: 20,
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
-    marginBottom: 20,
+    gap: 6,
   },
   quickNavBtnSosPressed: { backgroundColor: "rgba(239,68,68,0.25)" },
   quickNavTextSos: {

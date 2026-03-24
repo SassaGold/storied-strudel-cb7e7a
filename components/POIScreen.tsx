@@ -291,61 +291,11 @@ export default function POIScreen({
         </View>
       )}
 
-      {/* ── View mode toggle (only when map native module is available) ── */}
-      {places.length > 0 && MapView && (
-        <View style={styles.viewToggleRow}>
-          <Pressable
-            style={[styles.viewToggleBtn, viewMode === "list" && styles.viewToggleBtnActive]}
-            onPress={() => { hapticLight(); setViewMode("list"); }}
-          >
-            <Text style={[styles.viewToggleText, viewMode === "list" && styles.viewToggleTextActive]}>
-              {t("common.viewList")}
-            </Text>
-          </Pressable>
-          <Pressable
-            style={[styles.viewToggleBtn, viewMode === "map" && styles.viewToggleBtnActive]}
-            onPress={() => { hapticLight(); setViewMode("map"); }}
-          >
-            <Text style={[styles.viewToggleText, viewMode === "map" && styles.viewToggleTextActive]}>
-              {t("common.viewMap")}
-            </Text>
-          </Pressable>
-        </View>
-      )}
-
-      {/* ── Map view ── */}
-      {viewMode === "map" && userLocation && MapView && (
-        <MapView
-          style={styles.mapView}
-          mapType={Platform.OS === "android" ? "none" : "standard"}
-          showsUserLocation
-          initialRegion={{
-            latitude: userLocation.latitude,
-            longitude: userLocation.longitude,
-            latitudeDelta: 0.06,
-            longitudeDelta: 0.06,
-          }}
-        >
-          {Platform.OS === "android" && UrlTile && (
-            <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
-          )}
-          {places.map((place) => (
-            <Marker
-              key={place.id}
-              coordinate={{ latitude: place.latitude, longitude: place.longitude }}
-              title={place.name}
-              onPress={() => { hapticLight(); setInfoPlace(place); }}
-            />
-          ))}
-        </MapView>
-      )}
-
       {/* ── List view ── */}
-      {viewMode === "list" && (
-        places.length === 0 && !loading ? (
-          <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
-        ) : (
-          places.map((place) => (
+      {places.length === 0 && !loading ? (
+        <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
+      ) : (
+        places.map((place) => (
             <Pressable
               key={place.id}
               style={styles.placeRow}
@@ -376,7 +326,6 @@ export default function POIScreen({
               </View>
             </Pressable>
           ))
-        )
       )}
     </ScrollView>
   );
