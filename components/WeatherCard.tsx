@@ -113,7 +113,7 @@ export function WeatherCard({ weather, weatherUrl }: Props) {
         <Pressable
           style={styles.secondaryButton}
           onPress={() => {
-            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null);
             Linking.openURL(weatherUrl).catch(() => null);
           }}
           accessibilityRole="link"

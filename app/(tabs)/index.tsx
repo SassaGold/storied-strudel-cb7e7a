@@ -107,7 +107,7 @@ export default function Index() {
               pressed && styles.headerIconBtnPressed,
             ]}
             onPress={() => {
-              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
                 () => null
               );
               router.navigate("/about");
@@ -131,7 +131,7 @@ export default function Index() {
                 pressed && styles.headerIconBtnPressed,
               ]}
               onPress={() => {
-                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
                   () => null
                 );
                 setLangModalVisible(true);
@@ -148,7 +148,7 @@ export default function Index() {
                 pressed && styles.headerIconBtnPressed,
               ]}
               onPress={() => {
-                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
                   () => null
                 );
                 router.navigate("/settings");
@@ -193,7 +193,7 @@ export default function Index() {
                 onPress={() => {
                   Haptics?.impactAsync(
                     Haptics.ImpactFeedbackStyle.Light
-                  ).catch(() => null);
+                  )?.catch(() => null);
                   i18n.changeLanguage(lang);
                   saveLanguage(lang);
                   setLangModalVisible(false);
@@ -220,7 +220,7 @@ export default function Index() {
       <Pressable
         style={styles.primaryButton}
         onPress={() => {
-          Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(
+          Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium)?.catch(
             () => null
           );
           loadData();
@@ -262,7 +262,7 @@ export default function Index() {
           <Pressable
             style={styles.secondaryButton}
             onPress={() => {
-              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
                 () => null
               );
               openMaps();
@@ -318,7 +318,7 @@ export default function Index() {
               pressed && styles.quickNavBtnPressed,
             ]}
             onPress={() => {
-              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+              Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
                 () => null
               );
               router.navigate(route);
@@ -334,7 +334,7 @@ export default function Index() {
             pressed && styles.quickNavBtnSosPressed,
           ]}
           onPress={() => {
-            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(
+            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium)?.catch(
               () => null
             );
             router.navigate("/emergency");
@@ -349,7 +349,7 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  scrollView: { flex: 1, backgroundColor: "#0a0a0a" },
+  scrollView: { flex: 1, backgroundColor: "#0a0a0a", overflow: "hidden" },
   container: { padding: 20, backgroundColor: "#0a0a0a" },
   // ── Header ──────────────────────────────────────────────────────
   header: {
@@ -547,8 +547,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   quickNavBtn: {
-    flex: 1,
-    minWidth: "45%",
+    width: "47%",
     backgroundColor: "#141414",
     borderWidth: 1,
     borderColor: "#2a2a2a",
@@ -570,8 +569,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   quickNavBtnSos: {
-    flex: 1,
-    minWidth: "45%",
+    width: "47%",
     backgroundColor: "rgba(239,68,68,0.12)",
     borderWidth: 2,
     borderColor: "#ef4444",
