@@ -3,7 +3,6 @@
     "name": "Where Am I – Explore. Ride. Discover",
     "slug": "where-am-i",
     "version": "1.1.0",
-    "privacyPolicyUrl": "https://sassagold.com/privacy",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "whereami",
@@ -17,10 +16,7 @@
         "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked.",
         "NSLocationAlwaysUsageDescription": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked."
-      },
-      "backgroundModes": [
-        "location"
-      ]
+      }
     },
     "android": {
       "permissions": [
