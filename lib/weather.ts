@@ -174,8 +174,8 @@ export const ridingSuitability = (
   const precip = weather.precipitation ?? 0;
   const rainChance = weather.precipitationProbability ?? 0;
 
-  if (temp <= 0) score -= 40;
-  else if (temp <= 5) score -= 20;
+  if (temp <= 0) score -= 100;
+  else if (temp <= 5) score -= 80;
   else if (temp >= 35) score -= 20;
   else if (temp >= 30) score -= 10;
 
