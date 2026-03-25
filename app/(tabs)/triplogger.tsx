@@ -128,7 +128,7 @@ export default function TripLoggerScreen() {
         }
       );
     };
-    startLiveWatch();
+    startLiveWatch().catch(() => null);
     return () => {
       active = false;
       liveSpeedWatchRef.current?.remove();

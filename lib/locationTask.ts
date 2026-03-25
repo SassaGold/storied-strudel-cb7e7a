@@ -17,30 +17,35 @@ export type BgPoint = { latitude: number; longitude: number; timestamp: number }
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: typeof import("@react-native-async-storage/async-storage").default | null = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
-TaskManager.defineTask(
-  LOCATION_TASK_NAME,
-  async ({
-    data,
-    error,
-  }: TaskManager.TaskManagerTaskBody<{ locations: Location.LocationObject[] }>) => {
-    if (error || !data) return;
-    const { locations } = data;
-    if (!locations?.length || !AsyncStorage) return;
-    try {
-      const raw = await AsyncStorage.getItem(BG_POINTS_KEY);
-      const existing: BgPoint[] = raw ? (JSON.parse(raw) as BgPoint[]) : [];
-      const newPoints: BgPoint[] = locations.map((loc) => ({
-        latitude: loc.coords.latitude,
-        longitude: loc.coords.longitude,
-        timestamp: loc.timestamp,
-      }));
-      await AsyncStorage.setItem(
-        BG_POINTS_KEY,
-        JSON.stringify([...existing, ...newPoints]),
-      );
-    } catch {
-      // Silently ignore storage failures in the background task — there is no
-      // UI context available here and a crash would terminate the background service.
-    }
-  },
-);
+try {
+  TaskManager.defineTask(
+    LOCATION_TASK_NAME,
+    async ({
+      data,
+      error,
+    }: TaskManager.TaskManagerTaskBody<{ locations: Location.LocationObject[] }>) => {
+      if (error || !data) return;
+      const { locations } = data;
+      if (!locations?.length || !AsyncStorage) return;
+      try {
+        const raw = await AsyncStorage.getItem(BG_POINTS_KEY);
+        const existing: BgPoint[] = raw ? (JSON.parse(raw) as BgPoint[]) : [];
+        const newPoints: BgPoint[] = locations.map((loc) => ({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+          timestamp: loc.timestamp,
+        }));
+        await AsyncStorage.setItem(
+          BG_POINTS_KEY,
+          JSON.stringify([...existing, ...newPoints]),
+        );
+      } catch {
+        // Silently ignore storage failures in the background task — there is no
+        // UI context available here and a crash would terminate the background service.
+      }
+    },
+  );
+} catch {
+  // TaskManager may not be available in all environments (e.g. restricted devices).
+  // Foreground-only location tracking will still work without the background task.
+}
