@@ -79,7 +79,7 @@ export function RoadConditionsCard({
                   canOpen && pressed && styles.roadAlertRowPressed,
                 ]}
                 onPress={() => {
-                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+                  Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
                     () => null
                   );
                   openInMaps();
@@ -127,7 +127,7 @@ export function RoadConditionsCard({
         <Pressable
           style={styles.secondaryButton}
           onPress={() => {
-            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(
+            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
               () => null
             );
             const { latitude, longitude } = location.coords;
