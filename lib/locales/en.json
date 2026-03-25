@@ -334,7 +334,11 @@
     "mapUnavailable": "Map not available",
     "tooShortTitle": "Ride Not Saved",
     "tooShortMsg": "Ride was under 10 m — not saved.",
-    "speedLabel": "SPEED"
+    "speedLabel": "SPEED",
+    "startErrorTitle": "Could Not Start Ride",
+    "startErrorMsg": "Failed to start ride tracking. Please check that location permission is enabled and try again.",
+    "stopErrorTitle": "Ride Save Error",
+    "stopErrorMsg": "Your ride may not have saved correctly. Please try again."
   },
   "about": {
     "badge": "ℹ️ ABOUT",
