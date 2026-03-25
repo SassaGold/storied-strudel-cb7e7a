@@ -93,7 +93,7 @@ export default function Index() {
       style={styles.scrollView}
       contentContainerStyle={[
         styles.container,
-        { paddingTop: insets.top + 20 },
+        { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 40 },
       ]}
     >
       {/* ── Header ───────────────────────────────────────────────── */}
@@ -350,7 +350,7 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   scrollView: { flex: 1, backgroundColor: "#0a0a0a" },
-  container: { padding: 20, paddingBottom: 40, backgroundColor: "#0a0a0a" },
+  container: { padding: 20, backgroundColor: "#0a0a0a" },
   // ── Header ──────────────────────────────────────────────────────
   header: {
     marginTop: 18,
