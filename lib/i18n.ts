@@ -16,7 +16,12 @@ const AsyncStorage: any = (() => { try { return require("@react-native-async-sto
 
 const LANG_STORAGE_KEY = "app_language_v1";
 
-const deviceLang = Localization.getLocales()[0]?.languageCode ?? "en";
+let deviceLang = "en";
+try {
+  deviceLang = Localization.getLocales()[0]?.languageCode ?? "en";
+} catch {
+  // expo-localization native module unavailable; fall back to English.
+}
 export const SUPPORTED_LANGS = ["en", "es", "de", "fr", "is", "no", "sv", "da", "nl"] as const;
 export type SupportedLang = typeof SUPPORTED_LANGS[number];
 const lng = (SUPPORTED_LANGS as readonly string[]).includes(deviceLang) ? deviceLang : "en";
