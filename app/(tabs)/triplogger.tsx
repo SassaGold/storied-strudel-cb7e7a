@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
-import { LOCATION_TASK_NAME, BG_POINTS_KEY, type BgPoint } from "../../lib/locationTask";
+import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
@@ -110,21 +110,25 @@ export default function TripLoggerScreen() {
       liveSpeedWatchRef.current = await Location.watchPositionAsync(
         { accuracy: Location.Accuracy.Balanced, timeInterval: 1500 },
         (loc) => {
-          if (recordingRef.current) return; // recording watcher handles speed during active trip
-          const { latitude, longitude, speed } = loc.coords;
-          const ts = loc.timestamp;
-          if (speed != null && speed >= 0) {
-            setCurrentSpeedKmh(speed * 3.6);
-          } else if (prevSpeedPointRef.current) {
-            const distM = haversineMeters(prevSpeedPointRef.current.latitude, prevSpeedPointRef.current.longitude, latitude, longitude);
-            const dtSec = (ts - prevSpeedPointRef.current.timestamp) / 1000;
-            if (dtSec > 0.5) {
-              setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
+          try {
+            if (recordingRef.current) return; // recording watcher handles speed during active trip
+            const { latitude, longitude, speed } = loc.coords;
+            const ts = loc.timestamp;
+            if (speed != null && speed >= 0) {
+              setCurrentSpeedKmh(speed * 3.6);
+            } else if (prevSpeedPointRef.current) {
+              const distM = haversineMeters(prevSpeedPointRef.current.latitude, prevSpeedPointRef.current.longitude, latitude, longitude);
+              const dtSec = (ts - prevSpeedPointRef.current.timestamp) / 1000;
+              if (dtSec > 0.5) {
+                setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
+              }
+            } else {
+              setCurrentSpeedKmh(0);
             }
-          } else {
-            setCurrentSpeedKmh(0);
+            prevSpeedPointRef.current = { latitude, longitude, timestamp: ts };
+          } catch {
+            // Silently ignore any error in the speed update callback.
           }
-          prevSpeedPointRef.current = { latitude, longitude, timestamp: ts };
         }
       );
     };
@@ -220,7 +224,7 @@ export default function TripLoggerScreen() {
       // This ensures GPS points are captured even when the screen is locked.
       try {
         const bgGranted = (await Location.getBackgroundPermissionsAsync()).status === "granted";
-        if (bgGranted) {
+        if (bgGranted && isLocationTaskDefined()) {
           await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
             accuracy: Location.Accuracy.BestForNavigation,
             distanceInterval: 5,
@@ -245,36 +249,41 @@ export default function TripLoggerScreen() {
           timeInterval: 3000,         // or every 3 s
         },
         (loc) => {
-          const { latitude, longitude, speed, accuracy: acc } = loc.coords;
-          const ts = loc.timestamp;
+          try {
+            const { latitude, longitude, speed, accuracy: acc } = loc.coords;
+            const ts = loc.timestamp;
 
-          // Update speed — use native GPS speed if available, otherwise calculate from GPS delta
-          const prev = routeRef.current[routeRef.current.length - 1];
-          if (speed != null && speed >= 0) {
-            setCurrentSpeedKmh(speed * 3.6);
-          } else if (prev) {
-            const distM = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
-            const dtSec = (ts - prev.timestamp) / 1000;
-            if (dtSec > 0.5) {
-              setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
+            // Update speed — use native GPS speed if available, otherwise calculate from GPS delta
+            const prev = routeRef.current[routeRef.current.length - 1];
+            if (speed != null && speed >= 0) {
+              setCurrentSpeedKmh(speed * 3.6);
+            } else if (prev) {
+              const distM = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
+              const dtSec = (ts - prev.timestamp) / 1000;
+              if (dtSec > 0.5) {
+                setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
+              }
             }
-          }
-          setAccuracy(acc ?? null);
+            setAccuracy(acc ?? null);
 
-          const newPoint: GpsPoint = { latitude, longitude, timestamp: ts };
+            const newPoint: GpsPoint = { latitude, longitude, timestamp: ts };
 
-          if (prev) {
-            const dist = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
-            // Ignore jitter: only count if moved >= 3 m
-            if (dist >= 3) {
-              distRef.current += dist / 1000;
-              setDistanceKm(distRef.current);
-              routeRef.current = [...routeRef.current, newPoint];
-              setRoute([...routeRef.current]);
+            if (prev) {
+              const dist = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
+              // Ignore jitter: only count if moved >= 3 m
+              if (dist >= 3) {
+                distRef.current += dist / 1000;
+                setDistanceKm(distRef.current);
+                routeRef.current = [...routeRef.current, newPoint];
+                setRoute([...routeRef.current]);
+              }
+            } else {
+              routeRef.current = [newPoint];
+              setRoute([newPoint]);
             }
-          } else {
-            routeRef.current = [newPoint];
-            setRoute([newPoint]);
+          } catch {
+            // Silently ignore any error in the location update callback to prevent
+            // an unhandled exception from crashing the app in production.
           }
         },
       );
@@ -299,8 +308,10 @@ export default function TripLoggerScreen() {
 
       // Stop the background location task if it is running.
       try {
-        const isRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
-        if (isRunning) await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        if (isLocationTaskDefined()) {
+          const isRunning = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+          if (isRunning) await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        }
       } catch {
         // Non-critical: the task will stop automatically when the app is terminated.
       }

@@ -25,6 +25,15 @@ const AsyncStorage: any = (() => { try { return require("@react-native-async-sto
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const TaskManager: any = (() => { try { return require("expo-task-manager"); } catch { return null; } })();
 
+/** Returns true only if the background location task has been successfully registered. */
+export function isLocationTaskDefined(): boolean {
+  try {
+    return TaskManager != null && TaskManager.isTaskDefined(LOCATION_TASK_NAME) === true;
+  } catch {
+    return false;
+  }
+}
+
 try {
   TaskManager?.defineTask(
     LOCATION_TASK_NAME,
