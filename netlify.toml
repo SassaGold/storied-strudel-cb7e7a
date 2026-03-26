@@ -2,6 +2,7 @@
 [build]
   publish = "dist"
   command = "npx expo export --platform web"
+  ignore = "exit 1"
 
 [[redirects]]
   from = "/*"

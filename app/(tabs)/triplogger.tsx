@@ -3,7 +3,6 @@ import {
   Alert,
   Animated,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -16,16 +15,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
+import LeafletMapView from "../../components/LeafletMapView";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-
-// Safely load react-native-maps: requires a custom dev/production build.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Polyline: any = rnMaps?.Polyline;
-const UrlTile: any = rnMaps?.UrlTile ?? null;
 
 // Safely load AsyncStorage
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -493,16 +485,15 @@ export default function TripLoggerScreen() {
           )}
 
           {/* Inline map while recording — shows from first GPS point */}
-          {recording && MapView && route.length === 0 && (
+          {recording && route.length === 0 && (
             <View style={styles.inlineMapPlaceholder}>
               <Text style={styles.mapWaitText}>📍 Waiting for GPS…</Text>
             </View>
           )}
-          {recording && route.length >= 1 && MapView && (
+          {recording && route.length >= 1 && (
             <View style={styles.inlineMap}>
-              <MapView
+              <LeafletMapView
                 style={StyleSheet.absoluteFill}
-                mapType={Platform.OS === "android" ? "none" : "standard"}
                 region={(() => {
                   const lats = route.map((p) => p.latitude);
                   const lons = route.map((p) => p.longitude);
@@ -516,20 +507,10 @@ export default function TripLoggerScreen() {
                     longitudeDelta: Math.max(maxLon - minLon + pad, 0.004),
                   };
                 })()}
+                route={route}
                 scrollEnabled={false}
                 zoomEnabled={false}
-              >
-                {Platform.OS === "android" && UrlTile && (
-                  <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
-                )}
-                {Polyline && route.length > 1 && (
-                  <Polyline
-                    coordinates={route}
-                    strokeColor="#ff6600"
-                    strokeWidth={4}
-                  />
-                )}
-              </MapView>
+              />
             </View>
           )}
 
@@ -592,7 +573,7 @@ export default function TripLoggerScreen() {
               </View>
               {/* Action buttons */}
               <View style={styles.rideActions}>
-                {ride.route.length > 1 && MapView && (
+                {ride.route.length > 1 && (
                   <Pressable
                     style={[styles.rideBtn, styles.viewRouteBtn]}
                     onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); setMapRide(ride); }}
@@ -632,23 +613,12 @@ export default function TripLoggerScreen() {
               <Text style={styles.modalClose}>{t("triplog.closeMap")}</Text>
             </Pressable>
           </View>
-          {mapRide && mapRegion && MapView ? (
-            <MapView
+          {mapRide && mapRegion ? (
+            <LeafletMapView
               style={styles.fullMap}
-              mapType={Platform.OS === "android" ? "none" : "standard"}
               initialRegion={mapRegion}
-            >
-              {Platform.OS === "android" && UrlTile && (
-                <UrlTile urlTemplate="https://tile.openstreetmap.org/{z}/{x}/{y}.png" maximumZ={19} flipY={false} />
-              )}
-              {Polyline && (
-                <Polyline
-                  coordinates={mapRide.route}
-                  strokeColor="#ff6600"
-                  strokeWidth={4}
-                />
-              )}
-            </MapView>
+              route={mapRide.route}
+            />
           ) : (
             <View style={styles.noMapMsg}>
               <Text style={styles.noMapText}>{t("triplog.mapUnavailable")}</Text>
