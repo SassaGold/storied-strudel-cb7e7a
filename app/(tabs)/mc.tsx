@@ -18,13 +18,6 @@ import { useSettings, fmtDistShort } from "../../lib/settings";
 import { haversineMeters, parseWikiTag, CACHE_TTL_MS } from "../../lib/overpass";
 import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
 
-// Safely load react-native-maps: requires a custom dev/production build.
-let rnMaps: any = null;
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-try { rnMaps = require("react-native-maps"); } catch {}
-const MapView: any = rnMaps?.default;
-const Marker: any = rnMaps?.Marker;
-const UrlTile: any = rnMaps?.UrlTile ?? null;
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
