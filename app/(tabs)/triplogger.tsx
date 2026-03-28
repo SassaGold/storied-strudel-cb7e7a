@@ -23,6 +23,9 @@ const Haptics: typeof import("expo-haptics") | null = (() => { try { return requ
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const TaskManager: any = (() => { try { return require("expo-task-manager"); } catch { return null; } })();
+
 const STORAGE_KEY = "triplogger_rides_v1";
 
 type GpsPoint = { latitude: number; longitude: number; timestamp: number };
@@ -211,6 +214,12 @@ export default function TripLoggerScreen() {
           // Stale data will be deduplicated on stop; not critical.
         }
       }
+
+      // Diagnostic: confirm task registration and running state before starting.
+      if (TaskManager) {
+        console.log("Registered tasks:", await TaskManager.getRegisteredTasksAsync());
+      }
+      console.log("Has started:", await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME));
 
       // Start the background location task (Android foreground service + iOS bg mode).
       // This ensures GPS points are captured even when the screen is locked.
