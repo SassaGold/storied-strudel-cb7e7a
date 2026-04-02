@@ -60,7 +60,7 @@ var map=L.map('map',{
   doubleClickZoom:false,
   attributionControl:false
 }).setView([${lat},${lng}],${zoom});
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
 var routeLine=null;
 function setRoute(coords){
   if(routeLine){map.removeLayer(routeLine);routeLine=null;}
