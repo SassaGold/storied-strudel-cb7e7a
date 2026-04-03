@@ -103,6 +103,22 @@ In Play Console → App Content → Sensitive app permissions, provide:
 - **Why background access is needed:** Without background location, GPS tracking stops when the screen locks during a ride, resulting in incomplete route data.
 - The foreground service notification ("Recording your ride in the background") is shown to users while background tracking is active.
 
+### 8. Foreground Service Permission Declaration
+Google Play will also ask whether the app uses any foreground service permissions.
+
+For this app, the correct declaration is:
+- **Does your app use foreground service permissions?** Yes
+- **Foreground service type:** `location`
+- **User-facing feature:** Trip Logger records the ride route, distance, and speed while the phone is locked.
+- **Why foreground service is needed:** Android requires an ongoing foreground service notification while continuous background GPS is active. Without it, trip recording stops or becomes unreliable when the app is backgrounded.
+- **User trigger:** The service starts only after the user explicitly taps Start in Trip Logger and stops when the user ends the recording.
+- **Notification shown to the user:** `Where Am I Trip Logger` / `Recording your ride in the background.`
+
+Recommended evidence for Play review:
+- Short video showing the user starting Trip Logger, locking the screen, and the persistent notification remaining visible while the ride is recorded.
+- Screenshot of the Trip Logger start screen and the Android foreground-service notification.
+- Recording script and adb capture steps: `store-listing/foreground_service_demo.md`
+
 ---
 
 ## 🚀 Building & Submitting

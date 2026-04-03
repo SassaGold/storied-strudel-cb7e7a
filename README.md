@@ -67,6 +67,10 @@ Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra 
 | Privacy statement in About screen with Privacy Policy link | ✅ Done |
 | Store listing files created (`store-listing/`) | ✅ Done |
 
+Because Trip Logger records GPS while the app is backgrounded, Google Play Console should be answered with:
+- **Foreground service permissions:** Yes
+- **Foreground service type:** `location`
+
 #### ⚠️ Still needed (account & asset setup — no code required)
 
 | Step | What | Cost |
