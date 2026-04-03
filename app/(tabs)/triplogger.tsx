@@ -2,7 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
+  Linking,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,6 +21,8 @@ import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint 
 import LeafletMapView from "../../components/LeafletMapView";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Notifications: typeof import("expo-notifications") | null = (() => { try { return require("expo-notifications"); } catch { return null; } })();
 
 // Safely load AsyncStorage
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -189,6 +193,27 @@ export default function TripLoggerScreen() {
       if (status !== "granted") {
         setPermError(true);
         return;
+      }
+
+      if (Platform.OS === "android" && Notifications) {
+        let notif = await Notifications.getPermissionsAsync();
+        if (!notif.granted && notif.status !== "granted") {
+          notif = await Notifications.requestPermissionsAsync();
+        }
+        if (!notif.granted && notif.status !== "granted") {
+          Alert.alert(
+            "Notifications are disabled",
+            "Trip Logger needs notifications enabled so Android can show active recording in the notification shade.",
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Open Settings",
+                onPress: () => { Linking.openSettings().catch(() => null); },
+              },
+            ]
+          );
+          return;
+        }
       }
 
       // Request background permission so the trip continues recording while the
