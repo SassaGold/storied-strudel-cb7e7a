@@ -60,7 +60,7 @@ var map=L.map('map',{
   doubleClickZoom:false,
   attributionControl:false
 }).setView([${lat},${lng}],${zoom});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,errorTileUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}).addTo(map);
 var routeLine=null;
 function setRoute(coords){
   if(routeLine){map.removeLayer(routeLine);routeLine=null;}
@@ -126,6 +126,7 @@ export default function LeafletMapView({
       }}
       scrollEnabled={false}
       originWhitelist={["*"]}
+      mixedContentMode="always"
       onLoadEnd={() => {
         loaded.current = true;
       }}
