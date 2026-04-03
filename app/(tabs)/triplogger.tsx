@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import * as Location from "expo-location";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
@@ -206,6 +207,8 @@ export default function TripLoggerScreen() {
       setElapsedMs(0);
       setStartTime(now);
       setCurrentSpeedKmh(null);
+      // Keep screen on during the ride so the odometer stays visible.
+      await activateKeepAwakeAsync().catch(() => null);
       setRecording(true);
 
       // Clear any stale background points from a previous session.
@@ -298,6 +301,8 @@ export default function TripLoggerScreen() {
 
   const stopRecording = useCallback(async () => {
     try {
+      // Release the screen-on lock now that the ride is finished.
+      deactivateKeepAwake();
       if (watchRef.current) {
         watchRef.current.remove();
         watchRef.current = null;
@@ -372,6 +377,7 @@ export default function TripLoggerScreen() {
     } catch {
       // Catch-all: prevent unhandled rejection from crashing the app on Android
       // production builds. Ensure recording state is cleared and inform the user.
+      deactivateKeepAwake();
       setRecording(false);
       Alert.alert(t("triplog.stopErrorTitle"), t("triplog.stopErrorMsg"));
     }
