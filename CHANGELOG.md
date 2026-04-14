@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.1 — Patch Release (2026-04-14)
+
+Maintenance release with bug fixes and stability improvements.
+
+---
+
 ## v2.0.0 — Version 2 (2026-03-13)
 
 Second major release of **Where Am I**. Expanded to 9 tabs and added Trip Logger, SOS/Emergency, Settings, and About screens, plus multilingual support for 9 languages.
