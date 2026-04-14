@@ -2,7 +2,7 @@
   "expo": {
     "name": "Where Am I – Explore. Ride. Discover",
     "slug": "where-am-i",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "whereami",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sassagold.whereami",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "We use your location to show where you are and what’s around you.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Trip Logger uses your location in the background to accurately record ride distance and route while the screen is locked.",
