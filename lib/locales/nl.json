@@ -391,5 +391,11 @@
     "clearCacheButton": "Gecachte gegevens wissen",
     "clearCacheSuccess": "Cache gewist",
     "clearCacheSuccessMsg": "Alle gecachte zoekresultaten zijn verwijderd."
+  },
+  "locationDisclosure": {
+    "title": "Locatietoestemming",
+    "body": "Where Am I gebruikt de locatie van je apparaat om je huidige positie te tonen.\n\nJe locatie wordt alleen binnen de app gebruikt en wordt niet gedeeld met anderen.\n\nJe kunt doorgaan zonder toestemming te verlenen.",
+    "allow": "Toestaan",
+    "deny": "Nee bedankt"
   }
 }

@@ -7,6 +7,7 @@ import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { withRetry, fetchOverpass } from "./overpass";
 import { useSettings } from "./settings";
+import { useLocationPermission } from "./locationPermission";
 import {
   NOMINATIM_BASE_URL,
   OPEN_METEO_BASE_URL,
@@ -71,6 +72,7 @@ export function useRiderHQ(): RiderHQState {
   const { t } = useTranslation();
   const { settings } = useSettings();
   const { searchRadiusKm } = settings;
+  const { requestForegroundPermission } = useLocationPermission();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +96,7 @@ export function useRiderHQ(): RiderHQState {
     setLoading(true);
     setError(null);
     try {
-      const permission = await Location.requestForegroundPermissionsAsync();
+      const permission = await requestForegroundPermission();
       if (activeCallRef.current !== callId) return;
       // Only bail out on explicit denial; 'undetermined' triggers the browser dialog.
       if (permission.status === "denied") {

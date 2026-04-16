@@ -391,5 +391,11 @@
     "clearCacheButton": "Tøm bufrede data",
     "clearCacheSuccess": "Hurtigbuffer tømt",
     "clearCacheSuccessMsg": "Alle bufrede søkeresultater er fjernet."
+  },
+  "locationDisclosure": {
+    "title": "Posisjonstillatelse",
+    "body": "Where Am I bruker enhetens posisjon for å vise din nåværende plassering.\n\nPosisjonen din brukes kun inne i appen og deles ikke med noen.\n\nDu kan fortsette uten å gi tillatelse.",
+    "allow": "Tillat",
+    "deny": "Nei takk"
   }
 }

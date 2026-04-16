@@ -391,5 +391,11 @@
     "clearCacheButton": "Gecachte Daten löschen",
     "clearCacheSuccess": "Cache geleert",
     "clearCacheSuccessMsg": "Alle zwischengespeicherten Suchergebnisse wurden entfernt."
+  },
+  "locationDisclosure": {
+    "title": "Standortberechtigung",
+    "body": "Where Am I verwendet Ihren Gerätestandort, um Ihre aktuelle Position anzuzeigen.\n\nIhr Standort wird nur in der App verwendet und nicht mit Dritten geteilt.\n\nSie können ohne Standortzugriff fortfahren.",
+    "allow": "Erlauben",
+    "deny": "Nein danke"
   }
 }

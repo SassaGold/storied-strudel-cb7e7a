@@ -391,5 +391,11 @@
     "clearCacheButton": "Hreinsa vistuð gögn",
     "clearCacheSuccess": "Skyndiminni hreinsað",
     "clearCacheSuccessMsg": "Öll vistuð leitarniðurstöður hafa verið fjarlægðar."
+  },
+  "locationDisclosure": {
+    "title": "Staðsetningarleyfi",
+    "body": "Where Am I notar staðsetningu tækis þíns til að sýna núverandi staðsetningu þína.\n\nStaðsetning þín er eingöngu notuð í appinu og er ekki deilt með neinum.\n\nÞú getur haldið áfram án þess að veita leyfi.",
+    "allow": "Leyfa",
+    "deny": "Nei takk"
   }
 }
