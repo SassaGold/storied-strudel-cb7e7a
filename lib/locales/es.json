@@ -391,5 +391,11 @@
     "clearCacheButton": "Limpiar datos en caché",
     "clearCacheSuccess": "Caché limpiada",
     "clearCacheSuccessMsg": "Todos los resultados de búsqueda en caché han sido eliminados."
+  },
+  "locationDisclosure": {
+    "title": "Permiso de ubicación",
+    "body": "Where Am I usa la ubicación de tu dispositivo para mostrar tu posición actual.\n\nTu ubicación se usa únicamente dentro de la app y no se comparte con nadie.\n\nPuedes continuar sin conceder el permiso.",
+    "allow": "Permitir",
+    "deny": "No gracias"
   }
 }

@@ -391,5 +391,11 @@
     "clearCacheButton": "Rensa cachad data",
     "clearCacheSuccess": "Cache rensad",
     "clearCacheSuccessMsg": "Alla cachade sökresultat har tagits bort."
+  },
+  "locationDisclosure": {
+    "title": "Platsbehörighet",
+    "body": "Where Am I använder din enhets plats för att visa din aktuella position.\n\nDin plats används bara i appen och delas inte med någon.\n\nDu kan fortsätta utan att bevilja behörighet.",
+    "allow": "Tillåt",
+    "deny": "Nej tack"
   }
 }

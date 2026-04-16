@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.1.3 — Patch Release (2026-04-16)
+
+Added Google-required Prominent Disclosure screen for location permission. A full-screen in-app modal now appears before the OS location permission dialog, clearly explaining what location data is collected, how it is used, that it is never shared, and that the user may decline. Supported in all 9 app languages.
+
+---
+
 ## v1.1.1 — Patch Release (2026-04-14)
 
 Maintenance release with bug fixes and stability improvements.

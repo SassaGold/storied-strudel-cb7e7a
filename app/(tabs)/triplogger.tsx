@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
+import { useLocationPermission } from "../../lib/locationPermission";
 import LeafletMapView from "../../components/LeafletMapView";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -68,6 +69,7 @@ export default function TripLoggerScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
+  const { requestForegroundPermission } = useLocationPermission();
 
   // Recording state
   const [recording, setRecording] = useState(false);
@@ -105,7 +107,7 @@ export default function TripLoggerScreen() {
   useEffect(() => {
     let active = true;
     const startLiveWatch = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await requestForegroundPermission();
       if (!active || status === "denied") return;
       liveSpeedWatchRef.current = await Location.watchPositionAsync(
         { accuracy: Location.Accuracy.Balanced, timeInterval: 1500 },
@@ -189,7 +191,7 @@ export default function TripLoggerScreen() {
   const startRecording = useCallback(async () => {
     setPermError(false);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
+      const { status } = await requestForegroundPermission();
       if (status !== "granted") {
         setPermError(true);
         return;

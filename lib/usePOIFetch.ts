@@ -9,6 +9,7 @@ import { Linking } from "react-native";
 import * as Location from "expo-location";
 import { fetchOverpass, CACHE_TTL_MS, parseWikiTag } from "./overpass";
 import { WIKIPEDIA_SUMMARY_URL, POI_MAX_DISPLAY, OVERPASS_DEFAULT_TIMEOUT_MS } from "./config";
+import { useLocationPermission } from "./locationPermission";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
@@ -71,6 +72,8 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   /** Unix timestamp (ms) of the cache hit, or null if data is fresh. */
   const [cacheTs, setCacheTs] = useState<number | null>(null);
 
+  const { requestForegroundPermission } = useLocationPermission();
+
   // Keep a stable ref to the latest options so loadPlaces never becomes stale.
   const optionsRef = useRef(options);
   optionsRef.current = options;
@@ -118,7 +121,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     setError(null);
 
     try {
-      const permission = await Location.requestForegroundPermissionsAsync();
+      const permission = await requestForegroundPermission();
       if (activeCallRef.current !== callId) return;
       if (permission.status !== "granted") {
         setError(locationErrorMsg);

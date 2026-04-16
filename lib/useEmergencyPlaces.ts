@@ -12,6 +12,7 @@ import {
   EMERGENCY_MAX_DISPLAY,
   EMERGENCY_AMENITY_TYPES,
 } from "./config";
+import { useLocationPermission } from "./locationPermission";
 
 // ── AsyncStorage — safe require ───────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -58,6 +59,7 @@ export type EmergencyPlace = {
  */
 export function useEmergencyPlaces() {
   const { t } = useTranslation();
+  const { requestForegroundPermission } = useLocationPermission();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +108,7 @@ export function useEmergencyPlaces() {
     setLoading(true);
     setError(null);
     try {
-      const perm = await Location.requestForegroundPermissionsAsync();
+      const perm = await requestForegroundPermission();
       if (activeCallRef.current !== callId) return;
       if (perm.status !== "granted") {
         setError(t("sos.locationError"));

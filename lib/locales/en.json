@@ -395,5 +395,11 @@
     "clearCacheButton": "Clear Cached Data",
     "clearCacheSuccess": "Cache Cleared",
     "clearCacheSuccessMsg": "All cached search results have been removed."
+  },
+  "locationDisclosure": {
+    "title": "Location Permission",
+    "body": "Where Am I uses your device's location to show your current position.\n\nYour location is used only inside the app and is not shared with anyone.\n\nYou can continue without granting permission.",
+    "allow": "Allow",
+    "deny": "No thanks"
   }
 }

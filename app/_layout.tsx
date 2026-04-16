@@ -5,6 +5,7 @@ import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 import { SettingsProvider } from "../lib/settings";
+import { LocationPermissionProvider } from "../lib/locationPermission";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -26,9 +27,11 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <SettingsProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+        <LocationPermissionProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+        </LocationPermissionProvider>
       </SettingsProvider>
     </ErrorBoundary>
   );

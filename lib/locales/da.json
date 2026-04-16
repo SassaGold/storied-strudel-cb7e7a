@@ -391,5 +391,11 @@
     "clearCacheButton": "Ryd cachelagret data",
     "clearCacheSuccess": "Cache ryddet",
     "clearCacheSuccessMsg": "Alle cachelagrede søgeresultater er fjernet."
+  },
+  "locationDisclosure": {
+    "title": "Placeringstilladelse",
+    "body": "Where Am I bruger din enheds placering til at vise din aktuelle position.\n\nDin placering bruges kun i appen og deles ikke med nogen.\n\nDu kan fortsætte uden at give tilladelse.",
+    "allow": "Tillad",
+    "deny": "Nej tak"
   }
 }
