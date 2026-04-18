@@ -121,3 +121,8 @@ export const ROAD_MAX_RESULTS = 20;
 
 /** GPS update interval for the trip logger (ms). */
 export const TRIP_LOCATION_INTERVAL_MS = 1_500;
+
+// ── Privacy ───────────────────────────────────────────────────────────────────
+
+/** Publicly hosted privacy policy URL shown in the location-disclosure modal. */
+export const PRIVACY_POLICY_URL = "https://sassagold.com/privacy";

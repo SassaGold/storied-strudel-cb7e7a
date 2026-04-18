@@ -394,7 +394,8 @@
   },
   "locationDisclosure": {
     "title": "Permiso de ubicación",
-    "body": "Where Am I usa la ubicación de tu dispositivo para mostrar tu posición actual.\n\nTu ubicación se usa únicamente dentro de la app y no se comparte con nadie.\n\nPuedes continuar sin conceder el permiso.",
+    "body": "Where Am I recopila la ubicación precisa de tu dispositivo para:\n\n• Mostrar tu posición actual y dirección\n• Encontrar comida, alojamiento, gasolineras y servicios cercanos\n• Mostrar el tiempo local y las condiciones de la carretera\n• Registrar la distancia y la ruta del viaje en el Registro de Viajes\n\nTu ubicación se procesa únicamente en el dispositivo y nunca se comparte con nadie.",
+    "privacyPolicy": "📄 Política de privacidad",
     "allow": "Permitir",
     "deny": "No gracias"
   }

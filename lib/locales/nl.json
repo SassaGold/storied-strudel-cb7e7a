@@ -394,7 +394,8 @@
   },
   "locationDisclosure": {
     "title": "Locatietoestemming",
-    "body": "Where Am I gebruikt de locatie van je apparaat om je huidige positie te tonen.\n\nJe locatie wordt alleen binnen de app gebruikt en wordt niet gedeeld met anderen.\n\nJe kunt doorgaan zonder toestemming te verlenen.",
+    "body": "Where Am I verzamelt de precieze locatie van je apparaat om:\n\n• Je huidige positie en adres te tonen\n• Nabijgelegen eten, accommodatie, tankstations en diensten te vinden\n• Lokaal weer en wegomstandigheden te tonen\n• Rijafstand en route vast te leggen in de ritregistratie\n\nJe locatie wordt alleen op het apparaat verwerkt en nooit gedeeld met anderen.",
+    "privacyPolicy": "📄 Privacybeleid",
     "allow": "Toestaan",
     "deny": "Nee bedankt"
   }

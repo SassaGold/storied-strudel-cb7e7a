@@ -394,7 +394,8 @@
   },
   "locationDisclosure": {
     "title": "Platsbehörighet",
-    "body": "Where Am I använder din enhets plats för att visa din aktuella position.\n\nDin plats används bara i appen och delas inte med någon.\n\nDu kan fortsätta utan att bevilja behörighet.",
+    "body": "Where Am I samlar in din enhets exakta plats för att:\n\n• Visa din nuvarande position och adress\n• Hitta närliggande mat, boende, bensinstationer och tjänster\n• Visa lokalt väder och vägförhållanden\n• Registrera körsträcka och rutt i reseloggen\n\nDin plats behandlas enbart på enheten och delas aldrig med någon.",
+    "privacyPolicy": "📄 Integritetspolicy",
     "allow": "Tillåt",
     "deny": "Nej tack"
   }

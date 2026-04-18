@@ -394,7 +394,8 @@
   },
   "locationDisclosure": {
     "title": "Autorisation de localisation",
-    "body": "Where Am I utilise la localisation de votre appareil pour afficher votre position actuelle.\n\nVotre position est utilisée uniquement dans l'app et n'est partagée avec personne.\n\nVous pouvez continuer sans accorder la permission.",
+    "body": "Where Am I collecte la localisation précise de votre appareil pour :\n\n• Afficher votre position actuelle et votre adresse\n• Trouver la restauration, l'hébergement, les stations-service et services à proximité\n• Afficher la météo locale et l'état des routes\n• Enregistrer la distance et l'itinéraire du trajet dans le Journal de bord\n\nVotre localisation est traitée uniquement sur l'appareil et n'est jamais partagée avec personne.",
+    "privacyPolicy": "📄 Politique de confidentialité",
     "allow": "Autoriser",
     "deny": "Non merci"
   }

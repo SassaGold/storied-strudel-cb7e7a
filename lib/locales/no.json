@@ -394,7 +394,8 @@
   },
   "locationDisclosure": {
     "title": "Posisjonstillatelse",
-    "body": "Where Am I bruker enhetens posisjon for å vise din nåværende plassering.\n\nPosisjonen din brukes kun inne i appen og deles ikke med noen.\n\nDu kan fortsette uten å gi tillatelse.",
+    "body": "Where Am I samler inn nøyaktig plassering fra enheten din for å:\n\n• Vise din nåværende posisjon og adresse\n• Finne nærliggende mat, overnatting, bensinstasjoner og tjenester\n• Vise lokalt vær og veiforhold\n• Registrere kjøreavstand og rute i turloggen\n\nPosisjonen din behandles kun på enheten og deles aldri med noen.",
+    "privacyPolicy": "📄 Personvernregler",
     "allow": "Tillat",
     "deny": "Nei takk"
   }
