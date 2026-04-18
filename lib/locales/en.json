@@ -398,7 +398,8 @@
   },
   "locationDisclosure": {
     "title": "Location Permission",
-    "body": "Where Am I uses your device's location to show your current position.\n\nYour location is used only inside the app and is not shared with anyone.\n\nYou can continue without granting permission.",
+    "body": "Where Am I collects your device's precise location to:\n\n• Show your current position and address\n• Find nearby food, accommodation, fuel stations & services\n• Display local weather and road conditions\n• Record ride distance and route in the Trip Logger\n\nYour location is processed on-device only and is never shared with anyone.",
+    "privacyPolicy": "📄 Privacy Policy",
     "allow": "Allow",
     "deny": "No thanks"
   }

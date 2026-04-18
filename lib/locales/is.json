@@ -394,7 +394,8 @@
   },
   "locationDisclosure": {
     "title": "Staðsetningarleyfi",
-    "body": "Where Am I notar staðsetningu tækis þíns til að sýna núverandi staðsetningu þína.\n\nStaðsetning þín er eingöngu notuð í appinu og er ekki deilt með neinum.\n\nÞú getur haldið áfram án þess að veita leyfi.",
+    "body": "Where Am I safnar nákvæmri staðsetningu tækis þíns til að:\n\n• Sýna núverandi staðsetningu þína og heimilisfang\n• Finna nálægar veitingastaðir, gistingar, bensínstöðvar og þjónustur\n• Sýna staðbundið veður og vegaástand\n• Skrá akstursleið og fjarlægð í ferðadagbókina\n\nStaðsetning þín er eingöngu unnin á tækinu og er aldrei deilt með neinum.",
+    "privacyPolicy": "📄 Persónuverndarstefna",
     "allow": "Leyfa",
     "deny": "Nei takk"
   }

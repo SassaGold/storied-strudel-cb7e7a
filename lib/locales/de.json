@@ -394,7 +394,8 @@
   },
   "locationDisclosure": {
     "title": "Standortberechtigung",
-    "body": "Where Am I verwendet Ihren Gerätestandort, um Ihre aktuelle Position anzuzeigen.\n\nIhr Standort wird nur in der App verwendet und nicht mit Dritten geteilt.\n\nSie können ohne Standortzugriff fortfahren.",
+    "body": "Where Am I erfasst den genauen Standort Ihres Geräts, um:\n\n• Ihre aktuelle Position und Adresse anzuzeigen\n• Nahegelegene Gastronomie, Unterkünfte, Tankstellen & Dienste zu finden\n• Lokales Wetter und Straßenzustand anzuzeigen\n• Fahrstrecke und Route im Trip-Logger aufzuzeichnen\n\nIhr Standort wird nur auf dem Gerät verarbeitet und niemals mit Dritten geteilt.",
+    "privacyPolicy": "📄 Datenschutzerklärung",
     "allow": "Erlauben",
     "deny": "Nein danke"
   }

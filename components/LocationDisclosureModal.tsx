@@ -1,5 +1,6 @@
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { PRIVACY_POLICY_URL } from "../lib/config";
 
 interface Props {
   visible: boolean;
@@ -22,6 +23,13 @@ export function LocationDisclosureModal({ visible, onAllow, onDeny }: Props) {
           <Text style={styles.icon}>📍</Text>
           <Text style={styles.title}>{t("locationDisclosure.title")}</Text>
           <Text style={styles.body}>{t("locationDisclosure.body")}</Text>
+          <Pressable
+            onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => null)}
+            accessibilityRole="link"
+            accessibilityLabel={t("locationDisclosure.privacyPolicy")}
+          >
+            <Text style={styles.privacyLink}>{t("locationDisclosure.privacyPolicy")}</Text>
+          </Pressable>
           <Pressable
             style={({ pressed }) => [styles.allowBtn, pressed && styles.allowBtnPressed]}
             onPress={onAllow}
@@ -79,7 +87,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 12,
+  },
+  privacyLink: {
+    color: "#ff6600",
+    fontSize: 13,
+    textDecorationLine: "underline",
+    textAlign: "center",
+    marginBottom: 20,
   },
   allowBtn: {
     backgroundColor: "#ff6600",
