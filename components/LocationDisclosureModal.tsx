@@ -1,4 +1,4 @@
-import { Linking, Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { PRIVACY_POLICY_URL } from "../lib/config";
 
@@ -20,32 +20,41 @@ export function LocationDisclosureModal({ visible, onAllow, onDeny }: Props) {
     >
       <View style={styles.overlay}>
         <View style={styles.card}>
-          <Text style={styles.icon}>📍</Text>
-          <Text style={styles.title}>{t("locationDisclosure.title")}</Text>
-          <Text style={styles.body}>{t("locationDisclosure.body")}</Text>
-          <Pressable
-            onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => null)}
-            accessibilityRole="link"
-            accessibilityLabel={t("locationDisclosure.privacyPolicy")}
+          <ScrollView
+            style={styles.scrollArea}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={true}
+            bounces={false}
           >
-            <Text style={styles.privacyLink}>{t("locationDisclosure.privacyPolicy")}</Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [styles.allowBtn, pressed && styles.allowBtnPressed]}
-            onPress={onAllow}
-            accessibilityRole="button"
-            accessibilityLabel={t("locationDisclosure.allow")}
-          >
-            <Text style={styles.allowBtnText}>{t("locationDisclosure.allow")}</Text>
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [styles.denyBtn, pressed && styles.denyBtnPressed]}
-            onPress={onDeny}
-            accessibilityRole="button"
-            accessibilityLabel={t("locationDisclosure.deny")}
-          >
-            <Text style={styles.denyBtnText}>{t("locationDisclosure.deny")}</Text>
-          </Pressable>
+            <Text style={styles.icon}>📍</Text>
+            <Text style={styles.title}>{t("locationDisclosure.title")}</Text>
+            <Text style={styles.body}>{t("locationDisclosure.body")}</Text>
+            <Pressable
+              onPress={() => Linking.openURL(PRIVACY_POLICY_URL).catch(() => null)}
+              accessibilityRole="link"
+              accessibilityLabel={t("locationDisclosure.privacyPolicy")}
+            >
+              <Text style={styles.privacyLink}>{t("locationDisclosure.privacyPolicy")}</Text>
+            </Pressable>
+          </ScrollView>
+          <View style={styles.actions}>
+            <Pressable
+              style={({ pressed }) => [styles.allowBtn, pressed && styles.allowBtnPressed]}
+              onPress={onAllow}
+              accessibilityRole="button"
+              accessibilityLabel={t("locationDisclosure.allow")}
+            >
+              <Text style={styles.allowBtnText}>{t("locationDisclosure.allow")}</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.denyBtn, pressed && styles.denyBtnPressed]}
+              onPress={onDeny}
+              accessibilityRole="button"
+              accessibilityLabel={t("locationDisclosure.deny")}
+            >
+              <Text style={styles.denyBtnText}>{t("locationDisclosure.deny")}</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </Modal>
@@ -68,7 +77,19 @@ const styles = StyleSheet.create({
     padding: 24,
     width: "100%",
     maxWidth: 420,
+    maxHeight: "90%",
     alignItems: "center",
+  },
+  scrollArea: {
+    width: "100%",
+  },
+  scrollContent: {
+    alignItems: "center",
+    paddingBottom: 4,
+  },
+  actions: {
+    width: "100%",
+    marginTop: 16,
   },
   icon: {
     fontSize: 40,

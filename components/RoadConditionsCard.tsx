@@ -65,11 +65,7 @@ export function RoadConditionsCard({
               if (!canOpen) return;
               Linking.openURL(
                 `https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lon}`
-              ).catch(() =>
-                Linking.openURL(
-                  `https://maps.apple.com/?q=${alert.lat},${alert.lon}`
-                ).catch(() => null)
-              );
+              ).catch(() => null);
             };
             return (
               <Pressable

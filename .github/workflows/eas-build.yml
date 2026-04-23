@@ -1,8 +1,8 @@
 name: EAS Build
 
-# Trigger a full native EAS build:
+# Trigger a full native EAS Android build:
 #   • Automatically on version tags (v1.2.3)
-#   • On demand via workflow_dispatch (choose platform + profile)
+#   • On demand via workflow_dispatch (choose profile)
 #
 # Requires an EXPO_TOKEN repository secret with a personal access token
 # that has permission to build the project on Expo's servers.
@@ -16,11 +16,9 @@ on:
       platform:
         description: 'Platform to build'
         required: true
-        default: all
+        default: android
         type: choice
         options:
-          - all
-          - ios
           - android
       profile:
         description: 'EAS build profile'
@@ -37,7 +35,7 @@ permissions:
 
 jobs:
   build:
-    name: EAS Build (${{ github.event.inputs.platform || 'all' }} / ${{ github.event.inputs.profile || 'production' }})
+    name: EAS Build (${{ github.event.inputs.platform || 'android' }} / ${{ github.event.inputs.profile || 'production' }})
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository at the triggering commit
@@ -61,6 +59,6 @@ jobs:
       - name: Run EAS Build
         run: |
           eas build \
-            --platform ${{ github.event.inputs.platform || 'all' }} \
+            --platform ${{ github.event.inputs.platform || 'android' }} \
             --profile ${{ github.event.inputs.profile || 'production' }} \
             --non-interactive

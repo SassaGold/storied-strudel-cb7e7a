@@ -174,7 +174,6 @@ export default function AboutScreen() {
                 "Expo",
                 "React Native",
                 "expo-location",
-                "react-native-maps",
                 "AsyncStorage",
                 "i18next",
               ].map((lib) => (
