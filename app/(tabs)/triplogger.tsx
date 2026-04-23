@@ -69,7 +69,7 @@ export default function TripLoggerScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
-  const { requestForegroundPermission } = useLocationPermission();
+  const { requestForegroundPermission, requestBackgroundPermission } = useLocationPermission();
 
   // Recording state
   const [recording, setRecording] = useState(false);
@@ -219,8 +219,9 @@ export default function TripLoggerScreen() {
       }
 
       // Request background permission so the trip continues recording while the
-      // screen is locked. If denied we still proceed with foreground-only tracking.
-      await Location.requestBackgroundPermissionsAsync().catch(() => null);
+      // screen is locked. Disclosure is shown before the OS dialog; if denied
+      // we still proceed with foreground-only tracking.
+      await requestBackgroundPermission().catch(() => null);
 
       Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium)?.catch(() => null);
 
