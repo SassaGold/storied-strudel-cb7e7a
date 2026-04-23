@@ -252,7 +252,7 @@ export default function TripLoggerScreen() {
       }
       console.log("Has started:", await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME));
 
-      // Start the background location task (Android foreground service + iOS bg mode).
+      // Start the background location task (Android foreground service).
       // This ensures GPS points are captured even when the screen is locked.
       try {
         const bgGranted = (await Location.getBackgroundPermissionsAsync()).status === "granted";

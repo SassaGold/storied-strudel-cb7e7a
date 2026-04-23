@@ -30,11 +30,10 @@ const Haptics: typeof import("expo-haptics") | null = (() => {
   }
 })();
 
-/** Modern sans-serif font family: SF Pro on iOS, Roboto Black on Android, Inter on web */
+/** Modern sans-serif font family: Roboto Black on Android, Inter on web */
 const LOGO_FONT = Platform.select({
-  ios: "-apple-system",
   android: "sans-serif-black",
-  web: "Inter, -apple-system, system-ui, sans-serif",
+  web: "Inter, system-ui, sans-serif",
 });
 
 export default function Index() {
