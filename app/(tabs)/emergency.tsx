@@ -136,6 +136,8 @@ export default function EmergencyScreen() {
       Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
     }
   }, [t, requestForegroundPermission]);
+
+  const filtered =
     selected === "all"
       ? places
       : places.filter((p) => p.category === selected);
