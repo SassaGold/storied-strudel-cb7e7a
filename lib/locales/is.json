@@ -394,7 +394,7 @@
   },
   "locationDisclosure": {
     "title": "Staðsetningarleyfi",
-    "body": "Where Am I notar nákvæma staðsetningu tækis þins til að:\n\n• Sýna núverandi staðsetningu þina og heimilisfang á kortinu\n• Finna nálægar veitingastaðir, gistingar, bensínstöðvar og þjónustur\n• Sýna staðbundinn veður og vegaástand\n• Skrá ferðir í bakgrunni fyrir ferðadagbókina\n• Virkja SOS-viðvaranir og neyðarstaðsetningardeilingu\n\nBakgrunnsstaðsetning er aðeins notuð meðan ferðadagbókin er virk.\n\nStaðsetningargögn þin eru eingöngu notuð fyrir þessa eiginleika, eru ekki seld og eru aldrei deilt með þriðja aðila.\n\nSmelltu á „Halda áfram“ til að halda áfram til staðsetningaleyfisbeiðninnar.",
+    "body": "Where Am I notar nákvæma staðsetningu tækis þins til að:\n\n• Sýna núverandi staðsetningu þina og heimilisfang á kortinu\n• Finna nálægar veitingastaðir, gistingar, bensínstöðvar og þjónustur\n• Sýna staðbundið veður og vegaástand\n• Skrá ferðir í bakgrunni fyrir ferðadagbókina\n• Virkja SOS-viðvaranir og neyðarstaðsetningardeilingu\n\nBakgrunnsstaðsetning er aðeins notuð meðan ferðadagbókin er virk.\n\nStaðsetningargögn þin eru eingöngu notuð fyrir þessa eiginleika, eru ekki seld og eru aldrei deilt með þriðja aðila.\n\nSmelltu á „Halda áfram“ til að halda áfram til staðsetningaleyfisbeiðninnar.",
     "privacyPolicy": "📄 Persónuverndarstefna",
     "allow": "Halda áfram",
     "deny": "Nei takk"
