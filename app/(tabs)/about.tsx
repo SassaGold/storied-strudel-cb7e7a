@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
+import { PRIVACY_POLICY_URL } from "../../lib/config";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -158,7 +159,7 @@ export default function AboutScreen() {
             <Text style={styles.cardBody}>{t("about.privacyP4")}</Text>
             <LinkRow
               label={t("about.privacyPolicyLink")}
-              url="https://sassagold.com/privacy"
+              url={PRIVACY_POLICY_URL}
               openLabel={t("about.openLink")}
             />
           </View>
