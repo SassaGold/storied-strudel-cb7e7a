@@ -96,8 +96,11 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
     }
     if (current.status === "granted") return current;
 
-    // Show the Prominent Disclosure before the OS dialog, reusing the same
-    // modal infrastructure as foreground (the body already mentions background).
+    // If a disclosure is already showing (e.g. a concurrent foreground request),
+    // reuse the same Promise so we never open a second modal or overwrite
+    // resolveRef. Sequential callers (the only realistic pattern in this app)
+    // will each create their own Promise since handleAllow/handleDeny clear
+    // pendingRef.current before resolving.
     if (!pendingRef.current) {
       pendingRef.current = new Promise<boolean>((resolve) => {
         resolveRef.current = resolve;
