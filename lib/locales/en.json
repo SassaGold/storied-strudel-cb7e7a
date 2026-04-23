@@ -398,9 +398,9 @@
   },
   "locationDisclosure": {
     "title": "Location Permission",
-    "body": "Where Am I uses your device's precise location to:\n\n• Show your current position and address on the map\n• Find nearby food, accommodation, fuel stations & services\n• Display local weather and road conditions\n• Record rides in the background for Trip Logger\n• Enable SOS alerts and emergency location sharing\n\nBackground location is used only while Trip Logger is active.\n\nYour location data is used only for these features, is never sold, and is never shared with third parties.\n\nTap “Continue” to proceed to the permission request.",
+    "body": "Where Am I uses your device's precise location to:\n\n• Show your current position and address on the map\n• Find nearby food, accommodation, fuel stations & services\n• Display local weather and road conditions\n• Record rides even when the app is closed or not in use (Trip Logger)\n• Enable SOS alerts and emergency location sharing\n\nYour location is accessed in the background — even when the app is closed or not in use — only while Trip Logger is active.\n\nLocation coordinates are sent to mapping and weather services (OpenStreetMap, Open-Meteo) solely to power these features. Your data is never sold and is never shared for advertising purposes.\n\nTap “Allow & Continue” to proceed to the permission request.",
     "privacyPolicy": "📄 Privacy Policy",
-    "allow": "Continue",
+    "allow": "Allow & Continue",
     "deny": "No thanks"
   }
 }

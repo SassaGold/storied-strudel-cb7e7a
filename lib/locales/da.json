@@ -394,9 +394,9 @@
   },
   "locationDisclosure": {
     "title": "Placeringstilladelse",
-    "body": "Where Am I bruger din enheds præcise placering til at:\n\n• Vise din aktuelle position og adresse på kortet\n• Finde nærliggende mad, overnatning, tankstationer og tjenester\n• Vise lokalt vejr og vejforhold\n• Registrere ture i baggrunden for turudskriften\n• Aktivere SOS-advarsler og nødplacering\n\nBaggrundslokation bruges kun, mens turudskriften er aktiv.\n\nDine placeringsdata bruges kun til disse funktioner, sælges ikke og deles aldrig med tredjeparter.\n\nTryk på “Fortsæt” for at fortsætte til placeringstilladelsesanmodningen.",
+    "body": "Where Am I bruger din enheds præcise placering til at:\n\n• Vise din aktuelle position og adresse på kortet\n• Finde nærliggende mad, overnatning, tankstationer og tjenester\n• Vise lokalt vejr og vejforhold\n• Registrere ture, selv når appen er lukket eller ikke bruges (turudskriften)\n• Aktivere SOS-advarsler og nødplacering\n\nDin placering tilgås i baggrunden — selv når appen er lukket eller ikke bruges — kun mens turudskriften er aktiv.\n\nPlaceringskoordinater sendes til kortlægnings- og vejrtjenester (OpenStreetMap, Open-Meteo) udelukkende for at levere disse funktioner. Dine data sælges ikke og deles aldrig til reklamemæssige formål.\n\nTryk på „Tillad og fortsæt“ for at fortsætte til placeringstilladelsesanmodningen.",
     "privacyPolicy": "📄 Privatlivspolitik",
-    "allow": "Fortsæt",
+    "allow": "Tillad og fortsæt",
     "deny": "Nej tak"
   }
 }
