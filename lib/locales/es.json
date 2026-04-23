@@ -394,9 +394,9 @@
   },
   "locationDisclosure": {
     "title": "Permiso de ubicación",
-    "body": "Where Am I recopila la ubicación precisa de tu dispositivo para:\n\n• Mostrar tu posición actual y dirección\n• Encontrar comida, alojamiento, gasolineras y servicios cercanos\n• Mostrar el tiempo local y las condiciones de la carretera\n• Registrar la distancia y la ruta del viaje en el Registro de Viajes\n\nTu ubicación se procesa únicamente en el dispositivo y nunca se comparte con nadie.",
+    "body": "Where Am I utiliza la ubicación precisa de tu dispositivo para:\n\n• Mostrar tu posición actual y dirección en el mapa\n• Encontrar comida, alojamiento, gasolineras y servicios cercanos\n• Mostrar el tiempo local y las condiciones de la carretera\n• Registrar viajes en segundo plano para el Registro de Viajes\n• Activar alertas SOS y compartir ubicación en emergencias\n\nLa ubicación en segundo plano se usa solo mientras el Registro de Viajes está activo.\n\nTus datos de ubicación se usan únicamente para estas funciones, no se venden y nunca se comparten con terceros.\n\nToca “Continuar” para proceder a la solicitud de permiso de ubicación.",
     "privacyPolicy": "📄 Política de privacidad",
-    "allow": "Permitir",
+    "allow": "Continuar",
     "deny": "No gracias"
   }
 }

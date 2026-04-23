@@ -394,9 +394,9 @@
   },
   "locationDisclosure": {
     "title": "Staðsetningarleyfi",
-    "body": "Where Am I safnar nákvæmri staðsetningu tækis þíns til að:\n\n• Sýna núverandi staðsetningu þína og heimilisfang\n• Finna nálægar veitingastaðir, gistingar, bensínstöðvar og þjónustur\n• Sýna staðbundið veður og vegaástand\n• Skrá akstursleið og fjarlægð í ferðadagbókina\n\nStaðsetning þín er eingöngu unnin á tækinu og er aldrei deilt með neinum.",
+    "body": "Where Am I notar nákvæma staðsetningu tækis þins til að:\n\n• Sýna núverandi staðsetningu þina og heimilis-fang á kortinu\n• Finna nælægar veitingastaðir, gistingar, bensínstöðvar og þJónustur\n• Sýna staðbundinn veður og vegastand\n• Skrá ferðir í bakgrunni fyrir ferðadagbókina\n• Virkja SOS-viðvaranir og neyðarstaðsetningardeiling\n\nBakgrunnsstaðsetning er aðeins notunn meðan ferðadagbókin er virk.\n\nStaðsetningargögn þin eru eingongu notunn fyrir þessa eiginleika, eru ekki seld og eru aldrei deilt með þriðja aðila.\n\nStyðjið á „Halda áfram“ til að halda áfram til staðsetningarleyfisBeiðninnar.",
     "privacyPolicy": "📄 Persónuverndarstefna",
-    "allow": "Leyfa",
+    "allow": "Halda áfram",
     "deny": "Nei takk"
   }
 }
