@@ -1,32 +1,39 @@
-name: SassaGold CI/CD
+name: CI
+
+# Runs lint and tests on every push to main.
+# Production AAB builds are handled by eas-build.yml (triggered by v* tags).
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  lint-and-test:
+    name: Lint & Test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout latest commit
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - name: Lint
+        run: npm run lint
 
-      # ⭐ THIS IS WHERE YOU USE YOUR EXPO_TOKEN
-      - name: Authenticate with EAS
-        run: eas login --token ${{ secrets.EXPO_TOKEN }}
-
-      - name: Build Android
-        run: eas build --platform android --profile production --non-interactive
+      - name: Test
+        run: npm test -- --passWithNoTests

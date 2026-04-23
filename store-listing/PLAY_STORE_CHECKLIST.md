@@ -7,7 +7,7 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.whereami`
-- [x] App version: `2.0.0` (in `app.json` and `package.json`)
+- [x] App version: `1.1.3` (in `app.json` and `package.json`)
 - [x] Android `versionCode`: auto-incremented by EAS on each production build via `autoIncrement: true` in `eas.json`
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
