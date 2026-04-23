@@ -27,15 +27,20 @@ import * as Location from "expo-location";
 import { LocationDisclosureModal } from "../components/LocationDisclosureModal";
 
 type PermissionResult = Awaited<ReturnType<typeof Location.requestForegroundPermissionsAsync>>;
+type BackgroundPermissionResult = Awaited<ReturnType<typeof Location.requestBackgroundPermissionsAsync>>;
 
 interface LocationPermissionCtx {
   /** Drop-in replacement for Location.requestForegroundPermissionsAsync(). */
   requestForegroundPermission: () => Promise<PermissionResult>;
+  /** Drop-in replacement for Location.requestBackgroundPermissionsAsync().
+   *  Always shows the Prominent Disclosure before the OS dialog. */
+  requestBackgroundPermission: () => Promise<BackgroundPermissionResult>;
 }
 
 const LocationPermissionContext = createContext<LocationPermissionCtx>({
   // Fallback for components rendered outside the provider (e.g. Storybook / tests).
   requestForegroundPermission: () => Location.requestForegroundPermissionsAsync(),
+  requestBackgroundPermission: () => Location.requestBackgroundPermissionsAsync(),
 });
 
 export function useLocationPermission(): LocationPermissionCtx {
@@ -80,6 +85,47 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
     return Location.requestForegroundPermissionsAsync();
   }, []);
 
+  const requestBackgroundPermission = useCallback(async (): Promise<BackgroundPermissionResult> => {
+    // If background permission is already granted there is no need to show the disclosure.
+    let current: BackgroundPermissionResult;
+    try {
+      current = await Location.getBackgroundPermissionsAsync();
+    } catch {
+      // Background permissions API not available on this platform (e.g. web).
+      return { status: "denied" as const, granted: false, canAskAgain: false, expires: "never" };
+    }
+    if (current.status === "granted") return current;
+
+    // If a disclosure is already showing (e.g. a concurrent foreground request),
+    // reuse the same Promise so we never open a second modal or overwrite
+    // resolveRef. Sequential callers (the only realistic pattern in this app)
+    // will each create their own Promise since handleAllow/handleDeny clear
+    // pendingRef.current before resolving.
+    if (!pendingRef.current) {
+      pendingRef.current = new Promise<boolean>((resolve) => {
+        resolveRef.current = resolve;
+        setModalVisible(true);
+      });
+    }
+
+    const allowed = await pendingRef.current;
+
+    if (!allowed) {
+      return {
+        status: "denied" as const,
+        granted: false,
+        canAskAgain: current.canAskAgain,
+        expires: current.expires,
+      };
+    }
+
+    try {
+      return await Location.requestBackgroundPermissionsAsync();
+    } catch {
+      return { status: "denied" as const, granted: false, canAskAgain: false, expires: "never" };
+    }
+  }, []);
+
   const handleAllow = useCallback(() => {
     setModalVisible(false);
     pendingRef.current = null;
@@ -95,7 +141,7 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
   }, []);
 
   return (
-    <LocationPermissionContext.Provider value={{ requestForegroundPermission }}>
+    <LocationPermissionContext.Provider value={{ requestForegroundPermission, requestBackgroundPermission }}>
       {children}
       <LocationDisclosureModal
         visible={modalVisible}

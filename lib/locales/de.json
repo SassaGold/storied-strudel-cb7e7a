@@ -394,9 +394,9 @@
   },
   "locationDisclosure": {
     "title": "Standortberechtigung",
-    "body": "Where Am I erfasst den genauen Standort Ihres Geräts, um:\n\n• Ihre aktuelle Position und Adresse anzuzeigen\n• Nahegelegene Gastronomie, Unterkünfte, Tankstellen & Dienste zu finden\n• Lokales Wetter und Straßenzustand anzuzeigen\n• Fahrstrecke und Route im Trip-Logger aufzuzeichnen\n\nIhr Standort wird nur auf dem Gerät verarbeitet und niemals mit Dritten geteilt.",
+    "body": "Where Am I verwendet den genauen Standort Ihres Geräts, um:\n\n• Ihre aktuelle Position und Adresse auf der Karte anzuzeigen\n• Nahegelegene Gastronomie, Unterkünfte, Tankstellen & Dienste zu finden\n• Lokales Wetter und Straßenzustand anzuzeigen\n• Fahrten aufzuzeichnen, auch wenn die App geschlossen oder nicht in Verwendung ist (Tourenprotokoll)\n• SOS-Alarme und Notfall-Standortfreigabe zu aktivieren\n\nAuf Ihren Standort wird im Hintergrund zugegriffen — auch wenn die App geschlossen oder nicht in Verwendung ist — nur wenn das Tourenprotokoll aktiv ist.\n\nStandortkoordinaten werden an Karten- und Wetterdienste (OpenStreetMap, Open-Meteo) übermittelt, ausschließlich um diese Funktionen bereitzustellen. Ihre Daten werden nicht verkauft und nie zu Werbezwecken weitergegeben.\n\nTippen Sie auf „Erlauben und weiter“, um zur Standortberechtigungsanfrage zu gelangen.",
     "privacyPolicy": "📄 Datenschutzerklärung",
-    "allow": "Erlauben",
+    "allow": "Erlauben und weiter",
     "deny": "Nein danke"
   }
 }

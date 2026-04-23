@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyPlaces";
+import { useLocationPermission } from "../../lib/locationPermission";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -70,6 +71,7 @@ export default function EmergencyScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
+  const { requestForegroundPermission } = useLocationPermission();
 
   // Data from hook (loading, error, places, fromCache, cacheTs, userLocation, loadPlaces)
   const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch } =
@@ -108,7 +110,7 @@ export default function EmergencyScreen() {
 
   const shareLocation = useCallback(async () => {
     try {
-      const perm = await Location.requestForegroundPermissionsAsync();
+      const perm = await requestForegroundPermission();
       if (perm.status !== "granted") {
         Alert.alert(t("sos.permissionAlert"), t("sos.locationPermissionMsg"));
         return;
@@ -133,7 +135,7 @@ export default function EmergencyScreen() {
     } catch {
       Alert.alert(t("sos.shareFailed"), t("sos.shareFailedMsg"));
     }
-  }, [t]);
+  }, [t, requestForegroundPermission]);
 
   const filtered =
     selected === "all"

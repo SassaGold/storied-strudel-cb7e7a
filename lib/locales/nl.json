@@ -394,9 +394,9 @@
   },
   "locationDisclosure": {
     "title": "Locatietoestemming",
-    "body": "Where Am I verzamelt de precieze locatie van je apparaat om:\n\n• Je huidige positie en adres te tonen\n• Nabijgelegen eten, accommodatie, tankstations en diensten te vinden\n• Lokaal weer en wegomstandigheden te tonen\n• Rijafstand en route vast te leggen in de ritregistratie\n\nJe locatie wordt alleen op het apparaat verwerkt en nooit gedeeld met anderen.",
+    "body": "Where Am I gebruikt de precieze locatie van je apparaat om:\n\n• Je huidige positie en adres op de kaart te tonen\n• Nabijgelegen eten, accommodatie, tankstations en diensten te vinden\n• Lokaal weer en wegomstandigheden te tonen\n• Ritten vast te leggen, zelfs wanneer de app gesloten of niet in gebruik is (ritregistratie)\n• SOS-meldingen en noodlocatiedeling in te schakelen\n\nJe locatie wordt op de achtergrond benaderd — zelfs wanneer de app gesloten of niet in gebruik is — alleen terwijl de ritregistratie actief is.\n\nLocatiecoördinaten worden verzonden naar kaart- en weerdiensten (OpenStreetMap, Open-Meteo) uitsluitend om deze functies te ondersteunen. Je gegevens worden niet verkocht en nooit gedeeld voor reclamedoeleinden.\n\nTik op “Toestaan en doorgaan” om verder te gaan naar het locatiemachtigingsverzoek.",
     "privacyPolicy": "📄 Privacybeleid",
-    "allow": "Toestaan",
+    "allow": "Toestaan en doorgaan",
     "deny": "Nee bedankt"
   }
 }

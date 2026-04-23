@@ -394,9 +394,9 @@
   },
   "locationDisclosure": {
     "title": "Platsbehörighet",
-    "body": "Where Am I samlar in din enhets exakta plats för att:\n\n• Visa din nuvarande position och adress\n• Hitta närliggande mat, boende, bensinstationer och tjänster\n• Visa lokalt väder och vägförhållanden\n• Registrera körsträcka och rutt i reseloggen\n\nDin plats behandlas enbart på enheten och delas aldrig med någon.",
+    "body": "Where Am I använder din enhets exakta plats för att:\n\n• Visa din nuvarande position och adress på kartan\n• Hitta närliggande mat, boende, bensinstationer och tjänster\n• Visa lokalt väder och vägförhållanden\n• Registrera turer även när appen är stängd eller inte används (reseloggen)\n• Aktivera SOS-larm och nödplatsdelning\n\nDin plats används i bakgrunden — även när appen är stängd eller inte används — endast medan reseloggen är aktiv.\n\nPlatskoordinater skickas till kart- och vädertjänster (OpenStreetMap, Open-Meteo) enbart för att tillhandahålla dessa funktioner. Dina data säljs inte och delas aldrig i marknadsföringssyfte.\n\nTryck på “Tillåt och fortsätt” för att gå vidare till platsbehörighetsförfrågan.",
     "privacyPolicy": "📄 Integritetspolicy",
-    "allow": "Tillåt",
+    "allow": "Tillåt och fortsätt",
     "deny": "Nej tack"
   }
 }

@@ -394,9 +394,9 @@
   },
   "locationDisclosure": {
     "title": "Autorisation de localisation",
-    "body": "Where Am I collecte la localisation précise de votre appareil pour :\n\n• Afficher votre position actuelle et votre adresse\n• Trouver la restauration, l'hébergement, les stations-service et services à proximité\n• Afficher la météo locale et l'état des routes\n• Enregistrer la distance et l'itinéraire du trajet dans le Journal de bord\n\nVotre localisation est traitée uniquement sur l'appareil et n'est jamais partagée avec personne.",
+    "body": "Where Am I utilise la localisation précise de votre appareil pour :\n\n• Afficher votre position actuelle et votre adresse sur la carte\n• Trouver la restauration, l’hébergement, les stations-service et services à proximité\n• Afficher la météo locale et l’état des routes\n• Enregistrer les trajets même lorsque l’application est fermée ou non utilisée (Journal de bord)\n• Activer les alertes SOS et le partage de position d’urgence\n\nVotre localisation est accédée en arrière-plan — même lorsque l’application est fermée ou non utilisée — uniquement lorsque le Journal de bord est actif.\n\nLes coordonnées de localisation sont envoyées à des services de cartographie et météo (OpenStreetMap, Open-Meteo) uniquement pour alimenter ces fonctionnalités. Vos données ne sont jamais vendues et ne sont jamais partagées à des fins publicitaires.\n\nAppuyez sur « Autoriser et continuer » pour accéder à la demande d’autorisation de localisation.",
     "privacyPolicy": "📄 Politique de confidentialité",
-    "allow": "Autoriser",
+    "allow": "Autoriser et continuer",
     "deny": "Non merci"
   }
 }
