@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Where Am I \u2013 Explore. Ride. Discover",
+    "name": "Where Am I – Explore. Ride. Discover",
     "slug": "where-am-i",
-    "version": "1.1.3",
+    "version": "1.1.4",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "whereami",
