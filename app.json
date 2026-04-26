@@ -2,7 +2,7 @@
   "expo": {
     "name": "Where Am I – Explore. Ride. Discover",
     "slug": "where-am-i",
-    "version": "1.1.4",
+    "version": "2.0.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "whereami",
