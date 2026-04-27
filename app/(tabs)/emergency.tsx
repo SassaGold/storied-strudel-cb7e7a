@@ -73,8 +73,8 @@ export default function EmergencyScreen() {
   const insets = useSafeAreaInsets();
   const { requestForegroundPermission } = useLocationPermission();
 
-  // Data from hook (loading, error, places, fromCache, cacheTs, userLocation, loadPlaces)
-  const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch } =
+  // Data from hook (loading, error, places, fromCache, cacheTs, loadPlaces)
+  const { loading, error, places, fromCache, cacheTs, loadPlaces, cancelSearch } =
     useEmergencyPlaces();
 
   // Cancel any in-progress search when the user navigates away from this tab.
@@ -87,7 +87,6 @@ export default function EmergencyScreen() {
   // UI state
   const [selected, setSelected] = useState("all");
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
   // Quick action state
   const [torchOn, setTorchOn] = useState(false);
   const [instructionsVisible, setInstructionsVisible] = useState(false);

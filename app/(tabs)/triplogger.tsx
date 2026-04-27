@@ -140,7 +140,7 @@ export default function TripLoggerScreen() {
       liveSpeedWatchRef.current?.remove();
       liveSpeedWatchRef.current = null;
     };
-  }, []);
+  }, [requestForegroundPermission]);
 
   const loadRides = async () => {
     if (!AsyncStorage) return;
@@ -325,7 +325,7 @@ export default function TripLoggerScreen() {
       setRecording(false);
       Alert.alert(t("triplog.startErrorTitle"), t("triplog.startErrorMsg"));
     }
-  }, [t]);
+  }, [t, requestForegroundPermission, requestBackgroundPermission]);
 
   const stopRecording = useCallback(async () => {
     try {
