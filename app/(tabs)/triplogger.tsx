@@ -527,36 +527,6 @@ export default function TripLoggerScreen() {
             </Text>
           )}
 
-          {/* Inline map while recording — shows from first GPS point */}
-          {recording && route.length === 0 && (
-            <View style={styles.inlineMapPlaceholder}>
-              <Text style={styles.mapWaitText}>📍 Waiting for GPS…</Text>
-            </View>
-          )}
-          {recording && route.length >= 1 && (
-            <View style={styles.inlineMap}>
-              <LeafletMapView
-                style={StyleSheet.absoluteFill}
-                region={(() => {
-                  const lats = route.map((p) => p.latitude);
-                  const lons = route.map((p) => p.longitude);
-                  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-                  const minLon = Math.min(...lons), maxLon = Math.max(...lons);
-                  const pad = 0.001;
-                  return {
-                    latitude: (minLat + maxLat) / 2,
-                    longitude: (minLon + maxLon) / 2,
-                    latitudeDelta: Math.max(maxLat - minLat + pad, 0.004),
-                    longitudeDelta: Math.max(maxLon - minLon + pad, 0.004),
-                  };
-                })()}
-                route={route}
-                scrollEnabled={false}
-                zoomEnabled={false}
-              />
-            </View>
-          )}
-
           {/* Start / Stop button — large, rounded, bold color */}
           <Pressable
             style={({ pressed }) => [
@@ -889,29 +859,6 @@ const styles = StyleSheet.create({
     color: "#555",
     textAlign: "center",
     marginBottom: 4,
-  },
-  // Inline map while recording
-  inlineMapPlaceholder: {
-    width: "100%",
-    height: 60,
-    borderRadius: 10,
-    backgroundColor: "#111",
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 10,
-  },
-  mapWaitText: {
-    color: "#555",
-    fontSize: 13,
-    fontStyle: "italic",
-  },
-  inlineMap: {
-    width: "100%",
-    height: 200,
-    borderRadius: 10,
-    overflow: "hidden",
-    marginVertical: 12,
-    backgroundColor: "#222",
   },
   // Start / Stop button — large, bold, rounded
   mainBtn: {
