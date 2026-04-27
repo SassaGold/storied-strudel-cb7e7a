@@ -638,7 +638,7 @@ export default function TripLoggerScreen() {
             </View>
           )}
           {mapRide && (
-            <View style={styles.modalStats}>
+            <View style={[styles.modalStats, { paddingBottom: Math.max(insets.bottom, 16) }]}>
               <Text style={styles.modalStat}>📏 {fmtDist(mapRide.distanceKm, settings.unitSystem)}</Text>
               <Text style={styles.modalStat}>⏱ {formatDuration(mapRide.durationMs)}</Text>
               <Text style={styles.modalStat}>⚡ {fmtSpeed(mapRide.avgSpeedKmh, settings.unitSystem)}</Text>
