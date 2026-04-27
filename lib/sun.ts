@@ -73,7 +73,9 @@ export function computeSunTimes(
 /** Format a Date as HH:MM (24-hour clock). Returns "--:--" on failure. */
 export const formatTime = (date: Date): string => {
   try {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+    const result = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+    // Some V8/ICU versions return "24:00" for midnight; normalize to "00:00"
+    return result.replace(/^24:/, "00:");
   } catch {
     return "--:--";
   }
