@@ -162,8 +162,8 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       } catch {}
     } catch (err) {
       if (activeCallRef.current !== callId) return;
-      const suffix = err instanceof Error && err.message ? ` (${err.message})` : "";
-      setError(loadErrorMsg + suffix);
+      console.error("[usePOIFetch] loadPlaces failed:", err);
+      setError(loadErrorMsg);
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }
