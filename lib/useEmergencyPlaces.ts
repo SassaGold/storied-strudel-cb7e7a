@@ -1,16 +1,17 @@
 // ── lib/useEmergencyPlaces.ts ─────────────────────────────────────────────────
 // Data-fetching hook for the Emergency (SOS) screen.
-// Encapsulates location, Overpass POI query, caching and state management.
+// Encapsulates location, HERE Places POI query, caching and state management.
 
 import { useCallback, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
-import { haversineMeters, fetchOverpass, CACHE_TTL_MS } from "./overpass";
+import { haversineMeters, withRetry, CACHE_TTL_MS } from "./overpass";
+import { fetchHereDiscover, type HerePlaceItem, hereItemOpeningHours, hereItemPhone, hereItemWebsite } from "./herePlaces";
 import {
   EMERGENCY_SEARCH_RADIUS_M,
   EMERGENCY_MAX_RESULTS,
   EMERGENCY_MAX_DISPLAY,
-  EMERGENCY_AMENITY_TYPES,
+  HERE_DEFAULT_TIMEOUT_MS,
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
 
@@ -30,14 +31,6 @@ const CACHE_KEY = "cache_emergency_v2";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-type OverpassElement = {
-  id: number;
-  lat?: number;
-  lon?: number;
-  center?: { lat: number; lon: number };
-  tags?: Record<string, string>;
-};
-
 export type EmergencyPlace = {
   id: string;
   name: string;
@@ -55,7 +48,7 @@ export type EmergencyPlace = {
 
 /**
  * Manages fetching, caching and state for emergency services POIs.
- * Uses fetchOverpass (multi-mirror with per-endpoint timeout) for resilience.
+ * Uses HERE Places discover API for emergency-location discovery.
  */
 export function useEmergencyPlaces() {
   const { t } = useTranslation();
@@ -122,55 +115,51 @@ export function useEmergencyPlaces() {
       const { latitude, longitude } = pos.coords;
       setUserLocation({ latitude, longitude });
 
-      const overpassQuery = `
-[out:json][timeout:30];
-(
-  node(around:${EMERGENCY_SEARCH_RADIUS_M},${latitude},${longitude})[amenity~"${EMERGENCY_AMENITY_TYPES}"];
-  way(around:${EMERGENCY_SEARCH_RADIUS_M},${latitude},${longitude})[amenity~"${EMERGENCY_AMENITY_TYPES}"];
-  relation(around:${EMERGENCY_SEARCH_RADIUS_M},${latitude},${longitude})[amenity~"${EMERGENCY_AMENITY_TYPES}"];
-);
-out center ${EMERGENCY_MAX_RESULTS};`;
-
-      const data = await fetchOverpass(overpassQuery);
+      const items = await withRetry(() =>
+        fetchHereDiscover(
+          "hospital clinic doctor pharmacy police fire station ambulance",
+          latitude,
+          longitude,
+          EMERGENCY_SEARCH_RADIUS_M,
+          EMERGENCY_MAX_RESULTS,
+          HERE_DEFAULT_TIMEOUT_MS
+        )
+      );
       if (activeCallRef.current !== callId) return;
 
-      if (!data.elements) {
-        setPlaces([]);
-        return;
-      }
+      const mapEmergencyCategory = (item: HerePlaceItem): string => {
+        const haystack = [
+          item.title,
+          ...(item.categories ?? []).flatMap((c) => [c.id, c.name]),
+        ]
+          .join(" ")
+          .toLowerCase();
+        if (haystack.includes("hospital")) return "hospital";
+        if (haystack.includes("clinic")) return "clinic";
+        if (haystack.includes("doctor")) return "doctors";
+        if (haystack.includes("pharmacy")) return "pharmacy";
+        if (haystack.includes("police")) return "police";
+        if (haystack.includes("fire")) return "fire_station";
+        if (haystack.includes("ambulance")) return "ambulance_station";
+        return "other";
+      };
 
-      const mapped = (data.elements as OverpassElement[])
-        .map((el) => {
-          const lat = el.lat ?? el.center?.lat;
-          const lon = el.lon ?? el.center?.lon;
+      const mapped = items
+        .map((item) => {
+          const lat = item.position?.lat;
+          const lon = item.position?.lng;
           if (lat === undefined || lon === undefined) return null;
-          const tags = el.tags ?? {};
           return {
-            id: String(el.id),
-            name: tags.name || tags.amenity || "Emergency Service",
-            category: tags.amenity || "other",
+            id: item.id || `${lat},${lon},${item.title || "emergency"}`,
+            name: item.title || "Emergency Service",
+            category: mapEmergencyCategory(item),
             latitude: lat,
             longitude: lon,
             distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-            phone:
-              (
-                tags.phone ||
-                tags["contact:phone"] ||
-                tags["contact:mobile"] ||
-                ""
-              ).trim() || undefined,
-            address:
-              [
-                tags["addr:housenumber"],
-                tags["addr:street"],
-                tags["addr:city"],
-              ]
-                .filter(Boolean)
-                .join(" ") || undefined,
-            openingHours: (tags.opening_hours || "").trim() || undefined,
-            website:
-              (tags.website || tags["contact:website"] || "").trim() ||
-              undefined,
+            phone: hereItemPhone(item),
+            address: item.address?.label,
+            openingHours: hereItemOpeningHours(item),
+            website: hereItemWebsite(item),
           } as EmergencyPlace;
         })
         .filter(Boolean) as EmergencyPlace[];

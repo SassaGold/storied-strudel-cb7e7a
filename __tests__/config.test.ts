@@ -4,6 +4,7 @@
 import {
   HERE_GEOCODING_BASE_URL,
   HERE_MAP_TILE_BASE_URL,
+  HERE_DISCOVER_BASE_URL,
   OPEN_METEO_BASE_URL,
   YR_NO_BASE_URL,
   YR_NO_FALLBACK_URL,
@@ -11,6 +12,7 @@ import {
   OVERPASS_ENDPOINTS,
   OVERPASS_DEFAULT_TIMEOUT_MS,
   OVERPASS_ROAD_TIMEOUT_MS,
+  HERE_DEFAULT_TIMEOUT_MS,
   EMERGENCY_SEARCH_RADIUS_M,
   EMERGENCY_MAX_RESULTS,
   EMERGENCY_MAX_DISPLAY,
@@ -48,6 +50,11 @@ describe("API URL constants", () => {
   it("HERE_MAP_TILE_BASE_URL is a valid HTTPS URL pointing to HERE", () => {
     expect(HERE_MAP_TILE_BASE_URL).toMatch(/^https:\/\//);
     expect(HERE_MAP_TILE_BASE_URL).toContain("hereapi.com");
+  });
+
+  it("HERE_DISCOVER_BASE_URL is a valid HTTPS URL pointing to HERE", () => {
+    expect(HERE_DISCOVER_BASE_URL).toMatch(/^https:\/\//);
+    expect(HERE_DISCOVER_BASE_URL).toContain("hereapi.com");
   });
 
   it("OPEN_METEO_BASE_URL is a valid HTTPS URL", () => {
@@ -96,6 +103,11 @@ describe("Overpass constants", () => {
   it("OVERPASS_ROAD_TIMEOUT_MS is a positive number less than OVERPASS_DEFAULT_TIMEOUT_MS", () => {
     expect(OVERPASS_ROAD_TIMEOUT_MS).toBeGreaterThan(0);
     expect(OVERPASS_ROAD_TIMEOUT_MS).toBeLessThan(OVERPASS_DEFAULT_TIMEOUT_MS);
+  });
+
+  it("HERE_DEFAULT_TIMEOUT_MS is positive and sane", () => {
+    expect(HERE_DEFAULT_TIMEOUT_MS).toBeGreaterThan(0);
+    expect(HERE_DEFAULT_TIMEOUT_MS).toBeLessThan(120_000);
   });
 });
 

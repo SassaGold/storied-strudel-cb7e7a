@@ -3,42 +3,48 @@ import { useTranslation } from "react-i18next";
 import POIScreen from "../../components/POIScreen";
 import { haversineMeters } from "../../lib/overpass";
 import type { Place } from "../../lib/usePOIFetch";
+import {
+  type HerePlaceItem,
+  hereItemEmail,
+  hereItemOpeningHours,
+  hereItemPhone,
+  hereItemPrimaryCategory,
+  hereItemWebsite,
+} from "../../lib/herePlaces";
 
 // ── Hotels / Accommodation POI tab ────────────────────────────────────────────
 
-const ACCOMMODATION_TYPES =
-  "hotel|motel|hostel|guest_house|apartment|chalet|resort|camp_site|caravan_site|alpine_hut|wilderness_hut|villa|bungalow";
+const SEARCH_QUERY =
+  "hotel motel hostel guest house apartment chalet resort campsite caravan park alpine hut villa bungalow";
 
 const CACHE_KEY = "cache_hotels_v2";
 
-const buildOverpassQuery = (lat: number, lon: number, radiusM: number) => `
-[out:json][timeout:25];
-(
-  node(around:${radiusM},${lat},${lon})[tourism~"${ACCOMMODATION_TYPES}"];
-  way(around:${radiusM},${lat},${lon})[tourism~"${ACCOMMODATION_TYPES}"];
-  relation(around:${radiusM},${lat},${lon})[tourism~"${ACCOMMODATION_TYPES}"];
-);
-out center 120;`;
+const buildSearchQuery = (_lat: number, _lon: number, _radiusM: number) => SEARCH_QUERY;
 
-const mapElement = (element: any, userLat: number, userLon: number): Place | null => {
-  const lat = element.lat ?? element.center?.lat;
-  const lon = element.lon ?? element.center?.lon;
+const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Place | null => {
+  const lat = item.position?.lat;
+  const lon = item.position?.lng;
   if (lat === undefined || lon === undefined) return null;
-  const tags = element.tags ?? {};
+  const categoryRaw = (hereItemPrimaryCategory(item) || "hotel").toLowerCase();
+  const category =
+    categoryRaw.includes("motel") ? "motel" :
+    categoryRaw.includes("hostel") ? "hostel" :
+    categoryRaw.includes("guest") ? "guest_house" :
+    categoryRaw.includes("camp") ? "camp_site" :
+    categoryRaw.includes("resort") ? "resort" :
+    "hotel";
   return {
-    id: String(element.id),
-    name: tags.name || tags.tourism || "Accommodation",
-    category: tags.tourism || "hotel",
+    id: item.id || `${lat},${lon},${item.title || "hotel"}`,
+    name: item.title || "Accommodation",
+    category,
     latitude: lat,
     longitude: lon,
     distanceMeters: haversineMeters(userLat, userLon, lat, lon),
-    stars: tags.stars || tags["stars:official"] || undefined,
-    website: (tags.website || tags["contact:website"] || "").trim() || undefined,
-    phone: (tags.phone || tags["contact:phone"] || "").trim() || undefined,
-    email: (tags.email || tags["contact:email"] || "").trim() || undefined,
-    address: [tags["addr:housenumber"], tags["addr:street"], tags["addr:city"]].filter(Boolean).join(" ") || undefined,
-    openingHours: (tags.opening_hours || "").trim() || undefined,
-    wikipedia: (tags.wikipedia || "").trim() || undefined,
+    website: hereItemWebsite(item),
+    phone: hereItemPhone(item),
+    email: hereItemEmail(item),
+    address: item.address?.label,
+    openingHours: hereItemOpeningHours(item),
   };
 };
 
@@ -47,8 +53,8 @@ export default function HotelsScreen() {
   return (
     <POIScreen
       cacheKey={CACHE_KEY}
-      buildOverpassQuery={buildOverpassQuery}
-      mapElement={mapElement}
+      buildSearchQuery={buildSearchQuery}
+      mapPlaceItem={mapPlaceItem}
       i18nPrefix="sleep"
       renderExtraListTag={(place) =>
         place.stars ? (

@@ -16,6 +16,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { haversineMeters, parseWikiTag, CACHE_TTL_MS } from "../../lib/overpass";
 import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
+import {
+  type HerePlaceItem,
+  hereItemEmail,
+  hereItemOpeningHours,
+  hereItemPhone,
+  hereItemPrimaryCategory,
+  hereItemWebsite,
+} from "../../lib/herePlaces";
 
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -29,38 +37,24 @@ const AsyncStorage: any = (() => { try { return require("@react-native-async-sto
 /** AsyncStorage key for the last selected category — persists across restarts. */
 const MC_SELECTED_KEY = "mc_selected_v1";
 
-// OSM tags that indicate which fuel types a station carries
-const FUEL_TYPE_TAGS: [string, string][] = [
-  ["fuel:diesel", "Diesel"],
-  ["fuel:octane_95", "95"],
-  ["fuel:octane_98", "98"],
-  ["fuel:lpg", "LPG"],
-  ["fuel:cng", "CNG"],
-  ["fuel:e10", "E10"],
-  ["fuel:e85", "E85"],
-  ["fuel:adblue", "AdBlue"],
-  ["fuel:electric", "EV"],
-];
-
-// Per-category fetch timeouts must exceed the Overpass server-side [timeout:N] value.
+// Per-category fetch timeouts (HERE Places discover).
 const CATEGORY_FETCH_TIMEOUT_MS: Record<string, number> = {
-  services: 40000,     // Overpass [timeout:25] + 15 s buffer
-  fuel: 40000,         // Overpass [timeout:25] + 15 s buffer
-  parking: 40000,      // Overpass [timeout:25] + 15 s buffer
-  clubs_tracks: 45000, // Overpass [timeout:30] + 15 s buffer
-  atm_bank: 40000,     // Overpass [timeout:25] + 15 s buffer
+  services: 15000,
+  fuel: 15000,
+  parking: 15000,
+  clubs_tracks: 15000,
+  atm_bank: 15000,
 };
 
 type Category = "services" | "fuel" | "parking" | "clubs_tracks" | "atm_bank";
 
-const CATEGORY_RADIUS_M = {
+const CATEGORY_RADIUS_M: Record<Category, number> = {
   services: 30000,
   fuel: 20000,
-  parking_general: 5000,
-  parking_moto: 10000,
+  parking: 10000,
   clubs_tracks: 50000,
   atm_bank: 5000,
-} as const;
+};
 
 const CATEGORY_KEYS: Category[] = ["services", "fuel", "parking", "clubs_tracks", "atm_bank"];
 
@@ -97,147 +91,42 @@ const CATEGORY_ICONS: Record<Category, string> = {
   atm_bank:     "🏧",
 };
 
-// ── Element mapping ───────────────────────────────────────────────────────────
+// ── HERE item mapping ─────────────────────────────────────────────────────────
 
 const mapMcElement = (
-  element: any,
+  item: HerePlaceItem,
   latitude: number,
   longitude: number,
   fallbackCategory: string
 ): Place | null => {
-  const lat = element.lat ?? element.center?.lat;
-  const lon = element.lon ?? element.center?.lon;
+  const lat = item.position?.lat;
+  const lon = item.position?.lng;
   if (lat === undefined || lon === undefined) return null;
-  const tags = element.tags ?? {};
-  const name = tags.name || tags.brand || tags.operator || fallbackCategory;
-  const note = tags.fee === "no" ? "FREE_PARKING" : undefined;
-  const category =
-    tags.shop || tags.amenity || tags.tourism || tags.club || tags.leisure || tags.craft || fallbackCategory;
-  const fuelTypes: string[] = [];
-  for (const [tag, label] of FUEL_TYPE_TAGS) {
-    if (tags[tag] === "yes") fuelTypes.push(label);
-  }
+  const category = (hereItemPrimaryCategory(item) || fallbackCategory).toLowerCase();
   return {
-    id: String(element.id),
-    name,
+    id: item.id || `${lat},${lon},${item.title || fallbackCategory}`,
+    name: item.title || fallbackCategory,
     category,
     latitude: lat,
     longitude: lon,
     distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-    note,
-    website: (tags.website || tags["contact:website"] || "").trim() || undefined,
-    phone: (tags.phone || tags["contact:phone"] || "").trim() || undefined,
-    email: (tags.email || tags["contact:email"] || "").trim() || undefined,
-    address: [tags["addr:housenumber"], tags["addr:street"], tags["addr:city"]].filter(Boolean).join(" ") || undefined,
-    openingHours: (tags.opening_hours || "").trim() || undefined,
-    wikipedia: (tags.wikipedia || "").trim() || undefined,
-    fuelTypes: fuelTypes.length > 0 ? fuelTypes : undefined,
+    note: category.includes("parking") ? "FREE_PARKING" : undefined,
+    website: hereItemWebsite(item),
+    phone: hereItemPhone(item),
+    email: hereItemEmail(item),
+    address: item.address?.label,
+    openingHours: hereItemOpeningHours(item),
   };
 };
 
-// ── Overpass query builder ────────────────────────────────────────────────────
+// ── HERE query builder ────────────────────────────────────────────────────────
 
-const buildQuery = (category: Category, lat: number, lon: number): string => {
-  if (category === "services") {
-    const r = CATEGORY_RADIUS_M.services;
-    return `
-[out:json][timeout:25];
-(
-  node(around:${r},${lat},${lon})[shop=motorcycle];
-  way(around:${r},${lat},${lon})[shop=motorcycle];
-  relation(around:${r},${lat},${lon})[shop=motorcycle];
-  node(around:${r},${lat},${lon})[shop=motorbike];
-  way(around:${r},${lat},${lon})[shop=motorbike];
-  relation(around:${r},${lat},${lon})[shop=motorbike];
-  node(around:${r},${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
-  way(around:${r},${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
-  relation(around:${r},${lat},${lon})[shop=motor_vehicle][motorcycle=yes];
-  node(around:${r},${lat},${lon})[shop=motorcycle_repair];
-  way(around:${r},${lat},${lon})[shop=motorcycle_repair];
-  relation(around:${r},${lat},${lon})[shop=motorcycle_repair];
-  node(around:${r},${lat},${lon})[craft=motorcycle_repair];
-  way(around:${r},${lat},${lon})[craft=motorcycle_repair];
-  relation(around:${r},${lat},${lon})[craft=motorcycle_repair];
-  node(around:${r},${lat},${lon})[shop=motorcycle_parts];
-  way(around:${r},${lat},${lon})[shop=motorcycle_parts];
-  relation(around:${r},${lat},${lon})[shop=motorcycle_parts];
-  node(around:${r},${lat},${lon})[shop=motorbike_parts];
-  way(around:${r},${lat},${lon})[shop=motorbike_parts];
-  relation(around:${r},${lat},${lon})[shop=motorbike_parts];
-  node(around:${r},${lat},${lon})[shop=motorcycle_accessories];
-  way(around:${r},${lat},${lon})[shop=motorcycle_accessories];
-  relation(around:${r},${lat},${lon})[shop=motorcycle_accessories];
-  node(around:${r},${lat},${lon})[amenity=motorcycle_rental];
-  way(around:${r},${lat},${lon})[amenity=motorcycle_rental];
-  relation(around:${r},${lat},${lon})[amenity=motorcycle_rental];
-  node(around:${r},${lat},${lon})[shop=motorcycle_rental];
-  way(around:${r},${lat},${lon})[shop=motorcycle_rental];
-  relation(around:${r},${lat},${lon})[shop=motorcycle_rental];
-  node(around:${r},${lat},${lon})[craft=car_repair][motorcycle=yes];
-  way(around:${r},${lat},${lon})[craft=car_repair][motorcycle=yes];
-  relation(around:${r},${lat},${lon})[craft=car_repair][motorcycle=yes];
-  node(around:${r},${lat},${lon})[amenity=car_repair][motorcycle=yes];
-  way(around:${r},${lat},${lon})[amenity=car_repair][motorcycle=yes];
-  relation(around:${r},${lat},${lon})[amenity=car_repair][motorcycle=yes];
-);
-out center 120;`;
-  }
-  if (category === "fuel") {
-    const r = CATEGORY_RADIUS_M.fuel;
-    return `
-[out:json][timeout:25];
-(
-  node(around:${r},${lat},${lon})[amenity=fuel];
-  way(around:${r},${lat},${lon})[amenity=fuel];
-  relation(around:${r},${lat},${lon})[amenity=fuel];
-);
-out center 120;`;
-  }
-  if (category === "parking") {
-    const rg = CATEGORY_RADIUS_M.parking_general;
-    const rm = CATEGORY_RADIUS_M.parking_moto;
-    return `
-[out:json][timeout:25];
-(
-  node(around:${rg},${lat},${lon})[amenity=parking];
-  way(around:${rg},${lat},${lon})[amenity=parking];
-  relation(around:${rg},${lat},${lon})[amenity=parking];
-  node(around:${rm},${lat},${lon})[amenity=motorcycle_parking];
-  way(around:${rm},${lat},${lon})[amenity=motorcycle_parking];
-  relation(around:${rm},${lat},${lon})[amenity=motorcycle_parking];
-);
-out center 120;`;
-  }
-  // clubs_tracks
-  if (category === "clubs_tracks") {
-    const r = CATEGORY_RADIUS_M.clubs_tracks;
-    return `
-[out:json][timeout:30];
-(
-  node(around:${r},${lat},${lon})[club=motorcycle];
-  way(around:${r},${lat},${lon})[club=motorcycle];
-  relation(around:${r},${lat},${lon})[club=motorcycle];
-  node(around:${r},${lat},${lon})[leisure=motorcycle_track];
-  way(around:${r},${lat},${lon})[leisure=motorcycle_track];
-  relation(around:${r},${lat},${lon})[leisure=motorcycle_track];
-  node(around:${r},${lat},${lon})[sport=motorcycling];
-  way(around:${r},${lat},${lon})[sport=motorcycling];
-  relation(around:${r},${lat},${lon})[sport=motorcycling];
-);
-out center 120;`;
-  }
-  // atm_bank
-  const r = CATEGORY_RADIUS_M.atm_bank;
-  return `
-[out:json][timeout:25];
-(
-  node(around:${r},${lat},${lon})[amenity=atm];
-  way(around:${r},${lat},${lon})[amenity=atm];
-  node(around:${r},${lat},${lon})[amenity=bank];
-  way(around:${r},${lat},${lon})[amenity=bank];
-  relation(around:${r},${lat},${lon})[amenity=bank];
-);
-out center 120;`;
+const buildQuery = (category: Category, _lat: number, _lon: number): string => {
+  if (category === "services") return "motorcycle service repair dealer parts accessories rental";
+  if (category === "fuel") return "fuel station gas station petrol station";
+  if (category === "parking") return "motorcycle parking parking";
+  if (category === "clubs_tracks") return "motorcycle club race track kart track motor sports";
+  return "atm bank";
 };
 
 const fallbackLabel = (category: Category): string => {
@@ -278,12 +167,12 @@ export default function McScreen() {
     openInfo,
   } = usePOIFetch({
     cacheKey: `cache_mc_v2_${selected}`,
-    buildOverpassQuery: (lat, lon) => buildQuery(selected, lat, lon),
-    mapElement: (el, lat, lon) => mapMcElement(el, lat, lon, fallbackLabel(selected)),
+    buildSearchQuery: (lat, lon, _radiusM) => buildQuery(selected, lat, lon),
+    mapPlaceItem: (item, lat, lon) => mapMcElement(item, lat, lon, fallbackLabel(selected)),
     locationErrorMsg: t("garage.locationError"),
     loadErrorMsg: t("garage.loadError"),
-    searchRadiusKm: settings.searchRadiusKm,
-    fetchTimeoutMs: CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 45000,
+    searchRadiusKm: CATEGORY_RADIUS_M[selected] / 1000,
+    fetchTimeoutMs: CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 15000,
   });
 
   // Cancel any in-progress search when the user navigates away from this tab.

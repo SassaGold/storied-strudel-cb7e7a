@@ -1,14 +1,15 @@
 // ── Shared POI data-fetching hook ────────────────────────────────────────────
 // Used by restaurants, hotels, attractions, and mc tabs.
 // Encapsulates: state management, AsyncStorage caching, location permission,
-// Overpass API fetching, distance sorting, Google Maps navigation, and the
+// HERE Places API fetching, distance sorting, Google Maps navigation, and the
 // Wikipedia info modal fetch.
 
 import { useCallback, useRef, useState } from "react";
 import { Linking } from "react-native";
 import * as Location from "expo-location";
-import { fetchOverpass, CACHE_TTL_MS, parseWikiTag } from "./overpass";
-import { WIKIPEDIA_SUMMARY_URL, POI_MAX_DISPLAY, OVERPASS_DEFAULT_TIMEOUT_MS } from "./config";
+import { withRetry, CACHE_TTL_MS, parseWikiTag } from "./overpass";
+import { WIKIPEDIA_SUMMARY_URL, POI_MAX_DISPLAY, HERE_DEFAULT_TIMEOUT_MS } from "./config";
+import { fetchHereDiscover, type HerePlaceItem } from "./herePlaces";
 import { useLocationPermission } from "./locationPermission";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -37,27 +38,28 @@ export type Place = {
   fuelTypes?: string[];
 };
 
-/** Builds an Overpass QL query string from the user's coordinates and radius. */
-export type BuildOverpassQuery = (lat: number, lon: number, radiusM: number) => string;
+/** Builds a HERE discover query string from the user's coordinates and radius. */
+export type BuildSearchQuery = (lat: number, lon: number, radiusM: number) => string;
 
-/** Maps a single raw Overpass element to a Place, or returns null to discard it. */
-export type MapElement = (element: any, userLat: number, userLon: number) => Place | null;
+/** Maps a single HERE place item to a Place, or returns null to discard it. */
+export type MapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number) => Place | null;
 
 export interface UsePOIFetchOptions {
   cacheKey: string;
-  buildOverpassQuery: BuildOverpassQuery;
-  mapElement: MapElement;
+  buildSearchQuery: BuildSearchQuery;
+  mapPlaceItem: MapPlaceItem;
   locationErrorMsg: string;
   loadErrorMsg: string;
   searchRadiusKm: number;
   fetchTimeoutMs?: number;
+  fetchLimit?: number;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 /**
  * Shared hook for all POI screens.
- * Manages state, caching, GPS location, Overpass fetch, and info-modal wiki lookup.
+ * Manages state, caching, GPS location, HERE Places fetch, and info-modal wiki lookup.
  */
 export function usePOIFetch(options: UsePOIFetchOptions) {
   const [loading, setLoading] = useState(false);
@@ -92,12 +94,13 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
 
     const {
       cacheKey,
-      buildOverpassQuery,
-      mapElement,
+      buildSearchQuery,
+      mapPlaceItem,
       locationErrorMsg,
       loadErrorMsg,
       searchRadiusKm,
-      fetchTimeoutMs = OVERPASS_DEFAULT_TIMEOUT_MS,
+      fetchTimeoutMs = HERE_DEFAULT_TIMEOUT_MS,
+      fetchLimit = 120,
     } = optionsRef.current;
 
     // Serve cached data immediately so the user sees something while refreshing.
@@ -137,12 +140,14 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       setUserLocation({ latitude, longitude });
 
       const radiusM = searchRadiusKm * 1000;
-      const query = buildOverpassQuery(latitude, longitude, radiusM);
-      const data = await fetchOverpass(query, fetchTimeoutMs);
+      const query = buildSearchQuery(latitude, longitude, radiusM);
+      const items = await withRetry(
+        () => fetchHereDiscover(query, latitude, longitude, radiusM, fetchLimit, fetchTimeoutMs)
+      );
       if (activeCallRef.current !== callId) return;
 
-      const mapped = ((data.elements ?? []) as any[])
-        .map((el) => mapElement(el, latitude, longitude))
+      const mapped = items
+        .map((item) => mapPlaceItem(item, latitude, longitude))
         .filter(Boolean) as Place[];
 
       const sorted = mapped
