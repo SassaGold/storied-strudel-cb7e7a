@@ -5,9 +5,13 @@
 
 // ── API base URLs ─────────────────────────────────────────────────────────────
 
-/** Nominatim reverse-geocoding (OpenStreetMap). No API key required. */
-export const NOMINATIM_BASE_URL =
-  "https://nominatim.openstreetmap.org/reverse?format=jsonv2";
+/** HERE Reverse Geocoding API base URL. Requires EXPO_PUBLIC_HERE_API_KEY. */
+export const HERE_GEOCODING_BASE_URL =
+  "https://revgeocode.search.hereapi.com/v1/revgeocode";
+
+/** HERE Map Tiles v3 base URL (used by LeafletMapView). Requires EXPO_PUBLIC_HERE_API_KEY. */
+export const HERE_MAP_TILE_BASE_URL =
+  "https://maps.hereapi.com/v3/base/mc";
 
 /** Open-Meteo weather forecast. No API key required. */
 export const OPEN_METEO_BASE_URL = "https://api.open-meteo.com/v1/forecast";

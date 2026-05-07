@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Platform, StyleProp, ViewStyle } from "react-native";
 import WebView from "react-native-webview";
+import { HERE_MAP_TILE_BASE_URL } from "../lib/config";
 
 export interface GpsPoint {
   latitude: number;
@@ -43,6 +44,8 @@ function buildHtml(region: MapRegion, route: GpsPoint[], interactive: boolean): 
   const coordsJson = JSON.stringify(
     route.map((p) => [safeNum(p.latitude, 0), safeNum(p.longitude, 0)])
   );
+  const hereApiKey = process.env.EXPO_PUBLIC_HERE_API_KEY ?? "";
+  const tileUrl = `${HERE_MAP_TILE_BASE_URL}/{z}/{x}/{y}/png8?apiKey=${hereApiKey}`;
   return `<!DOCTYPE html>
 <html><head>
 <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
@@ -60,7 +63,7 @@ var map=L.map('map',{
   doubleClickZoom:false,
   attributionControl:false
 }).setView([${lat},${lng}],${zoom});
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,errorTileUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}).addTo(map);
+L.tileLayer('${tileUrl}',{maxZoom:20,errorTileUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='}).addTo(map);
 var routeLine=null;
 function setRoute(coords){
   if(routeLine){map.removeLayer(routeLine);routeLine=null;}

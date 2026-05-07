@@ -341,9 +341,6 @@
     "title": "DATA OG PRIVATLIV",
     "subtitle": "Hvor data kommer fra, og hvordan dit privatliv beskyttes.",
     "dataSources": "DATAKILDER",
-    "osm": "OpenStreetMap",
-    "osmDesc": "Alle POI-data — restauranter, hoteller, tankstationer, MC-forhandlere, nødtjenester — kommer fra OpenStreetMap via Overpass API. OpenStreetMap er en gratis, åben database over verden vedligeholdt af frivillige. Ingen API-nøgle kræves.",
-    "osmLicense": "© OpenStreetMap-bidragsydere · ODbL-licens",
     "overpass": "Overpass API",
     "overpassDesc": "Forespørgsler til OpenStreetMap-data køres via Overpass API (overpass-api.de og spejlendepunkter). Gratis at bruge, ingen konto kræves.",
     "weather": "Open-Meteo",
@@ -353,7 +350,7 @@
     "wikipediaDesc": "Stedsbeskrivelser hentes fra Wikipedia REST API, hvor et Wikipedia-tag er tilgængeligt i OpenStreetMap-data. Wikipedia-indhold er licenseret under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia-bidragsydere · CC BY-SA",
     "maps": "Kort og navigation",
-    "mapsDesc": "Kortet i appen bruger Leaflet.js (open source, CartoDB-tiles) vist i en WebView via react-native-webview. At trykke 'Åbn i kort' åbner din standardkortapp. Ingen Google Maps API-nøgle kræves.",
+    "mapsDesc": "Kortet i appen bruger Leaflet.js med HERE Map Tiles gengivet i en WebView via react-native-webview. Tryk på 'Åbn i Kort' åbner din standard kortapp.",
     "privacy": "PRIVATLIV",
     "privacyTitle": "Dit privatliv",
     "privacyP1": "Denne app indsamler, overfører eller deler ikke personlige data. Der er ingen analyse, ingen crash-reportere og ingen reklameprogrammer.",
@@ -370,7 +367,9 @@
     "updateAvailable": "⬇️ Opdatering tilgængelig — installerer…",
     "updateLatest": "✅ Du er opdateret",
     "updateError": "❌ Opdateringstjek mislykkedes",
-    "privacyPolicyLink": "📄 Privatlivspolitik"
+    "privacyPolicyLink": "📄 Privatlivspolitik",
+    "here": "HERE Maps",
+    "hereDesc": "Din nuværende adresse hentes via HERE Geocoding API. Kortet i appen bruger HERE Map Tiles via Leaflet.js. HERE er en førende kort- og stedsplatform. Kræver en HERE API-nøgle."
   },
   "settings": {
     "badge": "⚙️ INDSTILLINGER",

@@ -92,14 +92,13 @@ export default function AboutScreen() {
         {/* Data Sources */}
         <Section title={t("about.dataSources")}>
 
-          {/* OpenStreetMap */}
+          {/* HERE Maps */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>🗺️ {t("about.osm")}</Text>
-            <Text style={styles.cardBody}>{t("about.osmDesc")}</Text>
-            <Text style={styles.licenseText}>{t("about.osmLicense")}</Text>
+            <Text style={styles.cardTitle}>🗺️ {t("about.here")}</Text>
+            <Text style={styles.cardBody}>{t("about.hereDesc")}</Text>
             <LinkRow
-              label="openstreetmap.org"
-              url="https://www.openstreetmap.org"
+              label="developer.here.com"
+              url="https://developer.here.com"
               openLabel={t("about.openLink")}
             />
           </View>

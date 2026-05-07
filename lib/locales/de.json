@@ -341,9 +341,6 @@
     "title": "DATEN & DATENSCHUTZ",
     "subtitle": "Woher die Daten kommen und wie deine Privatsphäre geschützt wird.",
     "dataSources": "DATENQUELLEN",
-    "osm": "OpenStreetMap",
-    "osmDesc": "Alle POI-Daten — Restaurants, Hotels, Tankstellen, MC-Händler, Notfalldienste — stammen von OpenStreetMap über die Overpass API. OpenStreetMap ist eine freie, offene Weltkarte von Freiwilligen.",
-    "osmLicense": "© OpenStreetMap-Mitwirkende · ODbL-Lizenz",
     "overpass": "Overpass API",
     "overpassDesc": "Abfragen an OpenStreetMap-Daten werden über die Overpass API ausgeführt. Kostenlos, kein Konto erforderlich.",
     "weather": "Open-Meteo",
@@ -353,7 +350,7 @@
     "wikipediaDesc": "Ortsbeschreibungen werden von der Wikipedia-REST-API abgerufen, wenn ein Wikipedia-Tag in den OpenStreetMap-Daten vorhanden ist.",
     "wikiLicense": "© Wikipedia-Mitwirkende · CC BY-SA",
     "maps": "Karten & Navigation",
-    "mapsDesc": "Die In-App-Karte verwendet Leaflet.js (Open Source, CartoDB-Kacheln) in einer WebView via react-native-webview. Beim Tippen auf 'In Karten öffnen' wird deine Standard-Karten-App geöffnet. Kein Google Maps API-Schlüssel erforderlich.",
+    "mapsDesc": "Die In-App-Karte verwendet Leaflet.js mit HERE Map Tiles in einer WebView via react-native-webview. Beim Tippen auf 'In Karten öffnen' wird deine Standard-Karten-App geöffnet.",
     "privacy": "DATENSCHUTZ",
     "privacyTitle": "Deine Privatsphäre",
     "privacyP1": "Diese App sammelt, überträgt oder teilt keine persönlichen Daten. Keine Analysen, keine Absturzberichte, keine Werbe-SDKs.",
@@ -370,7 +367,9 @@
     "updateAvailable": "⬇️ Update verfügbar — wird installiert…",
     "updateLatest": "✅ Du bist aktuell",
     "updateError": "❌ Update-Prüfung fehlgeschlagen",
-    "privacyPolicyLink": "📄 Datenschutzerklärung"
+    "privacyPolicyLink": "📄 Datenschutzerklärung",
+    "here": "HERE Maps",
+    "hereDesc": "Deine aktuelle Adresse wird über die HERE Geocoding API ermittelt. Die In-App-Karte verwendet HERE Map Tiles über Leaflet.js. HERE ist eine führende Karten- und Standortdatenplattform. Erfordert einen HERE API-Schlüssel."
   },
   "settings": {
     "badge": "⚙️ EINSTELLUNGEN",

@@ -345,9 +345,6 @@
     "title": "DATA & PRIVACY",
     "subtitle": "Where data comes from and how your privacy is protected.",
     "dataSources": "DATA SOURCES",
-    "osm": "OpenStreetMap",
-    "osmDesc": "All POI data — restaurants, hotels, fuel stations, MC dealers, emergency services — comes from OpenStreetMap via the Overpass API. OpenStreetMap is a free, open database of the world maintained by volunteers worldwide. No API key required.",
-    "osmLicense": "© OpenStreetMap contributors · ODbL License",
     "overpass": "Overpass API",
     "overpassDesc": "Queries to OpenStreetMap data are run through the Overpass API (overpass-api.de and mirror endpoints). Free to use, no account required.",
     "weather": "Open-Meteo",
@@ -357,7 +354,7 @@
     "wikipediaDesc": "Place descriptions are fetched from the Wikipedia REST API where a Wikipedia tag is available in OpenStreetMap data. Wikipedia content is licensed under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia contributors · CC BY-SA",
     "maps": "Maps & Navigation",
-    "mapsDesc": "The in-app map uses Leaflet.js (open-source, CartoDB tiles) rendered inside a WebView via react-native-webview. Tapping 'Open in Maps' deeplinks to your default maps app. No Google Maps API key is required.",
+    "mapsDesc": "The in-app map uses Leaflet.js with HERE Map Tiles rendered inside a WebView via react-native-webview. Tapping 'Open in Maps' deeplinks to your default maps app.",
     "privacy": "PRIVACY",
     "privacyTitle": "Your Privacy",
     "privacyP1": "This app does not collect, transmit, or share any personal data. There are no analytics, no crash reporters, and no advertising SDKs.",
@@ -374,7 +371,9 @@
     "updateAvailable": "⬇️ Update available — installing…",
     "updateLatest": "✅ You're up to date",
     "updateError": "❌ Update check failed",
-    "privacyPolicyLink": "📄 Privacy Policy"
+    "privacyPolicyLink": "📄 Privacy Policy",
+    "here": "HERE Maps",
+    "hereDesc": "Your current location address is reverse-geocoded using the HERE Geocoding API. The in-app map uses HERE Map Tiles via Leaflet.js. HERE is a leading mapping and location-data platform. Requires a HERE API key."
   },
   "settings": {
     "badge": "⚙️ SETTINGS",

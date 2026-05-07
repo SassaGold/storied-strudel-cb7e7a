@@ -9,7 +9,7 @@ import { withRetry, fetchOverpass } from "./overpass";
 import { useSettings } from "./settings";
 import { useLocationPermission } from "./locationPermission";
 import {
-  NOMINATIM_BASE_URL,
+  HERE_GEOCODING_BASE_URL,
   OPEN_METEO_BASE_URL,
   YR_NO_BASE_URL,
   YR_NO_FALLBACK_URL,
@@ -112,21 +112,25 @@ export function useRiderHQ(): RiderHQState {
 
       const { latitude, longitude } = position.coords;
 
-      // ── Nominatim — free reverse geocoding, retried up to 3 times ────────
+      // ── HERE Geocoding — reverse geocoding, retried up to 3 times ────────
+      const hereApiKey = process.env.EXPO_PUBLIC_HERE_API_KEY ?? "";
       const addressPromise = withRetry(() =>
         fetch(
-          `${NOMINATIM_BASE_URL}&lat=${latitude}&lon=${longitude}`,
-          { headers: { "User-Agent": "where-am-i-app" } }
+          `${HERE_GEOCODING_BASE_URL}?at=${latitude},${longitude}&lang=en&apiKey=${hereApiKey}`
         )
           .then((r) => {
-            if (!r.ok) throw new Error(`Nominatim ${r.status}`);
+            if (!r.ok) throw new Error(`HERE Geocoding ${r.status}`);
             return r.json();
           })
-          .then((data) => ({
-            displayName: data.display_name as string,
-            city: data.address?.city || data.address?.town || data.address?.village,
-            country: data.address?.country,
-          }))
+          .then((data) => {
+            const item = data.items?.[0];
+            if (!item) return null;
+            return {
+              displayName: item.title as string,
+              city: item.address?.city || item.address?.county,
+              country: item.address?.countryName,
+            };
+          })
       ).catch(() => null);
 
       // ── Open-Meteo — free weather API, retried up to 3 times ─────────────
