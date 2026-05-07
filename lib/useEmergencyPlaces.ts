@@ -135,13 +135,12 @@ export function useEmergencyPlaces() {
           { key: "pharmacy", category: "pharmacy" },
           { key: "police", category: "police" },
           { key: "fire station", category: "fire_station" },
-          { key: "fire_station", category: "fire_station" },
           { key: "ambulance", category: "ambulance_station" },
         ];
         const categoryFields = (item.categories ?? [])
           .flatMap((c) => [c.id, c.name])
           .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
-          .map((v) => v.toLowerCase());
+          .map((v) => v.toLowerCase().replace(/_/g, " "));
         for (const rule of rules) {
           if (categoryFields.some((value) => value.includes(rule.key))) {
             return rule.category;

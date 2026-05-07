@@ -110,7 +110,6 @@ const mapMcElement = (
     latitude: lat,
     longitude: lon,
     distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-    note: category.includes("parking") ? "FREE_PARKING" : undefined,
     website: hereItemWebsite(item),
     phone: hereItemPhone(item),
     email: hereItemEmail(item),
