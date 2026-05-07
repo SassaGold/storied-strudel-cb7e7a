@@ -14,6 +14,11 @@ import {
 // and OVERPASS_ENDPOINTS from this module keep working unchanged.
 export { OVERPASS_ENDPOINTS, CACHE_TTL_MS_CFG as CACHE_TTL_MS };
 
+const OVERPASS_RETRYABLE_STATUS = new Set([403, 429, 500, 502, 503, 504]);
+const OVERPASS_ENDPOINT_COOLDOWN_MS = 5 * 60 * 1_000;
+const endpointCooldownUntil = new Map<string, number>();
+let endpointRoundRobinStart = 0;
+
 /** Haversine formula: returns the great-circle distance in metres. */
 export function haversineMeters(
   lat1: number,
@@ -40,7 +45,23 @@ export async function fetchOverpass(
   timeoutMs: number = OVERPASS_DEFAULT_TIMEOUT_MS
 ): Promise<any> {
   let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
+  if (OVERPASS_ENDPOINTS.length === 0) {
+    throw new Error("Overpass request failed");
+  }
+
+  const now = Date.now();
+  const orderedEndpoints = OVERPASS_ENDPOINTS.map(
+    (_, idx) => OVERPASS_ENDPOINTS[(endpointRoundRobinStart + idx) % OVERPASS_ENDPOINTS.length]
+  );
+  endpointRoundRobinStart = (endpointRoundRobinStart + 1) % OVERPASS_ENDPOINTS.length;
+
+  const preferred = orderedEndpoints.filter(
+    (endpoint) => (endpointCooldownUntil.get(endpoint) ?? 0) <= now
+  );
+  // If all mirrors are currently cooling down, still attempt all to avoid lockout.
+  const endpointsToTry = preferred.length > 0 ? preferred : orderedEndpoints;
+
+  for (const endpoint of endpointsToTry) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -54,9 +75,18 @@ export async function fetchOverpass(
       });
       clearTimeout(timeoutId);
       if (!response.ok) {
+        if (OVERPASS_RETRYABLE_STATUS.has(response.status)) {
+          const retryAfterHeader = response.headers.get("Retry-After");
+          const retryAfterSeconds = retryAfterHeader ? Number.parseInt(retryAfterHeader, 10) : NaN;
+          const retryAfterMs = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
+            ? retryAfterSeconds * 1_000
+            : OVERPASS_ENDPOINT_COOLDOWN_MS;
+          endpointCooldownUntil.set(endpoint, Date.now() + retryAfterMs);
+        }
         lastError = `Overpass error ${response.status}`;
         continue;
       }
+      endpointCooldownUntil.delete(endpoint);
       return await response.json();
     } catch (err) {
       clearTimeout(timeoutId);

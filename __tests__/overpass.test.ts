@@ -1,6 +1,6 @@
 // Tests for lib/overpass.ts — pure utility functions only, no network calls.
 
-import { haversineMeters, parseWikiTag, withRetry } from "../lib/overpass";
+import { haversineMeters, parseWikiTag, withRetry, fetchOverpass } from "../lib/overpass";
 
 // ── haversineMeters ───────────────────────────────────────────────────────────
 
@@ -125,5 +125,66 @@ describe("withRetry", () => {
   it("passes through non-Error rejections", async () => {
     const fn = jest.fn().mockRejectedValue("string error");
     await expect(withRetry(fn, 1, 0)).rejects.toBe("string error");
+  });
+});
+
+// ── fetchOverpass ──────────────────────────────────────────────────────────────
+
+describe("fetchOverpass", () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    jest.restoreAllMocks();
+  });
+
+  it("falls back to the next mirror when the first returns 403", async () => {
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        headers: { get: () => null },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: { get: () => null },
+        json: async () => ({ elements: [{ id: 1 }] }),
+      });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const result = await fetchOverpass("[out:json];node(1);out;", 1_000);
+    expect(result).toEqual({ elements: [{ id: 1 }] });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("temporarily cools down a mirror after 403 so next call avoids it first", async () => {
+    const fetchMock = jest.fn()
+      // call 1
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        headers: { get: () => "60" },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: { get: () => null },
+        json: async () => ({ elements: [{ id: 1 }] }),
+      })
+      // call 2
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: { get: () => null },
+        json: async () => ({ elements: [{ id: 2 }] }),
+      });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await fetchOverpass("[out:json];node(1);out;", 1_000);
+    const result = await fetchOverpass("[out:json];node(2);out;", 1_000);
+
+    expect(result).toEqual({ elements: [{ id: 2 }] });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 });
