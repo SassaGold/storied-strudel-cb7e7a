@@ -41,7 +41,7 @@ const EMERGENCY_CATEGORY_TITLE_PATTERNS = EMERGENCY_CATEGORY_RULES.map((rule) =>
   ...rule,
   pattern: new RegExp(
     `\\b${rule.key
-      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')
       .replace(/\s+/g, "\\s+")}\\b`,
     "i"
   ),
