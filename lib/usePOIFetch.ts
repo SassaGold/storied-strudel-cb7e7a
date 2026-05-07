@@ -163,7 +163,16 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     } catch (err) {
       if (activeCallRef.current !== callId) return;
       console.error("[usePOIFetch] loadPlaces failed:", err);
-      setError(loadErrorMsg);
+      // expo-location throws when the device's location services are disabled
+      // (even when the app already has permission). Show the location-specific
+      // message so users know to enable location services rather than seeing
+      // the generic "Unable to load data" message.
+      const errMsg = err instanceof Error ? err.message : "";
+      if (errMsg.toLowerCase().includes("location") || errMsg.toLowerCase().includes("unavailable")) {
+        setError(locationErrorMsg);
+      } else {
+        setError(loadErrorMsg);
+      }
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }
