@@ -22,11 +22,14 @@ let endpointRoundRobinStart = 0;
 
 function parseRetryAfterMs(value: string | null): number | null {
   if (!value) return null;
-  const retryAfterSeconds = Number.parseInt(value, 10);
-  if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
-    return retryAfterSeconds * 1_000;
+  const trimmed = value.trim();
+  if (/^\d+$/.test(trimmed)) {
+    const retryAfterSeconds = Number(trimmed);
+    if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+      return retryAfterSeconds * 1_000;
+    }
   }
-  const retryAtMs = Date.parse(value);
+  const retryAtMs = Date.parse(trimmed);
   if (Number.isFinite(retryAtMs)) {
     const delta = retryAtMs - Date.now();
     return delta > 0 ? delta : null;

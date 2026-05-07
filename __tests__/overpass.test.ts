@@ -132,6 +132,9 @@ describe("withRetry", () => {
 
 describe("fetchOverpass", () => {
   const originalFetch = global.fetch;
+  const headersWithRetryAfter = (retryAfter: string | null) => ({
+    get: (name: string) => (name === "Retry-After" ? retryAfter : null),
+  });
 
   beforeEach(() => {
     jest.resetModules();
@@ -149,12 +152,12 @@ describe("fetchOverpass", () => {
       .mockResolvedValueOnce({
         ok: false,
         status: 403,
-        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
+        headers: headersWithRetryAfter(null),
       })
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
+        headers: headersWithRetryAfter(null),
         json: async () => ({ elements: [{ id: 1 }] }),
       });
     global.fetch = fetchMock as unknown as typeof fetch;
@@ -174,30 +177,30 @@ describe("fetchOverpass", () => {
       .mockResolvedValueOnce({
         ok: false,
         status: 403,
-        headers: { get: (name: string) => (name === "Retry-After" ? "60" : null) },
+        headers: headersWithRetryAfter("60"),
       })
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
+        headers: headersWithRetryAfter(null),
         json: async () => ({ elements: [{ id: 1 }] }),
       })
       // call 2
       .mockResolvedValueOnce({
         ok: false,
         status: 500,
-        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
+        headers: headersWithRetryAfter(null),
       })
       .mockResolvedValueOnce({
         ok: false,
         status: 500,
-        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
+        headers: headersWithRetryAfter(null),
       })
       // would be call 5 if cooled endpoint were incorrectly retried
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
+        headers: headersWithRetryAfter(null),
         json: async () => ({ elements: [{ id: 999 }] }),
       });
     global.fetch = fetchMock as unknown as typeof fetch;
