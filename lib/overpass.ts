@@ -14,6 +14,29 @@ import {
 // and OVERPASS_ENDPOINTS from this module keep working unchanged.
 export { OVERPASS_ENDPOINTS, CACHE_TTL_MS_CFG as CACHE_TTL_MS };
 
+const OVERPASS_RETRYABLE_STATUS = new Set([403, 429, 500, 502, 503, 504]);
+const OVERPASS_ENDPOINT_COOLDOWN_MINUTES = 5;
+const OVERPASS_ENDPOINT_COOLDOWN_MS = OVERPASS_ENDPOINT_COOLDOWN_MINUTES * 60 * 1_000;
+const endpointCooldownUntil = new Map<string, number>();
+let endpointRoundRobinStart = 0;
+
+function parseRetryAfterMs(value: string | null): number | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (/^\d+$/.test(trimmed)) {
+    const retryAfterSeconds = Number(trimmed);
+    if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+      return retryAfterSeconds * 1_000;
+    }
+  }
+  const retryAtMs = Date.parse(trimmed);
+  if (Number.isFinite(retryAtMs)) {
+    const delta = retryAtMs - Date.now();
+    return delta > 0 ? delta : null;
+  }
+  return null;
+}
+
 /** Haversine formula: returns the great-circle distance in metres. */
 export function haversineMeters(
   lat1: number,
@@ -40,7 +63,23 @@ export async function fetchOverpass(
   timeoutMs: number = OVERPASS_DEFAULT_TIMEOUT_MS
 ): Promise<any> {
   let lastError: string | null = null;
-  for (const endpoint of OVERPASS_ENDPOINTS) {
+  if (OVERPASS_ENDPOINTS.length === 0) {
+    throw new Error("No Overpass endpoints configured");
+  }
+
+  const now = Date.now();
+  const orderedEndpoints = OVERPASS_ENDPOINTS
+    .slice(endpointRoundRobinStart)
+    .concat(OVERPASS_ENDPOINTS.slice(0, endpointRoundRobinStart));
+  endpointRoundRobinStart = (endpointRoundRobinStart + 1) % OVERPASS_ENDPOINTS.length;
+
+  const preferred = orderedEndpoints.filter(
+    (endpoint) => (endpointCooldownUntil.get(endpoint) ?? 0) <= now
+  );
+  // If all mirrors are currently cooling down, still attempt all to avoid lockout.
+  const endpointsToTry = preferred.length > 0 ? preferred : orderedEndpoints;
+
+  for (const endpoint of endpointsToTry) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -54,9 +93,14 @@ export async function fetchOverpass(
       });
       clearTimeout(timeoutId);
       if (!response.ok) {
+        if (OVERPASS_RETRYABLE_STATUS.has(response.status)) {
+          const retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After")) ?? OVERPASS_ENDPOINT_COOLDOWN_MS;
+          endpointCooldownUntil.set(endpoint, Date.now() + retryAfterMs);
+        }
         lastError = `Overpass error ${response.status}`;
         continue;
       }
+      endpointCooldownUntil.delete(endpoint);
       return await response.json();
     } catch (err) {
       clearTimeout(timeoutId);
