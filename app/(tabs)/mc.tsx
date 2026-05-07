@@ -144,7 +144,7 @@ export default function McScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
-  // MC categories keep their own fixed radii (same behavior as legacy Overpass queries).
+  // MC categories keep fixed HERE-tuned radii per category (independent of global settings.searchRadiusKm).
   const effectiveSearchRadiusKm = CATEGORY_RADIUS_M[selected] / 1000;
 
   const {
