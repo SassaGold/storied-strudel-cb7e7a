@@ -1,6 +1,6 @@
 // Tests for lib/overpass.ts — pure utility functions only, no network calls.
 
-import { haversineMeters, parseWikiTag, withRetry, fetchOverpass } from "../lib/overpass";
+import { haversineMeters, parseWikiTag, withRetry } from "../lib/overpass";
 
 // ── haversineMeters ───────────────────────────────────────────────────────────
 
@@ -133,12 +133,18 @@ describe("withRetry", () => {
 describe("fetchOverpass", () => {
   const originalFetch = global.fetch;
 
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
   afterEach(() => {
     global.fetch = originalFetch;
     jest.restoreAllMocks();
   });
 
   it("falls back to the next mirror when the first returns 403", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { fetchOverpass, OVERPASS_ENDPOINTS } = require("../lib/overpass");
     const fetchMock = jest.fn()
       .mockResolvedValueOnce({
         ok: false,
@@ -156,9 +162,13 @@ describe("fetchOverpass", () => {
     const result = await fetchOverpass("[out:json];node(1);out;", 1_000);
     expect(result).toEqual({ elements: [{ id: 1 }] });
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[0][0]).toBe(OVERPASS_ENDPOINTS[0]);
+    expect(fetchMock.mock.calls[1][0]).toBe(OVERPASS_ENDPOINTS[1]);
   });
 
   it("temporarily cools down a mirror after 403 so next call avoids it first", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { fetchOverpass, OVERPASS_ENDPOINTS } = require("../lib/overpass");
     const fetchMock = jest.fn()
       // call 1
       .mockResolvedValueOnce({
@@ -174,17 +184,30 @@ describe("fetchOverpass", () => {
       })
       // call 2
       .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        headers: { get: () => null },
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        headers: { get: () => null },
+      })
+      // would be call 5 if cooled endpoint were incorrectly retried
+      .mockResolvedValueOnce({
         ok: true,
         status: 200,
         headers: { get: () => null },
-        json: async () => ({ elements: [{ id: 2 }] }),
+        json: async () => ({ elements: [{ id: 999 }] }),
       });
     global.fetch = fetchMock as unknown as typeof fetch;
 
     await fetchOverpass("[out:json];node(1);out;", 1_000);
-    const result = await fetchOverpass("[out:json];node(2);out;", 1_000);
+    await expect(fetchOverpass("[out:json];node(2);out;", 1_000)).rejects.toThrow("Overpass error 500");
 
-    expect(result).toEqual({ elements: [{ id: 2 }] });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    const secondCallEndpoints = fetchMock.mock.calls.slice(2).map((args) => args[0]);
+    expect(secondCallEndpoints).toEqual([OVERPASS_ENDPOINTS[1], OVERPASS_ENDPOINTS[2]]);
+    expect(secondCallEndpoints).not.toContain(OVERPASS_ENDPOINTS[0]);
   });
 });

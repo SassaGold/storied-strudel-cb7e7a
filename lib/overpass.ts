@@ -50,9 +50,9 @@ export async function fetchOverpass(
   }
 
   const now = Date.now();
-  const orderedEndpoints = OVERPASS_ENDPOINTS.map(
-    (_, idx) => OVERPASS_ENDPOINTS[(endpointRoundRobinStart + idx) % OVERPASS_ENDPOINTS.length]
-  );
+  const orderedEndpoints = OVERPASS_ENDPOINTS
+    .slice(endpointRoundRobinStart)
+    .concat(OVERPASS_ENDPOINTS.slice(0, endpointRoundRobinStart));
   endpointRoundRobinStart = (endpointRoundRobinStart + 1) % OVERPASS_ENDPOINTS.length;
 
   const preferred = orderedEndpoints.filter(
@@ -81,7 +81,7 @@ export async function fetchOverpass(
           const retryAfterMs = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
             ? retryAfterSeconds * 1_000
             : OVERPASS_ENDPOINT_COOLDOWN_MS;
-          endpointCooldownUntil.set(endpoint, now + retryAfterMs);
+          endpointCooldownUntil.set(endpoint, Date.now() + retryAfterMs);
         }
         lastError = `Overpass error ${response.status}`;
         continue;
