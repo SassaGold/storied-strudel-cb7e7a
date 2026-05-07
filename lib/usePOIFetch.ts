@@ -131,6 +131,16 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
         return;
       }
 
+      // Check whether the device's location services are enabled even when the
+      // app already has permission. getCurrentPositionAsync() throws an opaque
+      // error when they are off; checking here gives a clearer signal.
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (activeCallRef.current !== callId) return;
+      if (!servicesEnabled) {
+        setError(locationErrorMsg);
+        return;
+      }
+
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
@@ -163,16 +173,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     } catch (err) {
       if (activeCallRef.current !== callId) return;
       console.error("[usePOIFetch] loadPlaces failed:", err);
-      // expo-location throws when the device's location services are disabled
-      // (even when the app already has permission). Show the location-specific
-      // message so users know to enable location services rather than seeing
-      // the generic "Unable to load data" message.
-      const errMsg = err instanceof Error ? err.message : "";
-      if (errMsg.toLowerCase().includes("location") || errMsg.toLowerCase().includes("unavailable")) {
-        setError(locationErrorMsg);
-      } else {
-        setError(loadErrorMsg);
-      }
+      setError(loadErrorMsg);
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }
