@@ -1,5 +1,8 @@
 import { HERE_DISCOVER_BASE_URL } from "./config";
 
+const HERE_MIN_RADIUS_M = 100;
+const HERE_MAX_LIMIT = 100;
+
 export type HereCategory = {
   id?: string;
   name?: string;
@@ -45,8 +48,8 @@ export async function fetchHereDiscover(
   const params = new URLSearchParams({
     q: query,
     at: `${lat},${lon}`,
-    in: `circle:${lat},${lon};r=${Math.max(100, Math.round(radiusM))}`,
-    limit: String(Math.max(1, Math.min(limit, 100))),
+    in: `circle:${lat},${lon};r=${Math.max(HERE_MIN_RADIUS_M, Math.round(radiusM))}`,
+    limit: String(Math.max(1, Math.min(limit, HERE_MAX_LIMIT))),
     lang: "en-US",
     apiKey,
   });

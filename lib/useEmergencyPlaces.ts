@@ -128,19 +128,27 @@ export function useEmergencyPlaces() {
       if (activeCallRef.current !== callId) return;
 
       const mapEmergencyCategory = (item: HerePlaceItem): string => {
-        const haystack = [
-          item.title,
-          ...(item.categories ?? []).flatMap((c) => [c.id, c.name]),
-        ]
-          .join(" ")
-          .toLowerCase();
-        if (haystack.includes("hospital")) return "hospital";
-        if (haystack.includes("clinic")) return "clinic";
-        if (haystack.includes("doctor")) return "doctors";
-        if (haystack.includes("pharmacy")) return "pharmacy";
-        if (haystack.includes("police")) return "police";
-        if (haystack.includes("fire")) return "fire_station";
-        if (haystack.includes("ambulance")) return "ambulance_station";
+        const categoryFields = (item.categories ?? [])
+          .flatMap((c) => [c.id, c.name])
+          .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+          .map((v) => v.toLowerCase());
+        const hasCategory = (needle: string) => categoryFields.some((v) => v.includes(needle));
+        if (hasCategory("hospital")) return "hospital";
+        if (hasCategory("clinic")) return "clinic";
+        if (hasCategory("doctor")) return "doctors";
+        if (hasCategory("pharmacy")) return "pharmacy";
+        if (hasCategory("police")) return "police";
+        if (hasCategory("fire_station") || hasCategory("fire station")) return "fire_station";
+        if (hasCategory("ambulance")) return "ambulance_station";
+
+        const title = (item.title || "").toLowerCase();
+        if (/\bhospital\b/.test(title)) return "hospital";
+        if (/\bclinic\b/.test(title)) return "clinic";
+        if (/\bdoctor\b/.test(title)) return "doctors";
+        if (/\bpharmacy\b/.test(title)) return "pharmacy";
+        if (/\bpolice\b/.test(title)) return "police";
+        if (/\bfire station\b/.test(title)) return "fire_station";
+        if (/\bambulance\b/.test(title)) return "ambulance_station";
         return "other";
       };
 
