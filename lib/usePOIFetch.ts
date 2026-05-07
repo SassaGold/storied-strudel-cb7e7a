@@ -131,6 +131,16 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
         return;
       }
 
+      // Check whether the device's location services are enabled even when the
+      // app already has permission. getCurrentPositionAsync() throws an opaque
+      // error when they are off; checking here gives a clearer signal.
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (activeCallRef.current !== callId) return;
+      if (!servicesEnabled) {
+        setError(locationErrorMsg);
+        return;
+      }
+
       const position = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
