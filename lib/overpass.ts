@@ -46,7 +46,7 @@ export async function fetchOverpass(
 ): Promise<any> {
   let lastError: string | null = null;
   if (OVERPASS_ENDPOINTS.length === 0) {
-    throw new Error("Overpass request failed");
+    throw new Error("No Overpass endpoints configured");
   }
 
   const now = Date.now();
@@ -81,7 +81,7 @@ export async function fetchOverpass(
           const retryAfterMs = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
             ? retryAfterSeconds * 1_000
             : OVERPASS_ENDPOINT_COOLDOWN_MS;
-          endpointCooldownUntil.set(endpoint, Date.now() + retryAfterMs);
+          endpointCooldownUntil.set(endpoint, now + retryAfterMs);
         }
         lastError = `Overpass error ${response.status}`;
         continue;
