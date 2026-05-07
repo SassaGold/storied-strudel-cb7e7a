@@ -144,7 +144,8 @@ export default function McScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
-  // MC categories keep fixed HERE-tuned radii per category (independent of global settings.searchRadiusKm).
+  // MC categories keep fixed HERE-tuned radii per category to improve relevance for each POI type
+  // (e.g. broader radius for tracks/services, tighter for ATM/bank), independent of global settings.searchRadiusKm.
   const effectiveSearchRadiusKm = CATEGORY_RADIUS_M[selected] / 1000;
 
   const {
