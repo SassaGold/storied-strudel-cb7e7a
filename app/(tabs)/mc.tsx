@@ -120,7 +120,7 @@ const mapMcElement = (
 
 // ── HERE query builder ────────────────────────────────────────────────────────
 
-const buildQuery = (category: Category, _lat: number, _lon: number): string => {
+const buildQuery = (category: Category): string => {
   if (category === "services") return "motorcycle service repair dealer parts accessories rental";
   if (category === "fuel") return "fuel station gas station petrol station";
   if (category === "parking") return "motorcycle parking parking";
@@ -168,7 +168,7 @@ export default function McScreen() {
     openInfo,
   } = usePOIFetch({
     cacheKey: `cache_mc_v2_${selected}`,
-    buildSearchQuery: (lat, lon, _radiusM) => buildQuery(selected, lat, lon),
+    buildSearchQuery: () => buildQuery(selected),
     mapPlaceItem: (item, lat, lon) => mapMcElement(item, lat, lon, fallbackLabel(selected)),
     locationErrorMsg: t("garage.locationError"),
     loadErrorMsg: t("garage.loadError"),

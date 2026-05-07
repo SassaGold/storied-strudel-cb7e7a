@@ -19,7 +19,7 @@ const SEARCH_QUERY =
 
 const CACHE_KEY = "cache_hotels_v2";
 
-const buildSearchQuery = (_lat: number, _lon: number, _radiusM: number) => SEARCH_QUERY;
+const buildSearchQuery = () => SEARCH_QUERY;
 
 const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Place | null => {
   const lat = item.position?.lat;

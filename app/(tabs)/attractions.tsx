@@ -13,9 +13,9 @@ import {
 // ── Attractions POI tab ───────────────────────────────────────────────────────
 
 const CACHE_KEY = "cache_attractions_v2";
+const SEARCH_QUERY = "attraction museum viewpoint castle monument artwork zoo theme park historic site";
 
-const buildSearchQuery = (_lat: number, _lon: number, _radiusM: number) =>
-  "attraction museum viewpoint castle monument artwork zoo theme park historic site";
+const buildSearchQuery = () => SEARCH_QUERY;
 
 const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Place | null => {
   const lat = item.position?.lat;

@@ -28,6 +28,19 @@ const AsyncStorage: any = (() => {
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 const CACHE_KEY = "cache_emergency_v2";
+const EMERGENCY_CATEGORY_RULES: Array<{ key: string; category: string }> = [
+  { key: "hospital", category: "hospital" },
+  { key: "clinic", category: "clinic" },
+  { key: "doctor", category: "doctors" },
+  { key: "pharmacy", category: "pharmacy" },
+  { key: "police", category: "police" },
+  { key: "fire station", category: "fire_station" },
+  { key: "ambulance", category: "ambulance_station" },
+];
+const EMERGENCY_CATEGORY_TITLE_PATTERNS = EMERGENCY_CATEGORY_RULES.map((rule) => ({
+  ...rule,
+  pattern: new RegExp(`\\b${rule.key.replace(/\s+/g, "\\s+")}\\b`, "i"),
+}));
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -128,29 +141,19 @@ export function useEmergencyPlaces() {
       if (activeCallRef.current !== callId) return;
 
       const mapEmergencyCategory = (item: HerePlaceItem): string => {
-        const rules: Array<{ key: string; category: string }> = [
-          { key: "hospital", category: "hospital" },
-          { key: "clinic", category: "clinic" },
-          { key: "doctor", category: "doctors" },
-          { key: "pharmacy", category: "pharmacy" },
-          { key: "police", category: "police" },
-          { key: "fire station", category: "fire_station" },
-          { key: "ambulance", category: "ambulance_station" },
-        ];
         const categoryFields = (item.categories ?? [])
           .flatMap((c) => [c.id, c.name])
           .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
           .map((v) => v.toLowerCase().replace(/_/g, " "));
-        for (const rule of rules) {
+        for (const rule of EMERGENCY_CATEGORY_RULES) {
           if (categoryFields.some((value) => value.includes(rule.key))) {
             return rule.category;
           }
         }
 
         const title = (item.title || "").toLowerCase();
-        for (const rule of rules) {
-          const pattern = new RegExp(`\\b${rule.key.replace(/\s+/g, "\\s+")}\\b`, "i");
-          if (pattern.test(title)) {
+        for (const rule of EMERGENCY_CATEGORY_TITLE_PATTERNS) {
+          if (rule.pattern.test(title)) {
             return rule.category;
           }
         }

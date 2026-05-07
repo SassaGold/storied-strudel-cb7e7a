@@ -47,6 +47,8 @@ export async function fetchHereDiscover(
 
   const params = new URLSearchParams({
     q: query,
+    // HERE Discover uses `at` as ranking center and `in` as a strict search-area filter.
+    // We intentionally send both so results are nearby and bounded by radius.
     at: `${lat},${lon}`,
     in: `circle:${lat},${lon};r=${Math.max(HERE_MIN_RADIUS_M, Math.round(radiusM))}`,
     limit: String(Math.max(1, Math.min(limit, HERE_MAX_LIMIT))),
