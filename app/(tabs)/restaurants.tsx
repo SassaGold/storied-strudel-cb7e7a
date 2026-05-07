@@ -43,13 +43,13 @@ const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Pl
   if (lat === undefined || lon === undefined) return null;
   const categoryRaw = (hereItemPrimaryCategory(item) || "restaurant").toLowerCase();
   const category =
-    categoryRaw.includes("cafe") ? "cafe" :
-    categoryRaw.includes("fast") ? "fast_food" :
-    categoryRaw.includes("bar") ? "bar" :
-    categoryRaw.includes("pub") ? "pub" :
-    categoryRaw.includes("food_court") || categoryRaw.includes("food court") ? "food_court" :
-    categoryRaw.includes("ice") ? "ice_cream" :
-    categoryRaw.includes("bakery") ? "bakery" :
+    /\bcafe\b/.test(categoryRaw) ? "cafe" :
+    /\bfast[_\s-]?food\b/.test(categoryRaw) ? "fast_food" :
+    /\bbar\b/.test(categoryRaw) ? "bar" :
+    /\bpub\b/.test(categoryRaw) ? "pub" :
+    /\bfood[_\s-]?court\b/.test(categoryRaw) ? "food_court" :
+    /\bice[_\s-]?cream\b/.test(categoryRaw) ? "ice_cream" :
+    /\bbakery\b/.test(categoryRaw) ? "bakery" :
     "restaurant";
   return {
     id: item.id || `${lat},${lon},${item.title || "restaurant"}`,

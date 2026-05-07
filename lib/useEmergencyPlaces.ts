@@ -128,27 +128,33 @@ export function useEmergencyPlaces() {
       if (activeCallRef.current !== callId) return;
 
       const mapEmergencyCategory = (item: HerePlaceItem): string => {
+        const rules: Array<{ key: string; category: string }> = [
+          { key: "hospital", category: "hospital" },
+          { key: "clinic", category: "clinic" },
+          { key: "doctor", category: "doctors" },
+          { key: "pharmacy", category: "pharmacy" },
+          { key: "police", category: "police" },
+          { key: "fire station", category: "fire_station" },
+          { key: "fire_station", category: "fire_station" },
+          { key: "ambulance", category: "ambulance_station" },
+        ];
         const categoryFields = (item.categories ?? [])
           .flatMap((c) => [c.id, c.name])
           .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
           .map((v) => v.toLowerCase());
-        const hasCategory = (needle: string) => categoryFields.some((v) => v.includes(needle));
-        if (hasCategory("hospital")) return "hospital";
-        if (hasCategory("clinic")) return "clinic";
-        if (hasCategory("doctor")) return "doctors";
-        if (hasCategory("pharmacy")) return "pharmacy";
-        if (hasCategory("police")) return "police";
-        if (hasCategory("fire_station") || hasCategory("fire station")) return "fire_station";
-        if (hasCategory("ambulance")) return "ambulance_station";
+        for (const rule of rules) {
+          if (categoryFields.some((value) => value.includes(rule.key))) {
+            return rule.category;
+          }
+        }
 
         const title = (item.title || "").toLowerCase();
-        if (/\bhospital\b/.test(title)) return "hospital";
-        if (/\bclinic\b/.test(title)) return "clinic";
-        if (/\bdoctor\b/.test(title)) return "doctors";
-        if (/\bpharmacy\b/.test(title)) return "pharmacy";
-        if (/\bpolice\b/.test(title)) return "police";
-        if (/\bfire station\b/.test(title)) return "fire_station";
-        if (/\bambulance\b/.test(title)) return "ambulance_station";
+        for (const rule of rules) {
+          const pattern = new RegExp(`\\b${rule.key.replace(/\s+/g, "\\s+")}\\b`, "i");
+          if (pattern.test(title)) {
+            return rule.category;
+          }
+        }
         return "other";
       };
 

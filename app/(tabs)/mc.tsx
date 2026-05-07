@@ -145,6 +145,8 @@ export default function McScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
+  // MC categories keep their own fixed radii (same behavior as legacy Overpass queries).
+  const effectiveSearchRadiusKm = CATEGORY_RADIUS_M[selected] / 1000;
 
   const {
     loading,
@@ -171,7 +173,7 @@ export default function McScreen() {
     mapPlaceItem: (item, lat, lon) => mapMcElement(item, lat, lon, fallbackLabel(selected)),
     locationErrorMsg: t("garage.locationError"),
     loadErrorMsg: t("garage.loadError"),
-    searchRadiusKm: CATEGORY_RADIUS_M[selected] / 1000,
+    searchRadiusKm: effectiveSearchRadiusKm,
     fetchTimeoutMs: CATEGORY_FETCH_TIMEOUT_MS[selected] ?? 15000,
   });
 
