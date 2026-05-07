@@ -15,9 +15,24 @@ import {
 export { OVERPASS_ENDPOINTS, CACHE_TTL_MS_CFG as CACHE_TTL_MS };
 
 const OVERPASS_RETRYABLE_STATUS = new Set([403, 429, 500, 502, 503, 504]);
-const OVERPASS_ENDPOINT_COOLDOWN_MS = 5 * 60 * 1_000;
+const OVERPASS_ENDPOINT_COOLDOWN_MINUTES = 5;
+const OVERPASS_ENDPOINT_COOLDOWN_MS = OVERPASS_ENDPOINT_COOLDOWN_MINUTES * 60 * 1_000;
 const endpointCooldownUntil = new Map<string, number>();
 let endpointRoundRobinStart = 0;
+
+function parseRetryAfterMs(value: string | null): number | null {
+  if (!value) return null;
+  const retryAfterSeconds = Number.parseInt(value, 10);
+  if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+    return retryAfterSeconds * 1_000;
+  }
+  const retryAtMs = Date.parse(value);
+  if (Number.isFinite(retryAtMs)) {
+    const delta = retryAtMs - Date.now();
+    return delta > 0 ? delta : null;
+  }
+  return null;
+}
 
 /** Haversine formula: returns the great-circle distance in metres. */
 export function haversineMeters(
@@ -76,11 +91,7 @@ export async function fetchOverpass(
       clearTimeout(timeoutId);
       if (!response.ok) {
         if (OVERPASS_RETRYABLE_STATUS.has(response.status)) {
-          const retryAfterHeader = response.headers.get("Retry-After");
-          const retryAfterSeconds = retryAfterHeader ? Number.parseInt(retryAfterHeader, 10) : NaN;
-          const retryAfterMs = Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0
-            ? retryAfterSeconds * 1_000
-            : OVERPASS_ENDPOINT_COOLDOWN_MS;
+          const retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After")) ?? OVERPASS_ENDPOINT_COOLDOWN_MS;
           endpointCooldownUntil.set(endpoint, Date.now() + retryAfterMs);
         }
         lastError = `Overpass error ${response.status}`;

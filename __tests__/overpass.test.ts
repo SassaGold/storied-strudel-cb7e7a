@@ -149,12 +149,12 @@ describe("fetchOverpass", () => {
       .mockResolvedValueOnce({
         ok: false,
         status: 403,
-        headers: { get: () => null },
+        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
       })
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: { get: () => null },
+        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
         json: async () => ({ elements: [{ id: 1 }] }),
       });
     global.fetch = fetchMock as unknown as typeof fetch;
@@ -174,30 +174,30 @@ describe("fetchOverpass", () => {
       .mockResolvedValueOnce({
         ok: false,
         status: 403,
-        headers: { get: () => "60" },
+        headers: { get: (name: string) => (name === "Retry-After" ? "60" : null) },
       })
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: { get: () => null },
+        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
         json: async () => ({ elements: [{ id: 1 }] }),
       })
       // call 2
       .mockResolvedValueOnce({
         ok: false,
         status: 500,
-        headers: { get: () => null },
+        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
       })
       .mockResolvedValueOnce({
         ok: false,
         status: 500,
-        headers: { get: () => null },
+        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
       })
       // would be call 5 if cooled endpoint were incorrectly retried
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
-        headers: { get: () => null },
+        headers: { get: (name: string) => (name === "Retry-After" ? null : null) },
         json: async () => ({ elements: [{ id: 999 }] }),
       });
     global.fetch = fetchMock as unknown as typeof fetch;
