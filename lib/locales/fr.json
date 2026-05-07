@@ -341,9 +341,6 @@
     "title": "DONNÉES & CONFIDENTIALITÉ",
     "subtitle": "D'où viennent les données et comment votre vie privée est protégée.",
     "dataSources": "SOURCES DE DONNÉES",
-    "osm": "OpenStreetMap",
-    "osmDesc": "Toutes les données POI — restaurants, hôtels, stations-service, concessionnaires moto, services d'urgence — proviennent d'OpenStreetMap via l'API Overpass. OpenStreetMap est une base de données mondiale libre et ouverte maintenue par des bénévoles.",
-    "osmLicense": "© Contributeurs OpenStreetMap · Licence ODbL",
     "overpass": "API Overpass",
     "overpassDesc": "Les requêtes aux données OpenStreetMap sont effectuées via l'API Overpass. Gratuite, sans compte requis.",
     "weather": "Open-Meteo",
@@ -353,7 +350,7 @@
     "wikipediaDesc": "Les descriptions de lieux sont récupérées depuis l'API REST Wikipedia lorsqu'un tag Wikipedia est disponible dans les données OpenStreetMap.",
     "wikiLicense": "© Contributeurs Wikipedia · CC BY-SA",
     "maps": "Cartes & Navigation",
-    "mapsDesc": "La carte intégrée utilise Leaflet.js (open-source, tuiles CartoDB) rendu dans une WebView via react-native-webview. Appuyer sur 'Ouvrir dans Maps' ouvre votre application de cartes par défaut. Aucune clé API Google Maps n'est requise.",
+    "mapsDesc": "La carte intégrée utilise Leaflet.js avec les tuiles HERE Map Tiles dans une WebView via react-native-webview. Appuyer sur 'Ouvrir dans Maps' ouvre votre application de carte par défaut.",
     "privacy": "CONFIDENTIALITÉ",
     "privacyTitle": "Votre Vie Privée",
     "privacyP1": "Cette application ne collecte, ne transmet ni ne partage aucune donnée personnelle. Pas d'analyses, pas de rapports de plantage, pas de SDK publicitaires.",
@@ -370,7 +367,9 @@
     "updateAvailable": "⬇️ Mise à jour disponible — installation…",
     "updateLatest": "✅ Vous êtes à jour",
     "updateError": "❌ Échec de la vérification",
-    "privacyPolicyLink": "📄 Politique de confidentialité"
+    "privacyPolicyLink": "📄 Politique de confidentialité",
+    "here": "HERE Maps",
+    "hereDesc": "L'adresse de votre position actuelle est obtenue via l'API de géocodage HERE. La carte intégrée utilise les tuiles HERE Map Tiles via Leaflet.js. HERE est une plateforme de cartographie et de données de localisation de premier plan. Nécessite une clé API HERE."
   },
   "settings": {
     "badge": "⚙️ PARAMÈTRES",

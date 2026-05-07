@@ -341,9 +341,6 @@
     "title": "DATOS Y PRIVACIDAD",
     "subtitle": "De dónde provienen los datos y cómo se protege tu privacidad.",
     "dataSources": "FUENTES DE DATOS",
-    "osm": "OpenStreetMap",
-    "osmDesc": "Todos los datos POI — restaurantes, hoteles, gasolineras, concesionarios de motos, servicios de emergencia — provienen de OpenStreetMap a través de la API Overpass. OpenStreetMap es una base de datos mundial libre y abierta mantenida por voluntarios.",
-    "osmLicense": "© Colaboradores de OpenStreetMap · Licencia ODbL",
     "overpass": "API Overpass",
     "overpassDesc": "Las consultas a los datos de OpenStreetMap se realizan mediante la API Overpass. Gratuita, sin cuenta requerida.",
     "weather": "Open-Meteo",
@@ -353,7 +350,7 @@
     "wikipediaDesc": "Las descripciones de lugares se obtienen de la API REST de Wikipedia cuando hay una etiqueta de Wikipedia disponible en los datos de OpenStreetMap.",
     "wikiLicense": "© Colaboradores de Wikipedia · CC BY-SA",
     "maps": "Mapas y Navegación",
-    "mapsDesc": "El mapa en la aplicación usa Leaflet.js (código abierto, teselas CartoDB) renderizado en un WebView mediante react-native-webview. Al tocar 'Abrir en Mapas' se abre tu aplicación de mapas predeterminada. No se requiere clave de API de Google Maps.",
+    "mapsDesc": "El mapa en la aplicación usa Leaflet.js con HERE Map Tiles renderizado en un WebView mediante react-native-webview. Al tocar 'Abrir en Mapas' se abre tu aplicación de mapas predeterminada.",
     "privacy": "PRIVACIDAD",
     "privacyTitle": "Tu Privacidad",
     "privacyP1": "Esta aplicación no recopila, transmite ni comparte ningún dato personal. No hay análisis, ni informes de fallos, ni SDK publicitarios.",
@@ -370,7 +367,9 @@
     "updateAvailable": "⬇️ Actualización disponible — instalando…",
     "updateLatest": "✅ Estás al día",
     "updateError": "❌ Error al buscar actualización",
-    "privacyPolicyLink": "📄 Política de privacidad"
+    "privacyPolicyLink": "📄 Política de privacidad",
+    "here": "HERE Maps",
+    "hereDesc": "La dirección de tu ubicación actual se obtiene mediante la API de geocodificación HERE. El mapa en la aplicación usa HERE Map Tiles a través de Leaflet.js. HERE es una plataforma líder de mapas y datos de localización. Requiere una clave de API HERE."
   },
   "settings": {
     "badge": "⚙️ AJUSTES",

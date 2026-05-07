@@ -2,11 +2,18 @@ import { useTranslation } from "react-i18next";
 import POIScreen from "../../components/POIScreen";
 import { haversineMeters } from "../../lib/overpass";
 import type { Place } from "../../lib/usePOIFetch";
+import {
+  type HerePlaceItem,
+  hereItemEmail,
+  hereItemOpeningHours,
+  hereItemPhone,
+  hereItemPrimaryCategory,
+  hereItemWebsite,
+} from "../../lib/herePlaces";
 
 // ── Restaurants POI tab ───────────────────────────────────────────────────────
 
-const AMENITY_TYPES =
-  "restaurant|cafe|fast_food|bar|pub|food_court|ice_cream|bakery";
+const SEARCH_QUERY = "restaurant cafe fast food bar pub bakery ice cream food court";
 
 const CATEGORY_LABEL: Record<string, string> = {
   restaurant: "🍽️ Restaurant",
@@ -28,33 +35,34 @@ const formatCategory = (category: string) =>
 
 const CACHE_KEY = "cache_restaurants_v2";
 
-const buildOverpassQuery = (lat: number, lon: number, radiusM: number) => `
-[out:json][timeout:25];
-(
-  node(around:${radiusM},${lat},${lon})[amenity~"${AMENITY_TYPES}"];
-  way(around:${radiusM},${lat},${lon})[amenity~"${AMENITY_TYPES}"];
-  relation(around:${radiusM},${lat},${lon})[amenity~"${AMENITY_TYPES}"];
-);
-out center 120;`;
+const buildSearchQuery = () => SEARCH_QUERY;
 
-const mapElement = (element: any, userLat: number, userLon: number): Place | null => {
-  const lat = element.lat ?? element.center?.lat;
-  const lon = element.lon ?? element.center?.lon;
+const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Place | null => {
+  const lat = item.position?.lat;
+  const lon = item.position?.lng;
   if (lat === undefined || lon === undefined) return null;
-  const tags = element.tags ?? {};
+  const categoryRaw = (hereItemPrimaryCategory(item) || "restaurant").toLowerCase();
+  const category =
+    /\bcafe\b/.test(categoryRaw) ? "cafe" :
+    /\bfast[_\s-]?food\b/.test(categoryRaw) ? "fast_food" :
+    /\bbar\b/.test(categoryRaw) ? "bar" :
+    /\bpub\b/.test(categoryRaw) ? "pub" :
+    /\bfood[_\s-]?court\b/.test(categoryRaw) ? "food_court" :
+    /\bice[_\s-]?cream\b/.test(categoryRaw) ? "ice_cream" :
+    /\bbakery\b/.test(categoryRaw) ? "bakery" :
+    "restaurant";
   return {
-    id: String(element.id),
-    name: tags.name || tags.amenity || "Restaurant",
-    category: tags.amenity || "restaurant",
+    id: item.id || `${lat},${lon},${item.title || "restaurant"}`,
+    name: item.title || "Restaurant",
+    category,
     latitude: lat,
     longitude: lon,
     distanceMeters: haversineMeters(userLat, userLon, lat, lon),
-    website: (tags.website || tags["contact:website"] || "").trim() || undefined,
-    phone: (tags.phone || tags["contact:phone"] || "").trim() || undefined,
-    email: (tags.email || tags["contact:email"] || "").trim() || undefined,
-    address: [tags["addr:housenumber"], tags["addr:street"], tags["addr:city"]].filter(Boolean).join(" ") || undefined,
-    openingHours: (tags.opening_hours || "").trim() || undefined,
-    wikipedia: (tags.wikipedia || "").trim() || undefined,
+    website: hereItemWebsite(item),
+    phone: hereItemPhone(item),
+    email: hereItemEmail(item),
+    address: item.address?.label,
+    openingHours: hereItemOpeningHours(item),
   };
 };
 
@@ -63,8 +71,8 @@ export default function RestaurantsScreen() {
   return (
     <POIScreen
       cacheKey={CACHE_KEY}
-      buildOverpassQuery={buildOverpassQuery}
-      mapElement={mapElement}
+      buildSearchQuery={buildSearchQuery}
+      mapPlaceItem={mapPlaceItem}
       i18nPrefix="food"
       formatCategoryLabel={(cat) => t(`food.categories.${cat}`, { defaultValue: formatCategory(cat) })}
     />

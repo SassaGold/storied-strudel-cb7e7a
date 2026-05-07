@@ -20,7 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../lib/settings";
 import { parseWikiTag } from "../lib/overpass";
-import { usePOIFetch, type Place, type BuildOverpassQuery, type MapElement } from "../lib/usePOIFetch";
+import { usePOIFetch, type Place, type BuildSearchQuery, type MapPlaceItem } from "../lib/usePOIFetch";
 
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -31,10 +31,10 @@ const Haptics: typeof import("expo-haptics") | null = (() => { try { return requ
 export interface POIScreenProps {
   /** AsyncStorage cache key (e.g. "cache_restaurants_v2") */
   cacheKey: string;
-  /** Builds the Overpass QL query for this POI type */
-  buildOverpassQuery: BuildOverpassQuery;
-  /** Maps a single raw Overpass element to a Place (return null to skip) */
-  mapElement: MapElement;
+  /** Builds the HERE discover query for this POI type */
+  buildSearchQuery: BuildSearchQuery;
+  /** Maps a single raw HERE item to a Place (return null to skip) */
+  mapPlaceItem: MapPlaceItem;
   /**
    * i18n key prefix for screen-specific strings.
    * Must have: badge, title, subtitle, findButton, searching, noResults,
@@ -63,8 +63,8 @@ export interface POIScreenProps {
 
 export default function POIScreen({
   cacheKey,
-  buildOverpassQuery,
-  mapElement,
+  buildSearchQuery,
+  mapPlaceItem,
   i18nPrefix,
   formatCategoryLabel,
   renderExtraListTag,
@@ -91,8 +91,8 @@ export default function POIScreen({
     openInfo,
   } = usePOIFetch({
     cacheKey,
-    buildOverpassQuery,
-    mapElement,
+    buildSearchQuery,
+    mapPlaceItem,
     locationErrorMsg: t(`${i18nPrefix}.locationError`),
     loadErrorMsg: t(`${i18nPrefix}.loadError`),
     searchRadiusKm: settings.searchRadiusKm,

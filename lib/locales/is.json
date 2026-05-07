@@ -341,9 +341,6 @@
     "title": "GÖGN & FRIÐHELGI",
     "subtitle": "Hvaðan gögnin koma og hvernig friðhelgi þín er vernduð.",
     "dataSources": "GAGNALEGAR",
-    "osm": "OpenStreetMap",
-    "osmDesc": "Öll POI-gögn — veitingastaðir, hótel, bensínstöðvar, mótorhjólasalar, neyðarþjónustur — koma frá OpenStreetMap í gegnum Overpass API. OpenStreetMap er frír, opinn heimsgrunnur viðhaldinn af sjálfboðaliðum.",
-    "osmLicense": "© OpenStreetMap-framleggjendur · ODbL-leyfi",
     "overpass": "Overpass API",
     "overpassDesc": "Fyrirspurnir á OpenStreetMap-gögn eru keyrðar í gegnum Overpass API. Ókeypis, engan reikning þarf.",
     "weather": "Open-Meteo",
@@ -353,7 +350,7 @@
     "wikipediaDesc": "Staðarlýsingar eru sóttar frá Wikipedia REST API þegar Wikipedia-merki er tiltækt í OpenStreetMap-gögnum.",
     "wikiLicense": "© Wikipedia-framleggjendur · CC BY-SA",
     "maps": "Kort & Leiðsögn",
-    "mapsDesc": "Kortin í forritinu nota Leaflet.js (opinn hugbúnaður, CartoDB-flísar) birtar í WebView með react-native-webview. Að ýta á 'Opna á korti' opnar sjálfgefið kortsforrit þitt. Engin Google Maps API-lykill er nauðsynlegur.",
+    "mapsDesc": "Kortið í forritinu notar Leaflet.js með HERE Map Tiles í WebView í gegnum react-native-webview. Að pikka á 'Opna í Kortum' opnar sjálfgefna kortsforritið þitt.",
     "privacy": "FRIÐHELGI",
     "privacyTitle": "Friðhelgi þín",
     "privacyP1": "Þetta forrit safnar ekki, sendir ekki eða deilir persónulegum gögnum. Engar greiningar, engar hrunaskýrslur, engin auglýsinga-SDK.",
@@ -370,7 +367,9 @@
     "updateAvailable": "⬇️ Uppfærsla tiltæk — setur upp…",
     "updateLatest": "✅ Þú ert uppfærður",
     "updateError": "❌ Uppfærsluleit mistókst",
-    "privacyPolicyLink": "📄 Persónuverndarstefna"
+    "privacyPolicyLink": "📄 Persónuverndarstefna",
+    "here": "HERE Maps",
+    "hereDesc": "Núverandi staðsetningarfang þitt er fengið með HERE Geocoding API. Kortið í forritinu notar HERE Map Tiles í gegnum Leaflet.js. HERE er leiðandi kortlagninga- og staðsetningarvettvangur. Krefst HERE API-lykils."
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",
