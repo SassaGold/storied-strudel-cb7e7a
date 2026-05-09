@@ -56,13 +56,13 @@ export interface UsePOIFetchOptions {
 }
 
 function classifyLoadError(err: unknown): string | null {
-  const msg = err instanceof Error ? err.message : `${err ?? ""}`;
+  const msg = err instanceof Error ? err.message : `${err ?? "Unknown error"}`;
   const lower = msg.toLowerCase();
   const hereStatusMatch = lower.match(/here places (\d{3})/);
   const hereStatus = hereStatusMatch ? Number(hereStatusMatch[1]) : null;
 
   if (lower.includes("missing here api key")) {
-    return "HERE API key configuration is missing. Configure it and restart the app.";
+    return "HERE API key configuration is missing. Configure it, then reload the app.";
   }
   if (lower.includes("here places timeout") || lower.includes("aborted")) {
     return "Request timed out. Check your network and try again.";
@@ -70,8 +70,11 @@ function classifyLoadError(err: unknown): string | null {
   if (lower.includes("network request failed") || lower.includes("failed to fetch")) {
     return "Network request failed. Check your connection and try again.";
   }
-  if (hereStatus === 401 || hereStatus === 403) {
-    return "HERE API key is invalid or restricted for Discover API.";
+  if (hereStatus === 401) {
+    return "HERE API key is invalid for Discover API authentication.";
+  }
+  if (hereStatus === 403) {
+    return "HERE API key does not have Discover API access.";
   }
   if (hereStatus === 429) {
     return "HERE API rate limit reached. Please try again in a moment.";
