@@ -281,7 +281,7 @@ export default function POIScreen({
       )}
 
       {/* ── List view ── */}
-      {places.length === 0 && !loading ? (
+      {places.length === 0 && !loading && !error ? (
         <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
       ) : (
         places.map((place) => (

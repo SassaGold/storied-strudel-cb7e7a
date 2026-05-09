@@ -55,6 +55,31 @@ export interface UsePOIFetchOptions {
   fetchLimit?: number;
 }
 
+function classifyLoadError(err: unknown): string | null {
+  const msg = err instanceof Error ? err.message : String(err ?? "");
+  const lower = msg.toLowerCase();
+
+  if (lower.includes("missing here api key")) {
+    return "HERE API key missing. Add EXPO_PUBLIC_HERE_API_KEY to .env and restart the app.";
+  }
+  if (lower.includes("here places timeout") || lower.includes("aborted")) {
+    return "Request timed out. Check your network and try again.";
+  }
+  if (lower.includes("network request failed") || lower.includes("failed to fetch")) {
+    return "Network request failed. Check your connection and try again.";
+  }
+  if (lower.includes("here places 401") || lower.includes("here places 403")) {
+    return "HERE API key is invalid or restricted for Discover API.";
+  }
+  if (lower.includes("here places 429")) {
+    return "HERE API rate limit reached. Please try again in a moment.";
+  }
+  if (lower.includes("here places 5")) {
+    return "HERE service is temporarily unavailable. Please try again.";
+  }
+  return null;
+}
+
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
 /**
@@ -173,7 +198,8 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     } catch (err) {
       if (activeCallRef.current !== callId) return;
       console.error("[usePOIFetch] loadPlaces failed:", err);
-      setError(loadErrorMsg);
+      const detail = classifyLoadError(err);
+      setError(detail ? `${loadErrorMsg} ${detail}` : loadErrorMsg);
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }

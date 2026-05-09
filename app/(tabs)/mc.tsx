@@ -484,7 +484,7 @@ export default function McScreen() {
             ) : null}
           </>
         )}
-        {filteredPlaces.length === 0 && !loading ? (
+        {filteredPlaces.length === 0 && !loading && !error ? (
             <Text style={styles.bodyText}>
               {nameSearch.trim() && places.length > 0 ? t("garage.noSearchResults") : emptyText}
             </Text>
