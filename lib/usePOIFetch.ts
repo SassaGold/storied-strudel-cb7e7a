@@ -56,7 +56,7 @@ export interface UsePOIFetchOptions {
 }
 
 function classifyLoadError(err: unknown): string | null {
-  const msg = err instanceof Error ? err.message : String(err ?? "");
+  const msg = err instanceof Error ? err.message : `${err ?? ""}`;
   const lower = msg.toLowerCase();
   const hereStatusMatch = lower.match(/here places (\d{3})/);
   const hereStatus = hereStatusMatch ? Number(hereStatusMatch[1]) : null;
@@ -201,7 +201,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       if (activeCallRef.current !== callId) return;
       console.error("[usePOIFetch] loadPlaces failed:", err);
       const detail = classifyLoadError(err);
-      setError(detail ? `${loadErrorMsg} ${detail}` : loadErrorMsg);
+      setError(detail ? `${loadErrorMsg}: ${detail}` : loadErrorMsg);
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }
