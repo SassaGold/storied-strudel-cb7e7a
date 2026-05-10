@@ -1,29 +1,29 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Linking,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSettings, fmtDistShort } from "../../lib/settings";
-import { haversineMeters, parseWikiTag, CACHE_TTL_MS } from "../../lib/overpass";
-import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
 import {
-  type HerePlaceItem,
-  hereItemEmail,
-  hereItemOpeningHours,
-  hereItemPhone,
-  hereItemPrimaryCategory,
-  hereItemWebsite,
+    ActivityIndicator,
+    Linking,
+    Modal,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+    hereItemEmail,
+    hereItemOpeningHours,
+    hereItemPhone,
+    hereItemPrimaryCategory,
+    hereItemWebsite,
+    type HerePlaceItem,
 } from "../../lib/herePlaces";
+import { CACHE_TTL_MS, haversineMeters, parseWikiTag } from "../../lib/overpass";
+import { fmtDistShort, useSettings } from "../../lib/settings";
+import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
 
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -121,11 +121,11 @@ const mapMcElement = (
 // ── HERE query builder ────────────────────────────────────────────────────────
 
 const buildQuery = (category: Category): string => {
-  if (category === "services") return "motorcycle service repair dealer parts accessories rental";
-  if (category === "fuel") return "fuel station gas station petrol station";
-  if (category === "parking") return "motorcycle parking parking";
-  if (category === "clubs_tracks") return "motorcycle club race track kart track motor sports";
-  return "atm bank";
+  if (category === "services") return "motorcycle_repair|car_repair|bicycle_repair|service_station";
+  if (category === "fuel") return "fuel";
+  if (category === "parking") return "parking";
+  if (category === "clubs_tracks") return "club|raceway|stadium";
+  return "atm|bank";
 };
 
 const fallbackLabel = (category: Category): string => {

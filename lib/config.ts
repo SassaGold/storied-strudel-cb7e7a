@@ -5,17 +5,13 @@
 
 // ── API base URLs ─────────────────────────────────────────────────────────────
 
-/** HERE Reverse Geocoding API base URL. Requires EXPO_PUBLIC_HERE_API_KEY. */
-export const HERE_GEOCODING_BASE_URL =
-  "https://revgeocode.search.hereapi.com/v1/revgeocode";
+/** Nominatim Reverse Geocoding API base URL (OpenStreetMap). No API key required. */
+export const NOMINATIM_REVERSE_GEOCODING_BASE_URL =
+  "https://nominatim.openstreetmap.org/reverse";
 
-/** HERE Map Tiles v3 base URL (used by LeafletMapView). Requires EXPO_PUBLIC_HERE_API_KEY. */
-export const HERE_MAP_TILE_BASE_URL =
-  "https://maps.hereapi.com/v3/base/mc";
-
-/** HERE Places Search API base URL (used for POI discovery). Requires EXPO_PUBLIC_HERE_API_KEY. */
-export const HERE_DISCOVER_BASE_URL =
-  "https://discover.search.hereapi.com/v1/discover";
+/** OpenStreetMap tile layer for maps. No API key required. */
+export const OSM_TILE_URL =
+  "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 /** Open-Meteo weather forecast. No API key required. */
 export const OPEN_METEO_BASE_URL = "https://api.open-meteo.com/v1/forecast";
@@ -44,9 +40,6 @@ export const OVERPASS_DEFAULT_TIMEOUT_MS = 40_000;
 
 /** Overpass timeout for road-condition queries (faster, smaller result set). */
 export const OVERPASS_ROAD_TIMEOUT_MS = 15_000;
-
-/** Default per-request timeout for HERE Places search queries (ms). */
-export const HERE_DEFAULT_TIMEOUT_MS = 15_000;
 
 /** Search radius for emergency POIs (metres). */
 export const EMERGENCY_SEARCH_RADIUS_M = 10_000;

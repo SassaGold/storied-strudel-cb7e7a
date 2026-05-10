@@ -2,36 +2,36 @@
 // Data-fetching hook for the RIDER HQ (index) screen.
 // Encapsulates all async I/O, derived-value memos, and state management.
 
-import { useCallback, useMemo, useRef, useState } from "react";
 import * as Location from "expo-location";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { withRetry, fetchOverpass } from "./overpass";
-import { useSettings } from "./settings";
-import { useLocationPermission } from "./locationPermission";
 import {
-  HERE_GEOCODING_BASE_URL,
-  OPEN_METEO_BASE_URL,
-  YR_NO_BASE_URL,
-  YR_NO_FALLBACK_URL,
-  OVERPASS_ROAD_TIMEOUT_MS,
-  FORECAST_DAYS,
-  HOURLY_SLOTS,
-  FORECAST_DISPLAY_DAYS,
-  ROAD_ALERTS_MAX,
-  ROAD_OVERPASS_TIMEOUT_S,
-  ROAD_MAX_RESULTS,
+    FORECAST_DAYS,
+    FORECAST_DISPLAY_DAYS,
+    HOURLY_SLOTS,
+    NOMINATIM_REVERSE_GEOCODING_BASE_URL,
+    OPEN_METEO_BASE_URL,
+    OVERPASS_ROAD_TIMEOUT_MS,
+    ROAD_ALERTS_MAX,
+    ROAD_MAX_RESULTS,
+    ROAD_OVERPASS_TIMEOUT_S,
+    YR_NO_BASE_URL,
+    YR_NO_FALLBACK_URL,
 } from "./config";
-import {
-  type WeatherInfo,
-  type ForecastDay,
-  type HourlyForecast,
-  wmoToSymbol,
-  buildAlerts,
-  ridingSuitability,
-  buildRecommendations,
-} from "./weather";
-import { computeSunTimes, type SunTimes } from "./sun";
+import { useLocationPermission } from "./locationPermission";
+import { fetchOverpass, withRetry } from "./overpass";
 import { type RoadAlert, ROAD_TYPES, haversineKm } from "./roads";
+import { useSettings } from "./settings";
+import { type SunTimes, computeSunTimes } from "./sun";
+import {
+    type ForecastDay,
+    type HourlyForecast,
+    type WeatherInfo,
+    buildAlerts,
+    buildRecommendations,
+    ridingSuitability,
+    wmoToSymbol,
+} from "./weather";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -112,23 +112,22 @@ export function useRiderHQ(): RiderHQState {
 
       const { latitude, longitude } = position.coords;
 
-      // ── HERE Geocoding — reverse geocoding, retried up to 3 times ────────
-      const hereApiKey = process.env.EXPO_PUBLIC_HERE_API_KEY ?? "";
+      // ── Nominatim Reverse Geocoding — free OSM, retried up to 3 times ────
       const addressPromise = withRetry(() =>
         fetch(
-          `${HERE_GEOCODING_BASE_URL}?at=${latitude},${longitude}&lang=en&apiKey=${hereApiKey}`
+          `${NOMINATIM_REVERSE_GEOCODING_BASE_URL}?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`
         )
           .then((r) => {
-            if (!r.ok) throw new Error(`HERE Geocoding ${r.status}`);
+            if (!r.ok) throw new Error(`Nominatim Geocoding ${r.status}`);
             return r.json();
           })
           .then((data) => {
-            const item = data.items?.[0];
-            if (!item) return null;
+            if (!data.address) return null;
+            const address = data.address;
             return {
-              displayName: item.title as string,
-              city: item.address?.city || item.address?.county,
-              country: item.address?.countryName,
+              displayName: data.name || data.display_name || "",
+              city: address.city || address.town || address.village || address.county,
+              country: address.country,
             };
           })
       ).catch(() => null);

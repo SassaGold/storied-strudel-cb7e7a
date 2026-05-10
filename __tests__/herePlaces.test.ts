@@ -1,13 +1,12 @@
 // Tests for lib/herePlaces.ts — pure utility functions and key-guard behaviour.
 
 import {
-  hereItemPrimaryCategory,
-  hereItemPhone,
-  hereItemWebsite,
-  hereItemEmail,
-  hereItemOpeningHours,
-  fetchHereDiscover,
-  type HerePlaceItem,
+    hereItemEmail,
+    hereItemOpeningHours,
+    hereItemPhone,
+    hereItemPrimaryCategory,
+    hereItemWebsite,
+    type HerePlaceItem,
 } from "../lib/herePlaces";
 
 // ── hereItemPrimaryCategory ───────────────────────────────────────────────────
@@ -88,34 +87,5 @@ describe("hereItemOpeningHours", () => {
   it("returns undefined when openingHours is empty", () => {
     expect(hereItemOpeningHours({ openingHours: [] })).toBeUndefined();
     expect(hereItemOpeningHours({})).toBeUndefined();
-  });
-});
-
-// ── fetchHereDiscover — missing API key ───────────────────────────────────────
-
-describe("fetchHereDiscover", () => {
-  const originalEnv = process.env.EXPO_PUBLIC_HERE_API_KEY;
-
-  afterEach(() => {
-    // Restore the original value after each test.
-    if (originalEnv === undefined) {
-      delete process.env.EXPO_PUBLIC_HERE_API_KEY;
-    } else {
-      process.env.EXPO_PUBLIC_HERE_API_KEY = originalEnv;
-    }
-  });
-
-  it("throws 'Missing HERE API key' when EXPO_PUBLIC_HERE_API_KEY is not set", async () => {
-    delete process.env.EXPO_PUBLIC_HERE_API_KEY;
-    await expect(
-      fetchHereDiscover("restaurant", 0, 0, 5000, 10, 5000)
-    ).rejects.toThrow("Missing HERE API key");
-  });
-
-  it("throws 'Missing HERE API key' when EXPO_PUBLIC_HERE_API_KEY is an empty string", async () => {
-    process.env.EXPO_PUBLIC_HERE_API_KEY = "";
-    await expect(
-      fetchHereDiscover("restaurant", 0, 0, 5000, 10, 5000)
-    ).rejects.toThrow("Missing HERE API key");
   });
 });

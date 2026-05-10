@@ -1,19 +1,19 @@
 import POIScreen from "../../components/POIScreen";
+import {
+    type HerePlaceItem,
+    hereItemEmail,
+    hereItemOpeningHours,
+    hereItemPhone,
+    hereItemPrimaryCategory,
+    hereItemWebsite,
+} from "../../lib/herePlaces";
 import { haversineMeters } from "../../lib/overpass";
 import type { Place } from "../../lib/usePOIFetch";
-import {
-  type HerePlaceItem,
-  hereItemEmail,
-  hereItemOpeningHours,
-  hereItemPhone,
-  hereItemPrimaryCategory,
-  hereItemWebsite,
-} from "../../lib/herePlaces";
 
 // ── Attractions POI tab ───────────────────────────────────────────────────────
 
 const CACHE_KEY = "cache_attractions_v2";
-const SEARCH_QUERY = "attraction museum viewpoint castle monument artwork zoo theme park historic site";
+const SEARCH_QUERY = "attraction|museum|viewpoint|castle|monument|artwork|zoo|theme_park|historic|memorial";
 
 const buildSearchQuery = () => SEARCH_QUERY;
 

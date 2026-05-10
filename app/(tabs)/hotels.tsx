@@ -1,21 +1,21 @@
-import { Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Text, View } from "react-native";
 import POIScreen from "../../components/POIScreen";
+import {
+    type HerePlaceItem,
+    hereItemEmail,
+    hereItemOpeningHours,
+    hereItemPhone,
+    hereItemPrimaryCategory,
+    hereItemWebsite,
+} from "../../lib/herePlaces";
 import { haversineMeters } from "../../lib/overpass";
 import type { Place } from "../../lib/usePOIFetch";
-import {
-  type HerePlaceItem,
-  hereItemEmail,
-  hereItemOpeningHours,
-  hereItemPhone,
-  hereItemPrimaryCategory,
-  hereItemWebsite,
-} from "../../lib/herePlaces";
 
 // ── Hotels / Accommodation POI tab ────────────────────────────────────────────
 
 const SEARCH_QUERY =
-  "hotel motel hostel guest house apartment chalet resort campsite caravan park alpine hut villa bungalow";
+  "hotel|motel|hostel|guest_house|apartment|chalet|resort|camp_site|caravan_site|alpine_hut|villa|bungalow|holiday_let|bed_and_breakfast";
 
 const CACHE_KEY = "cache_hotels_v2";
 
@@ -27,11 +27,11 @@ const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Pl
   if (lat === undefined || lon === undefined) return null;
   const categoryRaw = (hereItemPrimaryCategory(item) || "hotel").toLowerCase();
   const category =
-    categoryRaw.includes("motel") ? "motel" :
-    categoryRaw.includes("hostel") ? "hostel" :
-    categoryRaw.includes("guest") ? "guest_house" :
-    categoryRaw.includes("camp") ? "camp_site" :
-    categoryRaw.includes("resort") ? "resort" :
+    categoryRaw === "motel" ? "motel" :
+    categoryRaw === "hostel" ? "hostel" :
+    categoryRaw === "guest_house" ? "guest_house" :
+    categoryRaw === "camp_site" || categoryRaw === "caravan_site" ? "camp_site" :
+    categoryRaw === "resort" ? "resort" :
     "hotel";
   return {
     id: item.id || `${lat},${lon},${item.title || "hotel"}`,
