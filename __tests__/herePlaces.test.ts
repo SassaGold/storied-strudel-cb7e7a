@@ -133,6 +133,7 @@ describe("fetchHereDiscover", () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 401,
+      json: jest.fn(),
     } as Response);
 
     await expect(
@@ -145,6 +146,7 @@ describe("fetchHereDiscover", () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 403,
+      json: jest.fn(),
     } as Response);
 
     await expect(
