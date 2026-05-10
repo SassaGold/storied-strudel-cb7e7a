@@ -66,7 +66,7 @@ function classifyLoadError(err: unknown): string | null {
   const hereStatus = hereStatusMatch ? Number(hereStatusMatch[1]) : null;
 
   if (lower.includes("missing here api key")) {
-    return "HERE API key configuration is missing. Configure it, then reload the app.";
+    return "HERE API key configuration is missing. Set EXPO_PUBLIC_HERE_API_KEY, then reload the app.";
   }
   if (lower.includes("here places timeout") || lower.includes("aborted")) {
     return "Request timed out. Check your network and try again.";
@@ -74,8 +74,8 @@ function classifyLoadError(err: unknown): string | null {
   if (lower.includes("network request failed") || lower.includes("failed to fetch")) {
     return "Network request failed. Check your connection and try again.";
   }
-  if (hereStatus === 401) return "HERE API key is invalid.";
-  if (hereStatus === 403) return "HERE API key does not have Discover API access.";
+  if (hereStatus === 401) return "HERE API key is invalid. Verify the key value and try again.";
+  if (hereStatus === 403) return "HERE API key does not have Discover API access. Check your HERE project permissions.";
   if (hereStatus === 429) {
     return "HERE API rate limit reached. Please try again in a moment.";
   }
