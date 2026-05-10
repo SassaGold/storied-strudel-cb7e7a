@@ -2,59 +2,52 @@
 // types and reasonable values, so accidental edits are caught immediately.
 
 import {
-  HERE_GEOCODING_BASE_URL,
-  HERE_MAP_TILE_BASE_URL,
-  HERE_DISCOVER_BASE_URL,
-  OPEN_METEO_BASE_URL,
-  YR_NO_BASE_URL,
-  YR_NO_FALLBACK_URL,
-  WIKIPEDIA_SUMMARY_URL,
-  OVERPASS_ENDPOINTS,
-  OVERPASS_DEFAULT_TIMEOUT_MS,
-  OVERPASS_ROAD_TIMEOUT_MS,
-  HERE_DEFAULT_TIMEOUT_MS,
-  EMERGENCY_SEARCH_RADIUS_M,
-  EMERGENCY_MAX_RESULTS,
-  EMERGENCY_MAX_DISPLAY,
-  POI_MAX_DISPLAY,
-  EMERGENCY_AMENITY_TYPES,
-  CACHE_TTL_MS,
-  RETRY_MAX_ATTEMPTS,
-  RETRY_INITIAL_DELAY_MS,
-  EARTH_RADIUS_M,
-  EARTH_RADIUS_KM,
-  KM_TO_MILES,
-  M_TO_FEET,
-  KMH_TO_MPH,
-  C_TO_F_FACTOR,
-  C_TO_F_OFFSET,
-  METRES_PER_MILE,
-  SHORT_DISTANCE_THRESHOLD_MILES,
-  FORECAST_DAYS,
-  HOURLY_SLOTS,
-  FORECAST_DISPLAY_DAYS,
-  ROAD_ALERTS_MAX,
-  ROAD_OVERPASS_TIMEOUT_S,
-  ROAD_MAX_RESULTS,
-  TRIP_LOCATION_INTERVAL_MS,
+    C_TO_F_FACTOR,
+    C_TO_F_OFFSET,
+    CACHE_TTL_MS,
+    EARTH_RADIUS_KM,
+    EARTH_RADIUS_M,
+    EMERGENCY_AMENITY_TYPES,
+    EMERGENCY_MAX_DISPLAY,
+    EMERGENCY_MAX_RESULTS,
+    EMERGENCY_SEARCH_RADIUS_M,
+    FORECAST_DAYS,
+    FORECAST_DISPLAY_DAYS,
+    HOURLY_SLOTS,
+    KM_TO_MILES,
+    KMH_TO_MPH,
+    M_TO_FEET,
+    METRES_PER_MILE,
+    NOMINATIM_REVERSE_GEOCODING_BASE_URL,
+    OPEN_METEO_BASE_URL,
+    OSM_TILE_URL,
+    OVERPASS_DEFAULT_TIMEOUT_MS,
+    OVERPASS_ENDPOINTS,
+    OVERPASS_ROAD_TIMEOUT_MS,
+    POI_MAX_DISPLAY,
+    RETRY_INITIAL_DELAY_MS,
+    RETRY_MAX_ATTEMPTS,
+    ROAD_ALERTS_MAX,
+    ROAD_MAX_RESULTS,
+    ROAD_OVERPASS_TIMEOUT_S,
+    SHORT_DISTANCE_THRESHOLD_MILES,
+    TRIP_LOCATION_INTERVAL_MS,
+    WIKIPEDIA_SUMMARY_URL,
+    YR_NO_BASE_URL,
+    YR_NO_FALLBACK_URL,
 } from "../lib/config";
 
 // ── URL constants ─────────────────────────────────────────────────────────────
 
 describe("API URL constants", () => {
-  it("HERE_GEOCODING_BASE_URL is a valid HTTPS URL pointing to HERE", () => {
-    expect(HERE_GEOCODING_BASE_URL).toMatch(/^https:\/\//);
-    expect(HERE_GEOCODING_BASE_URL).toContain("hereapi.com");
+  it("NOMINATIM_REVERSE_GEOCODING_BASE_URL is a valid HTTPS URL pointing to OpenStreetMap", () => {
+    expect(NOMINATIM_REVERSE_GEOCODING_BASE_URL).toMatch(/^https:\/\//);
+    expect(NOMINATIM_REVERSE_GEOCODING_BASE_URL).toContain("openstreetmap.org");
   });
 
-  it("HERE_MAP_TILE_BASE_URL is a valid HTTPS URL pointing to HERE", () => {
-    expect(HERE_MAP_TILE_BASE_URL).toMatch(/^https:\/\//);
-    expect(HERE_MAP_TILE_BASE_URL).toContain("hereapi.com");
-  });
-
-  it("HERE_DISCOVER_BASE_URL is a valid HTTPS URL pointing to HERE", () => {
-    expect(HERE_DISCOVER_BASE_URL).toMatch(/^https:\/\//);
-    expect(HERE_DISCOVER_BASE_URL).toContain("hereapi.com");
+  it("OSM_TILE_URL is a valid HTTPS URL pointing to OpenStreetMap", () => {
+    expect(OSM_TILE_URL).toMatch(/^https:\/\//);
+    expect(OSM_TILE_URL).toContain("openstreetmap.org");
   });
 
   it("OPEN_METEO_BASE_URL is a valid HTTPS URL", () => {
@@ -105,10 +98,6 @@ describe("Overpass constants", () => {
     expect(OVERPASS_ROAD_TIMEOUT_MS).toBeLessThan(OVERPASS_DEFAULT_TIMEOUT_MS);
   });
 
-  it("HERE_DEFAULT_TIMEOUT_MS is positive and sane", () => {
-    expect(HERE_DEFAULT_TIMEOUT_MS).toBeGreaterThan(0);
-    expect(HERE_DEFAULT_TIMEOUT_MS).toBeLessThan(120_000);
-  });
 });
 
 // ── Cache & retry constants ───────────────────────────────────────────────────

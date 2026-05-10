@@ -1,19 +1,19 @@
 import { useTranslation } from "react-i18next";
 import POIScreen from "../../components/POIScreen";
+import {
+    type HerePlaceItem,
+    hereItemEmail,
+    hereItemOpeningHours,
+    hereItemPhone,
+    hereItemPrimaryCategory,
+    hereItemWebsite,
+} from "../../lib/herePlaces";
 import { haversineMeters } from "../../lib/overpass";
 import type { Place } from "../../lib/usePOIFetch";
-import {
-  type HerePlaceItem,
-  hereItemEmail,
-  hereItemOpeningHours,
-  hereItemPhone,
-  hereItemPrimaryCategory,
-  hereItemWebsite,
-} from "../../lib/herePlaces";
 
 // ── Restaurants POI tab ───────────────────────────────────────────────────────
 
-const SEARCH_QUERY = "restaurant cafe fast food bar pub bakery ice cream food court";
+const SEARCH_QUERY = "restaurant|cafe|fast_food|bar|pub|bakery|ice_cream|food_court";
 
 const CATEGORY_LABEL: Record<string, string> = {
   restaurant: "🍽️ Restaurant",
@@ -43,13 +43,13 @@ const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Pl
   if (lat === undefined || lon === undefined) return null;
   const categoryRaw = (hereItemPrimaryCategory(item) || "restaurant").toLowerCase();
   const category =
-    /\bcafe\b/.test(categoryRaw) ? "cafe" :
-    /\bfast[_\s-]?food\b/.test(categoryRaw) ? "fast_food" :
-    /\bbar\b/.test(categoryRaw) ? "bar" :
-    /\bpub\b/.test(categoryRaw) ? "pub" :
-    /\bfood[_\s-]?court\b/.test(categoryRaw) ? "food_court" :
-    /\bice[_\s-]?cream\b/.test(categoryRaw) ? "ice_cream" :
-    /\bbakery\b/.test(categoryRaw) ? "bakery" :
+    /^cafe$/.test(categoryRaw) ? "cafe" :
+    /^fast_food$/.test(categoryRaw) ? "fast_food" :
+    /^bar$/.test(categoryRaw) ? "bar" :
+    /^pub$/.test(categoryRaw) ? "pub" :
+    /^food_court$/.test(categoryRaw) ? "food_court" :
+    /^ice_cream$/.test(categoryRaw) ? "ice_cream" :
+    /^bakery$/.test(categoryRaw) ? "bakery" :
     "restaurant";
   return {
     id: item.id || `${lat},${lon},${item.title || "restaurant"}`,

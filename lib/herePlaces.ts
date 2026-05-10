@@ -1,34 +1,31 @@
-import { HERE_DISCOVER_BASE_URL } from "./config";
+import { fetchOverpass } from "./overpass";
 
-const HERE_MIN_RADIUS_M = 100;
-const HERE_MAX_LIMIT = 100;
-const HERE_FALLBACK_MIN_TERM_LENGTH = 3;
-const HERE_FALLBACK_QUERY_TERMS_MAX = 6;
-const HERE_FALLBACK_RADIUS_MULTIPLIER = 2;
-const HERE_QUERY_SPLIT_REGEX = /[\s,;|]+/;
+// ── OSM data types (replacing HERE types) ──────────────────────────────────────
+const MIN_OVERPASS_TIMEOUT_SECONDS = 10;
 
-export type HereCategory = {
-  id?: string;
-  name?: string;
+export type OsmPlace = {
+  type: string; // "node", "way", or "relation"
+  id: number;
+  lat?: number;
+  lon?: number;
+  center?: { lat: number; lon: number };
+  tags?: Record<string, string>;
 };
 
-export type HereContact = {
+type ContactInfo = {
   phone?: Array<{ value?: string }>;
   www?: Array<{ value?: string }>;
   email?: Array<{ value?: string }>;
 };
 
-export type HereOpeningHours = {
-  text?: string[];
-};
-
-export type HerePlaceItem = {
+export type OsmPlaceItem = {
   id?: string;
   title?: string;
   position?: { lat: number; lng: number };
-  categories?: HereCategory[];
-  contacts?: HereContact[];
-  openingHours?: HereOpeningHours[];
+  categories?: Array<{ id?: string; name?: string }>;
+  // Keep array shape for HERE compatibility aliases (`HerePlaceItem` + helper tests).
+  contacts?: ContactInfo[];
+  openingHours?: Array<{ text?: string[] }>;
   address?: {
     label?: string;
     street?: string;
@@ -38,115 +35,129 @@ export type HerePlaceItem = {
   };
 };
 
-export async function fetchHereDiscover(
-  query: string,
+/** Builds an Overpass query for discovering POI by keywords/tags.
+ * Returns OSM data which is normalized to OsmPlaceItem format. */
+export async function fetchOsmPlaces(
+  amenities: string, // e.g., "restaurant|cafe|fast_food"
   lat: number,
   lon: number,
   radiusM: number,
   limit: number,
   timeoutMs: number
-): Promise<HerePlaceItem[]> {
-  const apiKey = process.env.EXPO_PUBLIC_HERE_API_KEY ?? "";
-  if (!apiKey) throw new Error("Missing HERE API key");
+): Promise<OsmPlaceItem[]> {
+  const timeout = Math.max(MIN_OVERPASS_TIMEOUT_SECONDS, Math.floor(timeoutMs / 1000));
 
-  const requestedLimit = Math.max(1, Math.min(limit, HERE_MAX_LIMIT));
-  const requestedRadius = Math.max(HERE_MIN_RADIUS_M, Math.round(radiusM));
+  // Build Overpass query for amenities within radius
+  const query = `
+    [out:json][timeout:${timeout}];
+    (
+      node["amenity"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
+      way["amenity"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
+      relation["amenity"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
+      node["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
+      way["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
+      relation["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
+    );
+    out center ${limit > 0 ? `limit ${Math.min(limit, 1000)}` : ""};
+  `;
 
-  const fetchDiscoverPage = async (queryText: string, radius: number): Promise<HerePlaceItem[]> => {
-    const params = new URLSearchParams({
-      q: queryText,
-      in: `circle:${lat},${lon};r=${Math.max(HERE_MIN_RADIUS_M, Math.round(radius))}`,
-      limit: String(requestedLimit),
-      lang: "en-US",
-      apiKey,
-    });
+  try {
+    const data = await fetchOverpass(query, timeoutMs);
+    const elements = Array.isArray(data.elements) ? data.elements : [];
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(`${HERE_DISCOVER_BASE_URL}?${params.toString()}`, {
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        throw new Error(`HERE Places ${response.status}`);
-      }
-      const data = (await response.json()) as { items?: HerePlaceItem[] };
-      return Array.isArray(data.items) ? data.items : [];
-    } catch (err) {
-      if (err instanceof Error && err.name === "AbortError") {
-        throw new Error("HERE Places timeout");
-      }
-      throw err;
-    } finally {
-      clearTimeout(timeoutId);
+    return elements
+      .slice(0, limit)
+      .map((elem: OsmPlace): OsmPlaceItem | null => {
+        let itemLat = elem.lat;
+        let itemLon = elem.lon;
+
+        // For ways and relations, use center if available
+        if (!itemLat && elem.center) {
+          itemLat = elem.center.lat;
+          itemLon = elem.center.lon;
+        }
+
+        if (!itemLat || !itemLon) return null;
+
+        const tags = elem.tags || {};
+        const name = tags.name || tags.operator || "POI";
+        const phone = tags.phone;
+        const website = tags.website;
+        const email = tags.email;
+        const openingHours = tags.opening_hours;
+
+        const primaryContact: ContactInfo = {
+          phone: phone ? [{ value: phone }] : undefined,
+          www: website ? [{ value: website }] : undefined,
+          email: email ? [{ value: email }] : undefined,
+        };
+        const hasContactData = Boolean(primaryContact.phone || primaryContact.www || primaryContact.email);
+
+        return {
+          id: `${elem.type}/${elem.id}`,
+          title: name,
+          position: { lat: itemLat, lng: itemLon },
+          categories: [
+            {
+              id: tags.amenity || tags.tourism || "poi",
+              name: tags.amenity || tags.tourism || "Point of Interest",
+            },
+          ],
+          contacts: hasContactData ? [primaryContact] : undefined,
+          openingHours: openingHours ? [{ text: [openingHours] }] : undefined,
+          address: {
+            label: [tags.street, tags.housenumber].filter(Boolean).join(" "),
+            street: tags.street,
+            houseNumber: tags.housenumber,
+            city: tags.city || tags.town || tags.village,
+            countryName: tags.country,
+          },
+        };
+      })
+      .filter(Boolean) as OsmPlaceItem[];
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("timeout")) {
+      throw new Error("Overpass Places timeout");
     }
-  };
-
-  const dedupeKey = (item: HerePlaceItem) => {
-    const normalizedId = typeof item.id === "string" ? item.id.trim() : "";
-    if (normalizedId.length > 0) return normalizedId;
-    return [
-      item.position?.lat ?? "na",
-      item.position?.lng ?? "na",
-      item.title?.trim() || "na",
-      item.address?.label?.trim() || "na",
-    ].join("|");
-  };
-
-  const collected = new Map<string, HerePlaceItem>();
-  const primaryItems = await fetchDiscoverPage(query, requestedRadius);
-  for (const item of primaryItems) {
-    collected.set(dedupeKey(item), item);
+    throw err;
   }
-  if (collected.size >= requestedLimit) {
-    return Array.from(collected.values()).slice(0, requestedLimit);
-  }
-
-  const fallbackTerms: string[] = [];
-  for (const rawTerm of query.split(HERE_QUERY_SPLIT_REGEX)) {
-    const term = rawTerm.trim();
-    if (term.length < HERE_FALLBACK_MIN_TERM_LENGTH) continue;
-    if (fallbackTerms.includes(term)) continue;
-    fallbackTerms.push(term);
-    if (fallbackTerms.length >= HERE_FALLBACK_QUERY_TERMS_MAX) break;
-  }
-
-  const fallbackRadius = requestedRadius * HERE_FALLBACK_RADIUS_MULTIPLIER;
-  for (const term of fallbackTerms) {
-    if (collected.size >= requestedLimit) break;
-    try {
-      const items = await fetchDiscoverPage(term, fallbackRadius);
-      for (const item of items) {
-        collected.set(dedupeKey(item), item);
-      }
-    } catch (fallbackErr) {
-      // Fallback queries are best-effort only; preserve successfully collected results.
-      console.warn("[herePlaces] fallback discover query failed:", fallbackErr);
-    }
-  }
-
-  return Array.from(collected.values()).slice(0, requestedLimit);
 }
 
-export function hereItemPrimaryCategory(item: HerePlaceItem): string | undefined {
+// ── Helpers to extract data from OsmPlaceItem (replaces HERE helpers) ───────────
+
+export function osmItemPrimaryCategory(item: OsmPlaceItem): string | undefined {
   const cat = item.categories?.[0];
   return (cat?.id || cat?.name || "").trim() || undefined;
 }
 
-export function hereItemPhone(item: HerePlaceItem): string | undefined {
-  return item.contacts?.[0]?.phone?.[0]?.value?.trim() || undefined;
+function getPrimaryContact(item: OsmPlaceItem): ContactInfo | undefined {
+  return item.contacts?.[0];
 }
 
-export function hereItemWebsite(item: HerePlaceItem): string | undefined {
-  return item.contacts?.[0]?.www?.[0]?.value?.trim() || undefined;
+export function osmItemPhone(item: OsmPlaceItem): string | undefined {
+  return getPrimaryContact(item)?.phone?.[0]?.value?.trim() || undefined;
 }
 
-export function hereItemEmail(item: HerePlaceItem): string | undefined {
-  return item.contacts?.[0]?.email?.[0]?.value?.trim() || undefined;
+export function osmItemWebsite(item: OsmPlaceItem): string | undefined {
+  return getPrimaryContact(item)?.www?.[0]?.value?.trim() || undefined;
 }
 
-export function hereItemOpeningHours(item: HerePlaceItem): string | undefined {
+export function osmItemEmail(item: OsmPlaceItem): string | undefined {
+  return getPrimaryContact(item)?.email?.[0]?.value?.trim() || undefined;
+}
+
+export function osmItemOpeningHours(item: OsmPlaceItem): string | undefined {
   const text = item.openingHours?.[0]?.text ?? [];
   const joined = text.join(" · ").trim();
   return joined || undefined;
 }
+
+// ── Re-export for backward compatibility ───────────────────────────────────────
+
+export type HerePlaceItem = OsmPlaceItem;
+export const fetchHereDiscover = fetchOsmPlaces;
+export const hereItemPrimaryCategory = osmItemPrimaryCategory;
+export const hereItemPhone = osmItemPhone;
+export const hereItemWebsite = osmItemWebsite;
+export const hereItemEmail = osmItemEmail;
+export const hereItemOpeningHours = osmItemOpeningHours;

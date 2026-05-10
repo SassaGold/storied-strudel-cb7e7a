@@ -1,16 +1,16 @@
 // ── Shared POI data-fetching hook ────────────────────────────────────────────
 // Used by restaurants, hotels, attractions, and mc tabs.
 // Encapsulates: state management, AsyncStorage caching, location permission,
-// HERE Places API fetching, distance sorting, Google Maps navigation, and the
+// Overpass API fetching, distance sorting, Google Maps navigation, and the
 // Wikipedia info modal fetch.
 
+import * as Location from "expo-location";
 import { useCallback, useRef, useState } from "react";
 import { Linking } from "react-native";
-import * as Location from "expo-location";
-import { withRetry, CACHE_TTL_MS, parseWikiTag } from "./overpass";
-import { WIKIPEDIA_SUMMARY_URL, POI_MAX_DISPLAY, HERE_DEFAULT_TIMEOUT_MS } from "./config";
-import { fetchHereDiscover, type HerePlaceItem } from "./herePlaces";
+import { OVERPASS_DEFAULT_TIMEOUT_MS, POI_MAX_DISPLAY, WIKIPEDIA_SUMMARY_URL } from "./config";
+import { fetchOsmPlaces, type OsmPlaceItem } from "./herePlaces";
 import { useLocationPermission } from "./locationPermission";
+import { CACHE_TTL_MS, parseWikiTag, withRetry } from "./overpass";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
@@ -38,11 +38,12 @@ export type Place = {
   fuelTypes?: string[];
 };
 
-/** Builds a HERE discover query string from the user's coordinates and radius. */
+/** Builds an Overpass amenity filter string (pipe-separated tags) from coordinates and radius.
+ * The coordinates and radius are provided but buildSearchQuery can ignore them for static queries. */
 export type BuildSearchQuery = (lat: number, lon: number, radiusM: number) => string;
 
-/** Maps a single HERE place item to a Place, or returns null to discard it. */
-export type MapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number) => Place | null;
+/** Maps a single Overpass place item to a Place, or returns null to discard it. */
+export type MapPlaceItem = (item: OsmPlaceItem, userLat: number, userLon: number) => Place | null;
 
 export interface UsePOIFetchOptions {
   cacheKey: string;
@@ -99,7 +100,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       locationErrorMsg,
       loadErrorMsg,
       searchRadiusKm,
-      fetchTimeoutMs = HERE_DEFAULT_TIMEOUT_MS,
+      fetchTimeoutMs = OVERPASS_DEFAULT_TIMEOUT_MS,
       fetchLimit = 120,
     } = optionsRef.current;
 
@@ -150,9 +151,9 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       setUserLocation({ latitude, longitude });
 
       const radiusM = searchRadiusKm * 1000;
-      const query = buildSearchQuery(latitude, longitude, radiusM);
+      const amenities = buildSearchQuery(latitude, longitude, radiusM);
       const items = await withRetry(
-        () => fetchHereDiscover(query, latitude, longitude, radiusM, fetchLimit, fetchTimeoutMs)
+        () => fetchOsmPlaces(amenities, latitude, longitude, radiusM, fetchLimit, fetchTimeoutMs)
       );
       if (activeCallRef.current !== callId) return;
 

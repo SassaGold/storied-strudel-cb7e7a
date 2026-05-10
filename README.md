@@ -188,22 +188,16 @@ cd storied-strudel-cb7e7a
 npm install
 ```
 
-### 3 — Configure environment variables
+### 3 — Configure environment variables (optional)
 
-The app requires a **HERE Platform API key** for map tiles, reverse geocoding, and POI search.
+The app uses **OpenStreetMap (Nominatim, Overpass)** for map tiles, reverse geocoding, and POI search — all free and open-source services that require **no API key**.
 
-1. Sign up for a free key at [developer.here.com](https://developer.here.com).
-2. Copy the example env file and add your key:
-   ```bash
-   cp .env.example .env
-   # then open .env in any editor and paste your key after the = sign
-   ```
-3. The `.env` file is git-ignored and must never be committed.
-
-For EAS cloud builds, add the key as an EAS Secret instead of a `.env` file:
 ```bash
-eas secret:create --name EXPO_PUBLIC_HERE_API_KEY --value YOUR_KEY_HERE
+cp .env.example .env
+# No additional setup required!
 ```
+
+The `.env` file is git-ignored and must never be committed.
 
 ### 4 — Choose how to run the app
 
