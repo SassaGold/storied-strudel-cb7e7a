@@ -23,6 +23,7 @@ export type OsmPlaceItem = {
   title?: string;
   position?: { lat: number; lng: number };
   categories?: Array<{ id?: string; name?: string }>;
+  // Keep array shape for HERE compatibility aliases (`HerePlaceItem` + helper tests).
   contacts?: ContactInfo[];
   openingHours?: Array<{ text?: string[] }>;
   address?: {
