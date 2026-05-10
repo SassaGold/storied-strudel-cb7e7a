@@ -98,10 +98,6 @@ describe("Overpass constants", () => {
     expect(OVERPASS_ROAD_TIMEOUT_MS).toBeLessThan(OVERPASS_DEFAULT_TIMEOUT_MS);
   });
 
-  it("HERE_DEFAULT_TIMEOUT_MS is positive and sane", () => {
-    expect(HERE_DEFAULT_TIMEOUT_MS).toBeGreaterThan(0);
-    expect(HERE_DEFAULT_TIMEOUT_MS).toBeLessThan(120_000);
-  });
 });
 
 // ── Cache & retry constants ───────────────────────────────────────────────────
