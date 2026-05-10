@@ -95,6 +95,7 @@ describe("hereItemOpeningHours", () => {
 
 describe("fetchHereDiscover", () => {
   const originalEnv = process.env.EXPO_PUBLIC_HERE_API_KEY;
+  const originalFetch = global.fetch;
 
   afterEach(() => {
     // Restore the original value after each test.
@@ -103,6 +104,8 @@ describe("fetchHereDiscover", () => {
     } else {
       process.env.EXPO_PUBLIC_HERE_API_KEY = originalEnv;
     }
+    global.fetch = originalFetch;
+    jest.restoreAllMocks();
   });
 
   it("throws 'Missing HERE API key' when EXPO_PUBLIC_HERE_API_KEY is not set", async () => {
@@ -117,5 +120,33 @@ describe("fetchHereDiscover", () => {
     await expect(
       fetchHereDiscover("restaurant", 0, 0, 5000, 10, 5000)
     ).rejects.toThrow("Missing HERE API key");
+  });
+
+  it("returns deduplicated fallback results when the initial discover query is sparse", async () => {
+    process.env.EXPO_PUBLIC_HERE_API_KEY = "test-key";
+    const itemA = { id: "a", title: "A", position: { lat: 1, lng: 2 } };
+    const itemB = { id: "b", title: "B", position: { lat: 3, lng: 4 } };
+
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [itemA] }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ items: [itemA, itemB] }),
+      });
+    global.fetch = fetchMock as typeof fetch;
+
+    const items = await fetchHereDiscover("restaurant cafe", 64.1, -21.9, 5000, 2, 5000);
+
+    expect(items.map((i) => i.id)).toEqual(["a", "b"]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const firstUrl = new URL(fetchMock.mock.calls[0][0] as string);
+    const secondUrl = new URL(fetchMock.mock.calls[1][0] as string);
+    expect(firstUrl.searchParams.get("q")).toBe("restaurant cafe");
+    expect(firstUrl.searchParams.get("in")).toContain("r=5000");
+    expect(["restaurant", "cafe"]).toContain(secondUrl.searchParams.get("q"));
+    expect(secondUrl.searchParams.get("in")).toContain("r=10000");
   });
 });
