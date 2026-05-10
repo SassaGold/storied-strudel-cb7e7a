@@ -1,6 +1,7 @@
 import { fetchOverpass } from "./overpass";
 
 // ── OSM data types (replacing HERE types) ──────────────────────────────────────
+const MIN_OVERPASS_TIMEOUT_SECONDS = 10;
 
 export type OsmPlace = {
   type: string; // "node", "way", or "relation"
@@ -22,7 +23,7 @@ export type OsmPlaceItem = {
   title?: string;
   position?: { lat: number; lng: number };
   categories?: Array<{ id?: string; name?: string }>;
-  contacts?: ContactInfo | ContactInfo[];
+  contacts?: ContactInfo[];
   openingHours?: Array<{ text?: string[] }>;
   address?: {
     label?: string;
@@ -43,7 +44,7 @@ export async function fetchOsmPlaces(
   limit: number,
   timeoutMs: number
 ): Promise<OsmPlaceItem[]> {
-  const timeout = Math.max(10, Math.floor(timeoutMs / 1000));
+  const timeout = Math.max(MIN_OVERPASS_TIMEOUT_SECONDS, Math.floor(timeoutMs / 1000));
 
   // Build Overpass query for amenities within radius
   const query = `
@@ -94,11 +95,13 @@ export async function fetchOsmPlaces(
               name: tags.amenity || tags.tourism || "Point of Interest",
             },
           ],
-          contacts: {
-            phone: phone ? [{ value: phone }] : undefined,
-            www: website ? [{ value: website }] : undefined,
-            email: email ? [{ value: email }] : undefined,
-          },
+          contacts: [
+            {
+              phone: phone ? [{ value: phone }] : undefined,
+              www: website ? [{ value: website }] : undefined,
+              email: email ? [{ value: email }] : undefined,
+            },
+          ],
           openingHours: openingHours ? [{ text: [openingHours] }] : undefined,
           address: {
             label: [tags.street, tags.housenumber].filter(Boolean).join(" "),
@@ -126,8 +129,7 @@ export function osmItemPrimaryCategory(item: OsmPlaceItem): string | undefined {
 }
 
 function getPrimaryContact(item: OsmPlaceItem): ContactInfo | undefined {
-  if (!item.contacts) return undefined;
-  return Array.isArray(item.contacts) ? item.contacts[0] : item.contacts;
+  return item.contacts?.[0];
 }
 
 export function osmItemPhone(item: OsmPlaceItem): string | undefined {
