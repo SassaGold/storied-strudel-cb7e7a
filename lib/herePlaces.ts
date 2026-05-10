@@ -2,8 +2,10 @@ import { HERE_DISCOVER_BASE_URL } from "./config";
 
 const HERE_MIN_RADIUS_M = 100;
 const HERE_MAX_LIMIT = 100;
+const HERE_FALLBACK_MIN_TERM_LENGTH = 3;
 const HERE_FALLBACK_QUERY_TERMS_MAX = 6;
 const HERE_FALLBACK_RADIUS_MULTIPLIER = 2;
+const HERE_QUERY_SPLIT_REGEX = /[\s,;|]+/;
 
 export type HereCategory = {
   id?: string;
@@ -80,8 +82,16 @@ export async function fetchHereDiscover(
     }
   };
 
-  const dedupeKey = (item: HerePlaceItem) =>
-    item.id || `${item.position?.lat ?? ""},${item.position?.lng ?? ""},${item.title ?? ""}`;
+  const dedupeKey = (item: HerePlaceItem) => {
+    const normalizedId = typeof item.id === "string" ? item.id.trim() : "";
+    if (normalizedId.length > 0) return normalizedId;
+    return [
+      item.position?.lat ?? "na",
+      item.position?.lng ?? "na",
+      item.title?.trim() || "na",
+      item.address?.label?.trim() || "na",
+    ].join("|");
+  };
 
   const collected = new Map<string, HerePlaceItem>();
   const primaryItems = await fetchDiscoverPage(query, requestedRadius);
@@ -92,25 +102,27 @@ export async function fetchHereDiscover(
     return Array.from(collected.values()).slice(0, requestedLimit);
   }
 
-  const fallbackTerms = Array.from(
-    new Set(
-      query
-        .split(/[\s,]+/)
-        .map((term) => term.trim())
-        .filter((term) => term.length >= 3)
-    )
-  ).slice(0, HERE_FALLBACK_QUERY_TERMS_MAX);
+  const fallbackTerms: string[] = [];
+  for (const rawTerm of query.split(HERE_QUERY_SPLIT_REGEX)) {
+    const term = rawTerm.trim();
+    if (term.length < HERE_FALLBACK_MIN_TERM_LENGTH) continue;
+    if (fallbackTerms.includes(term)) continue;
+    fallbackTerms.push(term);
+    if (fallbackTerms.length >= HERE_FALLBACK_QUERY_TERMS_MAX) break;
+  }
 
   const fallbackRadius = requestedRadius * HERE_FALLBACK_RADIUS_MULTIPLIER;
   for (const term of fallbackTerms) {
     if (collected.size >= requestedLimit) break;
-    if (term.toLowerCase() === query.trim().toLowerCase()) continue;
     try {
       const items = await fetchDiscoverPage(term, fallbackRadius);
       for (const item of items) {
         collected.set(dedupeKey(item), item);
       }
-    } catch {}
+    } catch (fallbackErr) {
+      // Fallback queries are best-effort only; preserve successfully collected results.
+      console.warn("[herePlaces] fallback discover query failed:", fallbackErr);
+    }
   }
 
   return Array.from(collected.values()).slice(0, requestedLimit);

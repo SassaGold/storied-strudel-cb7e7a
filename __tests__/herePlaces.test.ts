@@ -124,15 +124,17 @@ describe("fetchHereDiscover", () => {
 
   it("returns deduplicated fallback results when the initial discover query is sparse", async () => {
     process.env.EXPO_PUBLIC_HERE_API_KEY = "test-key";
+    const itemA = { id: "a", title: "A", position: { lat: 1, lng: 2 } };
+    const itemB = { id: "b", title: "B", position: { lat: 3, lng: 4 } };
 
     const fetchMock = jest.fn()
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ items: [{ id: "a", title: "A", position: { lat: 1, lng: 2 } }] }),
+        json: async () => ({ items: [itemA] }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ items: [{ id: "a", title: "A", position: { lat: 1, lng: 2 } }, { id: "b", title: "B", position: { lat: 3, lng: 4 } }] }),
+        json: async () => ({ items: [itemA, itemB] }),
       });
     global.fetch = fetchMock as typeof fetch;
 
@@ -140,8 +142,8 @@ describe("fetchHereDiscover", () => {
 
     expect(items.map((i) => i.id)).toEqual(["a", "b"]);
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    const firstUrl = new URL((fetchMock.mock.calls[0]?.[0] as string) ?? "");
-    const secondUrl = new URL((fetchMock.mock.calls[1]?.[0] as string) ?? "");
+    const firstUrl = new URL(fetchMock.mock.calls[0][0] as string);
+    const secondUrl = new URL(fetchMock.mock.calls[1][0] as string);
     expect(firstUrl.searchParams.get("q")).toBe("restaurant cafe");
     expect(firstUrl.searchParams.get("in")).toContain("r=5000");
     expect(["restaurant", "cafe"]).toContain(secondUrl.searchParams.get("q"));
