@@ -42,7 +42,7 @@ export async function fetchHereDiscover(
   limit: number,
   timeoutMs: number
 ): Promise<HerePlaceItem[]> {
-  const apiKey = process.env.EXPO_PUBLIC_HERE_API_KEY ?? "";
+  const apiKey = (process.env.EXPO_PUBLIC_HERE_API_KEY ?? "").trim();
   if (!apiKey) throw new Error("Missing HERE API key");
 
   const params = new URLSearchParams({
@@ -60,6 +60,12 @@ export async function fetchHereDiscover(
       signal: controller.signal,
     });
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("HERE Places 401 invalid API key");
+      }
+      if (response.status === 403) {
+        throw new Error("HERE Places 403 Discover API blocked for this key");
+      }
       throw new Error(`HERE Places ${response.status}`);
     }
     const data = (await response.json()) as { items?: HerePlaceItem[] };

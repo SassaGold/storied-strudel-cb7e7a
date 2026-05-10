@@ -95,6 +95,7 @@ describe("hereItemOpeningHours", () => {
 
 describe("fetchHereDiscover", () => {
   const originalEnv = process.env.EXPO_PUBLIC_HERE_API_KEY;
+  const originalFetch = global.fetch;
 
   afterEach(() => {
     // Restore the original value after each test.
@@ -103,6 +104,7 @@ describe("fetchHereDiscover", () => {
     } else {
       process.env.EXPO_PUBLIC_HERE_API_KEY = originalEnv;
     }
+    global.fetch = originalFetch;
   });
 
   it("throws 'Missing HERE API key' when EXPO_PUBLIC_HERE_API_KEY is not set", async () => {
@@ -117,5 +119,36 @@ describe("fetchHereDiscover", () => {
     await expect(
       fetchHereDiscover("restaurant", 0, 0, 5000, 10, 5000)
     ).rejects.toThrow("Missing HERE API key");
+  });
+
+  it("throws 'Missing HERE API key' when EXPO_PUBLIC_HERE_API_KEY is whitespace only", async () => {
+    process.env.EXPO_PUBLIC_HERE_API_KEY = "   ";
+    await expect(
+      fetchHereDiscover("restaurant", 0, 0, 5000, 10, 5000)
+    ).rejects.toThrow("Missing HERE API key");
+  });
+
+  it("surfaces invalid key failures with HERE 401 classification", async () => {
+    process.env.EXPO_PUBLIC_HERE_API_KEY = "fake-key";
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+    } as Response);
+
+    await expect(
+      fetchHereDiscover("restaurant", 0, 0, 5000, 10, 5000)
+    ).rejects.toThrow("HERE Places 401 invalid API key");
+  });
+
+  it("surfaces restricted key failures with HERE 403 classification", async () => {
+    process.env.EXPO_PUBLIC_HERE_API_KEY = "fake-key";
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 403,
+    } as Response);
+
+    await expect(
+      fetchHereDiscover("restaurant", 0, 0, 5000, 10, 5000)
+    ).rejects.toThrow("HERE Places 403 Discover API blocked for this key");
   });
 });
