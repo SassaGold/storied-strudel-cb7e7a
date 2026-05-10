@@ -56,7 +56,11 @@ export interface UsePOIFetchOptions {
 }
 
 function classifyLoadError(err: unknown): string | null {
-  const msg = err instanceof Error ? err.message : String(err || "An unexpected error occurred");
+  const msg = err instanceof Error
+    ? err.message
+    : err == null
+      ? "An unexpected error occurred"
+      : String(err);
   const lower = msg.toLowerCase();
   const hereStatusMatch = lower.match(/here places (\d{3})/);
   const hereStatus = hereStatusMatch ? Number(hereStatusMatch[1]) : null;
@@ -70,11 +74,8 @@ function classifyLoadError(err: unknown): string | null {
   if (lower.includes("network request failed") || lower.includes("failed to fetch")) {
     return "Network request failed. Check your connection and try again.";
   }
-  if (hereStatus === 401 || hereStatus === 403) {
-    return hereStatus === 401
-      ? "HERE API key is invalid."
-      : "HERE API key does not have Discover API access.";
-  }
+  if (hereStatus === 401) return "HERE API key is invalid.";
+  if (hereStatus === 403) return "HERE API key does not have Discover API access.";
   if (hereStatus === 429) {
     return "HERE API rate limit reached. Please try again in a moment.";
   }
