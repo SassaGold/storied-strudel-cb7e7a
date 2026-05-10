@@ -1,12 +1,12 @@
 // Tests for lib/herePlaces.ts — pure utility functions and key-guard behaviour.
 
 import {
-    hereItemEmail,
-    hereItemOpeningHours,
-    hereItemPhone,
-    hereItemPrimaryCategory,
-    hereItemWebsite,
-    type HerePlaceItem,
+  hereItemEmail,
+  hereItemOpeningHours,
+  hereItemPhone,
+  hereItemPrimaryCategory,
+  hereItemWebsite,
+  type HerePlaceItem,
 } from "../lib/herePlaces";
 
 // ── hereItemPrimaryCategory ───────────────────────────────────────────────────

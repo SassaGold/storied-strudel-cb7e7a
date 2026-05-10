@@ -11,12 +11,18 @@ export type OsmPlace = {
   tags?: Record<string, string>;
 };
 
+type ContactInfo = {
+  phone?: Array<{ value?: string }>;
+  www?: Array<{ value?: string }>;
+  email?: Array<{ value?: string }>;
+};
+
 export type OsmPlaceItem = {
   id?: string;
   title?: string;
   position?: { lat: number; lng: number };
   categories?: Array<{ id?: string; name?: string }>;
-  contacts?: { phone?: Array<{ value?: string }>; www?: Array<{ value?: string }>; email?: Array<{ value?: string }> };
+  contacts?: ContactInfo | ContactInfo[];
   openingHours?: Array<{ text?: string[] }>;
   address?: {
     label?: string;
@@ -37,7 +43,6 @@ export async function fetchOsmPlaces(
   limit: number,
   timeoutMs: number
 ): Promise<OsmPlaceItem[]> {
-  const radiusKm = Math.max(0.1, radiusM / 1000);
   const timeout = Math.max(10, Math.floor(timeoutMs / 1000));
 
   // Build Overpass query for amenities within radius
@@ -57,32 +62,32 @@ export async function fetchOsmPlaces(
   try {
     const data = await fetchOverpass(query, timeoutMs);
     const elements = Array.isArray(data.elements) ? data.elements : [];
-    
+
     return elements
       .slice(0, limit)
       .map((elem: OsmPlace): OsmPlaceItem | null => {
-        let lat = elem.lat;
-        let lon = elem.lon;
-        
+        let itemLat = elem.lat;
+        let itemLon = elem.lon;
+
         // For ways and relations, use center if available
-        if (!lat && elem.center) {
-          lat = elem.center.lat;
-          lon = elem.center.lon;
+        if (!itemLat && elem.center) {
+          itemLat = elem.center.lat;
+          itemLon = elem.center.lon;
         }
-        
-        if (!lat || !lon) return null;
-        
+
+        if (!itemLat || !itemLon) return null;
+
         const tags = elem.tags || {};
         const name = tags.name || tags.operator || "POI";
         const phone = tags.phone;
-        const website = tags.website || tags.contact?.website;
-        const email = tags.email || tags.contact?.email;
+        const website = tags.website;
+        const email = tags.email;
         const openingHours = tags.opening_hours;
-        
+
         return {
           id: `${elem.type}/${elem.id}`,
           title: name,
-          position: { lat, lng: lon },
+          position: { lat: itemLat, lng: itemLon },
           categories: [
             {
               id: tags.amenity || tags.tourism || "poi",
@@ -120,16 +125,21 @@ export function osmItemPrimaryCategory(item: OsmPlaceItem): string | undefined {
   return (cat?.id || cat?.name || "").trim() || undefined;
 }
 
+function getPrimaryContact(item: OsmPlaceItem): ContactInfo | undefined {
+  if (!item.contacts) return undefined;
+  return Array.isArray(item.contacts) ? item.contacts[0] : item.contacts;
+}
+
 export function osmItemPhone(item: OsmPlaceItem): string | undefined {
-  return item.contacts?.phone?.[0]?.value?.trim() || undefined;
+  return getPrimaryContact(item)?.phone?.[0]?.value?.trim() || undefined;
 }
 
 export function osmItemWebsite(item: OsmPlaceItem): string | undefined {
-  return item.contacts?.www?.[0]?.value?.trim() || undefined;
+  return getPrimaryContact(item)?.www?.[0]?.value?.trim() || undefined;
 }
 
 export function osmItemEmail(item: OsmPlaceItem): string | undefined {
-  return item.contacts?.email?.[0]?.value?.trim() || undefined;
+  return getPrimaryContact(item)?.email?.[0]?.value?.trim() || undefined;
 }
 
 export function osmItemOpeningHours(item: OsmPlaceItem): string | undefined {
@@ -147,4 +157,3 @@ export const hereItemPhone = osmItemPhone;
 export const hereItemWebsite = osmItemWebsite;
 export const hereItemEmail = osmItemEmail;
 export const hereItemOpeningHours = osmItemOpeningHours;
-
