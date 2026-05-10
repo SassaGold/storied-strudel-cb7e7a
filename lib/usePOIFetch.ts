@@ -56,7 +56,7 @@ export interface UsePOIFetchOptions {
 }
 
 function classifyLoadError(err: unknown): string | null {
-  const msg = err instanceof Error ? err.message : `${err ?? "Unknown error"}`;
+  const msg = err instanceof Error ? err.message : `${err ?? "An unexpected error occurred"}`;
   const lower = msg.toLowerCase();
   const hereStatusMatch = lower.match(/here places (\d{3})/);
   const hereStatus = hereStatusMatch ? Number(hereStatusMatch[1]) : null;
@@ -71,7 +71,7 @@ function classifyLoadError(err: unknown): string | null {
     return "Network request failed. Check your connection and try again.";
   }
   if (hereStatus === 401) {
-    return "HERE API key is invalid for Discover API authentication.";
+    return "HERE API key is invalid.";
   }
   if (hereStatus === 403) {
     return "HERE API key does not have Discover API access.";
