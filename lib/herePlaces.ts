@@ -2,6 +2,8 @@ import { HERE_DISCOVER_BASE_URL } from "./config";
 
 const HERE_MIN_RADIUS_M = 100;
 const HERE_MAX_LIMIT = 100;
+const HERE_FALLBACK_QUERY_TERMS_MAX = 6;
+const HERE_FALLBACK_RADIUS_MULTIPLIER = 2;
 
 export type HereCategory = {
   id?: string;
@@ -45,33 +47,73 @@ export async function fetchHereDiscover(
   const apiKey = process.env.EXPO_PUBLIC_HERE_API_KEY ?? "";
   if (!apiKey) throw new Error("Missing HERE API key");
 
-  const params = new URLSearchParams({
-    q: query,
-    in: `circle:${lat},${lon};r=${Math.max(HERE_MIN_RADIUS_M, Math.round(radiusM))}`,
-    limit: String(Math.max(1, Math.min(limit, HERE_MAX_LIMIT))),
-    lang: "en-US",
-    apiKey,
-  });
+  const requestedLimit = Math.max(1, Math.min(limit, HERE_MAX_LIMIT));
+  const requestedRadius = Math.max(HERE_MIN_RADIUS_M, Math.round(radiusM));
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    const response = await fetch(`${HERE_DISCOVER_BASE_URL}?${params.toString()}`, {
-      signal: controller.signal,
+  const fetchDiscoverPage = async (queryText: string, radius: number): Promise<HerePlaceItem[]> => {
+    const params = new URLSearchParams({
+      q: queryText,
+      in: `circle:${lat},${lon};r=${Math.max(HERE_MIN_RADIUS_M, Math.round(radius))}`,
+      limit: String(requestedLimit),
+      lang: "en-US",
+      apiKey,
     });
-    if (!response.ok) {
-      throw new Error(`HERE Places ${response.status}`);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(`${HERE_DISCOVER_BASE_URL}?${params.toString()}`, {
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`HERE Places ${response.status}`);
+      }
+      const data = (await response.json()) as { items?: HerePlaceItem[] };
+      return Array.isArray(data.items) ? data.items : [];
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        throw new Error("HERE Places timeout");
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
     }
-    const data = (await response.json()) as { items?: HerePlaceItem[] };
-    return Array.isArray(data.items) ? data.items : [];
-  } catch (err) {
-    if (err instanceof Error && err.name === "AbortError") {
-      throw new Error("HERE Places timeout");
-    }
-    throw err;
-  } finally {
-    clearTimeout(timeoutId);
+  };
+
+  const dedupeKey = (item: HerePlaceItem) =>
+    item.id || `${item.position?.lat ?? ""},${item.position?.lng ?? ""},${item.title ?? ""}`;
+
+  const collected = new Map<string, HerePlaceItem>();
+  const primaryItems = await fetchDiscoverPage(query, requestedRadius);
+  for (const item of primaryItems) {
+    collected.set(dedupeKey(item), item);
   }
+  if (collected.size >= requestedLimit) {
+    return Array.from(collected.values()).slice(0, requestedLimit);
+  }
+
+  const fallbackTerms = Array.from(
+    new Set(
+      query
+        .split(/[\s,]+/)
+        .map((term) => term.trim())
+        .filter((term) => term.length >= 3)
+    )
+  ).slice(0, HERE_FALLBACK_QUERY_TERMS_MAX);
+
+  const fallbackRadius = requestedRadius * HERE_FALLBACK_RADIUS_MULTIPLIER;
+  for (const term of fallbackTerms) {
+    if (collected.size >= requestedLimit) break;
+    if (term.toLowerCase() === query.trim().toLowerCase()) continue;
+    try {
+      const items = await fetchDiscoverPage(term, fallbackRadius);
+      for (const item of items) {
+        collected.set(dedupeKey(item), item);
+      }
+    } catch {}
+  }
+
+  return Array.from(collected.values()).slice(0, requestedLimit);
 }
 
 export function hereItemPrimaryCategory(item: HerePlaceItem): string | undefined {
