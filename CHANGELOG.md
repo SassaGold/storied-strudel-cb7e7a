@@ -1,5 +1,29 @@
 # Changelog
 
+## v1.1.7 — Patch Release (2026-05-10)
+
+Completed the migration from HERE Maps to OpenStreetMap/Nominatim throughout the entire app. Removed all remaining HERE references from source code, comments, locale strings, and the About screen data-sources card. The `hereApiKey.ts` helper file was deleted (unused). The About screen now correctly credits Nominatim and links to `nominatim.openstreetmap.org`. No API keys are required for any feature.
+
+---
+
+## v1.1.6 — Patch Release (2026-05-09)
+
+Resolved merge conflicts from concurrent branch work. All tab screens, shared hooks, and locale files reconciled to a single clean state. Lint and tests confirmed green.
+
+---
+
+## v1.1.5 — Patch Release (2026-05-08)
+
+Migrated POI search from HERE Places API to OpenStreetMap / Overpass API. `lib/herePlaces.ts` now queries Overpass directly using `fetchOsmPlaces`, with backward-compatible type aliases (`HerePlaceItem`, `fetchHereDiscover`, etc.) retained for callers. Emergency places hook (`lib/useEmergencyPlaces.ts`) updated to use `OVERPASS_DEFAULT_TIMEOUT_MS`. All nine locale files updated to remove HERE Map Tiles references; `mapsDesc` now describes OSM tile layers.
+
+---
+
+## v1.1.4 — Patch Release (2026-05-07)
+
+Dependency maintenance: updated all Expo SDK packages to latest patch versions, resolved peer-dependency warnings, confirmed lint and test suite green after upgrade.
+
+---
+
 ## v1.1.3 — Patch Release (2026-04-16)
 
 Added Google-required Prominent Disclosure screen for location permission. A full-screen in-app modal now appears before the OS location permission dialog, clearly explaining what location data is collected, how it is used, that it is never shared, and that the user may decline. Supported in all 9 app languages.
