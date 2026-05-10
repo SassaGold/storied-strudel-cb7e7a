@@ -350,7 +350,7 @@
     "wikipediaDesc": "Stedsbeskrivelser hentes fra Wikipedia REST API der en Wikipedia-tag er tilgjengelig i OpenStreetMap-data. Wikipedia-innhold er lisensiert under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia-bidragsytere · CC BY-SA",
     "maps": "Kart og navigasjon",
-    "mapsDesc": "Kartet i appen bruker Leaflet.js med HERE Map Tiles gjengitt i en WebView via react-native-webview. Å trykke på 'Åpne i Kart' åpner standard kartappen din.",
+    "mapsDesc": "Kartet i appen bruker Leaflet.js med OpenStreetMap-kartlag gjengitt i en WebView via react-native-webview. Å trykke på 'Åpne i Kart' åpner standard kartappen din.",
     "privacy": "PERSONVERN",
     "privacyTitle": "Ditt personvern",
     "privacyP1": "Denne appen samler ikke inn, overfører eller deler personlige data. Det er ingen analyse, ingen krasjrapportere og ingen reklameprogramvare.",
@@ -368,8 +368,8 @@
     "updateLatest": "✅ Du er oppdatert",
     "updateError": "❌ Oppdateringssjekk mislyktes",
     "privacyPolicyLink": "📄 Personvernregler",
-    "here": "HERE Maps",
-    "hereDesc": "Nåværende adresse hentes via HERE Geocoding API. Kartet i appen bruker HERE Map Tiles via Leaflet.js. HERE er en ledende kart- og stedsplattform. Krever en HERE API-nøkkel."
+    "here": "OpenStreetMap / Nominatim",
+    "hereDesc": "Nåværende adresse hentes via Nominatim API (OpenStreetMap). Kartet i appen bruker OpenStreetMap-kartlag via Leaflet.js. Ingen API-nøkkel kreves."
   },
   "settings": {
     "badge": "⚙️ INNSTILLINGER",

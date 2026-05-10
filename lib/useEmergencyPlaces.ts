@@ -1,6 +1,6 @@
 // ── lib/useEmergencyPlaces.ts ─────────────────────────────────────────────────
 // Data-fetching hook for the Emergency (SOS) screen.
-// Encapsulates location, HERE Places POI query, caching and state management.
+// Encapsulates location, Overpass/OSM POI query, caching and state management.
 
 import { useCallback, useRef, useState } from "react";
 import * as Location from "expo-location";
@@ -11,7 +11,7 @@ import {
   EMERGENCY_SEARCH_RADIUS_M,
   EMERGENCY_MAX_RESULTS,
   EMERGENCY_MAX_DISPLAY,
-  HERE_DEFAULT_TIMEOUT_MS,
+  OVERPASS_DEFAULT_TIMEOUT_MS,
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
 
@@ -66,7 +66,7 @@ export type EmergencyPlace = {
 
 /**
  * Manages fetching, caching and state for emergency services POIs.
- * Uses HERE Places discover API for emergency-location discovery.
+ * Uses OSM/Overpass for emergency-location discovery.
  */
 export function useEmergencyPlaces() {
   const { t } = useTranslation();
@@ -140,7 +140,7 @@ export function useEmergencyPlaces() {
           longitude,
           EMERGENCY_SEARCH_RADIUS_M,
           EMERGENCY_MAX_RESULTS,
-          HERE_DEFAULT_TIMEOUT_MS
+          OVERPASS_DEFAULT_TIMEOUT_MS
         )
       );
       if (activeCallRef.current !== callId) return;

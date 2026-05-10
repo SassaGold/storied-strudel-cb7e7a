@@ -1,6 +1,6 @@
 import { fetchOverpass } from "./overpass";
 
-// ── OSM data types (replacing HERE types) ──────────────────────────────────────
+// ── OSM data types ─────────────────────────────────────────────────────────────
 const MIN_OVERPASS_TIMEOUT_SECONDS = 10;
 
 export type OsmPlace = {
@@ -23,7 +23,7 @@ export type OsmPlaceItem = {
   title?: string;
   position?: { lat: number; lng: number };
   categories?: Array<{ id?: string; name?: string }>;
-  // Keep array shape for HERE compatibility aliases (`HerePlaceItem` + helper tests).
+  // Keep array shape for backward-compatible aliases.
   contacts?: ContactInfo[];
   openingHours?: Array<{ text?: string[] }>;
   address?: {
@@ -123,7 +123,7 @@ export async function fetchOsmPlaces(
   }
 }
 
-// ── Helpers to extract data from OsmPlaceItem (replaces HERE helpers) ───────────
+// ── Helpers to extract data from OsmPlaceItem ─────────────────────────────────
 
 export function osmItemPrimaryCategory(item: OsmPlaceItem): string | undefined {
   const cat = item.categories?.[0];

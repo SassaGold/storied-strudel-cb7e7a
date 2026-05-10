@@ -92,13 +92,13 @@ export default function AboutScreen() {
         {/* Data Sources */}
         <Section title={t("about.dataSources")}>
 
-          {/* HERE Maps */}
+          {/* Nominatim / OpenStreetMap */}
           <View style={styles.card}>
             <Text style={styles.cardTitle}>🗺️ {t("about.here")}</Text>
             <Text style={styles.cardBody}>{t("about.hereDesc")}</Text>
             <LinkRow
-              label="developer.here.com"
-              url="https://developer.here.com"
+              label="nominatim.openstreetmap.org"
+              url="https://nominatim.openstreetmap.org"
               openLabel={t("about.openLink")}
             />
           </View>

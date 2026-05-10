@@ -37,7 +37,7 @@ const AsyncStorage: any = (() => { try { return require("@react-native-async-sto
 /** AsyncStorage key for the last selected category — persists across restarts. */
 const MC_SELECTED_KEY = "mc_selected_v1";
 
-// Per-category fetch timeouts (HERE Places discover).
+// Per-category fetch timeouts (Overpass queries).
 const CATEGORY_FETCH_TIMEOUT_MS: Record<string, number> = {
   services: 15000,
   fuel: 15000,
@@ -91,7 +91,7 @@ const CATEGORY_ICONS: Record<Category, string> = {
   atm_bank:     "🏧",
 };
 
-// ── HERE item mapping ─────────────────────────────────────────────────────────
+// ── OSM item mapping ───────────────────────────────────────────────────────────
 
 const mapMcElement = (
   item: HerePlaceItem,
@@ -118,7 +118,7 @@ const mapMcElement = (
   };
 };
 
-// ── HERE query builder ────────────────────────────────────────────────────────
+// ── Overpass query builder ────────────────────────────────────────────────────
 
 const buildQuery = (category: Category): string => {
   if (category === "services") return "motorcycle_repair|car_repair|bicycle_repair|service_station";
@@ -144,7 +144,7 @@ export default function McScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
-  // MC categories keep fixed HERE-tuned radii per category to improve relevance for each POI type
+  // MC categories keep fixed radii per category to improve relevance for each POI type
   // (e.g. broader radius for tracks/services, tighter for ATM/bank), independent of global settings.searchRadiusKm.
   const effectiveSearchRadiusKm = CATEGORY_RADIUS_M[selected] / 1000;
 

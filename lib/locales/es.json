@@ -350,7 +350,7 @@
     "wikipediaDesc": "Las descripciones de lugares se obtienen de la API REST de Wikipedia cuando hay una etiqueta de Wikipedia disponible en los datos de OpenStreetMap.",
     "wikiLicense": "© Colaboradores de Wikipedia · CC BY-SA",
     "maps": "Mapas y Navegación",
-    "mapsDesc": "El mapa en la aplicación usa Leaflet.js con HERE Map Tiles renderizado en un WebView mediante react-native-webview. Al tocar 'Abrir en Mapas' se abre tu aplicación de mapas predeterminada.",
+    "mapsDesc": "El mapa en la aplicación usa Leaflet.js con capas de teselas de OpenStreetMap renderizado en un WebView mediante react-native-webview. Al tocar 'Abrir en Mapas' se abre tu aplicación de mapas predeterminada.",
     "privacy": "PRIVACIDAD",
     "privacyTitle": "Tu Privacidad",
     "privacyP1": "Esta aplicación no recopila, transmite ni comparte ningún dato personal. No hay análisis, ni informes de fallos, ni SDK publicitarios.",
@@ -368,8 +368,8 @@
     "updateLatest": "✅ Estás al día",
     "updateError": "❌ Error al buscar actualización",
     "privacyPolicyLink": "📄 Política de privacidad",
-    "here": "HERE Maps",
-    "hereDesc": "La dirección de tu ubicación actual se obtiene mediante la API de geocodificación HERE. El mapa en la aplicación usa HERE Map Tiles a través de Leaflet.js. HERE es una plataforma líder de mapas y datos de localización. Requiere una clave de API HERE."
+    "here": "OpenStreetMap / Nominatim",
+    "hereDesc": "La dirección de tu ubicación actual se obtiene mediante la API Nominatim (OpenStreetMap). El mapa en la aplicación usa capas de teselas de OpenStreetMap a través de Leaflet.js. No se requiere clave de API."
   },
   "settings": {
     "badge": "⚙️ AJUSTES",

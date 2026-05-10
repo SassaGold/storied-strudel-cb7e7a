@@ -350,7 +350,7 @@
     "wikipediaDesc": "Staðarlýsingar eru sóttar frá Wikipedia REST API þegar Wikipedia-merki er tiltækt í OpenStreetMap-gögnum.",
     "wikiLicense": "© Wikipedia-framleggjendur · CC BY-SA",
     "maps": "Kort & Leiðsögn",
-    "mapsDesc": "Kortið í forritinu notar Leaflet.js með HERE Map Tiles í WebView í gegnum react-native-webview. Að pikka á 'Opna í Kortum' opnar sjálfgefna kortsforritið þitt.",
+    "mapsDesc": "Kortið í forritinu notar Leaflet.js með OpenStreetMap-flísum í WebView í gegnum react-native-webview. Að pikka á 'Opna í Kortum' opnar sjálfgefna kortsforritið þitt.",
     "privacy": "FRIÐHELGI",
     "privacyTitle": "Friðhelgi þín",
     "privacyP1": "Þetta forrit safnar ekki, sendir ekki eða deilir persónulegum gögnum. Engar greiningar, engar hrunaskýrslur, engin auglýsinga-SDK.",
@@ -368,8 +368,8 @@
     "updateLatest": "✅ Þú ert uppfærður",
     "updateError": "❌ Uppfærsluleit mistókst",
     "privacyPolicyLink": "📄 Persónuverndarstefna",
-    "here": "HERE Maps",
-    "hereDesc": "Núverandi staðsetningarfang þitt er fengið með HERE Geocoding API. Kortið í forritinu notar HERE Map Tiles í gegnum Leaflet.js. HERE er leiðandi kortlagninga- og staðsetningarvettvangur. Krefst HERE API-lykils."
+    "here": "OpenStreetMap / Nominatim",
+    "hereDesc": "Núverandi staðsetningarfang þitt er fengið með Nominatim API (OpenStreetMap). Kortið í forritinu notar OpenStreetMap-flísar í gegnum Leaflet.js. Engin API-lykill þarf."
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",

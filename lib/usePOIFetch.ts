@@ -60,7 +60,7 @@ export interface UsePOIFetchOptions {
 
 /**
  * Shared hook for all POI screens.
- * Manages state, caching, GPS location, HERE Places fetch, and info-modal wiki lookup.
+ * Manages state, caching, GPS location, Overpass Places fetch, and info-modal wiki lookup.
  */
 export function usePOIFetch(options: UsePOIFetchOptions) {
   const [loading, setLoading] = useState(false);
