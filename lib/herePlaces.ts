@@ -86,6 +86,13 @@ export async function fetchOsmPlaces(
         const email = tags.email;
         const openingHours = tags.opening_hours;
 
+        const primaryContact: ContactInfo = {
+          phone: phone ? [{ value: phone }] : undefined,
+          www: website ? [{ value: website }] : undefined,
+          email: email ? [{ value: email }] : undefined,
+        };
+        const hasContactData = Boolean(primaryContact.phone || primaryContact.www || primaryContact.email);
+
         return {
           id: `${elem.type}/${elem.id}`,
           title: name,
@@ -96,13 +103,7 @@ export async function fetchOsmPlaces(
               name: tags.amenity || tags.tourism || "Point of Interest",
             },
           ],
-          contacts: [
-            {
-              phone: phone ? [{ value: phone }] : undefined,
-              www: website ? [{ value: website }] : undefined,
-              email: email ? [{ value: email }] : undefined,
-            },
-          ],
+          contacts: hasContactData ? [primaryContact] : undefined,
           openingHours: openingHours ? [{ text: [openingHours] }] : undefined,
           address: {
             label: [tags.street, tags.housenumber].filter(Boolean).join(" "),
