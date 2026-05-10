@@ -354,7 +354,7 @@
     "wikipediaDesc": "Place descriptions are fetched from the Wikipedia REST API where a Wikipedia tag is available in OpenStreetMap data. Wikipedia content is licensed under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia contributors · CC BY-SA",
     "maps": "Maps & Navigation",
-    "mapsDesc": "The in-app map uses Leaflet.js with HERE Map Tiles rendered inside a WebView via react-native-webview. Tapping 'Open in Maps' deeplinks to your default maps app.",
+    "mapsDesc": "The in-app map uses Leaflet.js with OpenStreetMap tile layers rendered inside a WebView via react-native-webview. Tapping 'Open in Maps' deeplinks to your default maps app.",
     "privacy": "PRIVACY",
     "privacyTitle": "Your Privacy",
     "privacyP1": "This app does not collect, transmit, or share any personal data. There are no analytics, no crash reporters, and no advertising SDKs.",
@@ -372,8 +372,8 @@
     "updateLatest": "✅ You're up to date",
     "updateError": "❌ Update check failed",
     "privacyPolicyLink": "📄 Privacy Policy",
-    "here": "HERE Maps",
-    "hereDesc": "Your current location address is reverse-geocoded using the HERE Geocoding API. The in-app map uses HERE Map Tiles via Leaflet.js. HERE is a leading mapping and location-data platform. Requires a HERE API key."
+    "here": "OpenStreetMap / Nominatim",
+    "hereDesc": "Your current location address is reverse-geocoded using the Nominatim API (OpenStreetMap). The in-app map uses OpenStreetMap tile layers via Leaflet.js. No API key required."
   },
   "settings": {
     "badge": "⚙️ SETTINGS",

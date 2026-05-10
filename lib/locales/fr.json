@@ -350,7 +350,7 @@
     "wikipediaDesc": "Les descriptions de lieux sont récupérées depuis l'API REST Wikipedia lorsqu'un tag Wikipedia est disponible dans les données OpenStreetMap.",
     "wikiLicense": "© Contributeurs Wikipedia · CC BY-SA",
     "maps": "Cartes & Navigation",
-    "mapsDesc": "La carte intégrée utilise Leaflet.js avec les tuiles HERE Map Tiles dans une WebView via react-native-webview. Appuyer sur 'Ouvrir dans Maps' ouvre votre application de carte par défaut.",
+    "mapsDesc": "La carte intégrée utilise Leaflet.js avec les couches de tuiles OpenStreetMap dans une WebView via react-native-webview. Appuyer sur 'Ouvrir dans Maps' ouvre votre application de carte par défaut.",
     "privacy": "CONFIDENTIALITÉ",
     "privacyTitle": "Votre Vie Privée",
     "privacyP1": "Cette application ne collecte, ne transmet ni ne partage aucune donnée personnelle. Pas d'analyses, pas de rapports de plantage, pas de SDK publicitaires.",
@@ -368,8 +368,8 @@
     "updateLatest": "✅ Vous êtes à jour",
     "updateError": "❌ Échec de la vérification",
     "privacyPolicyLink": "📄 Politique de confidentialité",
-    "here": "HERE Maps",
-    "hereDesc": "L'adresse de votre position actuelle est obtenue via l'API de géocodage HERE. La carte intégrée utilise les tuiles HERE Map Tiles via Leaflet.js. HERE est une plateforme de cartographie et de données de localisation de premier plan. Nécessite une clé API HERE."
+    "here": "OpenStreetMap / Nominatim",
+    "hereDesc": "L'adresse de votre position actuelle est obtenue via l'API Nominatim (OpenStreetMap). La carte intégrée utilise les couches de tuiles OpenStreetMap via Leaflet.js. Aucune clé API requise."
   },
   "settings": {
     "badge": "⚙️ PARAMÈTRES",

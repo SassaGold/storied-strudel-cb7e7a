@@ -31,9 +31,9 @@ const Haptics: typeof import("expo-haptics") | null = (() => { try { return requ
 export interface POIScreenProps {
   /** AsyncStorage cache key (e.g. "cache_restaurants_v2") */
   cacheKey: string;
-  /** Builds the HERE discover query for this POI type */
+  /** Builds the Overpass query for this POI type */
   buildSearchQuery: BuildSearchQuery;
-  /** Maps a single raw HERE item to a Place (return null to skip) */
+  /** Maps a single raw OSM/Overpass item to a Place (return null to skip) */
   mapPlaceItem: MapPlaceItem;
   /**
    * i18n key prefix for screen-specific strings.

@@ -350,7 +350,7 @@
     "wikipediaDesc": "Ortsbeschreibungen werden von der Wikipedia-REST-API abgerufen, wenn ein Wikipedia-Tag in den OpenStreetMap-Daten vorhanden ist.",
     "wikiLicense": "© Wikipedia-Mitwirkende · CC BY-SA",
     "maps": "Karten & Navigation",
-    "mapsDesc": "Die In-App-Karte verwendet Leaflet.js mit HERE Map Tiles in einer WebView via react-native-webview. Beim Tippen auf 'In Karten öffnen' wird deine Standard-Karten-App geöffnet.",
+    "mapsDesc": "Die In-App-Karte verwendet Leaflet.js mit OpenStreetMap-Kacheln in einer WebView via react-native-webview. Beim Tippen auf 'In Karten öffnen' wird deine Standard-Karten-App geöffnet.",
     "privacy": "DATENSCHUTZ",
     "privacyTitle": "Deine Privatsphäre",
     "privacyP1": "Diese App sammelt, überträgt oder teilt keine persönlichen Daten. Keine Analysen, keine Absturzberichte, keine Werbe-SDKs.",
@@ -368,8 +368,8 @@
     "updateLatest": "✅ Du bist aktuell",
     "updateError": "❌ Update-Prüfung fehlgeschlagen",
     "privacyPolicyLink": "📄 Datenschutzerklärung",
-    "here": "HERE Maps",
-    "hereDesc": "Deine aktuelle Adresse wird über die HERE Geocoding API ermittelt. Die In-App-Karte verwendet HERE Map Tiles über Leaflet.js. HERE ist eine führende Karten- und Standortdatenplattform. Erfordert einen HERE API-Schlüssel."
+    "here": "OpenStreetMap / Nominatim",
+    "hereDesc": "Deine aktuelle Adresse wird über die Nominatim API (OpenStreetMap) ermittelt. Die In-App-Karte verwendet OpenStreetMap-Kacheln über Leaflet.js. Kein API-Schlüssel erforderlich."
   },
   "settings": {
     "badge": "⚙️ EINSTELLUNGEN",
