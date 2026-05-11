@@ -69,7 +69,6 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
   const [wikiExtract, setWikiExtract] = useState<string | null>(null);
   const [wikiLoading, setWikiLoading] = useState(false);
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [fromCache, setFromCache] = useState(false);
   /** Unix timestamp (ms) of the cache hit, or null if data is fresh. */
@@ -211,8 +210,6 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     infoPlace,
     wikiExtract,
     wikiLoading,
-    viewMode,
-    setViewMode,
     setInfoPlace,
     setWikiExtract,
     setPlaces,

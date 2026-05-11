@@ -137,12 +137,6 @@ export default function AboutScreen() {
               openLabel={t("about.openLink")}
             />
           </View>
-
-          {/* Maps */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>📍 {t("about.maps")}</Text>
-            <Text style={styles.cardBody}>{t("about.mapsDesc")}</Text>
-          </View>
         </Section>
 
         {/* Privacy */}

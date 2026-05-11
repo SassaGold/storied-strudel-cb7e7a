@@ -325,15 +325,10 @@
     "confirm": "Tout supprimer",
     "deleteRide": "Supprimer",
     "rideLabel": "Trajet {{n}}",
-    "viewMap": "Voir Itinéraire",
-    "closeMap": "Fermer",
-    "mapTitle": "Route du trajet",
     "accuracy": "Précision GPS {{value}} m",
     "points": "{{count}} points GPS",
-    "mapUnavailable": "Carte non disponible",
     "tooShortTitle": "Trajet Non Enregistré",
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
-    "viewMapShort": "Itinéraire",
     "speedLabel": "VITESSE"
   },
   "about": {
@@ -349,8 +344,6 @@
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Les descriptions de lieux sont récupérées depuis l'API REST Wikipedia lorsqu'un tag Wikipedia est disponible dans les données OpenStreetMap.",
     "wikiLicense": "© Contributeurs Wikipedia · CC BY-SA",
-    "maps": "Cartes & Navigation",
-    "mapsDesc": "La carte intégrée utilise Leaflet.js avec les couches de tuiles OpenStreetMap dans une WebView via react-native-webview. Appuyer sur 'Ouvrir dans Maps' ouvre votre application de carte par défaut.",
     "privacy": "CONFIDENTIALITÉ",
     "privacyTitle": "Votre Vie Privée",
     "privacyP1": "Cette application ne collecte, ne transmet ni ne partage aucune donnée personnelle. Pas d'analyses, pas de rapports de plantage, pas de SDK publicitaires.",
@@ -358,7 +351,7 @@
     "privacyP3": "Les données de trajet enregistrées par le Journal de Trajet (distances, routes GPS) sont stockées uniquement sur votre appareil et ne sont jamais téléchargées.",
     "privacyP4": "Les résultats de recherche POI sont mis en cache localement sur votre appareil pour réduire les requêtes réseau. Le cache peut être effacé à tout moment via Paramètres → Effacer les données en cache.",
     "credits": "CRÉDITS OPEN-SOURCE",
-    "creditsBody": "Développé avec Expo, React Native, expo-location, Leaflet.js, react-native-webview, @react-native-async-storage/async-storage, i18next et react-i18next. Toutes les bibliothèques sous leurs licences open-source respectives.",
+    "creditsBody": "Développé avec Expo, React Native, expo-location, @react-native-async-storage/async-storage, i18next et react-i18next. Toutes les bibliothèques sous leurs licences open-source respectives.",
     "version": "Version",
     "openLink": "Ouvrir ↗",
     "legal": "MENTIONS LÉGALES",
@@ -369,7 +362,7 @@
     "updateError": "❌ Échec de la vérification",
     "privacyPolicyLink": "📄 Politique de confidentialité",
     "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "L'adresse de votre position actuelle est obtenue via l'API Nominatim (OpenStreetMap). La carte intégrée utilise les couches de tuiles OpenStreetMap via Leaflet.js. Aucune clé API requise."
+    "hereDesc": "L'adresse de votre position actuelle est obtenue via l'API Nominatim (OpenStreetMap). Aucune clé API requise."
   },
   "settings": {
     "badge": "⚙️ PARAMÈTRES",
