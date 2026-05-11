@@ -1,6 +1,7 @@
 // Tests for lib/herePlaces.ts — pure utility functions and key-guard behaviour.
 
 import {
+  fetchOsmPlaces,
   hereItemEmail,
   hereItemOpeningHours,
   hereItemPhone,
@@ -87,5 +88,51 @@ describe("hereItemOpeningHours", () => {
   it("returns undefined when openingHours is empty", () => {
     expect(hereItemOpeningHours({ openingHours: [] })).toBeUndefined();
     expect(hereItemOpeningHours({})).toBeUndefined();
+  });
+});
+
+// ── fetchOsmPlaces — Overpass query syntax ────────────────────────────────────
+
+describe("fetchOsmPlaces query syntax", () => {
+  const originalFetch = global.fetch;
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  it("generates a valid 'out center N;' statement without the word 'limit'", async () => {
+    let capturedBody = "";
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({ elements: [] }),
+    }) as unknown as typeof fetch;
+
+    await fetchOsmPlaces("restaurant", 51.5, 0.0, 5000, 50, 10000);
+
+    capturedBody = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
+    const query = decodeURIComponent(capturedBody.replace(/^data=/, ""));
+
+    // Must use "out center 50;" — the number directly, no "limit" keyword
+    expect(query).toMatch(/out center 50;/);
+    expect(query).not.toMatch(/out center limit/);
+  });
+
+  it("generates 'out center;' with no number when limit is 0", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({ elements: [] }),
+    }) as unknown as typeof fetch;
+
+    await fetchOsmPlaces("restaurant", 51.5, 0.0, 5000, 0, 10000);
+
+    const capturedBody = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
+    const query = decodeURIComponent(capturedBody.replace(/^data=/, ""));
+
+    expect(query).toMatch(/out center;/);
+    expect(query).not.toMatch(/out center limit/);
   });
 });
