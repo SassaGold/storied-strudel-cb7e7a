@@ -597,13 +597,6 @@ const styles = StyleSheet.create({
   viewToggleTextActive: {
     color: "#000000",
   },
-  mapView: {
-    width: "100%",
-    height: 340,
-    borderRadius: 10,
-    marginBottom: 12,
-    overflow: "hidden",
-  },
   cacheBanner: {
     backgroundColor: "rgba(255,153,0,0.12)",
     borderRadius: 6,

@@ -3,7 +3,6 @@ import {
   Alert,
   Animated,
   Linking,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -19,7 +18,6 @@ import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
-import LeafletMapView from "../../components/LeafletMapView";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -83,7 +81,6 @@ export default function TripLoggerScreen() {
 
   // History state
   const [rides, setRides] = useState<SavedRide[]>([]);
-  const [mapRide, setMapRide] = useState<SavedRide | null>(null);
 
   const watchRef = useRef<Location.LocationSubscription | null>(null);
   const liveSpeedWatchRef = useRef<Location.LocationSubscription | null>(null);
@@ -435,23 +432,6 @@ export default function TripLoggerScreen() {
     );
   }, [t, saveRides]);
 
-  // Bounding region for map modal
-  const mapRegion = mapRide && mapRide.route.length > 0
-    ? (() => {
-        const lats = mapRide.route.map((p) => p.latitude);
-        const lons = mapRide.route.map((p) => p.longitude);
-        const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-        const minLon = Math.min(...lons), maxLon = Math.max(...lons);
-        const pad = 0.002;
-        return {
-          latitude: (minLat + maxLat) / 2,
-          longitude: (minLon + maxLon) / 2,
-          latitudeDelta: Math.max(maxLat - minLat + pad, 0.005),
-          longitudeDelta: Math.max(maxLon - minLon + pad, 0.005),
-        };
-      })()
-    : null;
-
   const avgSpeedKmh = elapsedMs > 0
     ? distanceKm / (elapsedMs / 3_600_000)
     : 0;
@@ -586,16 +566,6 @@ export default function TripLoggerScreen() {
               </View>
               {/* Action buttons */}
               <View style={styles.rideActions}>
-                {ride.route.length > 1 && (
-                  <Pressable
-                    style={[styles.rideBtn, styles.viewRouteBtn]}
-                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); setMapRide(ride); }}
-                    accessibilityRole="button"
-                    accessibilityLabel={t("triplog.viewMap")}
-                  >
-                    <Text style={styles.rideBtnText}>🗺  {t("triplog.viewMap")}</Text>
-                  </Pressable>
-                )}
                 <Pressable
                   style={[styles.rideBtn, styles.deleteBtn]}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); deleteRide(ride.id); }}
@@ -612,40 +582,6 @@ export default function TripLoggerScreen() {
 
         <View style={styles.bottomPad} />
       </ScrollView>
-
-      {/* Route map modal */}
-      <Modal
-        visible={mapRide !== null}
-        animationType="slide"
-        onRequestClose={() => setMapRide(null)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={[styles.modalHeader, { paddingTop: insets.top + 12 }]}>
-            <Text style={styles.modalTitle}>{t("triplog.mapTitle")}</Text>
-            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); setMapRide(null); }} accessibilityRole="button" accessibilityLabel={t("triplog.closeMap")}>
-              <Text style={styles.modalClose}>{t("triplog.closeMap")}</Text>
-            </Pressable>
-          </View>
-          {mapRide && mapRegion ? (
-            <LeafletMapView
-              style={styles.fullMap}
-              initialRegion={mapRegion}
-              route={mapRide.route}
-            />
-          ) : (
-            <View style={styles.noMapMsg}>
-              <Text style={styles.noMapText}>{t("triplog.mapUnavailable")}</Text>
-            </View>
-          )}
-          {mapRide && (
-            <View style={[styles.modalStats, { paddingBottom: Math.max(insets.bottom, 16) }]}>
-              <Text style={styles.modalStat}>📏 {fmtDist(mapRide.distanceKm, settings.unitSystem)}</Text>
-              <Text style={styles.modalStat}>⏱ {formatDuration(mapRide.durationMs)}</Text>
-              <Text style={styles.modalStat}>⚡ {fmtSpeed(mapRide.avgSpeedKmh, settings.unitSystem)}</Text>
-            </View>
-          )}
-        </View>
-      </Modal>
     </View>
   );
 }
@@ -992,11 +928,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     alignItems: "center",
   },
-  viewRouteBtn: {
-    backgroundColor: "#1e3a2a",
-    borderWidth: 1,
-    borderColor: "#22c55e",
-  },
   deleteBtn: {
     backgroundColor: "#1a1a1a",
     borderWidth: 1,
@@ -1013,45 +944,5 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 
-  // Modal
-  modalContainer: { flex: 1, backgroundColor: "#0a0a0a" },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingTop: 12,
-    paddingHorizontal: 20,
-    paddingBottom: 12,
-    backgroundColor: "#111",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ff6600",
-  },
-  modalTitle: {
-    color: "#fff",
-    fontWeight: "900",
-    fontSize: 18,
-    letterSpacing: 1,
-  },
-  modalClose: {
-    color: "#ff6600",
-    fontWeight: "700",
-    fontSize: 14,
-  },
-  fullMap: { flex: 1 },
-  noMapMsg: { flex: 1, justifyContent: "center", alignItems: "center" },
-  noMapText: { color: "#555", fontSize: 16 },
-  modalStats: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 16,
-    backgroundColor: "#111",
-    borderTopWidth: 1,
-    borderTopColor: "#2a2a2a",
-  },
-  modalStat: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 14,
-  },
   bottomPad: { height: 40 },
 });

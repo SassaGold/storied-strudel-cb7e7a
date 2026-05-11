@@ -325,16 +325,11 @@
     "confirm": "Radera alla",
     "deleteRide": "Radera",
     "rideLabel": "Tur {{n}}",
-    "viewMap": "Rutt",
-    "closeMap": "Stäng",
-    "mapTitle": "Turrutt",
     "accuracy": "GPS-noggrannhet {{value}} m",
     "points": "{{count}} GPS-punkter",
-    "mapUnavailable": "Karta ej tillgänglig",
     "tooShortTitle": "Tur inte sparad",
     "tooShortMsg": "Turen var under 10 m — inte sparad.",
-    "speedLabel": "HASTIGHET",
-    "viewMapShort": "Rutt"
+    "speedLabel": "HASTIGHET"
   },
   "about": {
     "badge": "ℹ️ OM",
@@ -349,8 +344,6 @@
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Platsbeskrivningar hämtas från Wikipedia REST API där en Wikipedia-tagg finns tillgänglig i OpenStreetMap-data. Wikipedia-innehåll är licensierat under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia-bidragsgivare · CC BY-SA",
-    "maps": "Kartor och navigation",
-    "mapsDesc": "Kartan i appen använder Leaflet.js med OpenStreetMap-kartlager i en WebView via react-native-webview. Att trycka på 'Öppna i Kartor' öppnar din standardkartapp.",
     "privacy": "INTEGRITET",
     "privacyTitle": "Din integritet",
     "privacyP1": "Den här appen samlar inte in, överför eller delar personuppgifter. Det finns ingen analys, inga kraschrapportörer och inga annonsprogramvaror.",
@@ -358,7 +351,7 @@
     "privacyP3": "Turdata inspelad av Turloggen (avstånd, GPS-rutter) lagras endast på din enhet med lokal lagring och laddas aldrig upp.",
     "privacyP4": "POI-sökresultat cachas lokalt på din enhet för att minska upprepade nätverksförfrågningar. Cachen kan rensas när som helst via Inställningar → Rensa cachad data.",
     "credits": "ÖPPEN KÄLLKOD",
-    "creditsBody": "Byggt med Expo, React Native, expo-location, Leaflet.js, react-native-webview, @react-native-async-storage/async-storage, i18next och react-i18next. Alla bibliotek används under sina respektive öppen källkod-licenser.",
+    "creditsBody": "Byggt med Expo, React Native, expo-location, @react-native-async-storage/async-storage, i18next och react-i18next. Alla bibliotek används under sina respektive öppen källkod-licenser.",
     "version": "App-version",
     "openLink": "Öppna ↗",
     "legal": "JURIDISKT",
@@ -369,7 +362,7 @@
     "updateError": "❌ Uppdateringskontroll misslyckades",
     "privacyPolicyLink": "📄 Integritetspolicy",
     "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Din nuvarande adress hämtas via Nominatim API (OpenStreetMap). Kartan i appen använder OpenStreetMap-kartlager via Leaflet.js. Ingen API-nyckel krävs."
+    "hereDesc": "Din nuvarande adress hämtas via Nominatim API (OpenStreetMap). Ingen API-nyckel krävs."
   },
   "settings": {
     "badge": "⚙️ INSTÄLLNINGAR",

@@ -325,16 +325,11 @@
     "confirm": "Slet alle",
     "deleteRide": "Slet",
     "rideLabel": "Tur {{n}}",
-    "viewMap": "Rute",
-    "closeMap": "Luk",
-    "mapTitle": "Turrute",
     "accuracy": "GPS-nøjagtighed {{value}} m",
     "points": "{{count}} GPS-punkter",
-    "mapUnavailable": "Kort ikke tilgængeligt",
     "tooShortTitle": "Tur ikke gemt",
     "tooShortMsg": "Turen var under 10 m — ikke gemt.",
-    "speedLabel": "FART",
-    "viewMapShort": "Rute"
+    "speedLabel": "FART"
   },
   "about": {
     "badge": "ℹ️ OM",
@@ -349,8 +344,6 @@
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Stedsbeskrivelser hentes fra Wikipedia REST API, hvor et Wikipedia-tag er tilgængeligt i OpenStreetMap-data. Wikipedia-indhold er licenseret under Creative Commons Attribution-ShareAlike.",
     "wikiLicense": "© Wikipedia-bidragsydere · CC BY-SA",
-    "maps": "Kort og navigation",
-    "mapsDesc": "Kortet i appen bruger Leaflet.js med OpenStreetMap-kortlag gengivet i en WebView via react-native-webview. Tryk på 'Åbn i Kort' åbner din standard kortapp.",
     "privacy": "PRIVATLIV",
     "privacyTitle": "Dit privatliv",
     "privacyP1": "Denne app indsamler, overfører eller deler ikke personlige data. Der er ingen analyse, ingen crash-reportere og ingen reklameprogrammer.",
@@ -358,7 +351,7 @@
     "privacyP3": "Turdata registreret af Turloggen (afstande, GPS-ruter) gemmes kun på din enhed ved hjælp af lokal lagring og uploades aldrig.",
     "privacyP4": "POI-søgeresultater cachelagres lokalt på din enhed for at reducere gentagne netværksanmodninger. Cachen kan ryddes når som helst via Indstillinger → Ryd cachelagrede data.",
     "credits": "ÅBEN KILDEKODE",
-    "creditsBody": "Bygget med Expo, React Native, expo-location, Leaflet.js, react-native-webview, @react-native-async-storage/async-storage, i18next og react-i18next. Alle biblioteker brugt under deres respektive open source-licenser.",
+    "creditsBody": "Bygget med Expo, React Native, expo-location, @react-native-async-storage/async-storage, i18next og react-i18next. Alle biblioteker brugt under deres respektive open source-licenser.",
     "version": "App-version",
     "openLink": "Åbn ↗",
     "legal": "JURIDISK",
@@ -369,7 +362,7 @@
     "updateError": "❌ Opdateringstjek mislykkedes",
     "privacyPolicyLink": "📄 Privatlivspolitik",
     "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Din nuværende adresse hentes via Nominatim API (OpenStreetMap). Kortet i appen bruger OpenStreetMap-kortlag via Leaflet.js. Ingen API-nøgle kræves."
+    "hereDesc": "Din nuværende adresse hentes via Nominatim API (OpenStreetMap). Ingen API-nøgle kræves."
   },
   "settings": {
     "badge": "⚙️ INDSTILLINGER",

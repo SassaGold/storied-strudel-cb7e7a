@@ -9,10 +9,6 @@
 export const NOMINATIM_REVERSE_GEOCODING_BASE_URL =
   "https://nominatim.openstreetmap.org/reverse";
 
-/** OpenStreetMap tile layer for maps. No API key required. */
-export const OSM_TILE_URL =
-  "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-
 /** Open-Meteo weather forecast. No API key required. */
 export const OPEN_METEO_BASE_URL = "https://api.open-meteo.com/v1/forecast";
 

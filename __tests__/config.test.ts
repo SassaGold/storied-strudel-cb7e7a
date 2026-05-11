@@ -20,7 +20,6 @@ import {
     METRES_PER_MILE,
     NOMINATIM_REVERSE_GEOCODING_BASE_URL,
     OPEN_METEO_BASE_URL,
-    OSM_TILE_URL,
     OVERPASS_DEFAULT_TIMEOUT_MS,
     OVERPASS_ENDPOINTS,
     OVERPASS_ROAD_TIMEOUT_MS,
@@ -43,11 +42,6 @@ describe("API URL constants", () => {
   it("NOMINATIM_REVERSE_GEOCODING_BASE_URL is a valid HTTPS URL pointing to OpenStreetMap", () => {
     expect(NOMINATIM_REVERSE_GEOCODING_BASE_URL).toMatch(/^https:\/\//);
     expect(NOMINATIM_REVERSE_GEOCODING_BASE_URL).toContain("openstreetmap.org");
-  });
-
-  it("OSM_TILE_URL is a valid HTTPS URL pointing to OpenStreetMap", () => {
-    expect(OSM_TILE_URL).toMatch(/^https:\/\//);
-    expect(OSM_TILE_URL).toContain("openstreetmap.org");
   });
 
   it("OPEN_METEO_BASE_URL is a valid HTTPS URL", () => {

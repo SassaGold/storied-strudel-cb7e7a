@@ -325,15 +325,10 @@
     "confirm": "Eyða öllu",
     "deleteRide": "Eyða",
     "rideLabel": "Ferð {{n}}",
-    "viewMap": "Sýna leið",
-    "closeMap": "Loka",
-    "mapTitle": "Ferðaleið",
     "accuracy": "GPS nákvæmni {{value}} m",
     "points": "{{count}} GPS-punktar",
-    "mapUnavailable": "Kort ekki tiltækt",
     "tooShortTitle": "Ferð Ekki Vistuð",
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
-    "viewMapShort": "Leið",
     "speedLabel": "HRAÐI"
   },
   "about": {
@@ -349,8 +344,6 @@
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Staðarlýsingar eru sóttar frá Wikipedia REST API þegar Wikipedia-merki er tiltækt í OpenStreetMap-gögnum.",
     "wikiLicense": "© Wikipedia-framleggjendur · CC BY-SA",
-    "maps": "Kort & Leiðsögn",
-    "mapsDesc": "Kortið í forritinu notar Leaflet.js með OpenStreetMap-flísum í WebView í gegnum react-native-webview. Að pikka á 'Opna í Kortum' opnar sjálfgefna kortsforritið þitt.",
     "privacy": "FRIÐHELGI",
     "privacyTitle": "Friðhelgi þín",
     "privacyP1": "Þetta forrit safnar ekki, sendir ekki eða deilir persónulegum gögnum. Engar greiningar, engar hrunaskýrslur, engin auglýsinga-SDK.",
@@ -358,7 +351,7 @@
     "privacyP3": "Ferðagögn skráð af Ferðaskráningunni (vegalengdir, GPS-leiðir) eru geymd aðeins á tækinu þínu og eru aldrei hlaðin upp.",
     "privacyP4": "POI-leitarniðurstöður eru geymdar í skyndiminni á tækinu til að draga úr netbeiðnum. Hægt er að hreinsa skyndiminni hvenær sem er í Stillingar → Hreinsa geymd gögn.",
     "credits": "OPINN HUGBÚNAÐAR ÞAKKLÆTI",
-    "creditsBody": "Byggt með Expo, React Native, expo-location, Leaflet.js, react-native-webview, @react-native-async-storage/async-storage, i18next og react-i18next. Allar bókasöfn undir viðeigandi opnum hugbúnaðarleyfum.",
+    "creditsBody": "Byggt með Expo, React Native, expo-location, @react-native-async-storage/async-storage, i18next og react-i18next. Allar bókasöfn undir viðeigandi opnum hugbúnaðarleyfum.",
     "version": "Útgáfa",
     "openLink": "Opna ↗",
     "legal": "LAGALEGT",
@@ -369,7 +362,7 @@
     "updateError": "❌ Uppfærsluleit mistókst",
     "privacyPolicyLink": "📄 Persónuverndarstefna",
     "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Núverandi staðsetningarfang þitt er fengið með Nominatim API (OpenStreetMap). Kortið í forritinu notar OpenStreetMap-flísar í gegnum Leaflet.js. Engin API-lykill þarf."
+    "hereDesc": "Núverandi staðsetningarfang þitt er fengið með Nominatim API (OpenStreetMap). Engin API-lykill þarf."
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",

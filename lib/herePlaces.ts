@@ -58,7 +58,7 @@ export async function fetchOsmPlaces(
       way["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
       relation["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
     );
-    out center ${limit > 0 ? `limit ${Math.min(limit, 1000)}` : ""};
+    out center${limit > 0 ? ` ${Math.min(limit, 1000)}` : ""};
   `;
 
   try {
