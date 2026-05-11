@@ -365,8 +365,8 @@
     "updateLatest": "✅ You're up to date",
     "updateError": "❌ Update check failed",
     "privacyPolicyLink": "📄 Privacy Policy",
-    "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Your current location address is reverse-geocoded using the Nominatim API (OpenStreetMap). No API key required."
+    "osm": "OpenStreetMap / Nominatim",
+    "osmDesc": "Your current location address is reverse-geocoded using the Nominatim API (OpenStreetMap). No API key required."
   },
   "settings": {
     "badge": "⚙️ SETTINGS",

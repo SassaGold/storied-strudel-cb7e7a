@@ -361,8 +361,8 @@
     "updateLatest": "✅ Du är uppdaterad",
     "updateError": "❌ Uppdateringskontroll misslyckades",
     "privacyPolicyLink": "📄 Integritetspolicy",
-    "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Din nuvarande adress hämtas via Nominatim API (OpenStreetMap). Ingen API-nyckel krävs."
+    "osm": "OpenStreetMap / Nominatim",
+    "osmDesc": "Din nuvarande adress hämtas via Nominatim API (OpenStreetMap). Ingen API-nyckel krävs."
   },
   "settings": {
     "badge": "⚙️ INSTÄLLNINGAR",

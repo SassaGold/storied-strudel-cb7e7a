@@ -6,7 +6,7 @@ import { useCallback, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
 import { haversineMeters, withRetry, CACHE_TTL_MS } from "./overpass";
-import { fetchHereDiscover, type HerePlaceItem, hereItemOpeningHours, hereItemPhone, hereItemWebsite } from "./herePlaces";
+import { fetchOsmPlaces, type OsmPlaceItem, osmItemOpeningHours, osmItemPhone, osmItemWebsite } from "./osmPlaces";
 import {
   EMERGENCY_SEARCH_RADIUS_M,
   EMERGENCY_MAX_RESULTS,
@@ -134,7 +134,7 @@ export function useEmergencyPlaces() {
       setUserLocation({ latitude, longitude });
 
       const items = await withRetry(() =>
-        fetchHereDiscover(
+        fetchOsmPlaces(
           "hospital clinic doctor pharmacy police fire station ambulance",
           latitude,
           longitude,
@@ -145,7 +145,7 @@ export function useEmergencyPlaces() {
       );
       if (activeCallRef.current !== callId) return;
 
-      const mapEmergencyCategory = (item: HerePlaceItem): string => {
+      const mapEmergencyCategory = (item: OsmPlaceItem): string => {
         const categoryFields = (item.categories ?? [])
           .flatMap((c) => [c.id, c.name])
           .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
@@ -177,10 +177,10 @@ export function useEmergencyPlaces() {
             latitude: lat,
             longitude: lon,
             distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-            phone: hereItemPhone(item),
+            phone: osmItemPhone(item),
             address: item.address?.label,
-            openingHours: hereItemOpeningHours(item),
-            website: hereItemWebsite(item),
+            openingHours: osmItemOpeningHours(item),
+            website: osmItemWebsite(item),
           } as EmergencyPlace;
         })
         .filter(Boolean) as EmergencyPlace[];

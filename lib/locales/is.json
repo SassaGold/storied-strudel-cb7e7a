@@ -361,8 +361,8 @@
     "updateLatest": "✅ Þú ert uppfærður",
     "updateError": "❌ Uppfærsluleit mistókst",
     "privacyPolicyLink": "📄 Persónuverndarstefna",
-    "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Núverandi staðsetningarfang þitt er fengið með Nominatim API (OpenStreetMap). Engin API-lykill þarf."
+    "osm": "OpenStreetMap / Nominatim",
+    "osmDesc": "Núverandi staðsetningarfang þitt er fengið með Nominatim API (OpenStreetMap). Engin API-lykill þarf."
   },
   "settings": {
     "badge": "⚙️ STILLINGAR",

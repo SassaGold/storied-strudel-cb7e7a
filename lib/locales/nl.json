@@ -361,8 +361,8 @@
     "updateLatest": "✅ Je bent up-to-date",
     "updateError": "❌ Update-controle mislukt",
     "privacyPolicyLink": "📄 Privacybeleid",
-    "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Je huidige locatieadres wordt opgehaald via de Nominatim API (OpenStreetMap). Geen API-sleutel vereist."
+    "osm": "OpenStreetMap / Nominatim",
+    "osmDesc": "Je huidige locatieadres wordt opgehaald via de Nominatim API (OpenStreetMap). Geen API-sleutel vereist."
   },
   "settings": {
     "badge": "⚙️ INSTELLINGEN",

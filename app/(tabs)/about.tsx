@@ -94,8 +94,8 @@ export default function AboutScreen() {
 
           {/* Nominatim / OpenStreetMap */}
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>🗺️ {t("about.here")}</Text>
-            <Text style={styles.cardBody}>{t("about.hereDesc")}</Text>
+            <Text style={styles.cardTitle}>🗺️ {t("about.osm")}</Text>
+            <Text style={styles.cardBody}>{t("about.osmDesc")}</Text>
             <LinkRow
               label="nominatim.openstreetmap.org"
               url="https://nominatim.openstreetmap.org"
