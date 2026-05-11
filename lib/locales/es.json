@@ -361,8 +361,8 @@
     "updateLatest": "✅ Estás al día",
     "updateError": "❌ Error al buscar actualización",
     "privacyPolicyLink": "📄 Política de privacidad",
-    "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "La dirección de tu ubicación actual se obtiene mediante la API Nominatim (OpenStreetMap). No se requiere clave de API."
+    "osm": "OpenStreetMap / Nominatim",
+    "osmDesc": "La dirección de tu ubicación actual se obtiene mediante la API Nominatim (OpenStreetMap). No se requiere clave de API."
   },
   "settings": {
     "badge": "⚙️ AJUSTES",

@@ -14,13 +14,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
-    hereItemEmail,
-    hereItemOpeningHours,
-    hereItemPhone,
-    hereItemPrimaryCategory,
-    hereItemWebsite,
-    type HerePlaceItem,
-} from "../../lib/herePlaces";
+    osmItemEmail,
+    osmItemOpeningHours,
+    osmItemPhone,
+    osmItemPrimaryCategory,
+    osmItemWebsite,
+    type OsmPlaceItem,
+} from "../../lib/osmPlaces";
 import { CACHE_TTL_MS, haversineMeters, parseWikiTag } from "../../lib/overpass";
 import { fmtDistShort, useSettings } from "../../lib/settings";
 import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
@@ -94,7 +94,7 @@ const CATEGORY_ICONS: Record<Category, string> = {
 // ── OSM item mapping ───────────────────────────────────────────────────────────
 
 const mapMcElement = (
-  item: HerePlaceItem,
+  item: OsmPlaceItem,
   latitude: number,
   longitude: number,
   fallbackCategory: string
@@ -102,7 +102,7 @@ const mapMcElement = (
   const lat = item.position?.lat;
   const lon = item.position?.lng;
   if (lat === undefined || lon === undefined) return null;
-  const category = (hereItemPrimaryCategory(item) || fallbackCategory).toLowerCase();
+  const category = (osmItemPrimaryCategory(item) || fallbackCategory).toLowerCase();
   return {
     id: item.id || `${lat},${lon},${item.title || fallbackCategory}`,
     name: item.title || fallbackCategory,
@@ -110,11 +110,11 @@ const mapMcElement = (
     latitude: lat,
     longitude: lon,
     distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-    website: hereItemWebsite(item),
-    phone: hereItemPhone(item),
-    email: hereItemEmail(item),
+    website: osmItemWebsite(item),
+    phone: osmItemPhone(item),
+    email: osmItemEmail(item),
     address: item.address?.label,
-    openingHours: hereItemOpeningHours(item),
+    openingHours: osmItemOpeningHours(item),
   };
 };
 

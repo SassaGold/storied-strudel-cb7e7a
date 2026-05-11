@@ -152,12 +152,4 @@ export function osmItemOpeningHours(item: OsmPlaceItem): string | undefined {
   return joined || undefined;
 }
 
-// ── Re-export for backward compatibility ───────────────────────────────────────
 
-export type HerePlaceItem = OsmPlaceItem;
-export const fetchHereDiscover = fetchOsmPlaces;
-export const hereItemPrimaryCategory = osmItemPrimaryCategory;
-export const hereItemPhone = osmItemPhone;
-export const hereItemWebsite = osmItemWebsite;
-export const hereItemEmail = osmItemEmail;
-export const hereItemOpeningHours = osmItemOpeningHours;

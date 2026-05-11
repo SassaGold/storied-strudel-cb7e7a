@@ -361,8 +361,8 @@
     "updateLatest": "✅ Du er opdateret",
     "updateError": "❌ Opdateringstjek mislykkedes",
     "privacyPolicyLink": "📄 Privatlivspolitik",
-    "here": "OpenStreetMap / Nominatim",
-    "hereDesc": "Din nuværende adresse hentes via Nominatim API (OpenStreetMap). Ingen API-nøgle kræves."
+    "osm": "OpenStreetMap / Nominatim",
+    "osmDesc": "Din nuværende adresse hentes via Nominatim API (OpenStreetMap). Ingen API-nøgle kræves."
   },
   "settings": {
     "badge": "⚙️ INDSTILLINGER",

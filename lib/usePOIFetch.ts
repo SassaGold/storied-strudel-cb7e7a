@@ -8,7 +8,7 @@ import * as Location from "expo-location";
 import { useCallback, useRef, useState } from "react";
 import { Linking } from "react-native";
 import { OVERPASS_DEFAULT_TIMEOUT_MS, POI_MAX_DISPLAY, WIKIPEDIA_SUMMARY_URL } from "./config";
-import { fetchOsmPlaces, type OsmPlaceItem } from "./herePlaces";
+import { fetchOsmPlaces, type OsmPlaceItem } from "./osmPlaces";
 import { useLocationPermission } from "./locationPermission";
 import { CACHE_TTL_MS, parseWikiTag, withRetry } from "./overpass";
 

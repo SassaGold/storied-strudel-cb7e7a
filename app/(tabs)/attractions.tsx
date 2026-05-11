@@ -1,12 +1,12 @@
 import POIScreen from "../../components/POIScreen";
 import {
-    type HerePlaceItem,
-    hereItemEmail,
-    hereItemOpeningHours,
-    hereItemPhone,
-    hereItemPrimaryCategory,
-    hereItemWebsite,
-} from "../../lib/herePlaces";
+    type OsmPlaceItem,
+    osmItemEmail,
+    osmItemOpeningHours,
+    osmItemPhone,
+    osmItemPrimaryCategory,
+    osmItemWebsite,
+} from "../../lib/osmPlaces";
 import { haversineMeters } from "../../lib/overpass";
 import type { Place } from "../../lib/usePOIFetch";
 
@@ -17,11 +17,11 @@ const SEARCH_QUERY = "attraction|museum|viewpoint|castle|monument|artwork|zoo|th
 
 const buildSearchQuery = () => SEARCH_QUERY;
 
-const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Place | null => {
+const mapPlaceItem = (item: OsmPlaceItem, userLat: number, userLon: number): Place | null => {
   const lat = item.position?.lat;
   const lon = item.position?.lng;
   if (lat === undefined || lon === undefined) return null;
-  const category = (hereItemPrimaryCategory(item) || "attraction").toLowerCase();
+  const category = (osmItemPrimaryCategory(item) || "attraction").toLowerCase();
   return {
     id: item.id || `${lat},${lon},${item.title || "attraction"}`,
     name: item.title || "Attraction",
@@ -29,11 +29,11 @@ const mapPlaceItem = (item: HerePlaceItem, userLat: number, userLon: number): Pl
     latitude: lat,
     longitude: lon,
     distanceMeters: haversineMeters(userLat, userLon, lat, lon),
-    website: hereItemWebsite(item),
-    phone: hereItemPhone(item),
-    email: hereItemEmail(item),
+    website: osmItemWebsite(item),
+    phone: osmItemPhone(item),
+    email: osmItemEmail(item),
     address: item.address?.label,
-    openingHours: hereItemOpeningHours(item),
+    openingHours: osmItemOpeningHours(item),
   };
 };
 
