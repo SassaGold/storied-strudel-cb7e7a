@@ -333,6 +333,7 @@
     "viewRoute": "🗺️ Voir l'itinéraire",
     "hideRoute": "▲ Masquer l'itinéraire"
   },
+  "about": {
     "badge": "ℹ️ À PROPOS",
     "title": "DONNÉES & CONFIDENTIALITÉ",
     "subtitle": "D'où viennent les données et comment votre vie privée est protégée.",
