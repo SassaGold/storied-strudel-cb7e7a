@@ -333,6 +333,9 @@
     "viewRoute": "🗺️ Vis rute",
     "hideRoute": "▲ Skjul rute"
   },
+  "about": {
+    "badge": "ℹ️ OM",
+    "title": "DATA & PERSONVERN",
     "subtitle": "Hvor data kommer fra og hvordan personvernet ditt er beskyttet.",
     "dataSources": "DATAKILDER",
     "overpass": "Overpass API",

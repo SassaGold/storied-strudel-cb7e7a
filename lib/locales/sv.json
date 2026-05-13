@@ -333,6 +333,7 @@
     "viewRoute": "🗺️ Visa rutt",
     "hideRoute": "▲ Dölj rutt"
   },
+  "about": {
     "badge": "ℹ️ OM",
     "title": "DATA OCH INTEGRITET",
     "subtitle": "Varifrån data kommer och hur din integritet skyddas.",

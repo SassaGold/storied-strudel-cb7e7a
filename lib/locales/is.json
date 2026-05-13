@@ -333,6 +333,7 @@
     "viewRoute": "🗺️ Skoða leið",
     "hideRoute": "▲ Fela leið"
   },
+  "about": {
     "badge": "ℹ️ UM FORRITIÐ",
     "title": "GÖGN & FRIÐHELGI",
     "subtitle": "Hvaðan gögnin koma og hvernig friðhelgi þín er vernduð.",

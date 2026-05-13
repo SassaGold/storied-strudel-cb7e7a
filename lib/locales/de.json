@@ -333,6 +333,7 @@
     "viewRoute": "🗺️ Route anzeigen",
     "hideRoute": "▲ Route ausblenden"
   },
+  "about": {
     "badge": "ℹ️ ÜBER",
     "title": "DATEN & DATENSCHUTZ",
     "subtitle": "Woher die Daten kommen und wie deine Privatsphäre geschützt wird.",
