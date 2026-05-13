@@ -329,9 +329,10 @@
     "points": "{{count}} puntos GPS",
     "tooShortTitle": "Viaje No Guardado",
     "tooShortMsg": "El viaje fue inferior a 10 m — no guardado.",
-    "speedLabel": "VELOCIDAD"
+    "speedLabel": "VELOCIDAD",
+    "viewRoute": "🗺️ Ver Ruta",
+    "hideRoute": "▲ Ocultar Ruta"
   },
-  "about": {
     "badge": "ℹ️ ACERCA DE",
     "title": "DATOS Y PRIVACIDAD",
     "subtitle": "De dónde provienen los datos y cómo se protege tu privacidad.",

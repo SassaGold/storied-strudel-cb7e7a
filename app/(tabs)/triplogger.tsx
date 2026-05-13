@@ -63,6 +63,18 @@ const formatDate = (iso: string): string => {
   });
 };
 
+/** Return at most `max` evenly-sampled points from `pts` (always keeps first + last). */
+const downsample = (pts: GpsPoint[], max = 200): GpsPoint[] => {
+  if (pts.length <= max) return pts;
+  const result: GpsPoint[] = [];
+  const step = (pts.length - 1) / (max - 1);
+  for (let i = 0; i < max - 1; i++) {
+    result.push(pts[Math.round(i * step)]);
+  }
+  result.push(pts[pts.length - 1]);
+  return result;
+};
+
 export default function TripLoggerScreen() {
   const { t } = useTranslation();
   const { settings } = useSettings();
@@ -81,6 +93,15 @@ export default function TripLoggerScreen() {
 
   // History state
   const [rides, setRides] = useState<SavedRide[]>([]);
+  const [expandedMaps, setExpandedMaps] = useState<Set<string>>(new Set());
+
+  const toggleMap = useCallback((id: string) => {
+    setExpandedMaps((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
 
   const watchRef = useRef<Location.LocationSubscription | null>(null);
   const liveSpeedWatchRef = useRef<Location.LocationSubscription | null>(null);
@@ -566,6 +587,19 @@ export default function TripLoggerScreen() {
               </View>
               {/* Action buttons */}
               <View style={styles.rideActions}>
+                {ride.route.length > 1 && (
+                  <Pressable
+                    style={[styles.rideBtn, styles.mapBtn, expandedMaps.has(ride.id) && styles.mapBtnActive]}
+                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); toggleMap(ride.id); }}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={expandedMaps.has(ride.id) ? t("triplog.hideRoute") : t("triplog.viewRoute")}
+                  >
+                    <Text style={[styles.rideBtnText, styles.mapBtnText]}>
+                      {expandedMaps.has(ride.id) ? t("triplog.hideRoute") : t("triplog.viewRoute")}
+                    </Text>
+                  </Pressable>
+                )}
                 <Pressable
                   style={[styles.rideBtn, styles.deleteBtn]}
                   onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); deleteRide(ride.id); }}
@@ -576,6 +610,12 @@ export default function TripLoggerScreen() {
                   <Text style={[styles.rideBtnText, styles.deleteBtnText]}>{t("triplog.deleteRide")}</Text>
                 </Pressable>
               </View>
+              {/* Route map preview */}
+              {expandedMaps.has(ride.id) && ride.route.length > 1 && (
+                <View style={styles.rideMapContainer}>
+                  <RideMapPreview route={ride.route} />
+                </View>
+              )}
             </View>
           ))
         )}
@@ -687,6 +727,104 @@ function StatBox({
       <Text style={styles.statValue}>{value}</Text>
       {unit ? <Text style={styles.statUnit}>{unit}</Text> : null}
       <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function RideMapPreview({ route }: { route: GpsPoint[] }) {
+  const PAD = 14;
+  const MAP_HEIGHT = 160;
+
+  const pts = downsample(route);
+
+  // Find bounding box
+  let minLat = pts[0].latitude, maxLat = pts[0].latitude;
+  let minLon = pts[0].longitude, maxLon = pts[0].longitude;
+  for (const p of pts) {
+    if (p.latitude < minLat) minLat = p.latitude;
+    if (p.latitude > maxLat) maxLat = p.latitude;
+    if (p.longitude < minLon) minLon = p.longitude;
+    if (p.longitude > maxLon) maxLon = p.longitude;
+  }
+  const latRange = maxLat - minLat || 0.001;
+  const lonRange = maxLon - minLon || 0.001;
+
+  // Convert lat/lon → relative [0..1] coordinates.
+  // We compute pixel positions lazily in the onLayout callback so the
+  // component works at any container width.
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  const toXY = (p: GpsPoint, w: number, h: number): [number, number] => [
+    PAD + ((p.longitude - minLon) / lonRange) * (w - PAD * 2),
+    PAD + ((maxLat - p.latitude) / latRange) * (h - PAD * 2),
+  ];
+
+  const segments = containerWidth > 0
+    ? pts.slice(0, -1).map((p, i) => {
+        const [x1, y1] = toXY(p, containerWidth, MAP_HEIGHT);
+        const [x2, y2] = toXY(pts[i + 1], containerWidth, MAP_HEIGHT);
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+        return { x1, y1, x2, y2, length, angle, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 };
+      })
+    : [];
+
+  const firstPt = containerWidth > 0 ? toXY(pts[0], containerWidth, MAP_HEIGHT) : null;
+  const lastPt  = containerWidth > 0 ? toXY(pts[pts.length - 1], containerWidth, MAP_HEIGHT) : null;
+
+  return (
+    <View
+      style={{ height: MAP_HEIGHT, backgroundColor: "#0d0d0d", borderRadius: 8, overflow: "hidden" }}
+      onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+    >
+      {/* Route line segments */}
+      {segments.map((seg, i) => {
+        if (seg.length < 0.5) return null;
+        return (
+          <View
+            key={i}
+            style={{
+              position: "absolute",
+              left: seg.mx - seg.length / 2,
+              top: seg.my - 1,
+              width: seg.length,
+              height: 2,
+              backgroundColor: "#ff6600",
+              transform: [{ rotate: `${seg.angle}deg` }],
+            }}
+          />
+        );
+      })}
+      {/* Start dot (green) */}
+      {firstPt && (
+        <View style={{
+          position: "absolute",
+          left: firstPt[0] - 5,
+          top: firstPt[1] - 5,
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: "#22c55e",
+          borderWidth: 2,
+          borderColor: "#fff",
+        }} />
+      )}
+      {/* End dot (red) */}
+      {lastPt && pts.length > 1 && (
+        <View style={{
+          position: "absolute",
+          left: lastPt[0] - 5,
+          top: lastPt[1] - 5,
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: "#ef4444",
+          borderWidth: 2,
+          borderColor: "#fff",
+        }} />
+      )}
     </View>
   );
 }
@@ -942,6 +1080,29 @@ const styles = StyleSheet.create({
   },
   deleteBtnText: {
     color: "#666",
+  },
+  mapBtn: {
+    flex: 1,
+    backgroundColor: "rgba(255,102,0,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.35)",
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: "center",
+  },
+  mapBtnActive: {
+    backgroundColor: "rgba(255,102,0,0.18)",
+    borderColor: "#ff6600",
+  },
+  mapBtnText: {
+    color: "#ff6600",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  rideMapContainer: {
+    paddingHorizontal: 14,
+    paddingBottom: 14,
   },
 
   bottomPad: { height: 40 },
