@@ -329,9 +329,10 @@
     "points": "{{count}} points GPS",
     "tooShortTitle": "Trajet Non Enregistré",
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
-    "speedLabel": "VITESSE"
+    "speedLabel": "VITESSE",
+    "viewRoute": "🗺️ Voir l'itinéraire",
+    "hideRoute": "▲ Masquer l'itinéraire"
   },
-  "about": {
     "badge": "ℹ️ À PROPOS",
     "title": "DONNÉES & CONFIDENTIALITÉ",
     "subtitle": "D'où viennent les données et comment votre vie privée est protégée.",

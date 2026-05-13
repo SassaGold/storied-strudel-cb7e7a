@@ -329,11 +329,10 @@
     "points": "{{count}} GPS-punkter",
     "tooShortTitle": "Tur ikke gemt",
     "tooShortMsg": "Turen var under 10 m — ikke gemt.",
-    "speedLabel": "FART"
+    "speedLabel": "FART",
+    "viewRoute": "🗺️ Vis rute",
+    "hideRoute": "▲ Skjul rute"
   },
-  "about": {
-    "badge": "ℹ️ OM",
-    "title": "DATA OG PRIVATLIV",
     "subtitle": "Hvor data kommer fra, og hvordan dit privatliv beskyttes.",
     "dataSources": "DATAKILDER",
     "overpass": "Overpass API",
