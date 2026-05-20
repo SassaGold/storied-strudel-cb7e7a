@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
+  Image,
   Linking,
   Platform,
   Pressable,
@@ -18,6 +19,7 @@ import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
+import { OSM_TILE_URL } from "../../lib/config";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -731,9 +733,46 @@ function StatBox({
   );
 }
 
+// ── OSM tile helpers ──────────────────────────────────────────────────────────
+
+const TILE_PX = 256;
+
+/** Fractional tile X for a longitude at zoom z. */
+const lngToTileFrac = (lng: number, z: number): number =>
+  ((lng + 180) / 360) * Math.pow(2, z);
+
+/** Fractional tile Y for a latitude at zoom z (Web Mercator). */
+const latToTileFrac = (lat: number, z: number): number => {
+  const sinLat = Math.sin((lat * Math.PI) / 180);
+  return (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * Math.pow(2, z);
+};
+
+/** Build a tile image URL from the OSM template. */
+const tileUrl = (z: number, x: number, y: number): string =>
+  OSM_TILE_URL.replace("{z}", String(z)).replace("{x}", String(x)).replace("{y}", String(y));
+
+/**
+ * Choose the highest zoom level where the padded bounding box fits within
+ * at most `maxTilesAcross` tiles horizontally and `maxTilesDown` vertically.
+ */
+const chooseBestZoom = (
+  minLat: number, maxLat: number, minLon: number, maxLon: number,
+  maxTilesAcross = 4, maxTilesDown = 3,
+): number => {
+  for (let z = 16; z >= 5; z--) {
+    const tileW = lngToTileFrac(maxLon, z) - lngToTileFrac(minLon, z);
+    const tileH = latToTileFrac(minLat, z) - latToTileFrac(maxLat, z);
+    if (tileW <= maxTilesAcross && tileH <= maxTilesDown) return z;
+  }
+  return 5;
+};
+
+// ── RideMapPreview ────────────────────────────────────────────────────────────
+
 function RideMapPreview({ route }: { route: GpsPoint[] }) {
-  const PAD = 14;
-  const MAP_HEIGHT = 160;
+  const MAP_HEIGHT = 200;
+  /** Extra space around the route so map context is visible (fraction of extent). */
+  const ROUTE_PAD = 0.3;
 
   const pts = downsample(route);
 
@@ -746,51 +785,119 @@ function RideMapPreview({ route }: { route: GpsPoint[] }) {
     if (p.longitude < minLon) minLon = p.longitude;
     if (p.longitude > maxLon) maxLon = p.longitude;
   }
-  const latRange = maxLat - minLat || 0.001;
-  const lonRange = maxLon - minLon || 0.001;
 
-  // Convert lat/lon → relative [0..1] coordinates.
-  // We compute pixel positions lazily in the onLayout callback so the
-  // component works at any container width.
+  // Pad the bounding box to show map context around the route
+  const latPad = (maxLat - minLat) * ROUTE_PAD || 0.005;
+  const lonPad = (maxLon - minLon) * ROUTE_PAD || 0.005;
+  const padMinLat = minLat - latPad;
+  const padMaxLat = maxLat + latPad;
+  const padMinLon = minLon - lonPad;
+  const padMaxLon = maxLon + lonPad;
+
   const [containerWidth, setContainerWidth] = useState(0);
 
-  const toXY = (p: GpsPoint, w: number, h: number): [number, number] => [
-    PAD + ((p.longitude - minLon) / lonRange) * (w - PAD * 2),
-    PAD + ((maxLat - p.latitude) / latRange) * (h - PAD * 2),
-  ];
+  // Compute tile grid and scale when container size is known
+  const layout = useMemo(() => {
+    if (containerWidth === 0) return null;
+    const z = chooseBestZoom(padMinLat, padMaxLat, padMinLon, padMaxLon);
+    const txMinFrac = lngToTileFrac(padMinLon, z);
+    const txMaxFrac = lngToTileFrac(padMaxLon, z);
+    const tyMinFrac = latToTileFrac(padMaxLat, z); // smaller y = more northern
+    const tyMaxFrac = latToTileFrac(padMinLat, z);
+    const txStart = Math.floor(txMinFrac);
+    const txEnd = Math.floor(txMaxFrac);
+    const tyStart = Math.floor(tyMinFrac);
+    const tyEnd = Math.floor(tyMaxFrac);
+    // Natural canvas size if tiles were rendered at full resolution
+    const worldW = (txEnd - txStart + 1) * TILE_PX;
+    const worldH = (tyEnd - tyStart + 1) * TILE_PX;
+    // Scale to fit container (preserve aspect ratio)
+    const scale = Math.min(containerWidth / worldW, MAP_HEIGHT / worldH);
+    const offsetX = (containerWidth - worldW * scale) / 2;
+    const offsetY = (MAP_HEIGHT - worldH * scale) / 2;
+    return { z, txStart, tyStart, txEnd, tyEnd, scale, offsetX, offsetY };
+  }, [containerWidth, padMinLat, padMaxLat, padMinLon, padMaxLon]);
 
-  const segments = containerWidth > 0
-    ? pts.slice(0, -1).map((p, i) => {
-        const [x1, y1] = toXY(p, containerWidth, MAP_HEIGHT);
-        const [x2, y2] = toXY(pts[i + 1], containerWidth, MAP_HEIGHT);
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        const length = Math.sqrt(dx * dx + dy * dy);
-        const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        return { x1, y1, x2, y2, length, angle, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 };
-      })
-    : [];
+  /** Convert a GPS point to screen [x, y] using the same Mercator projection as the tiles. */
+  const toScreen = (p: GpsPoint): [number, number] | null => {
+    if (!layout) return null;
+    const { z, txStart, tyStart, scale, offsetX, offsetY } = layout;
+    const x = offsetX + (lngToTileFrac(p.longitude, z) - txStart) * TILE_PX * scale;
+    const y = offsetY + (latToTileFrac(p.latitude, z) - tyStart) * TILE_PX * scale;
+    return [x, y];
+  };
 
-  const firstPt = containerWidth > 0 ? toXY(pts[0], containerWidth, MAP_HEIGHT) : null;
-  const lastPt  = containerWidth > 0 ? toXY(pts[pts.length - 1], containerWidth, MAP_HEIGHT) : null;
+  // Build tile list
+  const tiles = useMemo(() => {
+    if (!layout) return [];
+    const { z, txStart, txEnd, tyStart, tyEnd, scale, offsetX, offsetY } = layout;
+    const renderedSize = TILE_PX * scale;
+    const list: { url: string; x: number; y: number; size: number }[] = [];
+    for (let tx = txStart; tx <= txEnd; tx++) {
+      for (let ty = tyStart; ty <= tyEnd; ty++) {
+        list.push({
+          url: tileUrl(z, tx, ty),
+          x: offsetX + (tx - txStart) * renderedSize,
+          y: offsetY + (ty - tyStart) * renderedSize,
+          size: renderedSize,
+        });
+      }
+    }
+    return list;
+  }, [layout]);
+
+  // Build route segments
+  const segments = useMemo(() => {
+    if (!layout) return [];
+    return pts.slice(0, -1).map((p, i) => {
+      const s = toScreen(p);
+      const e = toScreen(pts[i + 1]);
+      if (!s || !e) return null;
+      const [x1, y1] = s;
+      const [x2, y2] = e;
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const length = Math.sqrt(dx * dx + dy * dy);
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+      return { length, angle, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layout]);
+
+  const firstPt = toScreen(pts[0]);
+  const lastPt  = pts.length > 1 ? toScreen(pts[pts.length - 1]) : null;
 
   return (
     <View
       style={{ height: MAP_HEIGHT, backgroundColor: "#0d0d0d", borderRadius: 8, overflow: "hidden" }}
       onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
     >
+      {/* OSM map tiles */}
+      {tiles.map((tile) => (
+        <Image
+          key={tile.url}
+          source={{ uri: tile.url }}
+          style={{
+            position: "absolute",
+            left: tile.x,
+            top: tile.y,
+            width: tile.size,
+            height: tile.size,
+          }}
+        />
+      ))}
       {/* Route line segments */}
       {segments.map((seg, i) => {
-        if (seg.length < 0.5) return null;
+        if (!seg || seg.length < 0.5) return null;
         return (
           <View
             key={i}
             style={{
               position: "absolute",
               left: seg.mx - seg.length / 2,
-              top: seg.my - 1,
+              top: seg.my - 1.5,
               width: seg.length,
-              height: 2,
+              height: 3,
               backgroundColor: "#ff6600",
               transform: [{ rotate: `${seg.angle}deg` }],
             }}
