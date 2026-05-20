@@ -126,3 +126,8 @@ export const TRIP_LOCATION_INTERVAL_MS = 1_500;
 
 /** Publicly hosted privacy policy URL shown in the location-disclosure modal. */
 export const PRIVACY_POLICY_URL = "https://sassagold.com/privacy";
+
+// ── Map tiles ─────────────────────────────────────────────────────────────────
+
+/** OSM raster tile URL template. Replace {z}/{x}/{y} with zoom and tile coordinates. */
+export const OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";

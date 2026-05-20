@@ -20,6 +20,7 @@ import {
     METRES_PER_MILE,
     NOMINATIM_REVERSE_GEOCODING_BASE_URL,
     OPEN_METEO_BASE_URL,
+    OSM_TILE_URL,
     OVERPASS_DEFAULT_TIMEOUT_MS,
     OVERPASS_ENDPOINTS,
     OVERPASS_ROAD_TIMEOUT_MS,
@@ -68,6 +69,14 @@ describe("API URL constants", () => {
   it("WIKIPEDIA_SUMMARY_URL encodes special characters in title", () => {
     const url = WIKIPEDIA_SUMMARY_URL("de", "Berliner Mauer");
     expect(url).toContain(encodeURIComponent("Berliner Mauer"));
+  });
+
+  it("OSM_TILE_URL is a valid HTTPS URL template containing {z}, {x}, {y} placeholders", () => {
+    expect(OSM_TILE_URL).toMatch(/^https:\/\//);
+    expect(OSM_TILE_URL).toContain("openstreetmap.org");
+    expect(OSM_TILE_URL).toContain("{z}");
+    expect(OSM_TILE_URL).toContain("{x}");
+    expect(OSM_TILE_URL).toContain("{y}");
   });
 });
 
