@@ -735,7 +735,20 @@ function StatBox({
 
 // ── OSM tile helpers ──────────────────────────────────────────────────────────
 
+/** Standard OSM/Web Mercator tile size in pixels. */
 const TILE_PX = 256;
+
+/** Highest zoom level considered when auto-selecting a zoom for the route preview. */
+const MAX_TILE_ZOOM = 16;
+
+/** Lowest zoom level considered when auto-selecting a zoom for the route preview. */
+const MIN_TILE_ZOOM = 5;
+
+/** Maximum number of tiles allowed horizontally in the preview grid. */
+const MAX_TILES_ACROSS = 4;
+
+/** Maximum number of tiles allowed vertically in the preview grid. */
+const MAX_TILES_DOWN = 3;
 
 /** Fractional tile X for a longitude at zoom z. */
 const lngToTileFrac = (lng: number, z: number): number =>
@@ -753,18 +766,17 @@ const tileUrl = (z: number, x: number, y: number): string =>
 
 /**
  * Choose the highest zoom level where the padded bounding box fits within
- * at most `maxTilesAcross` tiles horizontally and `maxTilesDown` vertically.
+ * at most `MAX_TILES_ACROSS` tiles horizontally and `MAX_TILES_DOWN` vertically.
  */
 const chooseBestZoom = (
   minLat: number, maxLat: number, minLon: number, maxLon: number,
-  maxTilesAcross = 4, maxTilesDown = 3,
 ): number => {
-  for (let z = 16; z >= 5; z--) {
+  for (let z = MAX_TILE_ZOOM; z >= MIN_TILE_ZOOM; z--) {
     const tileW = lngToTileFrac(maxLon, z) - lngToTileFrac(minLon, z);
     const tileH = latToTileFrac(minLat, z) - latToTileFrac(maxLat, z);
-    if (tileW <= maxTilesAcross && tileH <= maxTilesDown) return z;
+    if (tileW <= MAX_TILES_ACROSS && tileH <= MAX_TILES_DOWN) return z;
   }
-  return 5;
+  return MIN_TILE_ZOOM;
 };
 
 // ── RideMapPreview ────────────────────────────────────────────────────────────
@@ -832,10 +844,11 @@ function RideMapPreview({ route }: { route: GpsPoint[] }) {
     if (!layout) return [];
     const { z, txStart, txEnd, tyStart, tyEnd, scale, offsetX, offsetY } = layout;
     const renderedSize = TILE_PX * scale;
-    const list: { url: string; x: number; y: number; size: number }[] = [];
+    const list: { key: string; url: string; x: number; y: number; size: number }[] = [];
     for (let tx = txStart; tx <= txEnd; tx++) {
       for (let ty = tyStart; ty <= tyEnd; ty++) {
         list.push({
+          key: `${z}-${tx}-${ty}`,
           url: tileUrl(z, tx, ty),
           x: offsetX + (tx - txStart) * renderedSize,
           y: offsetY + (ty - tyStart) * renderedSize,
@@ -875,7 +888,7 @@ function RideMapPreview({ route }: { route: GpsPoint[] }) {
       {/* OSM map tiles */}
       {tiles.map((tile) => (
         <Image
-          key={tile.url}
+          key={tile.key}
           source={{ uri: tile.url }}
           style={{
             position: "absolute",
