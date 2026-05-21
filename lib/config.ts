@@ -139,5 +139,5 @@ export const OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
  * @see https://operations.osmfoundation.org/policies/nominatim/
  */
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const _appVersion: string = (require("../package.json") as { version: string }).version;
+const _appVersion: string = (() => { try { return (require("../package.json") as { version: string }).version; } catch { return "unknown"; } })();
 export const OSM_USER_AGENT = `WhereAmI/${_appVersion} (https://sassagold.com)`;
