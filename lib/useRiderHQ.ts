@@ -11,6 +11,7 @@ import {
     HOURLY_SLOTS,
     NOMINATIM_REVERSE_GEOCODING_BASE_URL,
     OPEN_METEO_BASE_URL,
+    OSM_USER_AGENT,
     OVERPASS_ROAD_TIMEOUT_MS,
     ROAD_ALERTS_MAX,
     ROAD_MAX_RESULTS,
@@ -115,7 +116,8 @@ export function useRiderHQ(): RiderHQState {
       // ── Nominatim Reverse Geocoding — free OSM, retried up to 3 times ────
       const addressPromise = withRetry(() =>
         fetch(
-          `${NOMINATIM_REVERSE_GEOCODING_BASE_URL}?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`
+          `${NOMINATIM_REVERSE_GEOCODING_BASE_URL}?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`,
+          { headers: { "User-Agent": OSM_USER_AGENT } }
         )
           .then((r) => {
             if (!r.ok) throw new Error(`Nominatim Geocoding ${r.status}`);

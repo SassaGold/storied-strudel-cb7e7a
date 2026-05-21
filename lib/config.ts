@@ -131,3 +131,13 @@ export const PRIVACY_POLICY_URL = "https://sassagold.com/privacy";
 
 /** OSM raster tile URL template. Replace {z}/{x}/{y} with zoom and tile coordinates. */
 export const OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+/**
+ * User-Agent header required by OSM tile and Nominatim usage policies.
+ * Version is read from package.json so it stays in sync automatically.
+ * @see https://operations.osmfoundation.org/policies/tiles/
+ * @see https://operations.osmfoundation.org/policies/nominatim/
+ */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const _appVersion: string = (() => { try { return (require("../package.json") as { version: string }).version; } catch { return "unknown"; } })();
+export const OSM_USER_AGENT = `WhereAmI/${_appVersion} (https://sassagold.com)`;

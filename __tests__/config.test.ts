@@ -21,6 +21,7 @@ import {
     NOMINATIM_REVERSE_GEOCODING_BASE_URL,
     OPEN_METEO_BASE_URL,
     OSM_TILE_URL,
+    OSM_USER_AGENT,
     OVERPASS_DEFAULT_TIMEOUT_MS,
     OVERPASS_ENDPOINTS,
     OVERPASS_ROAD_TIMEOUT_MS,
@@ -77,6 +78,12 @@ describe("API URL constants", () => {
     expect(OSM_TILE_URL).toContain("{z}");
     expect(OSM_TILE_URL).toContain("{x}");
     expect(OSM_TILE_URL).toContain("{y}");
+  });
+
+  it("OSM_USER_AGENT is a non-empty string identifying the app", () => {
+    expect(typeof OSM_USER_AGENT).toBe("string");
+    expect(OSM_USER_AGENT.length).toBeGreaterThan(0);
+    expect(OSM_USER_AGENT).toContain("WhereAmI");
   });
 });
 

@@ -19,7 +19,7 @@ import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
-import { OSM_TILE_URL } from "../../lib/config";
+import { OSM_TILE_URL, OSM_USER_AGENT } from "../../lib/config";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -889,7 +889,7 @@ function RideMapPreview({ route }: { route: GpsPoint[] }) {
       {tiles.map((tile) => (
         <Image
           key={tile.key}
-          source={{ uri: tile.url }}
+          source={{ uri: tile.url, headers: { "User-Agent": OSM_USER_AGENT } }}
           style={{
             position: "absolute",
             left: tile.x,
