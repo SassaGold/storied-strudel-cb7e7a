@@ -131,3 +131,10 @@ export const PRIVACY_POLICY_URL = "https://sassagold.com/privacy";
 
 /** OSM raster tile URL template. Replace {z}/{x}/{y} with zoom and tile coordinates. */
 export const OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+
+/**
+ * User-Agent header required by OSM tile and Nominatim usage policies.
+ * @see https://operations.osmfoundation.org/policies/tiles/
+ * @see https://operations.osmfoundation.org/policies/nominatim/
+ */
+export const OSM_USER_AGENT = "WhereAmI/1.1.7 (https://sassagold.com)";
