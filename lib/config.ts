@@ -134,7 +134,10 @@ export const OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 /**
  * User-Agent header required by OSM tile and Nominatim usage policies.
+ * Version is read from package.json so it stays in sync automatically.
  * @see https://operations.osmfoundation.org/policies/tiles/
  * @see https://operations.osmfoundation.org/policies/nominatim/
  */
-export const OSM_USER_AGENT = "WhereAmI/1.1.7 (https://sassagold.com)";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const _appVersion: string = (require("../package.json") as { version: string }).version;
+export const OSM_USER_AGENT = `WhereAmI/${_appVersion} (https://sassagold.com)`;
