@@ -70,7 +70,9 @@
           }
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      "./plugins/withAndroidEdgeToEdge",
+      "./plugins/withMaterialVersion"
     ],
     "experiments": {
       "typedRoutes": true,
