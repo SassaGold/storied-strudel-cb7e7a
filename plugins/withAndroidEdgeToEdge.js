@@ -24,20 +24,28 @@ module.exports = function withAndroidEdgeToEdge(config) {
 
     let { contents } = mod.modResults;
 
-    // 1. Add required imports before the class declaration (idempotent).
+    // 1. Add required imports after the last existing import line (idempotent).
     if (!contents.includes("androidx.core.view.WindowCompat")) {
-      contents = contents.replace(
-        "\nclass MainActivity",
-        "\nimport android.os.Bundle\nimport androidx.core.view.WindowCompat\n\nclass MainActivity"
-      );
+      // Find the final "import …" line so we insert immediately after it,
+      // avoiding extra blank lines regardless of what follows.
+      const lastImportMatch = contents.match(/(import [^\n]+\n)/g);
+      if (lastImportMatch) {
+        const lastImport = lastImportMatch[lastImportMatch.length - 1];
+        const lastImportIdx = contents.lastIndexOf(lastImport) + lastImport.length;
+        const newImports = "import android.os.Bundle\nimport androidx.core.view.WindowCompat\n";
+        contents =
+          contents.substring(0, lastImportIdx) +
+          newImports +
+          contents.substring(lastImportIdx);
+      }
     }
 
     // 2. Override isEdgeToEdgeEnabled() inside the anonymous DefaultReactActivityDelegate
     //    subclass so WindowUtilKt.enableEdgeToEdge() is never called.
-    //    The generated body is empty: ) {}  — we replace it with the override.
+    //    The body is empty or contains only whitespace: ) { … }
     if (!contents.includes("isEdgeToEdgeEnabled")) {
       contents = contents.replace(
-        /(object\s*:\s*DefaultReactActivityDelegate\s*\([\s\S]*?\))\s*\{\s*\}/,
+        /(object\s*:\s*DefaultReactActivityDelegate\s*\([\s\S]*?\))\s*\{[\s]*\}/,
         "$1 {\n        override fun isEdgeToEdgeEnabled(): Boolean = false\n      }"
       );
     }
