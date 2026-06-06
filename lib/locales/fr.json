@@ -331,7 +331,8 @@
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
     "speedLabel": "VITESSE",
     "viewRoute": "🗺️ Voir l'itinéraire",
-    "hideRoute": "▲ Masquer l'itinéraire"
+    "hideRoute": "▲ Masquer l'itinéraire",
+    "tapToExpand": "Appuyez pour agrandir"
   },
   "about": {
     "badge": "ℹ️ À PROPOS",

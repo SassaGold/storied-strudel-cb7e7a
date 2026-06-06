@@ -331,7 +331,8 @@
     "tooShortMsg": "Fahrt war unter 10 m — nicht gespeichert.",
     "speedLabel": "TEMPO",
     "viewRoute": "🗺️ Route anzeigen",
-    "hideRoute": "▲ Route ausblenden"
+    "hideRoute": "▲ Route ausblenden",
+    "tapToExpand": "Zum Vergrößern tippen"
   },
   "about": {
     "badge": "ℹ️ ÜBER",

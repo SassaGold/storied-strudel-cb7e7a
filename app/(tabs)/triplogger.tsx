@@ -2,8 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
+  Dimensions,
   Image,
   Linking,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -78,7 +80,7 @@ const downsample = (pts: GpsPoint[], max = 200): GpsPoint[] => {
 };
 
 export default function TripLoggerScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { settings } = useSettings();
   const insets = useSafeAreaInsets();
   const { requestForegroundPermission, requestBackgroundPermission } = useLocationPermission();
@@ -96,6 +98,7 @@ export default function TripLoggerScreen() {
   // History state
   const [rides, setRides] = useState<SavedRide[]>([]);
   const [expandedMaps, setExpandedMaps] = useState<Set<string>>(new Set());
+  const [fullscreenRide, setFullscreenRide] = useState<SavedRide | null>(null);
 
   const toggleMap = useCallback((id: string) => {
     setExpandedMaps((prev) => {
@@ -615,7 +618,15 @@ export default function TripLoggerScreen() {
               {/* Route map preview */}
               {expandedMaps.has(ride.id) && ride.route.length > 1 && (
                 <View style={styles.rideMapContainer}>
-                  <RideMapPreview route={ride.route} />
+                  <Pressable
+                    onPress={() => setFullscreenRide(ride)}
+                    accessibilityLabel={t("triplog.viewRoute")}
+                  >
+                    <RideMapPreview route={ride.route} />
+                    <View style={styles.mapExpandHint}>
+                      <Text style={styles.mapExpandHintText}>⤢ {t("triplog.tapToExpand")}</Text>
+                    </View>
+                  </Pressable>
                 </View>
               )}
             </View>
@@ -624,6 +635,28 @@ export default function TripLoggerScreen() {
 
         <View style={styles.bottomPad} />
       </ScrollView>
+
+      {/* Full-screen map modal */}
+      {fullscreenRide && (
+        <Modal
+          visible={true}
+          animationType="slide"
+          statusBarTranslucent
+          onRequestClose={() => setFullscreenRide(null)}
+        >
+          <View style={styles.mapModal}>
+            <View style={styles.mapModalHeader}>
+              <Text style={styles.mapModalTitle}>{fullscreenRide.date ? new Date(fullscreenRide.date).toLocaleDateString(i18n.language) : ""}</Text>
+              <Pressable onPress={() => setFullscreenRide(null)} style={styles.mapModalClose} accessibilityLabel={t("triplog.hideRoute")}>
+                <Text style={styles.mapModalCloseText}>✕</Text>
+              </Pressable>
+            </View>
+            <View style={styles.mapModalBody}>
+              <RideMapPreview route={fullscreenRide.route} fullscreen />
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -781,8 +814,11 @@ const chooseBestZoom = (
 
 // ── RideMapPreview ────────────────────────────────────────────────────────────
 
-function RideMapPreview({ route }: { route: GpsPoint[] }) {
-  const MAP_HEIGHT = 200;
+/** Height reserved for the modal header when the map is shown full-screen. */
+const FULLSCREEN_MAP_HEADER_OFFSET = 100;
+
+function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; fullscreen?: boolean }) {
+  const MAP_HEIGHT = fullscreen ? Dimensions.get("window").height - FULLSCREEN_MAP_HEADER_OFFSET : 200;
   /** Extra space around the route so map context is visible (fraction of extent). */
   const ROUTE_PAD = 0.3;
 
@@ -1223,6 +1259,57 @@ const styles = StyleSheet.create({
   rideMapContainer: {
     paddingHorizontal: 14,
     paddingBottom: 14,
+  },
+  mapExpandHint: {
+    position: "absolute",
+    bottom: 6,
+    right: 8,
+    backgroundColor: "rgba(0,0,0,0.55)",
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  mapExpandHintText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  mapModal: {
+    flex: 1,
+    backgroundColor: "#0a0a0a",
+  },
+  mapModalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingTop: 48,
+    paddingBottom: 12,
+    backgroundColor: "#111",
+    borderBottomWidth: 2,
+    borderBottomColor: "#ff6600",
+  },
+  mapModalTitle: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  mapModalClose: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255,102,0,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mapModalCloseText: {
+    color: "#ff6600",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  mapModalBody: {
+    flex: 1,
+    padding: 0,
   },
 
   bottomPad: { height: 40 },

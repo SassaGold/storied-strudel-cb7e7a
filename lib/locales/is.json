@@ -331,7 +331,8 @@
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
     "speedLabel": "HRAÐI",
     "viewRoute": "🗺️ Skoða leið",
-    "hideRoute": "▲ Fela leið"
+    "hideRoute": "▲ Fela leið",
+    "tapToExpand": "Ýttu til að stækka"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

@@ -331,7 +331,8 @@
     "tooShortMsg": "El viaje fue inferior a 10 m — no guardado.",
     "speedLabel": "VELOCIDAD",
     "viewRoute": "🗺️ Ver Ruta",
-    "hideRoute": "▲ Ocultar Ruta"
+    "hideRoute": "▲ Ocultar Ruta",
+    "tapToExpand": "Toca para ampliar"
   },
   "about": {
     "badge": "ℹ️ ACERCA DE",

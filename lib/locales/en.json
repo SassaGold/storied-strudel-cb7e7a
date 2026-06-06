@@ -335,7 +335,8 @@
     "stopErrorTitle": "Ride Save Error",
     "stopErrorMsg": "Your ride may not have saved correctly. Please try again.",
     "viewRoute": "🗺️ View Route",
-    "hideRoute": "▲ Hide Route"
+    "hideRoute": "▲ Hide Route",
+    "tapToExpand": "Tap to expand"
   },
   "about": {
     "badge": "ℹ️ ABOUT",
