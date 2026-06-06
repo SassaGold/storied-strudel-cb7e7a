@@ -331,7 +331,8 @@
     "tooShortMsg": "Turen var under 10 m — ikke gemt.",
     "speedLabel": "FART",
     "viewRoute": "🗺️ Vis rute",
-    "hideRoute": "▲ Skjul rute"
+    "hideRoute": "▲ Skjul rute",
+    "tapToExpand": "Tryk for at udvide"
   },
   "about": {
     "badge": "ℹ️ OM",

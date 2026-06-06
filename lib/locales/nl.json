@@ -331,7 +331,8 @@
     "tooShortMsg": "Rit was onder 10 m — niet opgeslagen.",
     "speedLabel": "SNELHEID",
     "viewRoute": "🗺️ Route bekijken",
-    "hideRoute": "▲ Route verbergen"
+    "hideRoute": "▲ Route verbergen",
+    "tapToExpand": "Tik om te vergroten"
   },
   "about": {
     "badge": "ℹ️ OVER",

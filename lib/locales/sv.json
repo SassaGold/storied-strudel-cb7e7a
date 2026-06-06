@@ -331,7 +331,8 @@
     "tooShortMsg": "Turen var under 10 m — inte sparad.",
     "speedLabel": "HASTIGHET",
     "viewRoute": "🗺️ Visa rutt",
-    "hideRoute": "▲ Dölj rutt"
+    "hideRoute": "▲ Dölj rutt",
+    "tapToExpand": "Tryck för att förstora"
   },
   "about": {
     "badge": "ℹ️ OM",
