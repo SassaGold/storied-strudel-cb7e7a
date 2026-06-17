@@ -22,6 +22,7 @@ import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
 import { OSM_TILE_URL, OSM_USER_AGENT } from "../../lib/config";
+import { mapMatchRoute } from "../../lib/mapMatch";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -822,7 +823,21 @@ function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; full
   /** Extra space around the route so map context is visible (fraction of extent). */
   const ROUTE_PAD = 0.3;
 
-  const pts = downsample(route);
+  // Use map-matched (road-snapped) route for display
+  const [matchedRoute, setMatchedRoute] = useState<{ latitude: number; longitude: number }[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    mapMatchRoute(route).then((matched) => {
+      if (!cancelled) setMatchedRoute(matched);
+    });
+    return () => { cancelled = true; };
+  }, [route]);
+
+  // Use matched route for rendering if available, otherwise fall back to raw GPS points
+  const pts = matchedRoute
+    ? downsample(matchedRoute.map((p, i) => ({ ...p, timestamp: route[0]?.timestamp ?? i })), 500)
+    : downsample(route);
 
   // Find bounding box
   let minLat = pts[0].latitude, maxLat = pts[0].latitude;
