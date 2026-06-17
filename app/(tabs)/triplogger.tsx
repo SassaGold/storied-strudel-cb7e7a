@@ -836,7 +836,10 @@ function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; full
 
   // Use matched route for rendering if available, otherwise fall back to raw GPS points
   const pts = matchedRoute
-    ? downsample(matchedRoute.map((p, i) => ({ ...p, timestamp: route[0]?.timestamp ?? i })), 500)
+    ? downsample(matchedRoute.map((p, i) => ({
+        ...p,
+        timestamp: route[Math.min(i, route.length - 1)]?.timestamp ?? 0,
+      })), 500)
     : downsample(route);
 
   // Find bounding box
