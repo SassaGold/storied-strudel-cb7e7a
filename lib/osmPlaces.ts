@@ -3,6 +3,14 @@ import { fetchOverpass } from "./overpass";
 // ── OSM data types ─────────────────────────────────────────────────────────────
 const MIN_OVERPASS_TIMEOUT_SECONDS = 10;
 
+/**
+ * OSM keys under which POI values can live. amenity/tourism cover most food and
+ * lodging, but shop (car_repair, bakery…), historic (castle, memorial…) and
+ * leisure (stadium, track…) hold the rest, so all are queried. A value only
+ * matches its real key, so unrelated keys simply return nothing.
+ */
+const OSM_POI_SEARCH_KEYS = ["amenity", "tourism", "shop", "historic", "leisure"] as const;
+
 export type OsmPlace = {
   type: string; // "node", "way", or "relation"
   id: number;
@@ -50,16 +58,17 @@ export async function fetchOsmPlaces(
 ): Promise<OsmPlaceItem[]> {
   const timeout = Math.max(MIN_OVERPASS_TIMEOUT_SECONDS, Math.floor(timeoutMs / 1000));
 
-  // Build Overpass query for amenities within radius
+  // Build Overpass query: match the value list across every supported OSM key
+  // and element type, within the radius.
+  const clauses = OSM_POI_SEARCH_KEYS.flatMap((key) =>
+    ["node", "way", "relation"].map(
+      (el) => `${el}["${key}"~"^(${amenities})$"](around:${radiusM},${lat},${lon});`
+    )
+  ).join("\n      ");
   const query = `
     [out:json][timeout:${timeout}];
     (
-      node["amenity"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
-      way["amenity"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
-      relation["amenity"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
-      node["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
-      way["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
-      relation["tourism"~"^(${amenities})$"](around:${radiusM},${lat},${lon});
+      ${clauses}
     );
     out center${limit > 0 ? ` ${Math.min(limit, 1000)}` : ""};
   `;
@@ -88,6 +97,10 @@ export async function fetchOsmPlaces(
         const website = tags.website;
         const email = tags.email;
         const openingHours = tags.opening_hours;
+        // Primary type comes from whichever supported key this element was
+        // matched on (a bakery is shop=bakery, a castle historic=castle, etc.).
+        const primaryType =
+          tags.amenity || tags.tourism || tags.shop || tags.historic || tags.leisure;
 
         const primaryContact: ContactInfo = {
           phone: phone ? [{ value: phone }] : undefined,
@@ -102,8 +115,8 @@ export async function fetchOsmPlaces(
           position: { lat: itemLat, lng: itemLon },
           categories: [
             {
-              id: tags.amenity || tags.tourism || "poi",
-              name: tags.amenity || tags.tourism || "Point of Interest",
+              id: primaryType || "poi",
+              name: primaryType || "Point of Interest",
             },
           ],
           contacts: hasContactData ? [primaryContact] : undefined,

@@ -40,6 +40,10 @@ export const OVERPASS_ROAD_TIMEOUT_MS = 15_000;
 /** Search radius for emergency POIs (metres). */
 export const EMERGENCY_SEARCH_RADIUS_M = 10_000;
 
+/** Expanded emergency search radius (metres), used as a fallback when nothing is
+ *  found within EMERGENCY_SEARCH_RADIUS_M (helps rural areas return results). */
+export const EMERGENCY_EXPANDED_SEARCH_RADIUS_M = 50_000;
+
 /** Maximum Overpass results fetched for emergency POIs. */
 export const EMERGENCY_MAX_RESULTS = 80;
 
@@ -48,6 +52,12 @@ export const EMERGENCY_MAX_DISPLAY = 40;
 
 /** Maximum results kept in state after distance-sorting (generic POI tabs). */
 export const POI_MAX_DISPLAY = 30;
+
+/** When a POI search finds nothing, retry once with the radius multiplied by this. */
+export const POI_EXPANDED_RADIUS_FACTOR = 4;
+
+/** Hard cap for the expanded POI search radius (metres). */
+export const POI_MAX_RADIUS_M = 100_000;
 
 /** Overpass amenity type filter for emergency services. */
 export const EMERGENCY_AMENITY_TYPES =

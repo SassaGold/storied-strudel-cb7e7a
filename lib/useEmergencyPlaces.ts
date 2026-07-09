@@ -8,22 +8,15 @@ import { useTranslation } from "react-i18next";
 import { haversineMeters, withRetry, CACHE_TTL_MS } from "./overpass";
 import { fetchOsmPlaces, type OsmPlaceItem, osmItemOpeningHours, osmItemPhone, osmItemWebsite } from "./osmPlaces";
 import {
+  EMERGENCY_AMENITY_TYPES,
   EMERGENCY_SEARCH_RADIUS_M,
+  EMERGENCY_EXPANDED_SEARCH_RADIUS_M,
   EMERGENCY_MAX_RESULTS,
   EMERGENCY_MAX_DISPLAY,
   OVERPASS_DEFAULT_TIMEOUT_MS,
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
-
-// ── AsyncStorage — safe require ───────────────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => {
-  try {
-    return require("@react-native-async-storage/async-storage").default;
-  } catch {
-    return null;
-  }
-})();
+import { storage } from "./storage";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -96,7 +89,7 @@ export function useEmergencyPlaces() {
 
     // Show cached results immediately while fetching fresh data
     try {
-      const raw = await AsyncStorage?.getItem(CACHE_KEY);
+      const raw = await storage.getItem(CACHE_KEY);
       if (activeCallRef.current !== callId) return;
       if (raw) {
         const parsed = JSON.parse(raw);
@@ -133,18 +126,6 @@ export function useEmergencyPlaces() {
       const { latitude, longitude } = pos.coords;
       setUserLocation({ latitude, longitude });
 
-      const items = await withRetry(() =>
-        fetchOsmPlaces(
-          "hospital clinic doctor pharmacy police fire station ambulance",
-          latitude,
-          longitude,
-          EMERGENCY_SEARCH_RADIUS_M,
-          EMERGENCY_MAX_RESULTS,
-          OVERPASS_DEFAULT_TIMEOUT_MS
-        )
-      );
-      if (activeCallRef.current !== callId) return;
-
       const mapEmergencyCategory = (item: OsmPlaceItem): string => {
         const categoryFields = (item.categories ?? [])
           .flatMap((c) => [c.id, c.name])
@@ -165,25 +146,47 @@ export function useEmergencyPlaces() {
         return "other";
       };
 
-      const mapped = items
-        .map((item) => {
-          const lat = item.position?.lat;
-          const lon = item.position?.lng;
-          if (lat === undefined || lon === undefined) return null;
-          return {
-            id: item.id || `${lat},${lon},${item.title || "emergency"}`,
-            name: item.title || "Emergency Service",
-            category: mapEmergencyCategory(item),
-            latitude: lat,
-            longitude: lon,
-            distanceMeters: haversineMeters(latitude, longitude, lat, lon),
-            phone: osmItemPhone(item),
-            address: item.address?.label,
-            openingHours: osmItemOpeningHours(item),
-            website: osmItemWebsite(item),
-          } as EmergencyPlace;
-        })
-        .filter(Boolean) as EmergencyPlace[];
+      // Fetch emergency amenities within a given radius and map them to places.
+      const fetchWithinRadius = async (radiusM: number): Promise<EmergencyPlace[]> => {
+        const items = await withRetry(() =>
+          fetchOsmPlaces(
+            EMERGENCY_AMENITY_TYPES,
+            latitude,
+            longitude,
+            radiusM,
+            EMERGENCY_MAX_RESULTS,
+            OVERPASS_DEFAULT_TIMEOUT_MS
+          )
+        );
+        return items
+          .map((item) => {
+            const lat = item.position?.lat;
+            const lon = item.position?.lng;
+            if (lat === undefined || lon === undefined) return null;
+            return {
+              id: item.id || `${lat},${lon},${item.title || "emergency"}`,
+              name: item.title || "Emergency Service",
+              category: mapEmergencyCategory(item),
+              latitude: lat,
+              longitude: lon,
+              distanceMeters: haversineMeters(latitude, longitude, lat, lon),
+              phone: osmItemPhone(item),
+              address: item.address?.label,
+              openingHours: osmItemOpeningHours(item),
+              website: osmItemWebsite(item),
+            } as EmergencyPlace;
+          })
+          .filter(Boolean) as EmergencyPlace[];
+      };
+
+      let mapped = await fetchWithinRadius(EMERGENCY_SEARCH_RADIUS_M);
+      if (activeCallRef.current !== callId) return;
+
+      // Nothing nearby — widen the search so rural users still get results.
+      if (mapped.length === 0) {
+        mapped = await fetchWithinRadius(EMERGENCY_EXPANDED_SEARCH_RADIUS_M);
+        if (activeCallRef.current !== callId) return;
+      }
 
       const sorted = mapped
         .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))
@@ -193,7 +196,7 @@ export function useEmergencyPlaces() {
       setFromCache(false);
       setCacheTs(null);
       try {
-        await AsyncStorage?.setItem(
+        await storage.setItem(
           CACHE_KEY,
           JSON.stringify({ ts: Date.now(), data: sorted })
         );
