@@ -7,7 +7,7 @@
 import * as Location from "expo-location";
 import { useCallback, useRef, useState } from "react";
 import { Linking } from "react-native";
-import { OVERPASS_DEFAULT_TIMEOUT_MS, POI_MAX_DISPLAY, WIKIPEDIA_SUMMARY_URL } from "./config";
+import { OVERPASS_DEFAULT_TIMEOUT_MS, POI_EXPANDED_RADIUS_FACTOR, POI_MAX_DISPLAY, POI_MAX_RADIUS_M, WIKIPEDIA_SUMMARY_URL } from "./config";
 import { fetchOsmPlaces, type OsmPlaceItem } from "./osmPlaces";
 import { useLocationPermission } from "./locationPermission";
 import { CACHE_TTL_MS, parseWikiTag, withRetry } from "./overpass";
@@ -152,16 +152,27 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
 
-      const radiusM = searchRadiusKm * 1000;
-      const amenities = buildSearchQuery(latitude, longitude, radiusM);
-      const items = await withRetry(
-        () => fetchOsmPlaces(amenities, latitude, longitude, radiusM, fetchLimit, fetchTimeoutMs)
-      );
+      // Fetch and map POIs within a given radius (metres).
+      const fetchWithinRadius = async (radiusM: number): Promise<Place[]> => {
+        const amenities = buildSearchQuery(latitude, longitude, radiusM);
+        const items = await withRetry(
+          () => fetchOsmPlaces(amenities, latitude, longitude, radiusM, fetchLimit, fetchTimeoutMs)
+        );
+        return items
+          .map((item) => mapPlaceItem(item, latitude, longitude))
+          .filter(Boolean) as Place[];
+      };
+
+      const baseRadiusM = searchRadiusKm * 1000;
+      let mapped = await fetchWithinRadius(baseRadiusM);
       if (activeCallRef.current !== callId) return;
 
-      const mapped = items
-        .map((item) => mapPlaceItem(item, latitude, longitude))
-        .filter(Boolean) as Place[];
+      // Nothing nearby — widen the search so rural users still get results.
+      const expandedRadiusM = Math.min(baseRadiusM * POI_EXPANDED_RADIUS_FACTOR, POI_MAX_RADIUS_M);
+      if (mapped.length === 0 && expandedRadiusM > baseRadiusM) {
+        mapped = await fetchWithinRadius(expandedRadiusM);
+        if (activeCallRef.current !== callId) return;
+      }
 
       const sorted = mapped
         .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0))

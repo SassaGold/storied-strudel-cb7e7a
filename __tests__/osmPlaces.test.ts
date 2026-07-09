@@ -170,6 +170,24 @@ describe("fetchOsmPlaces query syntax", () => {
     expect(query).not.toMatch(/out center limit/);
   });
 
+  it("queries amenity, tourism, shop, historic and leisure keys", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({ elements: [] }),
+    }) as unknown as typeof fetch;
+
+    await fetchOsmPlaces("car_repair", 51.5, 0.0, 5000, 50, 10000);
+
+    const capturedBody = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
+    const query = decodeURIComponent(capturedBody.replace(/^data=/, ""));
+
+    for (const key of ["amenity", "tourism", "shop", "historic", "leisure"]) {
+      expect(query).toContain(`["${key}"~"^(car_repair)$"]`);
+    }
+  });
+
   it("generates 'out center;' with no number when limit is 0", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

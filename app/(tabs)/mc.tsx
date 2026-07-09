@@ -129,10 +129,12 @@ const mapMcElement = (
 // ── Overpass query builder ────────────────────────────────────────────────────
 
 const buildQuery = (category: Category): string => {
-  if (category === "services") return "motorcycle_repair|car_repair|bicycle_repair|service_station";
+  // Values are matched across amenity/tourism/shop/historic/leisure keys by
+  // fetchOsmPlaces, so use the real OSM values (shop=car_repair, leisure=track…).
+  if (category === "services") return "motorcycle_repair|motorcycle|car_repair|car_parts|tyres|bicycle";
   if (category === "fuel") return "fuel";
   if (category === "parking") return "parking";
-  if (category === "clubs_tracks") return "club|raceway|stadium";
+  if (category === "clubs_tracks") return "stadium|sports_centre|track|fitness_centre|golf_course";
   return "atm|bank";
 };
 
