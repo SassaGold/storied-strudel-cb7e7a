@@ -11,9 +11,7 @@ import { OVERPASS_DEFAULT_TIMEOUT_MS, POI_MAX_DISPLAY, WIKIPEDIA_SUMMARY_URL } f
 import { fetchOsmPlaces, type OsmPlaceItem } from "./osmPlaces";
 import { useLocationPermission } from "./locationPermission";
 import { CACHE_TTL_MS, parseWikiTag, withRetry } from "./overpass";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
+import { storage } from "./storage";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -84,6 +82,11 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   // Allows in-flight calls to detect they've been superseded and bail out early.
   const activeCallRef = useRef(0);
 
+  // Generation counter for the Wikipedia info fetch. Incremented every time the
+  // info modal opens or closes so a slow response can't overwrite a newer place
+  // (or repopulate a closed modal).
+  const wikiCallRef = useRef(0);
+
   const cancelSearch = useCallback(() => {
     activeCallRef.current += 1;
     setLoading(false);
@@ -105,7 +108,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
 
     // Serve cached data immediately so the user sees something while refreshing.
     try {
-      const raw = await AsyncStorage?.getItem(cacheKey);
+      const raw = await storage.getItem(cacheKey);
       if (activeCallRef.current !== callId) return;
       if (raw) {
         const parsed = JSON.parse(raw);
@@ -168,7 +171,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       setFromCache(false);
       setCacheTs(null);
       try {
-        await AsyncStorage?.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted }));
+        await storage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted }));
       } catch {}
     } catch (err) {
       if (activeCallRef.current !== callId) return;
@@ -186,6 +189,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   }, []);
 
   const openInfo = useCallback((place: Place) => {
+    const callId = (wikiCallRef.current += 1);
     setInfoPlace(place);
     setWikiExtract(null);
     if (place.wikipedia) {
@@ -193,11 +197,31 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       const { lang, title } = parseWikiTag(place.wikipedia);
       // Wikipedia REST API — free, no API key required
       fetch(WIKIPEDIA_SUMMARY_URL(lang, title))
-        .then((r) => r.json())
-        .then((d) => setWikiExtract((d.extract || "").trim() || null))
-        .catch(() => setWikiExtract(null))
-        .finally(() => setWikiLoading(false));
+        .then((r) => {
+          if (!r.ok) throw new Error(`Wikipedia HTTP ${r.status}`);
+          return r.json();
+        })
+        .then((d) => {
+          if (wikiCallRef.current !== callId) return;
+          setWikiExtract((d.extract || "").trim() || null);
+        })
+        .catch(() => {
+          if (wikiCallRef.current !== callId) return;
+          setWikiExtract(null);
+        })
+        .finally(() => {
+          if (wikiCallRef.current === callId) setWikiLoading(false);
+        });
     }
+  }, []);
+
+  // Close the info modal and invalidate any in-flight Wikipedia fetch so its
+  // late response can't repopulate the just-closed modal.
+  const closeInfo = useCallback(() => {
+    wikiCallRef.current += 1;
+    setInfoPlace(null);
+    setWikiExtract(null);
+    setWikiLoading(false);
   }, []);
 
   return {
@@ -220,5 +244,6 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     cancelSearch,
     openInMaps,
     openInfo,
+    closeInfo,
   };
 }

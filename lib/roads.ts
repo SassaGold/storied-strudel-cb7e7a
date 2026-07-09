@@ -1,7 +1,7 @@
 // ── Road-condition utilities ──────────────────────────────────────────────────
 // Pure, side-effect-free helpers used by the RIDER HQ screen.
 
-import { EARTH_RADIUS_KM } from "./config";
+import { haversineMeters } from "./overpass";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -35,7 +35,8 @@ export const ROAD_TYPES = new Set([
 
 /**
  * Haversine formula — returns great-circle distance in kilometres.
- * (The overpass.ts version returns metres; this km variant is used by road alerts.)
+ * Thin wrapper over {@link haversineMeters} (the single source of truth) so
+ * road alerts get km without duplicating the formula.
  */
 export function haversineKm(
   lat1: number,
@@ -43,15 +44,7 @@ export function haversineKm(
   lat2: number,
   lon2: number
 ): number {
-  const R = EARTH_RADIUS_KM;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return haversineMeters(lat1, lon1, lat2, lon2) / 1000;
 }
 
 /**

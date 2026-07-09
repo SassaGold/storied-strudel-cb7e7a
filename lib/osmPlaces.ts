@@ -33,6 +33,9 @@ export type OsmPlaceItem = {
     city?: string;
     countryName?: string;
   };
+  /** Raw OSM tags, preserved for consumers that need type-specific tags
+   *  (e.g. the MC screen reads `fuel:*` and `fee`). */
+  tags?: Record<string, string>;
 };
 
 /** Builds an Overpass query for discovering POI by keywords/tags.
@@ -112,6 +115,7 @@ export async function fetchOsmPlaces(
             city: tags.city || tags.town || tags.village,
             countryName: tags.country,
           },
+          tags,
         };
       })
       .filter(Boolean) as OsmPlaceItem[];
@@ -150,6 +154,60 @@ export function osmItemOpeningHours(item: OsmPlaceItem): string | undefined {
   const text = item.openingHours?.[0]?.text ?? [];
   const joined = text.join(" · ").trim();
   return joined || undefined;
+}
+
+// ── Fuel & parking tag extraction (MC screen) ─────────────────────────────────
+
+/** OSM tag values that mean a fuel type is available at the station. */
+const FUEL_AVAILABLE_VALUES = new Set(["yes", "true", "1", "only"]);
+
+/** Human-readable labels for common OSM `fuel:*` tag suffixes. */
+const FUEL_LABELS: Record<string, string> = {
+  diesel: "Diesel",
+  biodiesel: "Biodiesel",
+  gtl_diesel: "GTL Diesel",
+  hgv_diesel: "HGV Diesel",
+  lpg: "LPG",
+  cng: "CNG",
+  lng: "LNG",
+  e5: "E5",
+  e10: "E10",
+  e85: "E85",
+  adblue: "AdBlue",
+  electricity: "Electric",
+  hydrogen: "Hydrogen",
+  kerosene: "Kerosene",
+  octane_91: "91",
+  octane_92: "92",
+  octane_95: "95",
+  octane_98: "98",
+  octane_100: "100",
+};
+
+/**
+ * Extract available fuel types from a fuel station's OSM `fuel:*` tags
+ * (e.g. `fuel:diesel=yes`, `fuel:octane_95=yes`). Returns undefined when none
+ * are tagged.
+ */
+export function osmItemFuelTypes(item: OsmPlaceItem): string[] | undefined {
+  const tags = item.tags;
+  if (!tags) return undefined;
+  const types: string[] = [];
+  for (const [key, value] of Object.entries(tags)) {
+    if (!key.startsWith("fuel:")) continue;
+    if (!FUEL_AVAILABLE_VALUES.has(value.trim().toLowerCase())) continue;
+    const suffix = key.slice("fuel:".length).toLowerCase();
+    const label =
+      FUEL_LABELS[suffix] ??
+      suffix.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    if (label && !types.includes(label)) types.push(label);
+  }
+  return types.length > 0 ? types : undefined;
+}
+
+/** Whether a parking OSM item is explicitly free to use (`fee=no`). */
+export function osmItemIsFreeParking(item: OsmPlaceItem): boolean {
+  return item.tags?.fee?.trim().toLowerCase() === "no";
 }
 
 

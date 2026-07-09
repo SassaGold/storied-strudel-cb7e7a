@@ -10,9 +10,7 @@ import no from "./locales/no.json";
 import sv from "./locales/sv.json";
 import da from "./locales/da.json";
 import nl from "./locales/nl.json";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
+import { storage } from "./storage";
 
 const LANG_STORAGE_KEY = "app_language_v1";
 
@@ -47,8 +45,8 @@ i18n
   });
 
 // Restore previously saved language preference (async, after init)
-AsyncStorage?.getItem(LANG_STORAGE_KEY)
-  .then((saved: string | null) => {
+storage.getItem(LANG_STORAGE_KEY)
+  .then((saved) => {
     if (saved && (SUPPORTED_LANGS as readonly string[]).includes(saved)) {
       i18n.changeLanguage(saved);
     }
@@ -57,7 +55,7 @@ AsyncStorage?.getItem(LANG_STORAGE_KEY)
 
 /** Persist language choice so it survives app restarts. */
 export function saveLanguage(lang: string): void {
-  AsyncStorage?.setItem(LANG_STORAGE_KEY, lang).catch(() => null);
+  storage.setItem(LANG_STORAGE_KEY, lang).catch(() => null);
 }
 
 export default i18n;

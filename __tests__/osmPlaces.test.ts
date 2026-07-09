@@ -3,6 +3,8 @@
 import {
   fetchOsmPlaces,
   osmItemEmail,
+  osmItemFuelTypes,
+  osmItemIsFreeParking,
   osmItemOpeningHours,
   osmItemPhone,
   osmItemPrimaryCategory,
@@ -88,6 +90,55 @@ describe("osmItemOpeningHours", () => {
   it("returns undefined when openingHours is empty", () => {
     expect(osmItemOpeningHours({ openingHours: [] })).toBeUndefined();
     expect(osmItemOpeningHours({})).toBeUndefined();
+  });
+});
+
+// ── osmItemFuelTypes ──────────────────────────────────────────────────────────
+
+describe("osmItemFuelTypes", () => {
+  it("extracts available fuel types with friendly labels", () => {
+    const item: OsmPlaceItem = {
+      tags: {
+        amenity: "fuel",
+        "fuel:diesel": "yes",
+        "fuel:octane_95": "yes",
+        "fuel:octane_98": "yes",
+        "fuel:e85": "yes",
+        "fuel:lpg": "yes",
+      },
+    };
+    expect(osmItemFuelTypes(item)).toEqual(["Diesel", "95", "98", "E85", "LPG"]);
+  });
+
+  it("ignores fuel tags that are not available", () => {
+    const item: OsmPlaceItem = {
+      tags: { "fuel:diesel": "yes", "fuel:lpg": "no" },
+    };
+    expect(osmItemFuelTypes(item)).toEqual(["Diesel"]);
+  });
+
+  it("title-cases unknown fuel suffixes", () => {
+    const item: OsmPlaceItem = { tags: { "fuel:some_new_fuel": "yes" } };
+    expect(osmItemFuelTypes(item)).toEqual(["Some New Fuel"]);
+  });
+
+  it("returns undefined when there are no fuel tags", () => {
+    expect(osmItemFuelTypes({ tags: { amenity: "fuel" } })).toBeUndefined();
+    expect(osmItemFuelTypes({})).toBeUndefined();
+  });
+});
+
+// ── osmItemIsFreeParking ──────────────────────────────────────────────────────
+
+describe("osmItemIsFreeParking", () => {
+  it("is true when fee=no", () => {
+    expect(osmItemIsFreeParking({ tags: { amenity: "parking", fee: "no" } })).toBe(true);
+  });
+
+  it("is false when fee=yes or fee is absent", () => {
+    expect(osmItemIsFreeParking({ tags: { amenity: "parking", fee: "yes" } })).toBe(false);
+    expect(osmItemIsFreeParking({ tags: { amenity: "parking" } })).toBe(false);
+    expect(osmItemIsFreeParking({})).toBe(false);
   });
 });
 

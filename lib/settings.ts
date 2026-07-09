@@ -1,4 +1,4 @@
-import { createContext, createElement, useContext, useEffect, useState } from "react";
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   C_TO_F_FACTOR,
@@ -9,14 +9,7 @@ import {
   M_TO_FEET,
   SHORT_DISTANCE_THRESHOLD_MILES,
 } from "./config";
-
-const AsyncStorage: any = (() => {
-  try {
-    return require("@react-native-async-storage/async-storage").default;
-  } catch {
-    return null;
-  }
-})();
+import { storage } from "./storage";
 
 export type UnitSystem = "metric" | "imperial";
 
@@ -63,7 +56,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
-        const raw = await AsyncStorage?.getItem(STORAGE_KEY);
+        const raw = await storage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)) {
@@ -74,21 +67,19 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  const setSetting = <K extends keyof AppSettings>(key: K, val: AppSettings[K]) => {
+  const setSetting = useCallback(<K extends keyof AppSettings>(key: K, val: AppSettings[K]) => {
     setSettings((prev) => {
       const next = { ...prev, [key]: val };
-      try {
-        AsyncStorage?.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {}
+      storage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
       return next;
     });
-  };
+  }, []);
 
-  return createElement(
-    SettingsContext.Provider,
-    { value: { settings, setSetting } },
-    children
-  );
+  // Memoize the context value so consumers only re-render when settings change,
+  // not on every provider render.
+  const value = useMemo(() => ({ settings, setSetting }), [settings, setSetting]);
+
+  return createElement(SettingsContext.Provider, { value }, children);
 }
 
 // ── Conversion helpers ────────────────────────────────────────────────────────
