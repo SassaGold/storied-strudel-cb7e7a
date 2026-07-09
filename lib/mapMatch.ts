@@ -8,6 +8,13 @@
  * @see https://project-osrm.org/docs/v5.24.0/api/#match-service
  */
 
+import {
+  OSM_USER_AGENT,
+  OSRM_MATCH_BASE_URL,
+  OSRM_MATCH_RADIUS_M,
+  OSRM_MAX_COORDS_PER_REQUEST,
+} from "./config";
+
 type Coordinate = { latitude: number; longitude: number; timestamp?: number };
 
 /** Decoded polyline point */
@@ -49,14 +56,11 @@ function decodePolyline(encoded: string): LatLng[] {
   return points;
 }
 
-/** Maximum number of coordinates OSRM accepts per request */
-const MAX_COORDS_PER_REQUEST = 100;
-
 /**
  * Downsample an array of coordinates to at most `max` points,
  * keeping the first and last point.
  */
-function downsampleCoords<T>(coords: T[], max: number): T[] {
+export function downsampleCoords<T>(coords: T[], max: number): T[] {
   if (coords.length <= max) return coords;
   const result: T[] = [];
   const step = (coords.length - 1) / (max - 1);
@@ -78,8 +82,8 @@ export async function mapMatchRoute(points: Coordinate[]): Promise<LatLng[]> {
     return points.map((p) => ({ latitude: p.latitude, longitude: p.longitude }));
   }
 
-  // OSRM has a limit of 100 coordinates per request – downsample if needed
-  const sampled = downsampleCoords(points, MAX_COORDS_PER_REQUEST);
+  // OSRM has a limit on coordinates per request – downsample if needed
+  const sampled = downsampleCoords(points, OSRM_MAX_COORDS_PER_REQUEST);
 
   // Build coordinates string: "lng,lat;lng,lat;..."
   const coordsStr = sampled
@@ -92,16 +96,16 @@ export async function mapMatchRoute(points: Coordinate[]): Promise<LatLng[]> {
     ? `&timestamps=${sampled.map((p) => Math.round(p.timestamp! / 1000)).join(";")}`
     : "";
 
-  // Radiuses: allow up to 50m deviation per point to improve matching
-  const radiusesParam = `&radiuses=${sampled.map(() => "50").join(";")}`;
+  // Radiuses: allow a fixed deviation per point to improve matching
+  const radiusesParam = `&radiuses=${sampled.map(() => String(OSRM_MATCH_RADIUS_M)).join(";")}`;
 
   const url =
-    `https://router.project-osrm.org/match/v1/driving/${coordsStr}` +
+    `${OSRM_MATCH_BASE_URL}${coordsStr}` +
     `?overview=full&geometries=polyline${timestampsParam}${radiusesParam}`;
 
   try {
     const response = await fetch(url, {
-      headers: { "User-Agent": "WhereAmI/1.0 (https://sassagold.com)" },
+      headers: { "User-Agent": OSM_USER_AGENT },
     });
 
     if (!response.ok) {

@@ -11,14 +11,13 @@
  * Foreground-only tracking in triplogger.tsx will continue to work.
  */
 
+import { storage } from "./storage";
+
 export const LOCATION_TASK_NAME = "whereami-bg-location";
 /** AsyncStorage key where background GPS points are accumulated during a trip. */
 export const BG_POINTS_KEY = "triplogger_bg_points_v1";
 
 export type BgPoint = { latitude: number; longitude: number; timestamp: number };
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
 // Dynamically load expo-task-manager so a missing/broken native module does
 // not prevent this file from being imported (which would crash the app).
@@ -40,16 +39,16 @@ try {
     async ({ data, error }: { data: { locations: any[] }; error: any }) => {
       if (error || !data) return;
       const { locations } = data;
-      if (!locations?.length || !AsyncStorage) return;
+      if (!locations?.length) return;
       try {
-        const raw = await AsyncStorage.getItem(BG_POINTS_KEY);
+        const raw = await storage.getItem(BG_POINTS_KEY);
         const existing: BgPoint[] = raw ? (JSON.parse(raw) as BgPoint[]) : [];
         const newPoints: BgPoint[] = locations.map((loc: any) => ({
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
           timestamp: loc.timestamp,
         }));
-        await AsyncStorage.setItem(
+        await storage.setItem(
           BG_POINTS_KEY,
           JSON.stringify([...existing, ...newPoints]),
         );

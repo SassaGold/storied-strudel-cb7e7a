@@ -7,8 +7,6 @@
 import { useCallback, type ReactNode } from "react";
 import {
   ActivityIndicator,
-  Linking,
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,8 +17,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../lib/settings";
-import { parseWikiTag } from "../lib/overpass";
 import { usePOIFetch, type Place, type BuildSearchQuery, type MapPlaceItem } from "../lib/usePOIFetch";
+import PlaceInfoModal from "./PlaceInfoModal";
 
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -83,12 +81,11 @@ export default function POIScreen({
     infoPlace,
     wikiExtract,
     wikiLoading,
-    setInfoPlace,
-    setWikiExtract,
     loadPlaces,
     cancelSearch,
     openInMaps,
     openInfo,
+    closeInfo,
   } = usePOIFetch({
     cacheKey,
     buildSearchQuery,
@@ -110,12 +107,6 @@ export default function POIScreen({
   const hapticMedium = () =>
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
 
-  const closeModal = () => {
-    hapticLight();
-    setInfoPlace(null);
-    setWikiExtract(null);
-  };
-
   const categoryDisplay = (cat: string) =>
     formatCategoryLabel ? formatCategoryLabel(cat) : cat;
 
@@ -125,118 +116,14 @@ export default function POIScreen({
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
     >
       {/* ── Info modal ── */}
-      <Modal
-        visible={infoPlace !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={closeModal}
-      >
-        <Pressable style={styles.modalOverlay} onPress={closeModal}>
-          <Pressable style={styles.modalCard} onPress={() => {}}>
-            <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
-
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.category")}</Text>
-              <Text style={styles.modalValue}>{categoryDisplay(infoPlace?.category ?? "")}</Text>
-            </View>
-
-            {renderExtraModalRows && infoPlace ? renderExtraModalRows(infoPlace) : null}
-
-            {infoPlace?.phone && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  onPress={() => { hapticLight(); Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null); }}
-                >
-                  {infoPlace.phone}
-                </Text>
-              </View>
-            )}
-
-            {infoPlace?.email && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.email")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  onPress={() => { hapticLight(); Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null); }}
-                  numberOfLines={1}
-                >
-                  {infoPlace.email}
-                </Text>
-              </View>
-            )}
-
-            {infoPlace?.address && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.address}</Text>
-              </View>
-            )}
-
-            {infoPlace?.website && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  onPress={() => { hapticLight(); Linking.openURL(infoPlace.website!).catch(() => null); }}
-                  numberOfLines={1}
-                >
-                  {infoPlace.website.replace(/^https?:\/\/(www\.)?/, "")}
-                </Text>
-              </View>
-            )}
-
-            {infoPlace?.openingHours && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
-              </View>
-            )}
-
-            {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && (
-              <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
-            )}
-
-            {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>{t("common.wikiLoading")}</Text>
-            )}
-
-            {wikiExtract && (
-              <View style={styles.modalWikiSection}>
-                <Text style={styles.modalWikiLabel}>{t("common.wikiLabel")}</Text>
-                <Text style={styles.modalWikiExtract} numberOfLines={5}>{wikiExtract}</Text>
-              </View>
-            )}
-
-            <View style={styles.modalActions}>
-              <Pressable
-                style={styles.modalActionButton}
-                onPress={() => { hapticLight(); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null); }}
-              >
-                <Text style={styles.modalActionButtonText}>{t("common.reviewsGoogle")}</Text>
-              </Pressable>
-
-              {infoPlace?.wikipedia && (
-                <Pressable
-                  style={[styles.modalActionButton, styles.modalActionButtonWiki]}
-                  onPress={() => {
-                    hapticLight();
-                    const { lang, title } = parseWikiTag(infoPlace.wikipedia!);
-                    Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
-                  }}
-                >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common.readWikipedia")}</Text>
-                </Pressable>
-              )}
-            </View>
-
-            <Pressable style={styles.modalClose} onPress={closeModal}>
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <PlaceInfoModal
+        place={infoPlace}
+        wikiExtract={wikiExtract}
+        wikiLoading={wikiLoading}
+        onClose={closeInfo}
+        formatCategoryLabel={formatCategoryLabel}
+        renderExtraRows={renderExtraModalRows}
+      />
 
       {/* ── Header ── */}
       <View style={styles.header}>
@@ -461,115 +348,6 @@ const styles = StyleSheet.create({
     color: "#ff6600",
     fontSize: 20,
     lineHeight: 22,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalCard: {
-    backgroundColor: "#141414",
-    borderRadius: 10,
-    padding: 22,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#2a2a2a",
-    gap: 12,
-  },
-  modalTitle: {
-    color: "#ffffff",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  modalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
-  modalLabel: {
-    color: "#666666",
-    fontSize: 13,
-  },
-  modalValue: {
-    color: "#c8c8c8",
-    fontSize: 13,
-    fontWeight: "500",
-    flexShrink: 1,
-    textAlign: "right",
-  },
-  modalLink: {
-    color: "#ff6600",
-    fontSize: 13,
-    fontWeight: "500",
-    flexShrink: 1,
-    textAlign: "right",
-    textDecorationLine: "underline",
-  },
-  modalNoInfo: {
-    color: "#555555",
-    fontSize: 13,
-    fontStyle: "italic",
-  },
-  modalLoadingText: {
-    color: "#666666",
-    fontSize: 13,
-    fontStyle: "italic",
-  },
-  modalWikiSection: {
-    backgroundColor: "rgba(255,255,255,0.04)",
-    borderRadius: 8,
-    padding: 10,
-    gap: 4,
-  },
-  modalWikiLabel: {
-    color: "#94a3b8",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  modalWikiExtract: {
-    color: "#94a3b8",
-    fontSize: 12,
-    lineHeight: 18,
-    fontStyle: "italic",
-  },
-  modalActions: {
-    gap: 8,
-  },
-  modalActionButton: {
-    backgroundColor: "rgba(255,102,0,0.12)",
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
-  },
-  modalActionButtonWiki: {
-    backgroundColor: "rgba(250,204,21,0.1)",
-    borderColor: "rgba(250,204,21,0.3)",
-  },
-  modalActionButtonText: {
-    color: "#ff6600",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  modalActionButtonTextWiki: {
-    color: "#fbbf24",
-  },
-  modalClose: {
-    marginTop: 8,
-    backgroundColor: "#ff6600",
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  modalCloseText: {
-    color: "#000000",
-    fontWeight: "800",
-    fontSize: 15,
   },
   viewToggleRow: {
     flexDirection: "row",

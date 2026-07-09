@@ -72,7 +72,9 @@
       ],
       "expo-web-browser",
       "./plugins/withAndroidEdgeToEdge",
-      "./plugins/withMaterialVersion"
+      "./plugins/withMaterialVersion",
+      "expo-font",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

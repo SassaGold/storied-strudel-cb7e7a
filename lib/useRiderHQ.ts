@@ -28,9 +28,6 @@ import {
     type ForecastDay,
     type HourlyForecast,
     type WeatherInfo,
-    buildAlerts,
-    buildRecommendations,
-    ridingSuitability,
     wmoToSymbol,
 } from "./weather";
 
@@ -50,11 +47,6 @@ export type RiderHQState = {
   location: Location.LocationObject | null;
   lastUpdated: Date | null;
   roadAlerts: RoadAlert[];
-  /** i18n key list of weather alerts */
-  alerts: string[];
-  suitability: { score: number; labelKey: string; color: string };
-  /** i18n key list of riding recommendations */
-  recommendations: string[];
   sunTimes: SunTimes;
   /** Deep-link URL to yr.no forecast for current location */
   weatherUrl: string;
@@ -277,10 +269,6 @@ export function useRiderHQ(): RiderHQState {
 
   // ── Derived values ────────────────────────────────────────────────────────
 
-  const alerts = useMemo(() => buildAlerts(weather ?? undefined), [weather]);
-  const suitability = useMemo(() => ridingSuitability(weather ?? undefined), [weather]);
-  const recommendations = useMemo(() => buildRecommendations(weather ?? undefined), [weather]);
-
   const sunTimes = useMemo(
     () =>
       location
@@ -303,9 +291,6 @@ export function useRiderHQ(): RiderHQState {
     location,
     lastUpdated,
     roadAlerts,
-    alerts,
-    suitability,
-    recommendations,
     sunTimes,
     weatherUrl,
     loadData,

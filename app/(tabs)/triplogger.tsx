@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -22,20 +22,17 @@ import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
 import { OSM_TILE_URL, OSM_USER_AGENT } from "../../lib/config";
-import { mapMatchRoute } from "../../lib/mapMatch";
+import { mapMatchRoute, downsampleCoords } from "../../lib/mapMatch";
+import { storage } from "../../lib/storage";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Notifications: typeof import("expo-notifications") | null = (() => { try { return require("expo-notifications"); } catch { return null; } })();
 
-// Safely load AsyncStorage
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const TaskManager: any = (() => { try { return require("expo-task-manager"); } catch { return null; } })();
-
 const STORAGE_KEY = "triplogger_rides_v1";
+
+/** Cap on saved rides kept in AsyncStorage; oldest are trimmed once exceeded. */
+const MAX_SAVED_RIDES = 100;
 
 type GpsPoint = { latitude: number; longitude: number; timestamp: number };
 
@@ -66,18 +63,6 @@ const formatDate = (iso: string): string => {
     hour: "2-digit",
     minute: "2-digit",
   });
-};
-
-/** Return at most `max` evenly-sampled points from `pts` (always keeps first + last). */
-const downsample = (pts: GpsPoint[], max = 200): GpsPoint[] => {
-  if (pts.length <= max) return pts;
-  const result: GpsPoint[] = [];
-  const step = (pts.length - 1) / (max - 1);
-  for (let i = 0; i < max - 1; i++) {
-    result.push(pts[Math.round(i * step)]);
-  }
-  result.push(pts[pts.length - 1]);
-  return result;
 };
 
 export default function TripLoggerScreen() {
@@ -167,20 +152,18 @@ export default function TripLoggerScreen() {
   }, [requestForegroundPermission]);
 
   const loadRides = async () => {
-    if (!AsyncStorage) return;
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
+      const raw = await storage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) setRides(parsed);
+        if (Array.isArray(parsed)) setRides(parsed.slice(0, MAX_SAVED_RIDES));
       }
     } catch {}
   };
 
   const saveRides = useCallback(async (updated: SavedRide[]) => {
-    if (!AsyncStorage) return;
     try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      await storage.setItem(STORAGE_KEY, JSON.stringify(updated));
     } catch {}
   }, []);
 
@@ -264,17 +247,9 @@ export default function TripLoggerScreen() {
       setRecording(true);
 
       // Clear any stale background points from a previous session.
-      if (AsyncStorage) {
-        try { await AsyncStorage.removeItem(BG_POINTS_KEY); } catch {
-          // Stale data will be deduplicated on stop; not critical.
-        }
+      try { await storage.removeItem(BG_POINTS_KEY); } catch {
+        // Stale data will be deduplicated on stop; not critical.
       }
-
-      // Diagnostic: confirm task registration and running state before starting.
-      if (TaskManager) {
-        console.log("Registered tasks:", await TaskManager.getRegisteredTasksAsync());
-      }
-      console.log("Has started:", await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME));
 
       // Start the background location task (Android foreground service).
       // This ensures GPS points are captured even when the screen is locked.
@@ -380,19 +355,17 @@ export default function TripLoggerScreen() {
 
       // Merge foreground + background points, deduplicate by timestamp, recalculate distance.
       let mergedRoute = [...routeRef.current];
-      if (AsyncStorage) {
-        try {
-          const raw = await AsyncStorage.getItem(BG_POINTS_KEY);
-          if (raw) {
-            const bgPoints: BgPoint[] = JSON.parse(raw);
-            const fgTsSet = new Set(routeRef.current.map((p) => p.timestamp));
-            const uniqueBg = bgPoints.filter((p) => !fgTsSet.has(p.timestamp));
-            mergedRoute = [...routeRef.current, ...uniqueBg].sort((a, b) => a.timestamp - b.timestamp);
-          }
-          await AsyncStorage.removeItem(BG_POINTS_KEY);
-        } catch {
-          // Keep foreground-only route if background data cannot be read.
+      try {
+        const raw = await storage.getItem(BG_POINTS_KEY);
+        if (raw) {
+          const bgPoints: BgPoint[] = JSON.parse(raw);
+          const fgTsSet = new Set(routeRef.current.map((p) => p.timestamp));
+          const uniqueBg = bgPoints.filter((p) => !fgTsSet.has(p.timestamp));
+          mergedRoute = [...routeRef.current, ...uniqueBg].sort((a, b) => a.timestamp - b.timestamp);
         }
+        await storage.removeItem(BG_POINTS_KEY);
+      } catch {
+        // Keep foreground-only route if background data cannot be read.
       }
 
       // Recalculate distance from merged route.
@@ -420,7 +393,8 @@ export default function TripLoggerScreen() {
           avgSpeedKmh: Math.round(avgSpeed * 10) / 10,
           route: mergedRoute,
         };
-        const updated = [ride, ...rides];
+        // Cap history so storage can't grow unbounded; keep the newest rides.
+        const updated = [ride, ...rides].slice(0, MAX_SAVED_RIDES);
         setRides(updated);
         await saveRides(updated);
       } else {
@@ -662,7 +636,7 @@ export default function TripLoggerScreen() {
   );
 }
 
-function SpeedGauge({
+const SpeedGauge = memo(function SpeedGauge({
   speedKmh,
   maxKmh = 160,
   unit,
@@ -747,9 +721,9 @@ function SpeedGauge({
       </View>
     </View>
   );
-}
+});
 
-function StatBox({
+const StatBox = memo(function StatBox({
   label,
   value,
   unit,
@@ -765,7 +739,7 @@ function StatBox({
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
-}
+});
 
 // ── OSM tile helpers ──────────────────────────────────────────────────────────
 
@@ -818,7 +792,7 @@ const chooseBestZoom = (
 /** Height reserved for the modal header when the map is shown full-screen. */
 const FULLSCREEN_MAP_HEADER_OFFSET = 100;
 
-function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; fullscreen?: boolean }) {
+const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; fullscreen?: boolean }) {
   const MAP_HEIGHT = fullscreen ? Dimensions.get("window").height - FULLSCREEN_MAP_HEADER_OFFSET : 200;
   /** Extra space around the route so map context is visible (fraction of extent). */
   const ROUTE_PAD = 0.3;
@@ -834,31 +808,39 @@ function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; full
     return () => { cancelled = true; };
   }, [route]);
 
-  // Use matched route for rendering if available, otherwise fall back to raw GPS points
-  const pts = matchedRoute
-    ? downsample(matchedRoute.map((p, i) => ({
-        ...p,
-        timestamp: route[Math.min(i, route.length - 1)]?.timestamp ?? 0,
-      })), 500)
-    : downsample(route);
+  // Use matched route for rendering if available, otherwise fall back to raw GPS points.
+  const pts = useMemo(
+    () =>
+      matchedRoute
+        ? downsampleCoords(matchedRoute.map((p, i) => ({
+            ...p,
+            timestamp: route[Math.min(i, route.length - 1)]?.timestamp ?? 0,
+          })), 500)
+        : downsampleCoords(route, 200),
+    [matchedRoute, route],
+  );
 
-  // Find bounding box
-  let minLat = pts[0].latitude, maxLat = pts[0].latitude;
-  let minLon = pts[0].longitude, maxLon = pts[0].longitude;
-  for (const p of pts) {
-    if (p.latitude < minLat) minLat = p.latitude;
-    if (p.latitude > maxLat) maxLat = p.latitude;
-    if (p.longitude < minLon) minLon = p.longitude;
-    if (p.longitude > maxLon) maxLon = p.longitude;
-  }
-
-  // Pad the bounding box to show map context around the route
-  const latPad = (maxLat - minLat) * ROUTE_PAD || 0.005;
-  const lonPad = (maxLon - minLon) * ROUTE_PAD || 0.005;
-  const padMinLat = minLat - latPad;
-  const padMaxLat = maxLat + latPad;
-  const padMinLon = minLon - lonPad;
-  const padMaxLon = maxLon + lonPad;
+  // Find the padded bounding box that contains the whole route.
+  const bounds = useMemo(() => {
+    let minLat = pts[0].latitude, maxLat = pts[0].latitude;
+    let minLon = pts[0].longitude, maxLon = pts[0].longitude;
+    for (const p of pts) {
+      if (p.latitude < minLat) minLat = p.latitude;
+      if (p.latitude > maxLat) maxLat = p.latitude;
+      if (p.longitude < minLon) minLon = p.longitude;
+      if (p.longitude > maxLon) maxLon = p.longitude;
+    }
+    // Pad the bounding box to show map context around the route.
+    const latPad = (maxLat - minLat) * ROUTE_PAD || 0.005;
+    const lonPad = (maxLon - minLon) * ROUTE_PAD || 0.005;
+    return {
+      padMinLat: minLat - latPad,
+      padMaxLat: maxLat + latPad,
+      padMinLon: minLon - lonPad,
+      padMaxLon: maxLon + lonPad,
+    };
+  }, [pts]);
+  const { padMinLat, padMaxLat, padMinLon, padMaxLon } = bounds;
 
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -882,16 +864,16 @@ function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; full
     const offsetX = (containerWidth - worldW * scale) / 2;
     const offsetY = (MAP_HEIGHT - worldH * scale) / 2;
     return { z, txStart, tyStart, txEnd, tyEnd, scale, offsetX, offsetY };
-  }, [containerWidth, padMinLat, padMaxLat, padMinLon, padMaxLon]);
+  }, [containerWidth, padMinLat, padMaxLat, padMinLon, padMaxLon, MAP_HEIGHT]);
 
   /** Convert a GPS point to screen [x, y] using the same Mercator projection as the tiles. */
-  const toScreen = (p: GpsPoint): [number, number] | null => {
+  const toScreen = useCallback((p: GpsPoint): [number, number] | null => {
     if (!layout) return null;
     const { z, txStart, tyStart, scale, offsetX, offsetY } = layout;
     const x = offsetX + (lngToTileFrac(p.longitude, z) - txStart) * TILE_PX * scale;
     const y = offsetY + (latToTileFrac(p.latitude, z) - tyStart) * TILE_PX * scale;
     return [x, y];
-  };
+  }, [layout]);
 
   // Build tile list
   const tiles = useMemo(() => {
@@ -928,8 +910,7 @@ function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; full
       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
       return { length, angle, mx: (x1 + x2) / 2, my: (y1 + y2) / 2 };
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layout]);
+  }, [pts, toScreen, layout]);
 
   const firstPt = toScreen(pts[0]);
   const lastPt  = pts.length > 1 ? toScreen(pts[pts.length - 1]) : null;
@@ -1001,7 +982,7 @@ function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; full
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#0a0a0a" },

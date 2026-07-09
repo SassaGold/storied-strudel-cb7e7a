@@ -122,6 +122,17 @@ export const ROAD_MAX_RESULTS = 20;
 /** GPS update interval for the trip logger (ms). */
 export const TRIP_LOCATION_INTERVAL_MS = 1_500;
 
+// ── OSRM map matching ─────────────────────────────────────────────────────────
+
+/** OSRM public demo "match" service base URL (snaps GPS traces to roads). No API key. */
+export const OSRM_MATCH_BASE_URL = "https://router.project-osrm.org/match/v1/driving/";
+
+/** Maximum number of coordinates OSRM accepts per match request. */
+export const OSRM_MAX_COORDS_PER_REQUEST = 100;
+
+/** Allowed per-point GPS deviation (metres) when matching a trace to roads. */
+export const OSRM_MATCH_RADIUS_M = 50;
+
 // ── Privacy ───────────────────────────────────────────────────────────────────
 
 /** Publicly hosted privacy policy URL shown in the location-disclosure modal. */

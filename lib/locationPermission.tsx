@@ -74,7 +74,7 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
     if (!allowed) {
       // User declined — return a denied-equivalent result without calling the OS.
       return {
-        status: "denied" as const,
+        status: Location.PermissionStatus.DENIED,
         granted: false,
         canAskAgain: current.canAskAgain,
         expires: current.expires,
@@ -92,7 +92,7 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
       current = await Location.getBackgroundPermissionsAsync();
     } catch {
       // Background permissions API not available on this platform (e.g. web).
-      return { status: "denied" as const, granted: false, canAskAgain: false, expires: "never" };
+      return { status: Location.PermissionStatus.DENIED, granted: false, canAskAgain: false, expires: "never" };
     }
     if (current.status === "granted") return current;
 
@@ -112,7 +112,7 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
 
     if (!allowed) {
       return {
-        status: "denied" as const,
+        status: Location.PermissionStatus.DENIED,
         granted: false,
         canAskAgain: current.canAskAgain,
         expires: current.expires,
@@ -122,7 +122,7 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
     try {
       return await Location.requestBackgroundPermissionsAsync();
     } catch {
-      return { status: "denied" as const, granted: false, canAskAgain: false, expires: "never" };
+      return { status: Location.PermissionStatus.DENIED, granted: false, canAskAgain: false, expires: "never" };
     }
   }, []);
 

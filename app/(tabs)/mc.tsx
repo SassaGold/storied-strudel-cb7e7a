@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import {
     ActivityIndicator,
     Linking,
-    Modal,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -15,22 +14,23 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
     osmItemEmail,
+    osmItemFuelTypes,
+    osmItemIsFreeParking,
     osmItemOpeningHours,
     osmItemPhone,
     osmItemPrimaryCategory,
     osmItemWebsite,
     type OsmPlaceItem,
 } from "../../lib/osmPlaces";
-import { CACHE_TTL_MS, haversineMeters, parseWikiTag } from "../../lib/overpass";
+import { CACHE_TTL_MS, haversineMeters } from "../../lib/overpass";
 import { fmtDistShort, useSettings } from "../../lib/settings";
+import { storage } from "../../lib/storage";
 import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
+import PlaceInfoModal from "../../components/PlaceInfoModal";
 
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
 // ── MC-specific constants ─────────────────────────────────────────────────────
 
@@ -97,15 +97,16 @@ const mapMcElement = (
   item: OsmPlaceItem,
   latitude: number,
   longitude: number,
-  fallbackCategory: string
+  selectedCategory: Category
 ): Place | null => {
   const lat = item.position?.lat;
   const lon = item.position?.lng;
   if (lat === undefined || lon === undefined) return null;
-  const category = (osmItemPrimaryCategory(item) || fallbackCategory).toLowerCase();
-  return {
-    id: item.id || `${lat},${lon},${item.title || fallbackCategory}`,
-    name: item.title || fallbackCategory,
+  const fallback = fallbackLabel(selectedCategory);
+  const category = (osmItemPrimaryCategory(item) || fallback).toLowerCase();
+  const place: Place = {
+    id: item.id || `${lat},${lon},${item.title || fallback}`,
+    name: item.title || fallback,
     category,
     latitude: lat,
     longitude: lon,
@@ -116,6 +117,13 @@ const mapMcElement = (
     address: item.address?.label,
     openingHours: osmItemOpeningHours(item),
   };
+  // Category-specific enrichment from raw OSM tags.
+  if (selectedCategory === "fuel") {
+    place.fuelTypes = osmItemFuelTypes(item);
+  } else if (selectedCategory === "parking" && osmItemIsFreeParking(item)) {
+    place.note = "FREE_PARKING";
+  }
+  return place;
 };
 
 // ── Overpass query builder ────────────────────────────────────────────────────
@@ -157,8 +165,6 @@ export default function McScreen() {
     infoPlace,
     wikiExtract,
     wikiLoading,
-    setInfoPlace,
-    setWikiExtract,
     setPlaces,
     setFromCache,
     setCacheTs,
@@ -167,10 +173,11 @@ export default function McScreen() {
     cancelSearch,
     openInMaps,
     openInfo,
+    closeInfo,
   } = usePOIFetch({
     cacheKey: `cache_mc_v2_${selected}`,
     buildSearchQuery: () => buildQuery(selected),
-    mapPlaceItem: (item, lat, lon) => mapMcElement(item, lat, lon, fallbackLabel(selected)),
+    mapPlaceItem: (item, lat, lon) => mapMcElement(item, lat, lon, selected),
     locationErrorMsg: t("garage.locationError"),
     loadErrorMsg: t("garage.loadError"),
     searchRadiusKm: effectiveSearchRadiusKm,
@@ -195,7 +202,7 @@ export default function McScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const savedSelected = await AsyncStorage?.getItem(MC_SELECTED_KEY);
+        const savedSelected = await storage.getItem(MC_SELECTED_KEY);
         const restoredCategory: Category =
           savedSelected && (CATEGORY_KEYS as readonly string[]).includes(savedSelected)
             ? (savedSelected as Category)
@@ -203,7 +210,7 @@ export default function McScreen() {
 
         // Populate places from cache (valid entries only — no network request).
         const cacheKey = `cache_mc_v2_${restoredCategory}`;
-        const raw = await AsyncStorage?.getItem(cacheKey);
+        const raw = await storage.getItem(cacheKey);
 
         // Apply all state updates in one synchronous block so that React
         // batches them into a single render, preventing an intermediate render
@@ -235,7 +242,7 @@ export default function McScreen() {
   // Persist selected category whenever it changes (skip during initial restore).
   useEffect(() => {
     if (!initDoneRef.current) return;
-    AsyncStorage?.setItem(MC_SELECTED_KEY, selected)?.catch(() => null);
+    storage.setItem(MC_SELECTED_KEY, selected).catch(() => null);
   }, [selected]);
 
   const sectionTitle = t(`garage.titles.${selected}`);
@@ -254,130 +261,18 @@ export default function McScreen() {
   const hapticMedium = () =>
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
 
-  const closeModal = () => {
-    hapticLight();
-    setInfoPlace(null);
-    setWikiExtract(null);
-  };
+  const formatNote = (note: string) => (note === "FREE_PARKING" ? t("garage.freeParking") : note);
 
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
-      <Modal
-        visible={infoPlace !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={closeModal}
-      >
-        <Pressable style={styles.modalOverlay} onPress={closeModal}>
-          <Pressable style={styles.modalCard} onPress={() => {}}>
-            <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.category")}</Text>
-              <Text style={styles.modalValue}>{infoPlace?.category}</Text>
-            </View>
-            {infoPlace?.note && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.note")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.note === "FREE_PARKING" ? t("garage.freeParking") : infoPlace.note}</Text>
-              </View>
-            )}
-            {infoPlace?.phone && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  onPress={() => { hapticLight(); Linking.openURL(`tel:${infoPlace.phone}`).catch(() => null); }}
-                >
-                  {infoPlace.phone}
-                </Text>
-              </View>
-            )}
-            {infoPlace?.email && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.email")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  onPress={() => { hapticLight(); Linking.openURL(`mailto:${infoPlace.email}`).catch(() => null); }}
-                  numberOfLines={1}
-                >
-                  {infoPlace.email}
-                </Text>
-              </View>
-            )}
-            {infoPlace?.address && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.address}</Text>
-              </View>
-            )}
-            {infoPlace?.website && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  onPress={() => { hapticLight(); Linking.openURL(infoPlace.website!).catch(() => null); }}
-                  numberOfLines={1}
-                >
-                  {infoPlace.website.replace(/^https?:\/\/(www\.)?/, "")}
-                </Text>
-              </View>
-            )}
-            {infoPlace?.openingHours && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
-              </View>
-            )}
-            {infoPlace?.fuelTypes && infoPlace.fuelTypes.length > 0 && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.fuelTypes")}</Text>
-                <View style={styles.fuelTypesRow}>
-                  {infoPlace.fuelTypes.map((ft) => (
-                    <View key={ft} style={styles.fuelTypeBadge}>
-                      <Text style={styles.fuelTypeBadgeText}>{ft}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-            {!infoPlace?.phone && !infoPlace?.website && !infoPlace?.openingHours && !infoPlace?.email && !infoPlace?.address && !infoPlace?.fuelTypes?.length && (
-              <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
-            )}
-            {infoPlace?.wikipedia && wikiLoading && (
-              <Text style={styles.modalLoadingText}>{t("common.wikiLoading")}</Text>
-            )}
-            {wikiExtract && (
-              <View style={styles.modalWikiSection}>
-                <Text style={styles.modalWikiLabel}>{t("common.wikiLabel")}</Text>
-                <Text style={styles.modalWikiExtract} numberOfLines={5}>{wikiExtract}</Text>
-              </View>
-            )}
-            <View style={styles.modalActions}>
-              <Pressable
-                style={styles.modalActionButton}
-                onPress={() => { hapticLight(); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(infoPlace?.name ?? "")}`).catch(() => null); }}
-              >
-                <Text style={styles.modalActionButtonText}>{mapsButtonLabel}</Text>
-              </Pressable>
-              {infoPlace?.wikipedia && (
-                <Pressable
-                  style={[styles.modalActionButton, styles.modalActionButtonWiki]}
-                  onPress={() => {
-                    hapticLight();
-                    const { lang, title } = parseWikiTag(infoPlace.wikipedia!);
-                    Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
-                  }}
-                >
-                  <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common.readWikipedia")}</Text>
-                </Pressable>
-              )}
-            </View>
-            <Pressable style={styles.modalClose} onPress={closeModal}>
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+      <PlaceInfoModal
+        place={infoPlace}
+        wikiExtract={wikiExtract}
+        wikiLoading={wikiLoading}
+        onClose={closeInfo}
+        mapsButtonLabel={mapsButtonLabel}
+        formatNote={formatNote}
+      />
       <View style={styles.header}>
         <View style={styles.headerGlow} />
         <View style={styles.headerGlowSecondary} />
@@ -750,103 +645,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     lineHeight: 22,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalCard: {
-    backgroundColor: "#141414",
-    borderRadius: 10,
-    padding: 22,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#2a2a2a",
-    gap: 12,
-  },
-  modalTitle: {
-    color: "#ffffff",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  modalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
-  modalLabel: {
-    color: "#666666",
-    fontSize: 13,
-  },
-  modalValue: {
-    color: "#c8c8c8",
-    fontSize: 13,
-    fontWeight: "500",
-    flexShrink: 1,
-    textAlign: "right",
-  },
-  modalLink: {
-    color: "#ff6600",
-    fontSize: 13,
-    fontWeight: "500",
-    flexShrink: 1,
-    textAlign: "right",
-    textDecorationLine: "underline",
-  },
-  modalNoInfo: {
-    color: "#555555",
-    fontSize: 13,
-    fontStyle: "italic",
-  },
-  modalLoadingText: {
-    color: "#666666",
-    fontSize: 13,
-    fontStyle: "italic",
-  },
-  modalWikiSection: {
-    backgroundColor: "rgba(255,255,255,0.04)",
-    borderRadius: 8,
-    padding: 10,
-    gap: 4,
-  },
-  modalWikiLabel: {
-    color: "#64748b",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  modalWikiExtract: {
-    color: "#64748b",
-    fontSize: 12,
-    lineHeight: 18,
-    fontStyle: "italic",
-  },
-  modalActions: {
-    gap: 8,
-  },
-  modalActionButton: {
-    backgroundColor: "rgba(255,102,0,0.12)",
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
-  },
-  modalActionButtonWiki: {
-    backgroundColor: "rgba(250,204,21,0.1)",
-    borderColor: "rgba(250,204,21,0.3)",
-  },
-  modalActionButtonText: {
-    color: "#ff6600",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  modalActionButtonTextWiki: {
-    color: "#fbbf24",
-  },
   fuelTypesRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -865,18 +663,6 @@ const styles = StyleSheet.create({
     color: "#22c55e",
     fontSize: 11,
     fontWeight: "700",
-  },
-  modalClose: {
-    marginTop: 8,
-    backgroundColor: "#ff6600",
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  modalCloseText: {
-    color: "#000000",
-    fontWeight: "800",
-    fontSize: 15,
   },
   viewToggleRow: {
     flexDirection: "row",
