@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings, fmtDistShort } from "../lib/settings";
 import { usePOIFetch, type Place, type BuildSearchQuery, type MapPlaceItem } from "../lib/usePOIFetch";
 import PlaceInfoModal from "./PlaceInfoModal";
+import POIMap from "./POIMap";
 
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -79,6 +80,7 @@ export default function POIScreen({
     places,
     fromCache,
     cacheTs,
+    userLocation,
     infoPlace,
     wikiExtract,
     wikiLoading,
@@ -116,6 +118,8 @@ export default function POIScreen({
     setRefreshing(true);
     try { await loadPlaces(); } finally { setRefreshing(false); }
   }, [loadPlaces]);
+
+  const [view, setView] = useState<"list" | "map">("list");
 
   return (
     <ScrollView
@@ -177,9 +181,40 @@ export default function POIScreen({
         </View>
       )}
 
-      {/* ── List view ── */}
+      {/* ── List / map toggle (only with results) ── */}
+      {places.length > 0 && (
+        <View style={styles.viewToggleRow}>
+          <Pressable
+            style={[styles.viewToggleBtn, view === "list" && styles.viewToggleBtnActive]}
+            onPress={() => { hapticLight(); setView("list"); }}
+            accessibilityRole="button"
+            accessibilityState={{ selected: view === "list" }}
+            accessibilityLabel={t("common.viewList")}
+          >
+            <Text style={[styles.viewToggleText, view === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
+          </Pressable>
+          <Pressable
+            style={[styles.viewToggleBtn, view === "map" && styles.viewToggleBtnActive]}
+            onPress={() => { hapticLight(); setView("map"); }}
+            accessibilityRole="button"
+            accessibilityState={{ selected: view === "map" }}
+            accessibilityLabel={t("common.viewMap")}
+          >
+            <Text style={[styles.viewToggleText, view === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
+          </Pressable>
+        </View>
+      )}
+
+      {/* ── Results ── */}
       {places.length === 0 && !loading ? (
         <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
+      ) : view === "map" ? (
+        <POIMap
+          places={places}
+          userLocation={userLocation}
+          onPressPlace={openInfo}
+          markerLabel={(p) => p.name}
+        />
       ) : (
         places.map((place) => (
             <Pressable

@@ -11,6 +11,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import * as Location from "expo-location";
@@ -53,7 +54,15 @@ type SavedRide = {
   durationMs: number;
   avgSpeedKmh: number;
   route: GpsPoint[];
+  /** Stable ride number assigned at save time (doesn't renumber on delete). */
+  seq?: number;
+  /** Optional user-given name; falls back to "Ride {seq}" when absent. */
+  name?: string;
 };
+
+/** Next stable ride number = one more than the highest existing seq. */
+const nextRideSeq = (rides: SavedRide[]): number =>
+  rides.reduce((max, r) => Math.max(max, r.seq ?? 0), 0) + 1;
 
 const formatDuration = (ms: number): string => {
   const totalSec = Math.floor(ms / 1000);
@@ -89,7 +98,7 @@ const routeDistanceKm = (route: GpsPoint[]): number => {
 };
 
 /** Build a SavedRide from a route + timing, or null if it's too short (< ~10 m). */
-const buildRide = (route: GpsPoint[], startTime: number | null, endTime: number): SavedRide | null => {
+const buildRide = (route: GpsPoint[], startTime: number | null, endTime: number, seq: number): SavedRide | null => {
   const distanceKm = routeDistanceKm(route);
   if (distanceKm <= 0.01) return null;
   const durationMs = startTime ? Math.max(0, endTime - startTime) : 0;
@@ -101,6 +110,7 @@ const buildRide = (route: GpsPoint[], startTime: number | null, endTime: number)
     durationMs,
     avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10,
     route,
+    seq,
   };
 };
 
@@ -124,6 +134,8 @@ export default function TripLoggerScreen() {
   const [rides, setRides] = useState<SavedRide[]>([]);
   const [expandedMaps, setExpandedMaps] = useState<Set<string>>(new Set());
   const [fullscreenRide, setFullscreenRide] = useState<SavedRide | null>(null);
+  const [renamingRide, setRenamingRide] = useState<SavedRide | null>(null);
+  const [renameText, setRenameText] = useState("");
 
   const toggleMap = useCallback((id: string) => {
     setExpandedMaps((prev) => {
@@ -225,7 +237,7 @@ export default function TripLoggerScreen() {
 
   /** If a previous session was killed mid-ride, rebuild that ride from its
    *  checkpoint (+ any leftover background points) so it isn't lost. */
-  const recoverCheckpointRide = useCallback(async (): Promise<SavedRide | null> => {
+  const recoverCheckpointRide = useCallback(async (seq: number): Promise<SavedRide | null> => {
     try {
       const raw = await storage.getItem(CHECKPOINT_KEY);
       if (!raw) return null;
@@ -242,7 +254,7 @@ export default function TripLoggerScreen() {
         await storage.removeItem(BG_POINTS_KEY);
       } catch {}
       const lastTs = route.length > 0 ? route[route.length - 1].timestamp : cp.startTime;
-      return buildRide(route, cp.startTime, lastTs);
+      return buildRide(route, cp.startTime, lastTs, seq);
     } catch {
       return null;
     }
@@ -257,10 +269,16 @@ export default function TripLoggerScreen() {
         if (Array.isArray(parsed)) existing = parsed;
       }
     } catch {}
-    const recovered = await recoverCheckpointRide();
+    // Backfill a stable seq for rides saved before this field existed (list is
+    // newest-first, so the newest gets the highest number).
+    const needsBackfill = existing.some((r) => r.seq == null);
+    if (needsBackfill) {
+      existing = existing.map((r, i) => (r.seq != null ? r : { ...r, seq: existing.length - i }));
+    }
+    const recovered = await recoverCheckpointRide(nextRideSeq(existing));
     const all = (recovered ? [recovered, ...existing] : existing).slice(0, MAX_SAVED_RIDES);
     setRides(all);
-    if (recovered) await saveRides(all);
+    if (recovered || needsBackfill) await saveRides(all);
   }, [recoverCheckpointRide, saveRides]);
 
   // Load saved rides (and recover a crashed in-progress ride) on mount.
@@ -476,7 +494,7 @@ export default function TripLoggerScreen() {
       }
 
       // Recompute distance/stats from the merged route and persist the ride.
-      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now());
+      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now(), nextRideSeq(rides));
       // The ride is finalized — drop the crash-recovery checkpoint.
       clearCheckpoint();
 
@@ -503,6 +521,23 @@ export default function TripLoggerScreen() {
     setRides(updated);
     await saveRides(updated);
   }, [rides, saveRides]);
+
+  const openRename = useCallback((ride: SavedRide) => {
+    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null);
+    setRenamingRide(ride);
+    setRenameText(ride.name ?? "");
+  }, []);
+
+  const saveRename = useCallback(async () => {
+    if (!renamingRide) return;
+    const name = renameText.trim();
+    const updated = rides.map((r) =>
+      r.id === renamingRide.id ? { ...r, name: name || undefined } : r
+    );
+    setRenamingRide(null);
+    setRides(updated);
+    await saveRides(updated);
+  }, [renamingRide, renameText, rides, saveRides]);
 
   const confirmClearAll = useCallback(() => {
     Alert.alert(
@@ -632,11 +667,20 @@ export default function TripLoggerScreen() {
             <View key={ride.id} style={styles.rideCard}>
               {/* Orange accent top strip */}
               <View style={styles.rideCardAccent} />
-              {/* Card header: title + date */}
+              {/* Card header: title (tap to rename) + date */}
               <View style={styles.rideCardHeader}>
-                <Text style={styles.rideTitle}>
-                  🏍️ {t("triplog.rideLabel", { n: rides.length - idx })}
-                </Text>
+                <Pressable
+                  onPress={() => openRename(ride)}
+                  hitSlop={8}
+                  style={styles.rideTitleBtn}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("triplog.rename")}
+                >
+                  <Text style={styles.rideTitle}>
+                    🏍️ {ride.name?.trim() || t("triplog.rideLabel", { n: ride.seq ?? (rides.length - idx) })}
+                    <Text style={styles.rideRenameHint}>  ✎</Text>
+                  </Text>
+                </Pressable>
                 <Text style={styles.rideDate}>{formatDate(ride.date)}</Text>
               </View>
               {/* Stat chips */}
@@ -721,6 +765,40 @@ export default function TripLoggerScreen() {
           </View>
         </Modal>
       )}
+
+      {/* Rename ride modal */}
+      <Modal
+        visible={renamingRide !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRenamingRide(null)}
+      >
+        <Pressable style={styles.renameOverlay} onPress={() => setRenamingRide(null)} accessibilityLabel={t("triplog.cancel")}>
+          <Pressable style={styles.renameCard} onPress={() => {}} accessibilityViewIsModal>
+            <Text style={styles.renameTitle} accessibilityRole="header">{t("triplog.rename")}</Text>
+            <TextInput
+              style={styles.renameInput}
+              value={renameText}
+              onChangeText={setRenameText}
+              placeholder={t("triplog.renamePlaceholder")}
+              placeholderTextColor="#555555"
+              maxLength={60}
+              autoFocus
+              returnKeyType="done"
+              onSubmitEditing={() => { saveRename(); }}
+              accessibilityLabel={t("triplog.renamePlaceholder")}
+            />
+            <View style={styles.renameActions}>
+              <Pressable style={[styles.renameBtn, styles.renameCancelBtn]} onPress={() => setRenamingRide(null)} accessibilityRole="button" accessibilityLabel={t("triplog.cancel")}>
+                <Text style={styles.renameCancelText}>{t("triplog.cancel")}</Text>
+              </Pressable>
+              <Pressable style={[styles.renameBtn, styles.renameSaveBtn]} onPress={() => { saveRename(); }} accessibilityRole="button" accessibilityLabel={t("triplog.save")}>
+                <Text style={styles.renameSaveText}>{t("triplog.save")}</Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -1266,11 +1344,13 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 8,
   },
+  rideTitleBtn: { flexShrink: 1, marginRight: 8 },
   rideTitle: {
     color: "#fff",
     fontWeight: "800",
     fontSize: 14,
   },
+  rideRenameHint: { color: "#ff6600", fontSize: 13 },
   rideDate: {
     color: "#666",
     fontSize: 11,
@@ -1406,4 +1486,39 @@ const styles = StyleSheet.create({
   },
 
   bottomPad: { height: 40 },
+
+  // Rename modal
+  renameOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  renameCard: {
+    backgroundColor: "#1a1a1a",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
+    padding: 20,
+    width: "100%",
+    gap: 14,
+  },
+  renameTitle: { color: "#fff", fontSize: 16, fontWeight: "800", letterSpacing: 1 },
+  renameInput: {
+    backgroundColor: "#111",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.35)",
+    color: "#fff",
+    fontSize: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  renameActions: { flexDirection: "row", gap: 10 },
+  renameBtn: { flex: 1, borderRadius: 8, paddingVertical: 11, alignItems: "center" },
+  renameCancelBtn: { backgroundColor: "#111", borderWidth: 1, borderColor: "#333" },
+  renameCancelText: { color: "#888", fontWeight: "700", fontSize: 14 },
+  renameSaveBtn: { backgroundColor: "#ff6600" },
+  renameSaveText: { color: "#000", fontWeight: "800", fontSize: 14 },
 });
