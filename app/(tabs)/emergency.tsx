@@ -22,6 +22,7 @@ import { emergencyNumberForCountry } from "../../lib/config";
 import { getCurrentPositionWithTimeout } from "../../lib/location";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyPlaces";
+import POIMap from "../../components/POIMap";
 import { useLocationPermission } from "../../lib/locationPermission";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -78,7 +79,7 @@ export default function EmergencyScreen() {
   const { requestForegroundPermission } = useLocationPermission();
 
   // Data from hook (loading, error, places, fromCache, cacheTs, loadPlaces)
-  const { loading, error, places, fromCache, cacheTs, loadPlaces, cancelSearch } =
+  const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch } =
     useEmergencyPlaces();
 
   // Cancel any in-progress search when the user navigates away from this tab.
@@ -95,6 +96,7 @@ export default function EmergencyScreen() {
   const [torchOn, setTorchOn] = useState(false);
   const [instructionsVisible, setInstructionsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [view, setView] = useState<"list" | "map">("list");
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -480,10 +482,39 @@ export default function EmergencyScreen() {
             <Text style={styles.cardDescription}>
               {t("sos.sortedBy")}
             </Text>
+            {filtered.length > 0 && (
+              <View style={styles.viewToggleRow}>
+                <Pressable
+                  style={[styles.viewToggleBtn, view === "list" && styles.viewToggleBtnActive]}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setView("list"); }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: view === "list" }}
+                  accessibilityLabel={t("common.viewList")}
+                >
+                  <Text style={[styles.viewToggleText, view === "list" && styles.viewToggleTextActive]}>{t("common.viewList")}</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.viewToggleBtn, view === "map" && styles.viewToggleBtnActive]}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setView("map"); }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: view === "map" }}
+                  accessibilityLabel={t("common.viewMap")}
+                >
+                  <Text style={[styles.viewToggleText, view === "map" && styles.viewToggleTextActive]}>{t("common.viewMap")}</Text>
+                </Pressable>
+              </View>
+            )}
             {filtered.length === 0 ? (
                 <Text style={styles.bodyText}>
                   {t("sos.noneInCategory")}
                 </Text>
+              ) : view === "map" ? (
+                <POIMap
+                  places={filtered}
+                  userLocation={userLocation}
+                  onPressPlace={setInfoPlace}
+                  markerLabel={(p) => p.name}
+                />
               ) : (
                 filtered.map((place) => (
                   <Pressable
