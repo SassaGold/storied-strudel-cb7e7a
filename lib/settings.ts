@@ -6,6 +6,7 @@ import {
   KM_TO_MILES,
   KMH_TO_MPH,
   METRES_PER_MILE,
+  MM_TO_INCHES,
   M_TO_FEET,
   SHORT_DISTANCE_THRESHOLD_MILES,
 } from "./config";
@@ -104,6 +105,13 @@ export function fmtSpeed(kmh: number, unit: UnitSystem): string {
     return `${(kmh * KMH_TO_MPH).toFixed(0)} mph`;
   }
   return `${kmh.toFixed(0)} km/h`;
+}
+
+export function fmtPrecip(mm: number, unit: UnitSystem): string {
+  if (unit === "imperial") {
+    return `${(mm * MM_TO_INCHES).toFixed(2)} in`;
+  }
+  return `${mm.toFixed(1)} mm`;
 }
 
 export function fmtDistShort(meters: number, unit: UnitSystem): string {

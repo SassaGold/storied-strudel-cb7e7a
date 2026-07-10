@@ -177,8 +177,9 @@ export default function Index() {
           <View
             style={styles.langModalContent}
             onStartShouldSetResponder={() => true}
+            accessibilityViewIsModal
           >
-            <Text style={styles.langModalTitle}>{t("language.label")}</Text>
+            <Text style={styles.langModalTitle} accessibilityRole="header">{t("language.label")}</Text>
             {(
               ["en", "es", "de", "fr", "is", "no", "sv", "da", "nl"] as const
             ).map((lang) => (
@@ -294,6 +295,7 @@ export default function Index() {
           loading={loading}
           roadAlerts={roadAlerts}
           searchRadiusKm={settings.searchRadiusKm}
+          unitSystem={settings.unitSystem}
           location={location}
         />
       )}

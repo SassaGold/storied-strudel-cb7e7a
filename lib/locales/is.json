@@ -81,9 +81,10 @@
     "lastUpdated": "Síðast uppfært {{time}}",
     "roadConditions": "🚧 Vegaskilyrði",
     "roadConditionsLoading": "Athuga vegaskilyrði…",
-    "roadConditionsNone": "✅ Engar vegaframkvæmdir greindar í {{radius}} km.",
-    "roadConditionsCount": "{{count}} vegaframkvæmd(ir) greindar í {{radius}} km",
+    "roadConditionsNone": "✅ Engar vegaframkvæmdir greindar í {{radius}}.",
+    "roadConditionsCount": "{{count}} vegaframkvæmd(ir) greindar í {{radius}}",
     "openTrafficMap": "UMFERÐARKORT",
+    "tapToOpenMaps": "Ýttu til að opna í kortum",
     "roadTypes": {
       "service": "Þjónustuvegur",
       "residential": "Íbúðagata",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Ferð Ekki Vistuð",
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
     "speedLabel": "HRAÐI",
+    "startErrorTitle": "Ekki tókst að hefja ferð",
+    "startErrorMsg": "Ekki tókst að hefja ferðaskráningu. Athugaðu hvort staðsetningarheimild sé virk og reyndu aftur.",
+    "stopErrorTitle": "Villa við að vista ferð",
+    "stopErrorMsg": "Ferðin þín kann að hafa ekki vistast rétt. Reyndu aftur.",
     "viewRoute": "🗺️ Skoða leið",
     "hideRoute": "▲ Fela leið",
     "tapToExpand": "Ýttu til að stækka"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Uppfærsla tiltæk — setur upp…",
     "updateLatest": "✅ Þú ert uppfærður",
     "updateError": "❌ Uppfærsluleit mistókst",
+    "updateRestart": "⬇️ Uppfærsla tilbúin — ýttu til að endurræsa",
     "privacyPolicyLink": "📄 Persónuverndarstefna",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Núverandi staðsetningarfang þitt er fengið með Nominatim API (OpenStreetMap). Engin API-lykill þarf."

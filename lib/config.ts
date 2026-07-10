@@ -63,6 +63,27 @@ export const POI_MAX_RADIUS_M = 100_000;
 export const EMERGENCY_AMENITY_TYPES =
   "hospital|police|fire_station|pharmacy|clinic|doctors|ambulance_station";
 
+/** Fallback emergency number — 112 also works as a GSM fallback in most countries. */
+export const DEFAULT_EMERGENCY_NUMBER = "112";
+
+/**
+ * Primary emergency number by ISO 3166-1 alpha-2 country code. Only countries
+ * whose single primary number differs from 112 are listed; everything else
+ * falls back to DEFAULT_EMERGENCY_NUMBER.
+ */
+export const EMERGENCY_NUMBER_BY_COUNTRY: Record<string, string> = {
+  US: "911", CA: "911", MX: "911",
+  GB: "999",
+  AU: "000",
+  NZ: "111",
+};
+
+/** Resolve the primary emergency number for an ISO country code (default 112). */
+export function emergencyNumberForCountry(iso?: string | null): string {
+  if (!iso) return DEFAULT_EMERGENCY_NUMBER;
+  return EMERGENCY_NUMBER_BY_COUNTRY[iso.toUpperCase()] ?? DEFAULT_EMERGENCY_NUMBER;
+}
+
 // ── Caching ───────────────────────────────────────────────────────────────────
 
 /** AsyncStorage TTL for all POI result caches: 30 minutes. */
@@ -102,6 +123,9 @@ export const C_TO_F_OFFSET = 32;
 /** Metres per mile (used for ft/mi threshold). */
 export const METRES_PER_MILE = 1609.34;
 
+/** Factor: millimetres → inches (precipitation). */
+export const MM_TO_INCHES = 0.0393701;
+
 /** Short-distance threshold: below this in miles, display in feet. */
 export const SHORT_DISTANCE_THRESHOLD_MILES = 0.1;
 
@@ -127,10 +151,19 @@ export const ROAD_OVERPASS_TIMEOUT_S = 10;
 /** Maximum Overpass results for road-condition queries. */
 export const ROAD_MAX_RESULTS = 20;
 
+// ── Location ──────────────────────────────────────────────────────────────────
+
+/** Timeout for a single getCurrentPositionAsync call before falling back (ms). */
+export const GPS_TIMEOUT_MS = 15_000;
+
 // ── Trip logger ───────────────────────────────────────────────────────────────
 
 /** GPS update interval for the trip logger (ms). */
 export const TRIP_LOCATION_INTERVAL_MS = 1_500;
+
+/** Discard GPS fixes worse than this accuracy (metres) so they don't inflate
+ *  trip distance. A typical good fix is < 10 m; > 40 m is unreliable. */
+export const TRIP_MAX_GPS_ACCURACY_M = 40;
 
 // ── OSRM map matching ─────────────────────────────────────────────────────────
 

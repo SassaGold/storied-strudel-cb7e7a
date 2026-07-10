@@ -60,9 +60,9 @@ export default function PlaceInfoModal({
       animationType="fade"
       onRequestClose={close}
     >
-      <Pressable style={styles.modalOverlay} onPress={close}>
-        <Pressable style={styles.modalCard} onPress={() => {}}>
-          <Text style={styles.modalTitle}>{place?.name}</Text>
+      <Pressable style={styles.modalOverlay} onPress={close} accessibilityLabel={t("common.close")}>
+        <Pressable style={styles.modalCard} onPress={() => {}} accessibilityViewIsModal>
+          <Text style={styles.modalTitle} accessibilityRole="header">{place?.name}</Text>
 
           <View style={styles.modalRow}>
             <Text style={styles.modalLabel}>{t("common.category")}</Text>
@@ -84,6 +84,8 @@ export default function PlaceInfoModal({
               <Text
                 style={styles.modalLink}
                 onPress={() => { hapticLight(); Linking.openURL(`tel:${place.phone}`).catch(() => null); }}
+                accessibilityRole="link"
+                accessibilityLabel={`${t("common.phone")} ${place.phone}`}
               >
                 {place.phone}
               </Text>
@@ -97,6 +99,8 @@ export default function PlaceInfoModal({
                 style={styles.modalLink}
                 onPress={() => { hapticLight(); Linking.openURL(`mailto:${place.email}`).catch(() => null); }}
                 numberOfLines={1}
+                accessibilityRole="link"
+                accessibilityLabel={`${t("common.email")} ${place.email}`}
               >
                 {place.email}
               </Text>
@@ -117,6 +121,8 @@ export default function PlaceInfoModal({
                 style={styles.modalLink}
                 onPress={() => { hapticLight(); Linking.openURL(place.website!).catch(() => null); }}
                 numberOfLines={1}
+                accessibilityRole="link"
+                accessibilityLabel={t("common.website")}
               >
                 {place.website.replace(/^https?:\/\/(www\.)?/, "")}
               </Text>
@@ -162,6 +168,8 @@ export default function PlaceInfoModal({
             <Pressable
               style={styles.modalActionButton}
               onPress={() => { hapticLight(); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place?.name ?? "")}`).catch(() => null); }}
+              accessibilityRole="button"
+              accessibilityLabel={mapsButtonLabel ?? t("common.reviewsGoogle")}
             >
               <Text style={styles.modalActionButtonText}>{mapsButtonLabel ?? t("common.reviewsGoogle")}</Text>
             </Pressable>
@@ -173,13 +181,15 @@ export default function PlaceInfoModal({
                   const { lang, title } = parseWikiTag(place.wikipedia!);
                   Linking.openURL(`https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`).catch(() => null);
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={t("common.readWikipedia")}
               >
                 <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextWiki]}>{t("common.readWikipedia")}</Text>
               </Pressable>
             )}
           </View>
 
-          <Pressable style={styles.modalClose} onPress={close}>
+          <Pressable style={styles.modalClose} onPress={close} accessibilityRole="button" accessibilityLabel={t("common.close")}>
             <Text style={styles.modalCloseText}>{t("common.close")}</Text>
           </Pressable>
         </Pressable>

@@ -81,9 +81,10 @@
     "lastUpdated": "Sist oppdatert {{time}}",
     "roadConditions": "🚧 Veiforhold",
     "roadConditionsLoading": "Sjekker veiforhold…",
-    "roadConditionsNone": "✅ Ingen veiarbeid oppdaget innen {{radius}} km.",
-    "roadConditionsCount": "{{count}} veiarbeid oppdaget innen {{radius}} km",
+    "roadConditionsNone": "✅ Ingen veiarbeid oppdaget innen {{radius}}.",
+    "roadConditionsCount": "{{count}} veiarbeid oppdaget innen {{radius}}",
     "openTrafficMap": "LIVE TRAFIKKART",
+    "tapToOpenMaps": "Trykk for å åpne i Kart",
     "roadTypes": {
       "service": "Servicevei",
       "residential": "Boliggate",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Tur ikke lagret",
     "tooShortMsg": "Turen var under 10 m — ikke lagret.",
     "speedLabel": "FART",
+    "startErrorTitle": "Kunne ikke starte turen",
+    "startErrorMsg": "Kunne ikke starte turregistrering. Kontroller at posisjonstillatelse er aktivert, og prøv igjen.",
+    "stopErrorTitle": "Feil ved lagring av tur",
+    "stopErrorMsg": "Turen din ble kanskje ikke lagret riktig. Prøv igjen.",
     "viewRoute": "🗺️ Vis rute",
     "hideRoute": "▲ Skjul rute",
     "tapToExpand": "Trykk for å utvide"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Oppdatering tilgjengelig — installerer…",
     "updateLatest": "✅ Du er oppdatert",
     "updateError": "❌ Oppdateringssjekk mislyktes",
+    "updateRestart": "⬇️ Oppdatering klar — trykk for å starte på nytt",
     "privacyPolicyLink": "📄 Personvernregler",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Nåværende adresse hentes via Nominatim API (OpenStreetMap). Ingen API-nøkkel kreves."

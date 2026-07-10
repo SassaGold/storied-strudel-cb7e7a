@@ -4,7 +4,7 @@
 
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { useSettings, fmtTemp } from "../lib/settings";
+import { useSettings, fmtTemp, fmtSpeed, fmtPrecip } from "../lib/settings";
 import {
   type WeatherInfo,
   weatherEmoji,
@@ -40,7 +40,7 @@ type Props = {
  * hourly forecast and 3-day forecast — all derived from a single WeatherInfo.
  */
 export function WeatherCard({ weather, weatherUrl }: Props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { settings } = useSettings();
 
   const alerts = buildAlerts(weather);
@@ -79,7 +79,7 @@ export function WeatherCard({ weather, weatherUrl }: Props) {
           <View style={styles.weatherStatsRow}>
             <View style={styles.weatherStatItem}>
               <Text style={styles.weatherStatValue}>
-                {weather.windSpeed?.toFixed(1) ?? "0"}
+                {weather.windSpeed != null ? fmtSpeed(weather.windSpeed, settings.unitSystem) : "—"}
                 {weather.windDirection != null
                   ? ` ${windDegToCompass(weather.windDirection)}`
                   : ""}
@@ -104,7 +104,7 @@ export function WeatherCard({ weather, weatherUrl }: Props) {
             </View>
             <View style={styles.weatherStatDivider} />
             <View style={styles.weatherStatItem}>
-              <Text style={styles.weatherStatValue}>{weather.precipitation ?? 0}</Text>
+              <Text style={styles.weatherStatValue}>{fmtPrecip(weather.precipitation ?? 0, settings.unitSystem)}</Text>
               <Text style={styles.weatherStatLabel}>{t("home.precip")}</Text>
             </View>
           </View>
@@ -194,10 +194,10 @@ export function WeatherCard({ weather, weatherUrl }: Props) {
             {weather.forecast.slice(0, 3).map((day) => (
               <View key={day.date} style={styles.forecastCard}>
                 <Text style={styles.forecastCardDay}>
-                  {formatForecastDate(day.date).split(",")[0]}
+                  {formatForecastDate(day.date, i18n.language).split(",")[0]}
                 </Text>
                 <Text style={styles.forecastCardDate}>
-                  {formatForecastDate(day.date).split(",")[1]?.trim() ?? ""}
+                  {formatForecastDate(day.date, i18n.language).split(",")[1]?.trim() ?? ""}
                 </Text>
                 <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
                 <Text style={styles.forecastCardCondition}>

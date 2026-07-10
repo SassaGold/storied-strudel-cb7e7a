@@ -81,9 +81,10 @@
     "lastUpdated": "Laatst bijgewerkt {{time}}",
     "roadConditions": "🚧 Wegomstandigheden",
     "roadConditionsLoading": "Wegomstandigheden controleren…",
-    "roadConditionsNone": "✅ Geen wegwerkzaamheden binnen {{radius}} km.",
-    "roadConditionsCount": "{{count}} wegwerk(en) binnen {{radius}} km gedetecteerd",
+    "roadConditionsNone": "✅ Geen wegwerkzaamheden binnen {{radius}}.",
+    "roadConditionsCount": "{{count}} wegwerk(en) binnen {{radius}} gedetecteerd",
     "openTrafficMap": "LIVE VERKEERSKAART",
+    "tapToOpenMaps": "Tik om in Kaarten te openen",
     "suitability": {
       "great": "UITSTEKEND",
       "good": "GOED",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Rit Niet Opgeslagen",
     "tooShortMsg": "Rit was onder 10 m — niet opgeslagen.",
     "speedLabel": "SNELHEID",
+    "startErrorTitle": "Kan rit niet starten",
+    "startErrorMsg": "Kan ritregistratie niet starten. Controleer of locatietoestemming is ingeschakeld en probeer het opnieuw.",
+    "stopErrorTitle": "Fout bij opslaan van rit",
+    "stopErrorMsg": "Je rit is mogelijk niet correct opgeslagen. Probeer het opnieuw.",
     "viewRoute": "🗺️ Route bekijken",
     "hideRoute": "▲ Route verbergen",
     "tapToExpand": "Tik om te vergroten"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Update beschikbaar — installeren…",
     "updateLatest": "✅ Je bent up-to-date",
     "updateError": "❌ Update-controle mislukt",
+    "updateRestart": "⬇️ Update gereed — tik om opnieuw te starten",
     "privacyPolicyLink": "📄 Privacybeleid",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Je huidige locatieadres wordt opgehaald via de Nominatim API (OpenStreetMap). Geen API-sleutel vereist."

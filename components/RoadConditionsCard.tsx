@@ -12,6 +12,8 @@ import {
 import { useTranslation } from "react-i18next";
 import type * as Location from "expo-location";
 import { type RoadAlert, humanizeConstructionType } from "../lib/roads";
+import { fmtDistShort, type UnitSystem } from "../lib/settings";
+import { KM_TO_MILES } from "../lib/config";
 
 const Haptics: typeof import("expo-haptics") | null = (() => {
   try {
@@ -26,6 +28,7 @@ type Props = {
   loading: boolean;
   roadAlerts: RoadAlert[];
   searchRadiusKm: number;
+  unitSystem: UnitSystem;
   location?: Location.LocationObject | null;
 };
 
@@ -34,9 +37,16 @@ export function RoadConditionsCard({
   loading,
   roadAlerts,
   searchRadiusKm,
+  unitSystem,
   location,
 }: Props) {
   const { t } = useTranslation();
+
+  // Radius label in the user's unit (e.g. "5 km" or "3.1 mi").
+  const radiusLabel =
+    unitSystem === "imperial"
+      ? `${(searchRadiusKm * KM_TO_MILES).toFixed(1)} mi`
+      : `${searchRadiusKm} km`;
 
   return (
     <View style={[styles.card, roadAlerts.length > 0 && styles.roadAlertCard]}>
@@ -49,14 +59,14 @@ export function RoadConditionsCard({
         </View>
       ) : roadAlerts.length === 0 ? (
         <Text style={styles.roadConditionsAllClear}>
-          {t("home.roadConditionsNone", { radius: searchRadiusKm })}
+          {t("home.roadConditionsNone", { radius: radiusLabel })}
         </Text>
       ) : (
         <>
           <Text style={styles.roadConditionsCount}>
             {t("home.roadConditionsCount", {
               count: roadAlerts.length,
-              radius: searchRadiusKm,
+              radius: radiusLabel,
             })}
           </Text>
           {roadAlerts.map((alert) => {
@@ -90,9 +100,7 @@ export function RoadConditionsCard({
                     </Text>
                     {alert.distance != null && (
                       <Text style={styles.roadAlertDistance}>
-                        {alert.distance < 1
-                          ? `${Math.round(alert.distance * 1000)} m`
-                          : `${alert.distance.toFixed(1)} km`}
+                        {fmtDistShort(alert.distance * 1000, unitSystem)}
                       </Text>
                     )}
                   </View>
@@ -109,7 +117,7 @@ export function RoadConditionsCard({
                   ) : null}
                   {canOpen && (
                     <Text style={styles.roadAlertMapHint}>
-                      📍 Tap to open in Maps
+                      📍 {t("home.tapToOpenMaps")}
                     </Text>
                   )}
                 </View>

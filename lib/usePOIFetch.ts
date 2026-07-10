@@ -12,6 +12,7 @@ import { fetchOsmPlaces, type OsmPlaceItem } from "./osmPlaces";
 import { useLocationPermission } from "./locationPermission";
 import { CACHE_TTL_MS, parseWikiTag, withRetry } from "./overpass";
 import { storage } from "./storage";
+import { getCurrentPositionWithTimeout } from "./location";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -144,7 +145,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
         return;
       }
 
-      const position = await Location.getCurrentPositionAsync({
+      const position = await getCurrentPositionWithTimeout({
         accuracy: Location.Accuracy.Balanced,
       });
       if (activeCallRef.current !== callId) return;

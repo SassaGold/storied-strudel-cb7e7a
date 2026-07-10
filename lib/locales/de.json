@@ -81,9 +81,10 @@
     "lastUpdated": "Zuletzt aktualisiert {{time}}",
     "roadConditions": "🚧 Straßenverhältnisse",
     "roadConditionsLoading": "Straßenbedingungen prüfen…",
-    "roadConditionsNone": "✅ Keine Baustellen in {{radius}} km.",
-    "roadConditionsCount": "{{count}} Baustelle(n) in {{radius}} km erkannt",
+    "roadConditionsNone": "✅ Keine Baustellen in {{radius}}.",
+    "roadConditionsCount": "{{count}} Baustelle(n) in {{radius}} erkannt",
     "openTrafficMap": "LIVE-VERKEHRSKARTE",
+    "tapToOpenMaps": "Zum Öffnen in Karten tippen",
     "roadTypes": {
       "service": "Servicestraße",
       "residential": "Wohnstraße",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Fahrt Nicht Gespeichert",
     "tooShortMsg": "Fahrt war unter 10 m — nicht gespeichert.",
     "speedLabel": "TEMPO",
+    "startErrorTitle": "Fahrt konnte nicht gestartet werden",
+    "startErrorMsg": "Fahrtaufzeichnung konnte nicht gestartet werden. Bitte prüfe, ob die Standortberechtigung aktiviert ist, und versuche es erneut.",
+    "stopErrorTitle": "Fehler beim Speichern der Fahrt",
+    "stopErrorMsg": "Deine Fahrt wurde möglicherweise nicht korrekt gespeichert. Bitte versuche es erneut.",
     "viewRoute": "🗺️ Route anzeigen",
     "hideRoute": "▲ Route ausblenden",
     "tapToExpand": "Zum Vergrößern tippen"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Update verfügbar — wird installiert…",
     "updateLatest": "✅ Du bist aktuell",
     "updateError": "❌ Update-Prüfung fehlgeschlagen",
+    "updateRestart": "⬇️ Update bereit — zum Neustart tippen",
     "privacyPolicyLink": "📄 Datenschutzerklärung",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Deine aktuelle Adresse wird über die Nominatim API (OpenStreetMap) ermittelt. Kein API-Schlüssel erforderlich."

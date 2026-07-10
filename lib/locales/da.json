@@ -81,9 +81,10 @@
     "lastUpdated": "Sidst opdateret {{time}}",
     "roadConditions": "🚧 Vejforhold",
     "roadConditionsLoading": "Tjekker vejforhold…",
-    "roadConditionsNone": "✅ Ingen vejarbejde inden for {{radius}} km.",
-    "roadConditionsCount": "{{count}} vejarbejde inden for {{radius}} km",
+    "roadConditionsNone": "✅ Ingen vejarbejde inden for {{radius}}.",
+    "roadConditionsCount": "{{count}} vejarbejde inden for {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKORT",
+    "tapToOpenMaps": "Tryk for at åbne i Kort",
     "roadTypes": {
       "service": "Servicevej",
       "residential": "Boliggade",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Tur ikke gemt",
     "tooShortMsg": "Turen var under 10 m — ikke gemt.",
     "speedLabel": "FART",
+    "startErrorTitle": "Kunne ikke starte turen",
+    "startErrorMsg": "Kunne ikke starte turregistrering. Kontrollér, at placeringstilladelse er aktiveret, og prøv igen.",
+    "stopErrorTitle": "Fejl ved lagring af tur",
+    "stopErrorMsg": "Din tur blev muligvis ikke gemt korrekt. Prøv igen.",
     "viewRoute": "🗺️ Vis rute",
     "hideRoute": "▲ Skjul rute",
     "tapToExpand": "Tryk for at udvide"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Opdatering tilgængelig — installerer…",
     "updateLatest": "✅ Du er opdateret",
     "updateError": "❌ Opdateringstjek mislykkedes",
+    "updateRestart": "⬇️ Opdatering klar — tryk for at genstarte",
     "privacyPolicyLink": "📄 Privatlivspolitik",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Din nuværende adresse hentes via Nominatim API (OpenStreetMap). Ingen API-nøgle kræves."

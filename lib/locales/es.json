@@ -81,9 +81,10 @@
     "lastUpdated": "Actualizado {{time}}",
     "roadConditions": "🚧 Condiciones de la carretera",
     "roadConditionsLoading": "Comprobando condiciones de la vía…",
-    "roadConditionsNone": "✅ No se detectan obras en {{radius}} km.",
-    "roadConditionsCount": "{{count}} obra(s) detectada(s) en {{radius}} km",
+    "roadConditionsNone": "✅ No se detectan obras en {{radius}}.",
+    "roadConditionsCount": "{{count}} obra(s) detectada(s) en {{radius}}",
     "openTrafficMap": "MAPA DE TRÁFICO EN VIVO",
+    "tapToOpenMaps": "Toca para abrir en Mapas",
     "roadTypes": {
       "service": "Vía de Servicio",
       "residential": "Calle Residencial",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Viaje No Guardado",
     "tooShortMsg": "El viaje fue inferior a 10 m — no guardado.",
     "speedLabel": "VELOCIDAD",
+    "startErrorTitle": "No se pudo iniciar el viaje",
+    "startErrorMsg": "No se pudo iniciar el seguimiento del viaje. Comprueba que el permiso de ubicación esté activado e inténtalo de nuevo.",
+    "stopErrorTitle": "Error al guardar el viaje",
+    "stopErrorMsg": "Es posible que tu viaje no se haya guardado correctamente. Inténtalo de nuevo.",
     "viewRoute": "🗺️ Ver Ruta",
     "hideRoute": "▲ Ocultar Ruta",
     "tapToExpand": "Toca para ampliar"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Actualización disponible — instalando…",
     "updateLatest": "✅ Estás al día",
     "updateError": "❌ Error al buscar actualización",
+    "updateRestart": "⬇️ Actualización lista — toca para reiniciar",
     "privacyPolicyLink": "📄 Política de privacidad",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "La dirección de tu ubicación actual se obtiene mediante la API Nominatim (OpenStreetMap). No se requiere clave de API."

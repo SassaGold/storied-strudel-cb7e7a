@@ -91,15 +91,23 @@ export const formatDuration = (minutes: number): string => {
 };
 
 /**
- * Format a forecast date string (YYYY-MM-DD) as a human-readable string.
- * Example: "2024-06-21" → "Fri, Jun 21"
+ * Format a forecast date string (YYYY-MM-DD) as a human-readable string in the
+ * given locale (defaults to en-US). Example: "2024-06-21" → "Fri, Jun 21".
  */
-export const formatForecastDate = (dateStr: string): string => {
+export const formatForecastDate = (dateStr: string, locale: string = "en-US"): string => {
   const [year, month, day] = dateStr.split("-").map(Number);
   const date = new Date(year, month - 1, day);
-  return date.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
+  // Compose weekday + month/day separately so a comma always separates them,
+  // regardless of the locale's native date order/punctuation. Callers split on
+  // the comma to render weekday and date on two lines.
+  const fmt = (loc: string) => {
+    const weekday = date.toLocaleDateString(loc, { weekday: "short" });
+    const monthDay = date.toLocaleDateString(loc, { month: "short", day: "numeric" });
+    return `${weekday}, ${monthDay}`;
+  };
+  try {
+    return fmt(locale);
+  } catch {
+    return fmt("en-US");
+  }
 };

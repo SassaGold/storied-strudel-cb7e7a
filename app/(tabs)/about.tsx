@@ -20,7 +20,7 @@ function LinkRow({ label, url, openLabel }: LinkRowProps) {
   return (
     <Pressable
       style={({ pressed }) => [styles.linkRow, pressed && styles.linkRowPressed]}
-      onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(url); }}
+      onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(url).catch(() => null); }}
       accessibilityRole="link"
       accessibilityLabel={label}
     >
@@ -46,7 +46,7 @@ export default function AboutScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  const [updateStatus, setUpdateStatus] = useState<"idle" | "checking" | "available" | "latest" | "error">("idle");
+  const [updateStatus, setUpdateStatus] = useState<"idle" | "checking" | "ready" | "latest" | "error">("idle");
 
   async function checkForUpdate() {
     if (!Updates || typeof Updates.checkForUpdateAsync !== "function") {
@@ -57,12 +57,21 @@ export default function AboutScreen() {
     try {
       const result = await Updates.checkForUpdateAsync();
       if (result.isAvailable) {
-        setUpdateStatus("available");
+        // Download it, but let the user choose when to restart instead of
+        // reloading the app out from under them mid-session.
         await Updates.fetchUpdateAsync();
-        await Updates.reloadAsync();
+        setUpdateStatus("ready");
       } else {
         setUpdateStatus("latest");
       }
+    } catch {
+      setUpdateStatus("error");
+    }
+  }
+
+  async function restartToUpdate() {
+    try {
+      await Updates?.reloadAsync();
     } catch {
       setUpdateStatus("error");
     }
@@ -194,18 +203,21 @@ export default function AboutScreen() {
         {/* Check for update */}
         <Pressable
           style={({ pressed }) => [styles.updateBtn, pressed && styles.updateBtnPressed]}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); checkForUpdate(); }}
+          onPress={() => {
+            Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null);
+            if (updateStatus === "ready") { restartToUpdate(); } else { checkForUpdate(); }
+          }}
           disabled={updateStatus === "checking"}
           accessibilityRole="button"
-          accessibilityLabel={t("about.updateCheck")}
+          accessibilityLabel={updateStatus === "ready" ? t("about.updateRestart") : t("about.updateCheck")}
         >
           {updateStatus === "checking" ? (
             <ActivityIndicator size="small" color="#ff6600" />
           ) : (
             <Text style={styles.updateBtnText}>
-              {updateStatus === "available" ? t("about.updateAvailable") :
-               updateStatus === "latest"    ? t("about.updateLatest") :
-               updateStatus === "error"     ? t("about.updateError") :
+              {updateStatus === "ready"    ? t("about.updateRestart") :
+               updateStatus === "latest"   ? t("about.updateLatest") :
+               updateStatus === "error"    ? t("about.updateError") :
                t("about.updateCheck")}
             </Text>
           )}

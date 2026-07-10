@@ -81,9 +81,10 @@
     "lastUpdated": "Senast uppdaterad {{time}}",
     "roadConditions": "🚧 Vägförhållanden",
     "roadConditionsLoading": "Kontrollerar vägförhållanden…",
-    "roadConditionsNone": "✅ Inga vägarbeten inom {{radius}} km.",
-    "roadConditionsCount": "{{count}} vägarbeten inom {{radius}} km",
+    "roadConditionsNone": "✅ Inga vägarbeten inom {{radius}}.",
+    "roadConditionsCount": "{{count}} vägarbeten inom {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKARTA",
+    "tapToOpenMaps": "Tryck för att öppna i Kartor",
     "roadTypes": {
       "service": "Serviceväg",
       "residential": "Bostadsgata",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Tur inte sparad",
     "tooShortMsg": "Turen var under 10 m — inte sparad.",
     "speedLabel": "HASTIGHET",
+    "startErrorTitle": "Kunde inte starta turen",
+    "startErrorMsg": "Det gick inte att starta turregistreringen. Kontrollera att platsbehörighet är aktiverad och försök igen.",
+    "stopErrorTitle": "Fel vid sparande av tur",
+    "stopErrorMsg": "Din tur kanske inte sparades korrekt. Försök igen.",
     "viewRoute": "🗺️ Visa rutt",
     "hideRoute": "▲ Dölj rutt",
     "tapToExpand": "Tryck för att förstora"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Uppdatering tillgänglig — installerar…",
     "updateLatest": "✅ Du är uppdaterad",
     "updateError": "❌ Uppdateringskontroll misslyckades",
+    "updateRestart": "⬇️ Uppdatering klar — tryck för att starta om",
     "privacyPolicyLink": "📄 Integritetspolicy",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Din nuvarande adress hämtas via Nominatim API (OpenStreetMap). Ingen API-nyckel krävs."
