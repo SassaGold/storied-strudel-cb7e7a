@@ -291,7 +291,7 @@
       "doctors": "👨‍⚕️ Doctor",
       "ambulance_station": "🚑 Ambulance"
     },
-    "callSos": "CALL SOS (112)",
+    "callSos": "CALL SOS",
     "quickActions": "QUICK ACTIONS",
     "torchScreen": "🔦 Torch Screen",
     "torchScreenOff": "🔦 Turn Off",
@@ -299,7 +299,7 @@
     "instructionsTitle": "Emergency Instructions",
     "instructionsClose": "Close",
     "instructionsBody": "1. STAY CALM — assess the situation.\n\n2. CALL 112 (EU/Intl) or 911 (USA) immediately.\n\n3. LOCATION — tell them exactly where you are.\n\n4. HELMET — do not remove unless airway is blocked.\n\n5. BLEEDING — apply firm direct pressure.\n\n6. DO NOT MOVE an injured rider unless in immediate danger.\n\n7. KEEP THEM WARM — use spare clothing or foil blanket.\n\n8. STAY ON LINE — do not hang up until help arrives.",
-    "quickActionCall": "Call 112",
+    "quickActionCall": "Call",
     "quickActionTorch": "Torch",
     "quickActionInstructions": "Instructions",
     "locationCopied": "📍 Copied!",

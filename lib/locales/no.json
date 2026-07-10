@@ -291,7 +291,7 @@
       "doctors": "👨‍⚕️ Lege",
       "ambulance_station": "🚑 Ambulanse"
     },
-    "callSos": "RING SOS (112)",
+    "callSos": "RING SOS",
     "quickActions": "HURTIGE HANDLINGER",
     "torchScreen": "🔦 Lommelykt",
     "torchScreenOff": "🔦 Slå av",
@@ -299,7 +299,7 @@
     "instructionsTitle": "Nødinstruksjoner",
     "instructionsClose": "Lukk",
     "instructionsBody": "1. HOLD ROEN — vurder situasjonen.\n\n2. RING 112 umiddelbart.\n\n3. POSISJON — fortell nøyaktig hvor du er.\n\n4. HJELM — ikke fjern hjelmen med mindre luftveien er blokkert.\n\n5. BLØDNING — legg fast direkte trykk.\n\n6. IKKE FLYTT den skadde med mindre det er umiddelbar fare.\n\n7. HOLD DEM VARME — bruk klær eller redningsfolie.\n\n8. BLI PÅ LINJEN — ikke legg på før hjelp ankommer.",
-    "quickActionCall": "Ring 112",
+    "quickActionCall": "Ring",
     "quickActionTorch": "Lommelykt",
     "quickActionInstructions": "Instruksjoner",
     "locationCopied": "📍 Kopiert!",
