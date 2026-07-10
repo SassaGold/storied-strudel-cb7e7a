@@ -228,21 +228,24 @@
       "fuel": "Tankstations",
       "parking": "Parkeren",
       "clubs_tracks": "Clubs & Tracks",
-      "atm_bank": "Geldautomaten & Banken"
+      "atm_bank": "Geldautomaten & Banken",
+      "fitness": "Sport & Fitness"
     },
     "descriptions": {
       "services": "Zoekt binnen 30 km naar motordealers, reparatiewerkplaatsen, onderdelenwinkels en verhuurbedrijven. Typ een naam in het zoekvak om rechtstreeks op Google Maps te zoeken.",
       "fuel": "Zoekt binnen 20 km naar alle tankstations. Brandstofsoorten worden getoond waar beschikbaar. Druk op ⛽ Controleer brandstofprijzen om het station op de kaart te openen.",
       "parking": "Zoekt binnen 5 km naar algemeen parkeren en binnen 10 km naar speciaal motorparkeren.",
       "clubs_tracks": "Zoekt binnen 50 km naar motorclubs en race-/rijbanen.",
-      "atm_bank": "Zoekt binnen 5 km naar geldautomaten en bankfilialen."
+      "atm_bank": "Zoekt binnen 5 km naar geldautomaten en bankfilialen.",
+      "fitness": "Zoekt binnen 15 km naar sportscholen, fitnesscentra, sportcentra, stadions, zwembaden en golfbanen."
     },
     "empty": {
       "services": "Geen motorservices gevonden in de buurt.\nProbeer je locatie bij te werken.",
       "fuel": "Geen tankstations gevonden. Probeer je locatie bij te werken.",
       "parking": "Geen parkeerplaatsen gevonden. Probeer je locatie bij te werken.",
       "clubs_tracks": "Geen MC-clubs of tracks gevonden binnen 50 km.",
-      "atm_bank": "Geen geldautomaten of banken gevonden in de buurt."
+      "atm_bank": "Geen geldautomaten of banken gevonden in de buurt.",
+      "fitness": "Geen sport- of fitnesslocaties in de buurt gevonden. Probeer je locatie bij te werken."
     },
     "searchPlaceholder": "🔍 Zoek op naam…",
     "noSearchResults": "Geen resultaten voor jouw zoekopdracht.",

@@ -46,9 +46,10 @@ const CATEGORY_FETCH_TIMEOUT_MS: Record<string, number> = {
   parking: 15000,
   clubs_tracks: 15000,
   atm_bank: 15000,
+  fitness: 15000,
 };
 
-type Category = "services" | "fuel" | "parking" | "clubs_tracks" | "atm_bank";
+type Category = "services" | "fuel" | "parking" | "clubs_tracks" | "atm_bank" | "fitness";
 
 const CATEGORY_RADIUS_M: Record<Category, number> = {
   services: 30000,
@@ -56,9 +57,10 @@ const CATEGORY_RADIUS_M: Record<Category, number> = {
   parking: 10000,
   clubs_tracks: 50000,
   atm_bank: 5000,
+  fitness: 15000,
 };
 
-const CATEGORY_KEYS: Category[] = ["services", "fuel", "parking", "clubs_tracks", "atm_bank"];
+const CATEGORY_KEYS: Category[] = ["services", "fuel", "parking", "clubs_tracks", "atm_bank", "fitness"];
 
 const CATEGORY_COLORS: Record<Category, string> = {
   services: "#ff6600",
@@ -66,6 +68,7 @@ const CATEGORY_COLORS: Record<Category, string> = {
   parking:  "#3b82f6",
   clubs_tracks: "#ef4444",
   atm_bank: "#a855f7",
+  fitness:  "#14b8a6",
 };
 
 // Pre-computed inactive border and active background colours (27% / 10% opacity)
@@ -75,6 +78,7 @@ const CATEGORY_BORDER_INACTIVE: Record<Category, string> = {
   parking:      "rgba(59,130,246,0.27)",
   clubs_tracks: "rgba(239,68,68,0.27)",
   atm_bank:     "rgba(168,85,247,0.27)",
+  fitness:      "rgba(20,184,166,0.27)",
 };
 
 const CATEGORY_BG_ACTIVE: Record<Category, string> = {
@@ -83,6 +87,7 @@ const CATEGORY_BG_ACTIVE: Record<Category, string> = {
   parking:      "rgba(59,130,246,0.10)",
   clubs_tracks: "rgba(239,68,68,0.10)",
   atm_bank:     "rgba(168,85,247,0.10)",
+  fitness:      "rgba(20,184,166,0.10)",
 };
 
 const CATEGORY_ICONS: Record<Category, string> = {
@@ -91,6 +96,7 @@ const CATEGORY_ICONS: Record<Category, string> = {
   parking:      "🅿️",
   clubs_tracks: "🏁",
   atm_bank:     "🏧",
+  fitness:      "💪",
 };
 
 // ── Category display ───────────────────────────────────────────────────────────
@@ -107,11 +113,21 @@ const MC_CATEGORY_LABEL: Record<string, string> = {
   parking: "🅿️ Parking",
   atm: "🏧 ATM",
   bank: "🏦 Bank",
+  // Clubs & Tracks (motorcycle clubs + racing/motorsport tracks)
+  mc_club: "🏍️ MC Club",
+  raceway: "🏁 Race Circuit",
+  motocross: "🏁 Motocross",
+  karting: "🏁 Karting",
+  speedway: "🏁 Speedway",
+  motorsport: "🏁 Motorsport",
+  // Sports & Fitness
   stadium: "🏟️ Stadium",
   sports_centre: "🏟️ Sports Centre",
-  track: "🏁 Track",
   fitness_centre: "💪 Fitness Centre",
+  fitness_station: "💪 Fitness Station",
+  swimming_pool: "🏊 Swimming Pool",
   golf_course: "⛳ Golf Course",
+  track: "🏁 Track",
 };
 
 const formatMcCategory = (category: string): string =>
@@ -130,7 +146,21 @@ const mapMcElement = (
   const lon = item.position?.lng;
   if (lat === undefined || lon === undefined) return null;
   const fallback = fallbackLabel(selectedCategory);
-  const category = (osmItemPrimaryCategory(item) || fallback).toLowerCase();
+  let category = (osmItemPrimaryCategory(item) || fallback).toLowerCase();
+  // Clubs & Tracks matches key-specific tags (club=motorcycle, highway=raceway,
+  // sport=*) that fetchOsmPlaces doesn't expose as a primary category, so derive a
+  // meaningful label from the raw tags here.
+  if (selectedCategory === "clubs_tracks") {
+    const tg = item.tags ?? {};
+    const sport = (tg.sport ?? "").toLowerCase();
+    if (tg.club === "motorcycle") category = "mc_club";
+    else if (tg.highway === "raceway") category = "raceway";
+    else if (sport.includes("motocross")) category = "motocross";
+    else if (sport.includes("karting")) category = "karting";
+    else if (sport.includes("speedway")) category = "speedway";
+    else if (sport) category = "motorsport";
+    else if (tg.leisure) category = tg.leisure.toLowerCase();
+  }
   const place: Place = {
     id: item.id || `${lat},${lon},${item.title || fallback}`,
     name: item.title || fallback,
@@ -156,12 +186,19 @@ const mapMcElement = (
 // ── Overpass query builder ────────────────────────────────────────────────────
 
 const buildQuery = (category: Category): string => {
-  // Values are matched across amenity/tourism/shop/historic/leisure keys by
-  // fetchOsmPlaces, so use the real OSM values (shop=car_repair, leisure=track…).
+  // Plain values are matched across amenity/tourism/shop/historic/leisure keys by
+  // fetchOsmPlaces (shop=car_repair, leisure=stadium…). "key=value" tokens match
+  // that exact OSM key only — used for tags outside the generic keys.
   if (category === "services") return "motorcycle_repair|motorcycle|car_repair|car_parts|tyres|bicycle";
   if (category === "fuel") return "fuel";
   if (category === "parking") return "parking";
-  if (category === "clubs_tracks") return "stadium|sports_centre|track|fitness_centre|golf_course";
+  // Real motorcycle clubs (club=motorcycle) and racing/motorsport tracks
+  // (highway=raceway, sport=motocross/karting/speedway/motor…). NOT generic gyms.
+  if (category === "clubs_tracks")
+    return "club=motorcycle|highway=raceway|sport=motocross|sport=karting|sport=speedway|sport=motor|sport=motorcycle";
+  // Gyms, fitness & general sports venues.
+  if (category === "fitness")
+    return "fitness_centre|sports_centre|stadium|golf_course|swimming_pool|fitness_station";
   return "atm|bank";
 };
 
@@ -170,6 +207,7 @@ const fallbackLabel = (category: Category): string => {
   if (category === "fuel") return "Fuel Station";
   if (category === "parking") return "Parking";
   if (category === "atm_bank") return "ATM / Bank";
+  if (category === "fitness") return "Sports & Fitness";
   return "MC Club / Track";
 };
 

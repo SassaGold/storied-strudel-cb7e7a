@@ -228,21 +228,24 @@
       "fuel": "Bensínstöðvar",
       "parking": "Bílastæði",
       "clubs_tracks": "Klúbbar og brautir",
-      "atm_bank": "Hraðbankar og bankar"
+      "atm_bank": "Hraðbankar og bankar",
+      "fitness": "Íþróttir og líkamsrækt"
     },
     "descriptions": {
       "services": "Leitar í 30 km að mótorhjalasölustöðum, viðgerðarverkstæðum, hlutaverslunum og leigum. Sláðu inn nafn til að leita beint á Google Maps.",
       "fuel": "Leitar í 20 km að öllum bensínstöðvum. Eldsneytistegundir frá OpenStreetMap. Ýttu ⛽ Athuga eldsneytisverð til að opna stöðina beint í Google Maps — eldsneytisverð birtist þar í löndum þar sem Google hefur þessi gögn.",
       "parking": "Leitar í 5 km að almennum bílastæðum og í 10 km að sérstökum mótorhjólabílastæðum.",
       "clubs_tracks": "Leitar í 50 km að mótorhjólaklúbbum og kappakstursbrautum.",
-      "atm_bank": "Leitar í 5 km að hraðbönkum og bankageirum — hentugt á löngum ferðum."
+      "atm_bank": "Leitar í 5 km að hraðbönkum og bankageirum — hentugt á löngum ferðum.",
+      "fitness": "Leitar innan 15 km að líkamsræktarstöðvum, íþróttamiðstöðvum, leikvöngum, sundlaugum og golfvöllum."
     },
     "empty": {
       "services": "Engin mótorhjólaþjónusta fundust í nágrenninu.\nReyndu að uppfæra staðsetningu þína eða stækka leitarradíus.",
       "fuel": "Engar bensínstöðvar fundust. Uppfærðu staðsetningu þína.",
       "parking": "Engin bílastæði fundust. Uppfærðu staðsetningu þína.",
       "clubs_tracks": "Engir klúbbar eða brautir fundust í 50 km. Uppfærðu staðsetningu þína.",
-      "atm_bank": "Engir hraðbankar eða bankar fundust nálægt. Uppfærðu staðsetningu þína."
+      "atm_bank": "Engir hraðbankar eða bankar fundust nálægt. Uppfærðu staðsetningu þína.",
+      "fitness": "Engir íþrótta- eða líkamsræktarstaðir fundust í nágrenninu. Prófaðu að uppfæra staðsetninguna."
     },
     "searchPlaceholder": "🔍 Leita eftir nafni…",
     "noSearchResults": "Engar niðurstöður passa við leit þína.",

@@ -228,21 +228,24 @@
       "fuel": "Fuel Stations",
       "parking": "Parking",
       "clubs_tracks": "Clubs & Tracks",
-      "atm_bank": "ATMs & Banks"
+      "atm_bank": "ATMs & Banks",
+      "fitness": "Sports & Fitness"
     },
     "descriptions": {
       "services": "Searches within 30 km for motorcycle dealers, repair workshops, parts & accessories shops, and rental shops. Type a name in the search box to search Google Maps directly.",
       "fuel": "Searches within 20 km for all fuel/petrol stations. Fuel types shown where available from OpenStreetMap. Press ⛽ Check Fuel Prices to open the station directly on the map at its exact location — fuel prices are shown there in countries where Google has that data.",
       "parking": "Searches within 5 km for general parking and within 10 km for dedicated motorcycle parking.",
       "clubs_tracks": "Searches within 50 km for motorcycle clubs and racing/riding tracks.",
-      "atm_bank": "Searches within 5 km for ATM machines and bank branches — handy on long-distance rides when cash is needed."
+      "atm_bank": "Searches within 5 km for ATM machines and bank branches — handy on long-distance rides when cash is needed.",
+      "fitness": "Searches within 15 km for gyms, fitness centres, sports centres, stadiums, swimming pools & golf courses."
     },
     "empty": {
       "services": "No motorcycle services found nearby.\nTry updating your location or expanding your search radius.",
       "fuel": "No fuel stations found yet. Try updating your location.",
       "parking": "No parking found yet. Try updating your location.",
       "clubs_tracks": "No MC clubs or tracks found within 50 km. Try updating your location.",
-      "atm_bank": "No ATMs or banks found nearby. Try updating your location."
+      "atm_bank": "No ATMs or banks found nearby. Try updating your location.",
+      "fitness": "No sports or fitness places found nearby. Try updating your location."
     },
     "searchPlaceholder": "🔍 Search by name…",
     "noSearchResults": "No results match your search.",

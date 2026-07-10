@@ -58,13 +58,42 @@ export async function fetchOsmPlaces(
 ): Promise<OsmPlaceItem[]> {
   const timeout = Math.max(MIN_OVERPASS_TIMEOUT_SECONDS, Math.floor(timeoutMs / 1000));
 
-  // Build Overpass query: match the value list across every supported OSM key
-  // and element type, within the radius.
-  const clauses = OSM_POI_SEARCH_KEYS.flatMap((key) =>
-    ["node", "way", "relation"].map(
-      (el) => `${el}["${key}"~"^(${amenities})$"](around:${radiusM},${lat},${lon});`
-    )
-  ).join("\n      ");
+  // Build Overpass query within the radius. Plain tokens (e.g. "fuel") match the
+  // value across every supported OSM key. "key=value" tokens (e.g.
+  // "club=motorcycle", "highway=raceway") match that exact key only — needed for
+  // tags that don't live under the generic keys.
+  const tokens = amenities.split("|").map((s) => s.trim()).filter(Boolean);
+  const plainValues: string[] = [];
+  const keyedValues: Record<string, string[]> = {};
+  for (const tok of tokens) {
+    const eq = tok.indexOf("=");
+    if (eq > 0) {
+      const key = tok.slice(0, eq).trim();
+      const value = tok.slice(eq + 1).trim();
+      if (key && value) {
+        if (!keyedValues[key]) keyedValues[key] = [];
+        keyedValues[key].push(value);
+      }
+    } else {
+      plainValues.push(tok);
+    }
+  }
+
+  const elementTypes = ["node", "way", "relation"] as const;
+  const clauseFor = (key: string, valueRe: string) =>
+    elementTypes.map(
+      (el) => `${el}["${key}"~"^(${valueRe})$"](around:${radiusM},${lat},${lon});`
+    );
+
+  const clauseList: string[] = [];
+  if (plainValues.length > 0) {
+    const valueRe = plainValues.join("|");
+    for (const key of OSM_POI_SEARCH_KEYS) clauseList.push(...clauseFor(key, valueRe));
+  }
+  for (const [key, values] of Object.entries(keyedValues)) {
+    clauseList.push(...clauseFor(key, values.join("|")));
+  }
+  const clauses = clauseList.join("\n      ");
   const query = `
     [out:json][timeout:${timeout}];
     (

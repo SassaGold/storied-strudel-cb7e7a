@@ -228,21 +228,24 @@
       "fuel": "Tankstellen",
       "parking": "Parken",
       "clubs_tracks": "Clubs & Strecken",
-      "atm_bank": "Geldautomaten & Banken"
+      "atm_bank": "Geldautomaten & Banken",
+      "fitness": "Sport & Fitness"
     },
     "descriptions": {
       "services": "Sucht im Umkreis von 30 km nach Motorradhändlern, Werkstätten, Teile- und Zubehörshops sowie Verleih. Namen eingeben, um direkt in Google Maps zu suchen.",
       "fuel": "Sucht im Umkreis von 20 km nach Tankstellen. Kraftstoffarten aus OpenStreetMap. ⛽ Kraftstoffpreise prüfen öffnet die Tankstelle direkt in Google Maps — Kraftstoffpreise werden dort angezeigt, wo Google diese Daten hat.",
       "parking": "Sucht im Umkreis von 5 km nach allgemeinen Parkplätzen und 10 km nach Motorradparkplätzen.",
       "clubs_tracks": "Sucht im Umkreis von 50 km nach Motorradclubs und Rennstrecken.",
-      "atm_bank": "Sucht im Umkreis von 5 km nach Geldautomaten und Bankfilialen — praktisch auf Langstreckentouren."
+      "atm_bank": "Sucht im Umkreis von 5 km nach Geldautomaten und Bankfilialen — praktisch auf Langstreckentouren.",
+      "fitness": "Sucht im Umkreis von 15 km nach Fitnessstudios, Sportzentren, Stadien, Schwimmbädern und Golfplätzen."
     },
     "empty": {
       "services": "Keine Motorradservices in der Nähe gefunden.\nVersuche, deinen Standort zu aktualisieren oder den Suchradius zu vergrößern.",
       "fuel": "Keine Tankstellen gefunden. Standort aktualisieren.",
       "parking": "Keine Parkplätze gefunden. Standort aktualisieren.",
       "clubs_tracks": "Keine Clubs oder Strecken in 50 km gefunden. Standort aktualisieren.",
-      "atm_bank": "Keine Geldautomaten oder Banken gefunden. Standort aktualisieren."
+      "atm_bank": "Keine Geldautomaten oder Banken gefunden. Standort aktualisieren.",
+      "fitness": "Keine Sport- oder Fitnessorte in der Nähe gefunden. Aktualisiere deinen Standort."
     },
     "searchPlaceholder": "🔍 Nach Name suchen…",
     "noSearchResults": "Keine Ergebnisse für Ihre Suche.",

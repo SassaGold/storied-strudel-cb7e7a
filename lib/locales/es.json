@@ -228,21 +228,24 @@
       "fuel": "Gasolineras",
       "parking": "Aparcamiento",
       "clubs_tracks": "Clubes y Circuitos",
-      "atm_bank": "Cajeros y Bancos"
+      "atm_bank": "Cajeros y Bancos",
+      "fitness": "Deporte y Fitness"
     },
     "descriptions": {
       "services": "Busca en 30 km talleres, concesionarios, tiendas y alquiler de motos. Escribe un nombre en el buscador para buscar directamente en Google Maps.",
       "fuel": "Busca en 20 km todas las gasolineras. Tipos de combustible de OpenStreetMap. Pulsa ⛽ Ver precios de combustible para abrir la gasolinera directamente en Google Maps — los precios del combustible se muestran allí en los países donde Google tiene esos datos.",
       "parking": "Busca en 5 km aparcamientos generales y en 10 km aparcamientos para motos.",
       "clubs_tracks": "Busca en 50 km clubes de motos y circuitos.",
-      "atm_bank": "Busca en 5 km cajeros automáticos y sucursales bancarias — útil en rutas largas."
+      "atm_bank": "Busca en 5 km cajeros automáticos y sucursales bancarias — útil en rutas largas.",
+      "fitness": "Busca en un radio de 15 km gimnasios, centros de fitness, polideportivos, estadios, piscinas y campos de golf."
     },
     "empty": {
       "services": "No se encontraron servicios de motocicleta cerca.\nIntenta actualizar tu ubicación o ampliar el radio de búsqueda.",
       "fuel": "No se encontraron gasolineras. Actualiza tu ubicación.",
       "parking": "No se encontró aparcamiento. Actualiza tu ubicación.",
       "clubs_tracks": "No se encontraron clubes o circuitos en 50 km. Actualiza tu ubicación.",
-      "atm_bank": "No se encontraron cajeros ni bancos. Actualiza tu ubicación."
+      "atm_bank": "No se encontraron cajeros ni bancos. Actualiza tu ubicación.",
+      "fitness": "No se encontraron lugares de deporte o fitness cerca. Prueba a actualizar tu ubicación."
     },
     "searchPlaceholder": "🔍 Buscar por nombre…",
     "noSearchResults": "No hay resultados para su búsqueda.",
