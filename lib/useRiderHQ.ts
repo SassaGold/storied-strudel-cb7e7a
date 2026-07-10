@@ -21,10 +21,11 @@ import {
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
 import { getCurrentPositionWithTimeout } from "./location";
+import { storage } from "./storage";
 import { fetchOverpass, withRetry } from "./overpass";
 import { type RoadAlert, ROAD_TYPES, haversineKm } from "./roads";
 import { useSettings } from "./settings";
-import { type SunTimes, computeSunTimes } from "./sun";
+import { type SunTimes, type PolarState, computeSunTimes, computeSunState } from "./sun";
 import {
     type ForecastDay,
     type HourlyForecast,
@@ -40,6 +41,17 @@ export type GeoAddress = {
   country?: string;
 };
 
+/** AsyncStorage key for the last-good RIDER HQ snapshot (offline fallback). */
+const RIDERHQ_CACHE_KEY = "cache_riderhq_v1";
+
+type HQCache = {
+  ts: number;
+  coords: { latitude: number; longitude: number };
+  address: GeoAddress | null;
+  weather: WeatherInfo | null;
+  roadAlerts: RoadAlert[];
+};
+
 export type RiderHQState = {
   loading: boolean;
   error: string | null;
@@ -49,6 +61,8 @@ export type RiderHQState = {
   lastUpdated: Date | null;
   roadAlerts: RoadAlert[];
   sunTimes: SunTimes;
+  /** Polar day/night state when there is no sunrise/sunset, else null. */
+  sunState: PolarState | null;
   /** Deep-link URL to yr.no forecast for current location */
   weatherUrl: string;
   loadData: () => Promise<void>;
@@ -89,12 +103,39 @@ export function useRiderHQ(): RiderHQState {
 
     setLoading(true);
     setError(null);
+
+    // Serve the last-good snapshot immediately so the home screen isn't blank
+    // on a cold start with poor/no signal. Fresh data replaces it below.
+    let cached: HQCache | null = null;
+    try {
+      const raw = await storage.getItem(RIDERHQ_CACHE_KEY);
+      if (activeCallRef.current !== callId) return;
+      if (raw) {
+        const parsed: HQCache = JSON.parse(raw);
+        if (parsed && parsed.coords) {
+          cached = parsed;
+          if (parsed.address) setAddress(parsed.address);
+          if (parsed.weather) setWeather(parsed.weather);
+          if (Array.isArray(parsed.roadAlerts)) setRoadAlerts(parsed.roadAlerts);
+          setLocation({
+            coords: {
+              latitude: parsed.coords.latitude,
+              longitude: parsed.coords.longitude,
+              altitude: null, accuracy: null, altitudeAccuracy: null, heading: null, speed: null,
+            },
+            timestamp: parsed.ts,
+          } as Location.LocationObject);
+          if (parsed.ts) setLastUpdated(new Date(parsed.ts));
+        }
+      }
+    } catch {}
+
     try {
       const permission = await requestForegroundPermission();
       if (activeCallRef.current !== callId) return;
       // Only bail out on explicit denial; 'undetermined' triggers the browser dialog.
       if (permission.status === "denied") {
-        setError(t("home.locationError"));
+        if (!cached) setError(t("home.locationError"));
         return;
       }
 
@@ -247,7 +288,7 @@ export function useRiderHQ(): RiderHQState {
             .filter((a) => ROAD_TYPES.has(a.type.toLowerCase()))
             .slice(0, ROAD_ALERTS_MAX);
         })
-        .catch(() => []);
+        .catch((): RoadAlert[] | null => null);
 
       const [addressResult, weatherResult, roadResult] = await Promise.all([
         addressPromise,
@@ -256,13 +297,29 @@ export function useRiderHQ(): RiderHQState {
       ]);
 
       if (activeCallRef.current !== callId) return;
-      setAddress(addressResult);
-      setWeather(weatherResult);
-      setRoadAlerts(roadResult);
+      // Keep the cached value for any piece whose fresh fetch failed, so a
+      // partial network failure doesn't wipe good data off the screen.
+      const finalAddress = addressResult ?? cached?.address ?? null;
+      const finalWeather = weatherResult ?? cached?.weather ?? null;
+      const finalRoads = roadResult ?? cached?.roadAlerts ?? [];
+      setAddress(finalAddress);
+      setWeather(finalWeather);
+      setRoadAlerts(finalRoads);
       setLastUpdated(new Date());
+
+      // Persist the best-known snapshot for the next cold/offline start.
+      const snapshot: HQCache = {
+        ts: Date.now(),
+        coords: { latitude, longitude },
+        address: finalAddress,
+        weather: finalWeather,
+        roadAlerts: finalRoads,
+      };
+      storage.setItem(RIDERHQ_CACHE_KEY, JSON.stringify(snapshot)).catch(() => {});
     } catch {
       if (activeCallRef.current !== callId) return;
-      setError(t("home.dataError"));
+      // Offline/GPS failure: keep showing cached data rather than an error.
+      if (!cached) setError(t("home.dataError"));
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }
@@ -276,6 +333,16 @@ export function useRiderHQ(): RiderHQState {
         ? computeSunTimes(location.coords.latitude, location.coords.longitude)
         : null,
     [location]
+  );
+
+  // When there is no sunrise/sunset (polar day/night), which case applies —
+  // so the sun card can explain it instead of vanishing.
+  const sunState = useMemo(
+    () =>
+      location && !sunTimes
+        ? computeSunState(location.coords.latitude, location.coords.longitude)
+        : null,
+    [location, sunTimes]
   );
 
   const weatherUrl = location
@@ -293,6 +360,7 @@ export function useRiderHQ(): RiderHQState {
     lastUpdated,
     roadAlerts,
     sunTimes,
+    sunState,
     weatherUrl,
     loadData,
     cancelSearch,

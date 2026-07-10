@@ -5,6 +5,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,7 +16,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "../../lib/settings";
-import { saveLanguage } from "../../lib/i18n";
+import { saveLanguage, SUPPORTED_LANGS } from "../../lib/i18n";
 import { useRiderHQ } from "../../lib/useRiderHQ";
 import { WeatherCard } from "../../components/WeatherCard";
 import { SunCard } from "../../components/SunCard";
@@ -53,6 +54,7 @@ export default function Index() {
     lastUpdated,
     roadAlerts,
     sunTimes,
+    sunState,
     weatherUrl,
     loadData,
     cancelSearch,
@@ -87,6 +89,12 @@ export default function Index() {
     ).catch(() => null);
   }, [location]);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await loadData(); } finally { setRefreshing(false); }
+  }, [loadData]);
+
   return (
     <ScrollView
       style={styles.scrollView}
@@ -94,6 +102,9 @@ export default function Index() {
         styles.container,
         { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 40 },
       ]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+      }
     >
       {/* ── Header ───────────────────────────────────────────────── */}
       <View style={styles.header}>
@@ -180,9 +191,7 @@ export default function Index() {
             accessibilityViewIsModal
           >
             <Text style={styles.langModalTitle} accessibilityRole="header">{t("language.label")}</Text>
-            {(
-              ["en", "es", "de", "fr", "is", "no", "sv", "da", "nl"] as const
-            ).map((lang) => (
+            {SUPPORTED_LANGS.map((lang) => (
               <Pressable
                 key={lang}
                 style={({ pressed }) => [
@@ -281,7 +290,7 @@ export default function Index() {
       {weather && <WeatherCard weather={weather} weatherUrl={weatherUrl} />}
 
       {/* ── Sunrise / sunset ──────────────────────────────────────── */}
-      {sunTimes && <SunCard sunTimes={sunTimes} />}
+      {location && <SunCard sunTimes={sunTimes} polarState={sunState} />}
 
       {lastUpdated && (
         <Text style={styles.metaText}>

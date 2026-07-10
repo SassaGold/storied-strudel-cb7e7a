@@ -6,6 +6,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   Share,
   StyleSheet,
@@ -18,6 +19,7 @@ import * as Localization from "expo-localization";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { emergencyNumberForCountry } from "../../lib/config";
+import { getCurrentPositionWithTimeout } from "../../lib/location";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyPlaces";
 import { useLocationPermission } from "../../lib/locationPermission";
@@ -92,6 +94,12 @@ export default function EmergencyScreen() {
   // Quick action state
   const [torchOn, setTorchOn] = useState(false);
   const [instructionsVisible, setInstructionsVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await loadPlaces(); } finally { setRefreshing(false); }
+  }, [loadPlaces]);
 
   // Primary emergency number for the user's country. Seed instantly from the
   // device region (offline, no permission), then refine to the *physical*
@@ -144,10 +152,11 @@ export default function EmergencyScreen() {
         Alert.alert(t("sos.permissionAlert"), t("sos.locationPermissionMsg"));
         return;
       }
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const pos = await getCurrentPositionWithTimeout({ accuracy: Location.Accuracy.Balanced });
       const { latitude, longitude } = pos.coords;
       const mapsLink = `https://maps.google.com/?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
-      const shareText = `🏍️ My current location:\n${mapsLink}\n\nCoordinates: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      const coords = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      const shareText = t("sos.shareText", { link: mapsLink, coords });
 
       // On web, Share API is limited — copy to clipboard as fallback
       if (Platform.OS === "web") {
@@ -175,6 +184,9 @@ export default function EmergencyScreen() {
     <ScrollView
       style={styles.scrollView}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+      }
     >
       {/* ── Torch Screen Overlay ─────────────────────────────────── */}
       <Modal visible={torchOn} transparent animationType="fade" onRequestClose={() => setTorchOn(false)}>
