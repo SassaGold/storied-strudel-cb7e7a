@@ -74,7 +74,7 @@ const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: stri
 
 export default function EmergencyScreen() {
   const { t } = useTranslation();
-  const { settings } = useSettings();
+  const { settings, setSetting } = useSettings();
   const insets = useSafeAreaInsets();
   const { requestForegroundPermission } = useLocationPermission();
 
@@ -96,7 +96,7 @@ export default function EmergencyScreen() {
   const [torchOn, setTorchOn] = useState(false);
   const [instructionsVisible, setInstructionsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [view, setView] = useState<"list" | "map">("list");
+  const view = settings.poiView;
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -486,7 +486,7 @@ export default function EmergencyScreen() {
               <View style={styles.viewToggleRow}>
                 <Pressable
                   style={[styles.viewToggleBtn, view === "list" && styles.viewToggleBtnActive]}
-                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setView("list"); }}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSetting("poiView", "list"); }}
                   accessibilityRole="button"
                   accessibilityState={{ selected: view === "list" }}
                   accessibilityLabel={t("common.viewList")}
@@ -495,7 +495,7 @@ export default function EmergencyScreen() {
                 </Pressable>
                 <Pressable
                   style={[styles.viewToggleBtn, view === "map" && styles.viewToggleBtnActive]}
-                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setView("map"); }}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setSetting("poiView", "map"); }}
                   accessibilityRole="button"
                   accessibilityState={{ selected: view === "map" }}
                   accessibilityLabel={t("common.viewMap")}
