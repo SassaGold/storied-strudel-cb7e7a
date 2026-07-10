@@ -88,6 +88,11 @@ export function useEmergencyPlaces() {
   const loadPlaces = useCallback(async () => {
     const callId = (activeCallRef.current += 1);
 
+    // Retain the last cached results (even if expired) so that, on the
+    // safety-critical SOS tab, a failed refresh can still show something.
+    let staleData: EmergencyPlace[] | null = null;
+    let staleTs = 0;
+
     // Show cached results immediately while fetching fresh data
     try {
       const raw = await storage.getItem(CACHE_KEY);
@@ -96,15 +101,14 @@ export function useEmergencyPlaces() {
         const parsed = JSON.parse(raw);
         const ts: number = parsed?.ts;
         const data: EmergencyPlace[] = parsed?.data;
-        if (
-          Array.isArray(data) &&
-          data.length > 0 &&
-          typeof ts === "number" &&
-          Date.now() - ts < CACHE_TTL_MS
-        ) {
-          setPlaces(data);
-          setFromCache(true);
-          setCacheTs(ts);
+        if (Array.isArray(data) && data.length > 0 && typeof ts === "number") {
+          staleData = data;
+          staleTs = ts;
+          if (Date.now() - ts < CACHE_TTL_MS) {
+            setPlaces(data);
+            setFromCache(true);
+            setCacheTs(ts);
+          }
         }
       }
     } catch {}
@@ -213,8 +217,16 @@ export function useEmergencyPlaces() {
       } catch {}
     } catch (err) {
       if (activeCallRef.current !== callId) return;
-      const isNetwork = err instanceof TypeError && String(err).includes("fetch");
-      setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
+      // Fall back to expired cache rather than leaving the SOS list empty when
+      // the network/GPS fails — outdated nearby hospitals still beat nothing.
+      if (staleData) {
+        setPlaces(staleData);
+        setFromCache(true);
+        setCacheTs(staleTs);
+      } else {
+        const isNetwork = err instanceof TypeError && String(err).includes("fetch");
+        setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
+      }
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }

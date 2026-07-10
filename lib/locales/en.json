@@ -253,6 +253,7 @@
     "subtitle": "Police, hospitals & emergency services near you.",
     "universalNumbers": "⚡ UNIVERSAL EMERGENCY NUMBERS",
     "shareLocation": "📍 Share My Location",
+    "shareText": "🏍️ My current location:\n{{link}}\n\nCoordinates: {{coords}}",
     "findButton": "FIND NEARBY EMERGENCY SERVICES",
     "searching": "Searching within 10 km…",
     "locationError": "Location permission is required to find emergency services.",
@@ -335,6 +336,8 @@
     "startErrorMsg": "Failed to start ride tracking. Please check that location permission is enabled and try again.",
     "stopErrorTitle": "Ride Save Error",
     "stopErrorMsg": "Your ride may not have saved correctly. Please try again.",
+    "notifTitle": "Where Am I · Trip Logger",
+    "notifBody": "Recording your ride in the background.",
     "viewRoute": "🗺️ View Route",
     "hideRoute": "▲ Hide Route",
     "tapToExpand": "Tap to expand"

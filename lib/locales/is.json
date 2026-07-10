@@ -253,6 +253,7 @@
     "subtitle": "Lögregla, sjúkrahús og neyðarþjónusta nálægt þér.",
     "universalNumbers": "⚡ ALÞJÓÐLEGAR NEYÐARNÚMER",
     "shareLocation": "📍 Deila staðsetningu minni",
+    "shareText": "🏍️ Núverandi staðsetning mín:\n{{link}}\n\nHnit: {{coords}}",
     "findButton": "FINNA NÁLÆGA NEYÐARÞJÓNUSTU",
     "searching": "Leitar í 10 km…",
     "locationError": "Staðsetningarleyfi er nauðsynlegt til að finna neyðarþjónustu.",
@@ -335,6 +336,8 @@
     "startErrorMsg": "Ekki tókst að hefja ferðaskráningu. Athugaðu hvort staðsetningarheimild sé virk og reyndu aftur.",
     "stopErrorTitle": "Villa við að vista ferð",
     "stopErrorMsg": "Ferðin þín kann að hafa ekki vistast rétt. Reyndu aftur.",
+    "notifTitle": "Where Am I · Ferðaskrá",
+    "notifBody": "Tek upp ferðina þína í bakgrunni.",
     "viewRoute": "🗺️ Skoða leið",
     "hideRoute": "▲ Fela leið",
     "tapToExpand": "Ýttu til að stækka"

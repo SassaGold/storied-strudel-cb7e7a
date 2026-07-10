@@ -364,8 +364,8 @@ export default function TripLoggerScreen() {
             timeInterval: 3000,
             showsBackgroundLocationIndicator: true,
             foregroundService: {
-              notificationTitle: "Where Am I Trip Logger",
-              notificationBody: "Recording your ride in the background.",
+              notificationTitle: t("triplog.notifTitle"),
+              notificationBody: t("triplog.notifBody"),
               notificationColor: "#ff6600",
             },
           });

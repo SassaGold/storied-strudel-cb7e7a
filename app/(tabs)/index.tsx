@@ -15,7 +15,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "../../lib/settings";
-import { saveLanguage } from "../../lib/i18n";
+import { saveLanguage, SUPPORTED_LANGS } from "../../lib/i18n";
 import { useRiderHQ } from "../../lib/useRiderHQ";
 import { WeatherCard } from "../../components/WeatherCard";
 import { SunCard } from "../../components/SunCard";
@@ -180,9 +180,7 @@ export default function Index() {
             accessibilityViewIsModal
           >
             <Text style={styles.langModalTitle} accessibilityRole="header">{t("language.label")}</Text>
-            {(
-              ["en", "es", "de", "fr", "is", "no", "sv", "da", "nl"] as const
-            ).map((lang) => (
+            {SUPPORTED_LANGS.map((lang) => (
               <Pressable
                 key={lang}
                 style={({ pressed }) => [

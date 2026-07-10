@@ -253,6 +253,7 @@
     "subtitle": "Police, hôpitaux & services d'urgence à proximité.",
     "universalNumbers": "⚡ NUMÉROS D'URGENCE",
     "shareLocation": "📍 Partager Ma Position",
+    "shareText": "🏍️ Ma position actuelle :\n{{link}}\n\nCoordonnées : {{coords}}",
     "findButton": "TROUVER SERVICES D'URGENCE",
     "searching": "Recherche dans 10 km…",
     "locationError": "Permission de localisation requise pour les services d'urgence.",
@@ -335,6 +336,8 @@
     "startErrorMsg": "Échec du démarrage du suivi du trajet. Veuillez vérifier que l'autorisation de localisation est activée et réessayer.",
     "stopErrorTitle": "Erreur d'enregistrement du trajet",
     "stopErrorMsg": "Votre trajet n'a peut-être pas été enregistré correctement. Veuillez réessayer.",
+    "notifTitle": "Where Am I · Enregistreur de trajet",
+    "notifBody": "Enregistrement de votre trajet en arrière-plan.",
     "viewRoute": "🗺️ Voir l'itinéraire",
     "hideRoute": "▲ Masquer l'itinéraire",
     "tapToExpand": "Appuyez pour agrandir"
