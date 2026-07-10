@@ -81,9 +81,10 @@
     "lastUpdated": "Mis à jour {{time}}",
     "roadConditions": "🚧 État des routes",
     "roadConditionsLoading": "Vérification des conditions routières…",
-    "roadConditionsNone": "✅ Aucun chantier détecté dans un rayon de {{radius}} km.",
-    "roadConditionsCount": "{{count}} chantier(s) détecté(s) dans {{radius}} km",
+    "roadConditionsNone": "✅ Aucun chantier détecté dans un rayon de {{radius}}.",
+    "roadConditionsCount": "{{count}} chantier(s) détecté(s) dans {{radius}}",
     "openTrafficMap": "CARTE TRAFIC EN DIRECT",
+    "tapToOpenMaps": "Appuyez pour ouvrir dans Maps",
     "roadTypes": {
       "service": "Voie de Service",
       "residential": "Rue Résidentielle",
@@ -330,6 +331,10 @@
     "tooShortTitle": "Trajet Non Enregistré",
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
     "speedLabel": "VITESSE",
+    "startErrorTitle": "Impossible de démarrer le trajet",
+    "startErrorMsg": "Échec du démarrage du suivi du trajet. Veuillez vérifier que l'autorisation de localisation est activée et réessayer.",
+    "stopErrorTitle": "Erreur d'enregistrement du trajet",
+    "stopErrorMsg": "Votre trajet n'a peut-être pas été enregistré correctement. Veuillez réessayer.",
     "viewRoute": "🗺️ Voir l'itinéraire",
     "hideRoute": "▲ Masquer l'itinéraire",
     "tapToExpand": "Appuyez pour agrandir"
@@ -363,6 +368,7 @@
     "updateAvailable": "⬇️ Mise à jour disponible — installation…",
     "updateLatest": "✅ Vous êtes à jour",
     "updateError": "❌ Échec de la vérification",
+    "updateRestart": "⬇️ Mise à jour prête — appuyez pour redémarrer",
     "privacyPolicyLink": "📄 Politique de confidentialité",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "L'adresse de votre position actuelle est obtenue via l'API Nominatim (OpenStreetMap). Aucune clé API requise."

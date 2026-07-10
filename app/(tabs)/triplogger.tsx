@@ -21,7 +21,7 @@ import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
-import { OSM_TILE_URL, OSM_USER_AGENT } from "../../lib/config";
+import { OSM_TILE_URL, OSM_USER_AGENT, TRIP_MAX_GPS_ACCURACY_M } from "../../lib/config";
 import { mapMatchRoute, downsampleCoords } from "../../lib/mapMatch";
 import { storage } from "../../lib/storage";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -31,8 +31,18 @@ const Notifications: typeof import("expo-notifications") | null = (() => { try {
 
 const STORAGE_KEY = "triplogger_rides_v1";
 
+/** Snapshot of the in-progress ride, so a crash/force-kill mid-ride can be
+ *  recovered on next launch instead of losing the whole foreground track. */
+const CHECKPOINT_KEY = "triplogger_active_v1";
+
+/** Minimum interval between checkpoint writes (ms) — avoids rewriting the whole
+ *  route blob on every GPS fix. */
+const CHECKPOINT_INTERVAL_MS = 15_000;
+
 /** Cap on saved rides kept in AsyncStorage; oldest are trimmed once exceeded. */
 const MAX_SAVED_RIDES = 100;
+
+type Checkpoint = { startTime: number; distanceKm: number; route: GpsPoint[] };
 
 type GpsPoint = { latitude: number; longitude: number; timestamp: number };
 
@@ -63,6 +73,35 @@ const formatDate = (iso: string): string => {
     hour: "2-digit",
     minute: "2-digit",
   });
+};
+
+/** Sum a route's great-circle distance in km, ignoring < 3 m GPS jitter. */
+const routeDistanceKm = (route: GpsPoint[]): number => {
+  let km = 0;
+  for (let i = 1; i < route.length; i++) {
+    const d = haversineMeters(
+      route[i - 1].latitude, route[i - 1].longitude,
+      route[i].latitude, route[i].longitude,
+    );
+    if (d >= 3) km += d / 1000;
+  }
+  return km;
+};
+
+/** Build a SavedRide from a route + timing, or null if it's too short (< ~10 m). */
+const buildRide = (route: GpsPoint[], startTime: number | null, endTime: number): SavedRide | null => {
+  const distanceKm = routeDistanceKm(route);
+  if (distanceKm <= 0.01) return null;
+  const durationMs = startTime ? Math.max(0, endTime - startTime) : 0;
+  const avgSpeedKmh = durationMs > 0 ? distanceKm / (durationMs / 3_600_000) : 0;
+  return {
+    id: String(endTime),
+    date: new Date(endTime).toISOString(),
+    distanceKm: Math.round(distanceKm * 100) / 100,
+    durationMs,
+    avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10,
+    route,
+  };
 };
 
 export default function TripLoggerScreen() {
@@ -103,17 +142,16 @@ export default function TripLoggerScreen() {
   const recordingRef = useRef(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const prevSpeedPointRef = useRef<{ latitude: number; longitude: number; timestamp: number } | null>(null);
+  const lastCheckpointRef = useRef(0);
 
   // Keep recordingRef in sync so the live speed watcher can check it without stale closure
   useEffect(() => { recordingRef.current = recording; }, [recording]);
 
-  // Load saved rides on mount
+  // Live speed watcher so the speedometer shows current speed when NOT recording.
+  // During a recording the recording watcher already provides speed, so we skip
+  // this one to avoid a redundant second GPS subscription (battery).
   useEffect(() => {
-    loadRides();
-  }, []);
-
-  // Always-on live speed watcher so the speedometer shows current speed even when not recording
-  useEffect(() => {
+    if (recording) return;
     let active = true;
     const startLiveWatch = async () => {
       const { status } = await requestForegroundPermission();
@@ -149,23 +187,86 @@ export default function TripLoggerScreen() {
       liveSpeedWatchRef.current?.remove();
       liveSpeedWatchRef.current = null;
     };
-  }, [requestForegroundPermission]);
+  }, [requestForegroundPermission, recording]);
 
-  const loadRides = async () => {
-    try {
-      const raw = await storage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) setRides(parsed.slice(0, MAX_SAVED_RIDES));
-      }
-    } catch {}
-  };
+  // Release the recording watcher and keep-awake lock if the screen unmounts
+  // mid-ride so they don't leak (the checkpoint above allows later recovery).
+  useEffect(() => {
+    return () => {
+      watchRef.current?.remove();
+      watchRef.current = null;
+      deactivateKeepAwake();
+    };
+  }, []);
 
   const saveRides = useCallback(async (updated: SavedRide[]) => {
     try {
       await storage.setItem(STORAGE_KEY, JSON.stringify(updated));
     } catch {}
   }, []);
+
+  /** Throttled snapshot of the in-progress ride so a crash can be recovered. */
+  const checkpointRide = useCallback(() => {
+    const now = Date.now();
+    if (now - lastCheckpointRef.current < CHECKPOINT_INTERVAL_MS) return;
+    lastCheckpointRef.current = now;
+    const cp: Checkpoint = {
+      startTime: startTimeRef.current ?? now,
+      distanceKm: distRef.current,
+      route: routeRef.current,
+    };
+    storage.setItem(CHECKPOINT_KEY, JSON.stringify(cp)).catch(() => null);
+  }, []);
+
+  const clearCheckpoint = useCallback(() => {
+    lastCheckpointRef.current = 0;
+    storage.removeItem(CHECKPOINT_KEY).catch(() => null);
+  }, []);
+
+  /** If a previous session was killed mid-ride, rebuild that ride from its
+   *  checkpoint (+ any leftover background points) so it isn't lost. */
+  const recoverCheckpointRide = useCallback(async (): Promise<SavedRide | null> => {
+    try {
+      const raw = await storage.getItem(CHECKPOINT_KEY);
+      if (!raw) return null;
+      await storage.removeItem(CHECKPOINT_KEY);
+      const cp: Checkpoint = JSON.parse(raw);
+      let route = Array.isArray(cp.route) ? cp.route : [];
+      try {
+        const bgRaw = await storage.getItem(BG_POINTS_KEY);
+        if (bgRaw) {
+          const bg: BgPoint[] = JSON.parse(bgRaw);
+          const fgTs = new Set(route.map((p) => p.timestamp));
+          route = [...route, ...bg.filter((p) => !fgTs.has(p.timestamp))].sort((a, b) => a.timestamp - b.timestamp);
+        }
+        await storage.removeItem(BG_POINTS_KEY);
+      } catch {}
+      const lastTs = route.length > 0 ? route[route.length - 1].timestamp : cp.startTime;
+      return buildRide(route, cp.startTime, lastTs);
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const loadRides = useCallback(async () => {
+    let existing: SavedRide[] = [];
+    try {
+      const raw = await storage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) existing = parsed;
+      }
+    } catch {}
+    const recovered = await recoverCheckpointRide();
+    const all = (recovered ? [recovered, ...existing] : existing).slice(0, MAX_SAVED_RIDES);
+    setRides(all);
+    if (recovered) await saveRides(all);
+  }, [recoverCheckpointRide, saveRides]);
+
+  // Load saved rides (and recover a crashed in-progress ride) on mount.
+  useEffect(() => {
+    loadRides();
+  }, [loadRides]);
 
   // Timer tick
   useEffect(() => {
@@ -246,10 +347,11 @@ export default function TripLoggerScreen() {
       await activateKeepAwakeAsync().catch(() => null);
       setRecording(true);
 
-      // Clear any stale background points from a previous session.
+      // Clear any stale background points + checkpoint from a previous session.
       try { await storage.removeItem(BG_POINTS_KEY); } catch {
         // Stale data will be deduplicated on stop; not critical.
       }
+      clearCheckpoint();
 
       // Start the background location task (Android foreground service).
       // This ensures GPS points are captured even when the screen is locked.
@@ -297,6 +399,10 @@ export default function TripLoggerScreen() {
             }
             setAccuracy(acc ?? null);
 
+            // Discard unreliable fixes — a poor GPS fix that "jumps" would
+            // inflate the recorded distance. Speed/accuracy are still shown above.
+            if (acc != null && acc > TRIP_MAX_GPS_ACCURACY_M) return;
+
             const newPoint: GpsPoint = { latitude, longitude, timestamp: ts };
 
             if (prev) {
@@ -307,10 +413,12 @@ export default function TripLoggerScreen() {
                 setDistanceKm(distRef.current);
                 routeRef.current = [...routeRef.current, newPoint];
                 setRoute([...routeRef.current]);
+                checkpointRide();
               }
             } else {
               routeRef.current = [newPoint];
               setRoute([newPoint]);
+              checkpointRide();
             }
           } catch {
             // Silently ignore any error in the location update callback to prevent
@@ -324,7 +432,7 @@ export default function TripLoggerScreen() {
       setRecording(false);
       Alert.alert(t("triplog.startErrorTitle"), t("triplog.startErrorMsg"));
     }
-  }, [t, requestForegroundPermission, requestBackgroundPermission]);
+  }, [t, requestForegroundPermission, requestBackgroundPermission, checkpointRide, clearCheckpoint]);
 
   const stopRecording = useCallback(async () => {
     try {
@@ -349,7 +457,6 @@ export default function TripLoggerScreen() {
         // Non-critical: the task will stop automatically when the app is terminated.
       }
 
-      const durationMs = startTimeRef.current ? Date.now() - startTimeRef.current : 0;
       setRecording(false);
       // Don't clear speed — live watcher will continue updating it after recording stops
 
@@ -368,31 +475,13 @@ export default function TripLoggerScreen() {
         // Keep foreground-only route if background data cannot be read.
       }
 
-      // Recalculate distance from merged route.
-      let mergedDistKm = 0;
-      for (let i = 1; i < mergedRoute.length; i++) {
-        const dist = haversineMeters(
-          mergedRoute[i - 1].latitude,
-          mergedRoute[i - 1].longitude,
-          mergedRoute[i].latitude,
-          mergedRoute[i].longitude,
-        );
-        // Filter GPS jitter: only count movements of ≥ 3 m (same threshold as the foreground watcher).
-        if (dist >= 3) mergedDistKm += dist / 1000;
-      }
+      // Recompute distance/stats from the merged route and persist the ride.
+      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now());
+      // The ride is finalized — drop the crash-recovery checkpoint.
+      clearCheckpoint();
 
-      const avgSpeed = durationMs > 0 ? mergedDistKm / (durationMs / 3_600_000) : 0;
-
-      if (mergedDistKm > 0.01) {
+      if (ride) {
         Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Success)?.catch(() => null);
-        const ride: SavedRide = {
-          id: String(Date.now()),
-          date: new Date().toISOString(),
-          distanceKm: Math.round(mergedDistKm * 100) / 100,
-          durationMs,
-          avgSpeedKmh: Math.round(avgSpeed * 10) / 10,
-          route: mergedRoute,
-        };
         // Cap history so storage can't grow unbounded; keep the newest rides.
         const updated = [ride, ...rides].slice(0, MAX_SAVED_RIDES);
         setRides(updated);
@@ -407,7 +496,7 @@ export default function TripLoggerScreen() {
       setRecording(false);
       Alert.alert(t("triplog.stopErrorTitle"), t("triplog.stopErrorMsg"));
     }
-  }, [rides, saveRides, t]);
+  }, [rides, saveRides, t, clearCheckpoint]);
 
   const deleteRide = useCallback(async (id: string) => {
     const updated = rides.filter((r) => r.id !== id);
@@ -619,9 +708,9 @@ export default function TripLoggerScreen() {
           statusBarTranslucent
           onRequestClose={() => setFullscreenRide(null)}
         >
-          <View style={styles.mapModal}>
+          <View style={styles.mapModal} accessibilityViewIsModal>
             <View style={styles.mapModalHeader}>
-              <Text style={styles.mapModalTitle}>{fullscreenRide.date ? new Date(fullscreenRide.date).toLocaleDateString(i18n.language) : ""}</Text>
+              <Text style={styles.mapModalTitle} accessibilityRole="header">{fullscreenRide.date ? new Date(fullscreenRide.date).toLocaleDateString(i18n.language) : ""}</Text>
               <Pressable onPress={() => setFullscreenRide(null)} style={styles.mapModalClose} accessibilityLabel={t("triplog.hideRoute")}>
                 <Text style={styles.mapModalCloseText}>✕</Text>
               </Pressable>
@@ -661,7 +750,12 @@ const SpeedGauge = memo(function SpeedGauge({
     pct > 0.3  ? "#fbbf24" : "#22c55e";
 
   return (
-    <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
+    <View
+      style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}
+      accessible
+      accessibilityRole="text"
+      accessibilityLabel={`${label}: ${speedKmh != null ? Math.round(speedKmh) : "—"} ${unit}`}
+    >
       {/* Tick marks around the gauge */}
       {Array.from({ length: TICKS }).map((_, i) => {
         const frac = i / (TICKS - 1);

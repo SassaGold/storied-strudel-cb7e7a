@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -14,8 +14,10 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import * as Location from "expo-location";
+import * as Localization from "expo-localization";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { emergencyNumberForCountry } from "../../lib/config";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyPlaces";
 import { useLocationPermission } from "../../lib/locationPermission";
@@ -91,6 +93,34 @@ export default function EmergencyScreen() {
   const [torchOn, setTorchOn] = useState(false);
   const [instructionsVisible, setInstructionsVisible] = useState(false);
 
+  // Primary emergency number for the user's country. Seed instantly from the
+  // device region (offline, no permission), then refine to the *physical*
+  // country via GPS when a fix is already available (so a traveller abroad gets
+  // the local number).
+  const [emergencyNumber, setEmergencyNumber] = useState(() =>
+    emergencyNumberForCountry(Localization.getLocales()[0]?.regionCode)
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const last = await Location.getLastKnownPositionAsync();
+        if (!last) return;
+        const [place] = await Location.reverseGeocodeAsync({
+          latitude: last.coords.latitude,
+          longitude: last.coords.longitude,
+        });
+        if (!cancelled && place?.isoCountryCode) {
+          setEmergencyNumber(emergencyNumberForCountry(place.isoCountryCode));
+        }
+      } catch {
+        // Keep the device-region number if GPS/geocoding is unavailable.
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
   const call = useCallback((number: string) => {
     Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null);
     callNumber(
@@ -148,7 +178,7 @@ export default function EmergencyScreen() {
     >
       {/* ── Torch Screen Overlay ─────────────────────────────────── */}
       <Modal visible={torchOn} transparent animationType="fade" onRequestClose={() => setTorchOn(false)}>
-        <Pressable style={styles.torchOverlay} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(false); }}>
+        <Pressable style={styles.torchOverlay} onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setTorchOn(false); }} accessibilityViewIsModal accessibilityRole="button" accessibilityLabel={t("sos.torchScreenOff")}>
           <Text style={styles.torchOffText}>{t("sos.torchScreenOff")}</Text>
         </Pressable>
       </Modal>
@@ -156,9 +186,9 @@ export default function EmergencyScreen() {
       {/* ── Emergency Instructions Modal ─────────────────────────── */}
       <Modal visible={instructionsVisible} transparent animationType="slide" onRequestClose={() => setInstructionsVisible(false)}>
         <View style={styles.instructionsOverlay}>
-          <View style={styles.instructionsCard}>
+          <View style={styles.instructionsCard} accessibilityViewIsModal>
             <View style={styles.instructionsHeader}>
-              <Text style={styles.instructionsTitle}>{t("sos.instructionsTitle")}</Text>
+              <Text style={styles.instructionsTitle} accessibilityRole="header">{t("sos.instructionsTitle")}</Text>
               <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInstructionsVisible(false); }} hitSlop={12}>
                 <Text style={styles.instructionsClose}>{t("sos.instructionsClose")} ✕</Text>
               </Pressable>
@@ -181,8 +211,8 @@ export default function EmergencyScreen() {
           style={styles.modalOverlay}
           onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}
         >
-          <Pressable style={styles.modalCard} onPress={() => {}}>
-            <Text style={styles.modalTitle}>{infoPlace?.name}</Text>
+          <Pressable style={styles.modalCard} onPress={() => {}} accessibilityViewIsModal>
+            <Text style={styles.modalTitle} accessibilityRole="header">{infoPlace?.name}</Text>
             <View style={styles.modalRow}>
               <Text style={styles.modalLabel}>{t("common.type")}</Text>
               <Text style={styles.modalValue}>
@@ -294,27 +324,28 @@ export default function EmergencyScreen() {
       {/* ── Large SOS Button ─────────────────────────────────────── */}
       <Pressable
         style={({ pressed }) => [styles.bigSosButton, pressed && { opacity: 0.85 }]}
-        onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+        onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call(emergencyNumber); }}
         accessibilityRole="button"
-        accessibilityLabel={t("sos.callSos")}
+        accessibilityLabel={`${t("sos.callSos")} ${emergencyNumber}`}
       >
         <Text style={styles.bigSosEmoji}>🆘</Text>
         <Text style={styles.bigSosText}>{t("sos.callSos")}</Text>
+        <Text style={styles.bigSosNumber}>{emergencyNumber}</Text>
       </Pressable>
 
       {/* ── Quick Actions ─────────────────────────────────────────── */}
       <View style={styles.quickActionsCard}>
         <Text style={styles.quickActionsTitle}>{t("sos.quickActions")}</Text>
         <View style={styles.quickActionsGrid}>
-          {/* Call 112 */}
+          {/* Call emergency services */}
           <Pressable
             style={styles.quickActionBtn}
-            onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call("112"); }}
+            onPress={() => { Haptics?.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => null); call(emergencyNumber); }}
             accessibilityRole="button"
-            accessibilityLabel={t("sos.quickActionCall")}
+            accessibilityLabel={`${t("sos.quickActionCall")} ${emergencyNumber}`}
           >
             <Text style={styles.quickActionEmoji}>📞</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")}</Text>
+            <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")} {emergencyNumber}</Text>
           </Pressable>
           {/* Share Location */}
           <Pressable
@@ -941,6 +972,14 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     fontSize: 22,
     letterSpacing: 2,
+  },
+  bigSosNumber: {
+    color: "#fff",
+    fontWeight: "900",
+    fontSize: 30,
+    letterSpacing: 3,
+    marginTop: 2,
+    fontVariant: ["tabular-nums"],
   },
   // ── Quick actions card ───────────────────────────────────────────
   quickActionsCard: {

@@ -20,6 +20,7 @@ import {
     YR_NO_FALLBACK_URL,
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
+import { getCurrentPositionWithTimeout } from "./location";
 import { fetchOverpass, withRetry } from "./overpass";
 import { type RoadAlert, ROAD_TYPES, haversineKm } from "./roads";
 import { useSettings } from "./settings";
@@ -97,7 +98,7 @@ export function useRiderHQ(): RiderHQState {
         return;
       }
 
-      const position = await Location.getCurrentPositionAsync({
+      const position = await getCurrentPositionWithTimeout({
         accuracy: Location.Accuracy.High,
       });
       if (activeCallRef.current !== callId) return;

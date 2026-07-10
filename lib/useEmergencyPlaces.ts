@@ -17,6 +17,7 @@ import {
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
 import { storage } from "./storage";
+import { getCurrentPositionWithTimeout } from "./location";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -119,7 +120,16 @@ export function useEmergencyPlaces() {
         return;
       }
 
-      const pos = await Location.getCurrentPositionAsync({
+      // Distinguish "location services off" from other failures so the user
+      // gets a clear message instead of an opaque error.
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (activeCallRef.current !== callId) return;
+      if (!servicesEnabled) {
+        setError(t("sos.locationError"));
+        return;
+      }
+
+      const pos = await getCurrentPositionWithTimeout({
         accuracy: Location.Accuracy.Balanced,
       });
       if (activeCallRef.current !== callId) return;

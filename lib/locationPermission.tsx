@@ -60,6 +60,14 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
     const current = await Location.getForegroundPermissionsAsync();
     if (current.status === "granted") return current;
 
+    // Permanently denied at the OS level: re-showing the disclosure would just
+    // lead to an OS dialog that silently returns denied. Return denied directly
+    // so the caller can surface its "location unavailable" message instead of
+    // looping the user through the modal.
+    if (current.status === "denied" && current.canAskAgain === false) {
+      return current;
+    }
+
     // If a disclosure is already showing, reuse its Promise so we don't open a
     // second modal or overwrite resolveRef.
     if (!pendingRef.current) {
@@ -95,6 +103,11 @@ export function LocationPermissionProvider({ children }: { children: ReactNode }
       return { status: Location.PermissionStatus.DENIED, granted: false, canAskAgain: false, expires: "never" };
     }
     if (current.status === "granted") return current;
+
+    // Permanently denied: don't loop the disclosure → silent OS denial.
+    if (current.status === "denied" && current.canAskAgain === false) {
+      return current;
+    }
 
     // If a disclosure is already showing (e.g. a concurrent foreground request),
     // reuse the same Promise so we never open a second modal or overwrite

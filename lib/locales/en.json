@@ -81,9 +81,10 @@
     "lastUpdated": "Last updated {{time}}",
     "roadConditions": "🚧 Road Conditions",
     "roadConditionsLoading": "Checking road conditions…",
-    "roadConditionsNone": "✅ No roadworks detected within {{radius}} km.",
-    "roadConditionsCount": "{{count}} roadwork(s) detected within {{radius}} km",
+    "roadConditionsNone": "✅ No roadworks detected within {{radius}}.",
+    "roadConditionsCount": "{{count}} roadwork(s) detected within {{radius}}",
     "openTrafficMap": "LIVE TRAFFIC MAP",
+    "tapToOpenMaps": "Tap to open in Maps",
     "roadTypes": {
       "service": "Service Road",
       "residential": "Residential Road",
@@ -367,6 +368,7 @@
     "updateAvailable": "⬇️ Update available — installing…",
     "updateLatest": "✅ You're up to date",
     "updateError": "❌ Update check failed",
+    "updateRestart": "⬇️ Update ready — tap to restart",
     "privacyPolicyLink": "📄 Privacy Policy",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Your current location address is reverse-geocoded using the Nominatim API (OpenStreetMap). No API key required."
