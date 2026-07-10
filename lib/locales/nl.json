@@ -77,6 +77,8 @@
     "sunrise": "Zonsopgang",
     "sunset": "Zonsondergang",
     "daylight": "Daglicht",
+    "polarDay": "☀️ Middernachtzon — de hele dag licht",
+    "polarNight": "🌙 Poolnacht — de zon komt vandaag niet op",
     "openWeather": "WEER OPENEN",
     "lastUpdated": "Laatst bijgewerkt {{time}}",
     "roadConditions": "🚧 Wegomstandigheden",

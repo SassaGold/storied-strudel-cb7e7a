@@ -3,17 +3,29 @@
 
 import { StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { type SunTimes, formatTime, formatDuration } from "../lib/sun";
+import { type SunTimes, type PolarState, formatTime, formatDuration } from "../lib/sun";
 
 type Props = {
   sunTimes: SunTimes;
+  polarState?: PolarState | null;
 };
 
 /** Renders the sunrise, sunset and total daylight duration card. */
-export function SunCard({ sunTimes }: Props) {
+export function SunCard({ sunTimes, polarState }: Props) {
   const { t } = useTranslation();
 
-  if (!sunTimes) return null;
+  // Polar day/night: no sunrise/sunset to show — explain why instead of hiding.
+  if (!sunTimes) {
+    if (!polarState) return null;
+    return (
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{t("home.sunriseSunset")}</Text>
+        <Text style={styles.polarText}>
+          {polarState === "polar-day" ? t("home.polarDay") : t("home.polarNight")}
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.card}>
@@ -80,4 +92,5 @@ const styles = StyleSheet.create({
   sunTimesEmoji: { fontSize: 22, marginBottom: 4 },
   sunTimesValue: { color: "#ff6600", fontSize: 16, fontWeight: "800" },
   sunTimesLabel: { color: "#666666", fontSize: 12, marginTop: 2 },
+  polarText: { color: "#c8c8c8", fontSize: 14, marginTop: 10, lineHeight: 20 },
 });

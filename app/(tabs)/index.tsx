@@ -54,6 +54,7 @@ export default function Index() {
     lastUpdated,
     roadAlerts,
     sunTimes,
+    sunState,
     weatherUrl,
     loadData,
     cancelSearch,
@@ -289,7 +290,7 @@ export default function Index() {
       {weather && <WeatherCard weather={weather} weatherUrl={weatherUrl} />}
 
       {/* ── Sunrise / sunset ──────────────────────────────────────── */}
-      {sunTimes && <SunCard sunTimes={sunTimes} />}
+      {location && <SunCard sunTimes={sunTimes} polarState={sunState} />}
 
       {lastUpdated && (
         <Text style={styles.metaText}>

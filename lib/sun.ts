@@ -68,6 +68,41 @@ export function computeSunTimes(
   return { sunrise, sunset, daylightMinutes };
 }
 
+export type PolarState = "polar-day" | "polar-night";
+
+/**
+ * For polar locations where the sun does not cross the horizon, returns which
+ * state applies — "polar-day" (midnight sun) or "polar-night" (no sunrise) — or
+ * null for normal locations that do have a sunrise/sunset. Lets the UI show a
+ * meaningful message instead of hiding the sun card entirely.
+ */
+export function computeSunState(
+  lat: number,
+  lon: number,
+  date: Date = new Date()
+): PolarState | null {
+  const DEG = Math.PI / 180;
+  const zenith = 90.833;
+  const doy = Math.floor(
+    (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
+      Date.UTC(date.getFullYear(), 0, 0)) /
+      86400000
+  );
+  const lngHour = lon / 15;
+  const t = doy + (6 - lngHour) / 24;
+  const M = 0.9856 * t - 3.289;
+  let L = M + 1.916 * Math.sin(M * DEG) + 0.02 * Math.sin(2 * M * DEG) + 282.634;
+  L = ((L % 360) + 360) % 360;
+  const sinDec = 0.39782 * Math.sin(L * DEG);
+  const cosDec = Math.cos(Math.asin(sinDec));
+  const cosH =
+    (Math.cos(zenith * DEG) - sinDec * Math.sin(lat * DEG)) /
+    (cosDec * Math.cos(lat * DEG));
+  if (cosH > 1) return "polar-night"; // sun never rises
+  if (cosH < -1) return "polar-day"; // midnight sun
+  return null;
+}
+
 // ── Display helpers ───────────────────────────────────────────────────────────
 
 /** Format a Date as HH:MM (24-hour clock). Returns "--:--" on failure. */

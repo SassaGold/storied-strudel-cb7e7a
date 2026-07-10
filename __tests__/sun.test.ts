@@ -2,10 +2,28 @@
 
 import {
   computeSunTimes,
+  computeSunState,
   formatTime,
   formatDuration,
   formatForecastDate,
 } from "../lib/sun";
+
+// ── computeSunState ───────────────────────────────────────────────────────────
+
+describe("computeSunState", () => {
+  // Svalbard (78°N) — midnight sun in summer, polar night in winter.
+  it("returns polar-day for a high-Arctic location at midsummer", () => {
+    expect(computeSunState(78, 15, new Date("2024-06-21T12:00:00Z"))).toBe("polar-day");
+  });
+
+  it("returns polar-night for a high-Arctic location at midwinter", () => {
+    expect(computeSunState(78, 15, new Date("2024-12-21T12:00:00Z"))).toBe("polar-night");
+  });
+
+  it("returns null for a mid-latitude location with a normal sunrise/sunset", () => {
+    expect(computeSunState(51.5, 0, new Date("2024-06-21T12:00:00Z"))).toBeNull();
+  });
+});
 
 // ── computeSunTimes ───────────────────────────────────────────────────────────
 

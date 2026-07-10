@@ -77,6 +77,8 @@
     "sunrise": "Sólarupprás",
     "sunset": "Sólsetur",
     "daylight": "Dagsbirt",
+    "polarDay": "☀️ Miðnætursól — bjart allan sólarhringinn",
+    "polarNight": "🌙 Skammdegi — sólin kemur ekki upp í dag",
     "openWeather": "OPNA VEDUR.IS",
     "lastUpdated": "Síðast uppfært {{time}}",
     "roadConditions": "🚧 Vegaskilyrði",

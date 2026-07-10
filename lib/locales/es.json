@@ -77,6 +77,8 @@
     "sunrise": "Amanecer",
     "sunset": "Atardecer",
     "daylight": "Luz del día",
+    "polarDay": "☀️ Sol de medianoche — luz de día las 24 horas",
+    "polarNight": "🌙 Noche polar — el sol no sale hoy",
     "openWeather": "VER PRONÓSTICO YR",
     "lastUpdated": "Actualizado {{time}}",
     "roadConditions": "🚧 Condiciones de la carretera",

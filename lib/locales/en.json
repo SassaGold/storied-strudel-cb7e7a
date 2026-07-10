@@ -77,6 +77,8 @@
     "sunrise": "Sunrise",
     "sunset": "Sunset",
     "daylight": "Daylight",
+    "polarDay": "☀️ Midnight sun — daylight around the clock",
+    "polarNight": "🌙 Polar night — the sun stays below the horizon",
     "openWeather": "OPEN WEATHER",
     "lastUpdated": "Last updated {{time}}",
     "roadConditions": "🚧 Road Conditions",

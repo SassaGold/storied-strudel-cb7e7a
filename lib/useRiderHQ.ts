@@ -25,7 +25,7 @@ import { storage } from "./storage";
 import { fetchOverpass, withRetry } from "./overpass";
 import { type RoadAlert, ROAD_TYPES, haversineKm } from "./roads";
 import { useSettings } from "./settings";
-import { type SunTimes, computeSunTimes } from "./sun";
+import { type SunTimes, type PolarState, computeSunTimes, computeSunState } from "./sun";
 import {
     type ForecastDay,
     type HourlyForecast,
@@ -61,6 +61,8 @@ export type RiderHQState = {
   lastUpdated: Date | null;
   roadAlerts: RoadAlert[];
   sunTimes: SunTimes;
+  /** Polar day/night state when there is no sunrise/sunset, else null. */
+  sunState: PolarState | null;
   /** Deep-link URL to yr.no forecast for current location */
   weatherUrl: string;
   loadData: () => Promise<void>;
@@ -333,6 +335,16 @@ export function useRiderHQ(): RiderHQState {
     [location]
   );
 
+  // When there is no sunrise/sunset (polar day/night), which case applies —
+  // so the sun card can explain it instead of vanishing.
+  const sunState = useMemo(
+    () =>
+      location && !sunTimes
+        ? computeSunState(location.coords.latitude, location.coords.longitude)
+        : null,
+    [location, sunTimes]
+  );
+
   const weatherUrl = location
     ? `${YR_NO_BASE_URL}/${encodeURIComponent(
         `${location.coords.latitude.toFixed(4)},${location.coords.longitude.toFixed(4)}`
@@ -348,6 +360,7 @@ export function useRiderHQ(): RiderHQState {
     lastUpdated,
     roadAlerts,
     sunTimes,
+    sunState,
     weatherUrl,
     loadData,
     cancelSearch,

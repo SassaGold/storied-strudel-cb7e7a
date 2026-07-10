@@ -77,6 +77,8 @@
     "sunrise": "Lever",
     "sunset": "Coucher",
     "daylight": "Lumière du jour",
+    "polarDay": "☀️ Soleil de minuit — jour permanent",
+    "polarNight": "🌙 Nuit polaire — le soleil ne se lève pas",
     "openWeather": "OUVRIR MÉTÉO YR",
     "lastUpdated": "Mis à jour {{time}}",
     "roadConditions": "🚧 État des routes",

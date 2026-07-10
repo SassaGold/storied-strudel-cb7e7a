@@ -77,6 +77,8 @@
     "sunrise": "Sonnenaufgang",
     "sunset": "Sonnenuntergang",
     "daylight": "Tageslicht",
+    "polarDay": "☀️ Mitternachtssonne — durchgehend Tageslicht",
+    "polarNight": "🌙 Polarnacht — die Sonne bleibt unter dem Horizont",
     "openWeather": "YR-WETTER ÖFFNEN",
     "lastUpdated": "Zuletzt aktualisiert {{time}}",
     "roadConditions": "🚧 Straßenverhältnisse",

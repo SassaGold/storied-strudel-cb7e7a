@@ -77,6 +77,8 @@
     "sunrise": "Solopgang",
     "sunset": "Solnedgang",
     "daylight": "Dagslys",
+    "polarDay": "☀️ Midnatssol — lyst hele døgnet",
+    "polarNight": "🌙 Polarnat — solen står ikke op i dag",
     "openWeather": "ÅBN YR VEJR",
     "lastUpdated": "Sidst opdateret {{time}}",
     "roadConditions": "🚧 Vejforhold",
