@@ -228,21 +228,24 @@
       "fuel": "Tankstationer",
       "parking": "Parkering",
       "clubs_tracks": "Klubber og baner",
-      "atm_bank": "Hæveautomater og banker"
+      "atm_bank": "Hæveautomater og banker",
+      "fitness": "Sport & Fitness"
     },
     "descriptions": {
       "services": "Søger inden for 30 km efter motorcykelforhandlere, reparationsværksteder, dele og tilbehørsbutikker samt udlejningsbutikker. Skriv et navn for at søge direkte i Google Maps.",
       "fuel": "Søger inden for 20 km efter alle benzin-/brændstofstationer. Brændstoftyper vises, hvor tilgængeligt fra OpenStreetMap. Tryk ⛽ Tjek brændstofpriser for at åbne stationen direkte i Google Maps — priser vises der i lande, hvor Google har disse data.",
       "parking": "Søger inden for 5 km efter generel parkering og inden for 10 km efter dedikeret motorcykelparkering.",
       "clubs_tracks": "Søger inden for 50 km efter motorcykelklubber og race-/kørebaner.",
-      "atm_bank": "Søger inden for 5 km efter hæveautomater og bankfilialer — nyttigt på langture, når kontanter er nødvendige."
+      "atm_bank": "Søger inden for 5 km efter hæveautomater og bankfilialer — nyttigt på langture, når kontanter er nødvendige.",
+      "fitness": "Søger inden for 15 km efter fitnesscentre, sportscentre, stadioner, svømmehaller og golfbaner."
     },
     "empty": {
       "services": "Ingen motorcykeltjenester fundet i nærheden.\nPrøv at opdatere din placering eller udvide din søgeradius.",
       "fuel": "Ingen tankstationer fundet endnu. Prøv at opdatere din placering.",
       "parking": "Ingen parkering fundet endnu. Prøv at opdatere din placering.",
       "clubs_tracks": "Ingen MC-klubber eller baner fundet inden for 50 km. Prøv at opdatere din placering.",
-      "atm_bank": "Ingen hæveautomater eller banker fundet i nærheden. Prøv at opdatere din placering."
+      "atm_bank": "Ingen hæveautomater eller banker fundet i nærheden. Prøv at opdatere din placering.",
+      "fitness": "Ingen sports- eller fitnesssteder fundet i nærheden. Prøv at opdatere din placering."
     },
     "searchPlaceholder": "🔍 Søg efter navn…",
     "noSearchResults": "Ingen resultater matcher din søgning.",

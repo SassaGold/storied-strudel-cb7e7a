@@ -228,21 +228,24 @@
       "fuel": "Bensinstationer",
       "parking": "Parkering",
       "clubs_tracks": "Klubbar och banor",
-      "atm_bank": "Bankomater och banker"
+      "atm_bank": "Bankomater och banker",
+      "fitness": "Sport & Träning"
     },
     "descriptions": {
       "services": "Söker inom 30 km efter MC-återförsäljare, reparationsverkstäder, delar och tillbehörsbutiker samt uthyrningsbutiker. Skriv ett namn för att söka direkt i Google Maps.",
       "fuel": "Söker inom 20 km efter alla bensin-/bränsle­stationer. Bränsletyper visas där tillgängligt från OpenStreetMap. Tryck ⛽ Kontrollera bränslepriser för att öppna stationen direkt i Google Maps — priser visas där i länder där Google har dessa uppgifter.",
       "parking": "Söker inom 5 km efter allmän parkering och inom 10 km efter dedikerad MC-parkering.",
       "clubs_tracks": "Söker inom 50 km efter MC-klubbar och tävlings-/körbanor.",
-      "atm_bank": "Söker inom 5 km efter bankomater och bankkontor — praktiskt på långturer när kontanter behövs."
+      "atm_bank": "Söker inom 5 km efter bankomater och bankkontor — praktiskt på långturer när kontanter behövs.",
+      "fitness": "Söker inom 15 km efter gym, träningscenter, sporthallar, arenor, simhallar och golfbanor."
     },
     "empty": {
       "services": "Inga motorcykeltjänster hittades i närheten.\nFörsök uppdatera din plats eller utöka sökradien.",
       "fuel": "Inga bensinstationer hittades ännu. Försök uppdatera din plats.",
       "parking": "Ingen parkering hittades ännu. Försök uppdatera din plats.",
       "clubs_tracks": "Inga MC-klubbar eller banor hittades inom 50 km. Försök uppdatera din plats.",
-      "atm_bank": "Inga bankomater eller banker hittades i närheten. Försök uppdatera din plats."
+      "atm_bank": "Inga bankomater eller banker hittades i närheten. Försök uppdatera din plats.",
+      "fitness": "Inga sport- eller träningsställen hittades i närheten. Försök att uppdatera din plats."
     },
     "searchPlaceholder": "🔍 Sök efter namn…",
     "noSearchResults": "Inga resultat matchar din sökning.",
