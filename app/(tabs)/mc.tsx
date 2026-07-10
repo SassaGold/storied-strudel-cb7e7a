@@ -5,6 +5,7 @@ import {
     ActivityIndicator,
     Linking,
     Pressable,
+    RefreshControl,
     ScrollView,
     StyleSheet,
     Text,
@@ -265,8 +266,20 @@ export default function McScreen() {
 
   const formatNote = (note: string) => (note === "FREE_PARKING" ? t("garage.freeParking") : note);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await loadPlaces(); } finally { setRefreshing(false); }
+  }, [loadPlaces]);
+
   return (
-    <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+      }
+    >
       <PlaceInfoModal
         place={infoPlace}
         wikiExtract={wikiExtract}

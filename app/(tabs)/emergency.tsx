@@ -6,6 +6,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   Share,
   StyleSheet,
@@ -93,6 +94,12 @@ export default function EmergencyScreen() {
   // Quick action state
   const [torchOn, setTorchOn] = useState(false);
   const [instructionsVisible, setInstructionsVisible] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await loadPlaces(); } finally { setRefreshing(false); }
+  }, [loadPlaces]);
 
   // Primary emergency number for the user's country. Seed instantly from the
   // device region (offline, no permission), then refine to the *physical*
@@ -177,6 +184,9 @@ export default function EmergencyScreen() {
     <ScrollView
       style={styles.scrollView}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+      }
     >
       {/* ── Torch Screen Overlay ─────────────────────────────────── */}
       <Modal visible={torchOn} transparent animationType="fade" onRequestClose={() => setTorchOn(false)}>

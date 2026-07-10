@@ -4,10 +4,11 @@
 // cache banner, map/list toggle, map view, list view, and info modal.
 // Screen-specific behaviour is injected via props.
 
-import { useCallback, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -110,10 +111,19 @@ export default function POIScreen({
   const categoryDisplay = (cat: string) =>
     formatCategoryLabel ? formatCategoryLabel(cat) : cat;
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await loadPlaces(); } finally { setRefreshing(false); }
+  }, [loadPlaces]);
+
   return (
     <ScrollView
       style={styles.scrollView}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+      }
     >
       {/* ── Info modal ── */}
       <PlaceInfoModal

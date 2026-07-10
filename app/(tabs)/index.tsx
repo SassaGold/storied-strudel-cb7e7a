@@ -5,6 +5,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -87,6 +88,12 @@ export default function Index() {
     ).catch(() => null);
   }, [location]);
 
+  const [refreshing, setRefreshing] = useState(false);
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await loadData(); } finally { setRefreshing(false); }
+  }, [loadData]);
+
   return (
     <ScrollView
       style={styles.scrollView}
@@ -94,6 +101,9 @@ export default function Index() {
         styles.container,
         { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 40 },
       ]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+      }
     >
       {/* ── Header ───────────────────────────────────────────────── */}
       <View style={styles.header}>
