@@ -4,7 +4,7 @@
 // cache banner, map/list toggle, map view, list view, and info modal.
 // Screen-specific behaviour is injected via props.
 
-import { useCallback, useState, type ReactNode } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -98,11 +98,18 @@ export default function POIScreen({
     searchRadiusKm: settings.searchRadiusKm,
   });
 
-  // Cancel any in-progress search when the user navigates away from this tab.
+  // Auto-load nearby places the first time this tab opens, so first-time users
+  // see results (served instantly from cache when available) instead of an empty
+  // "tap Find" screen. Cancel any in-flight search when they navigate away.
+  const autoLoadedRef = useRef(false);
   useFocusEffect(
     useCallback(() => {
+      if (!autoLoadedRef.current) {
+        autoLoadedRef.current = true;
+        loadPlaces();
+      }
       return () => { cancelSearch(); };
-    }, [cancelSearch])
+    }, [loadPlaces, cancelSearch])
   );
 
   const hapticLight = () =>
