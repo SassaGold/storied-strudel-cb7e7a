@@ -23,16 +23,21 @@ export type DefaultTab =
   | "triplogger"
   | "emergency";
 
+export type PoiView = "list" | "map";
+
 export interface AppSettings {
   unitSystem: UnitSystem;
   searchRadiusKm: number;
   defaultTab: DefaultTab;
+  /** Preferred results layout on the POI/SOS screens. */
+  poiView: PoiView;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
   unitSystem: "metric",
   searchRadiusKm: 5,
   defaultTab: "index",
+  poiView: "list",
 };
 
 const STORAGE_KEY = "app_settings_v1";

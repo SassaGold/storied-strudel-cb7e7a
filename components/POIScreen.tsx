@@ -71,7 +71,7 @@ export default function POIScreen({
   renderExtraModalRows,
 }: POIScreenProps) {
   const { t } = useTranslation();
-  const { settings } = useSettings();
+  const { settings, setSetting } = useSettings();
   const insets = useSafeAreaInsets();
 
   const {
@@ -119,7 +119,7 @@ export default function POIScreen({
     try { await loadPlaces(); } finally { setRefreshing(false); }
   }, [loadPlaces]);
 
-  const [view, setView] = useState<"list" | "map">("list");
+  const view = settings.poiView;
 
   return (
     <ScrollView
@@ -186,7 +186,7 @@ export default function POIScreen({
         <View style={styles.viewToggleRow}>
           <Pressable
             style={[styles.viewToggleBtn, view === "list" && styles.viewToggleBtnActive]}
-            onPress={() => { hapticLight(); setView("list"); }}
+            onPress={() => { hapticLight(); setSetting("poiView", "list"); }}
             accessibilityRole="button"
             accessibilityState={{ selected: view === "list" }}
             accessibilityLabel={t("common.viewList")}
@@ -195,7 +195,7 @@ export default function POIScreen({
           </Pressable>
           <Pressable
             style={[styles.viewToggleBtn, view === "map" && styles.viewToggleBtnActive]}
-            onPress={() => { hapticLight(); setView("map"); }}
+            onPress={() => { hapticLight(); setSetting("poiView", "map"); }}
             accessibilityRole="button"
             accessibilityState={{ selected: view === "map" }}
             accessibilityLabel={t("common.viewMap")}

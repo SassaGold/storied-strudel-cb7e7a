@@ -152,7 +152,7 @@ const fallbackLabel = (category: Category): string => {
 
 export default function McScreen() {
   const { t } = useTranslation();
-  const { settings } = useSettings();
+  const { settings, setSetting } = useSettings();
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
@@ -274,7 +274,7 @@ export default function McScreen() {
     try { await loadPlaces(); } finally { setRefreshing(false); }
   }, [loadPlaces]);
 
-  const [view, setView] = useState<"list" | "map">("list");
+  const view = settings.poiView;
 
   return (
     <ScrollView
@@ -402,7 +402,7 @@ export default function McScreen() {
           <View style={styles.viewToggleRow}>
             <Pressable
               style={[styles.viewToggleBtn, view === "list" && styles.viewToggleBtnActive]}
-              onPress={() => { hapticLight(); setView("list"); }}
+              onPress={() => { hapticLight(); setSetting("poiView", "list"); }}
               accessibilityRole="button"
               accessibilityState={{ selected: view === "list" }}
               accessibilityLabel={t("common.viewList")}
@@ -411,7 +411,7 @@ export default function McScreen() {
             </Pressable>
             <Pressable
               style={[styles.viewToggleBtn, view === "map" && styles.viewToggleBtnActive]}
-              onPress={() => { hapticLight(); setView("map"); }}
+              onPress={() => { hapticLight(); setSetting("poiView", "map"); }}
               accessibilityRole="button"
               accessibilityState={{ selected: view === "map" }}
               accessibilityLabel={t("common.viewMap")}

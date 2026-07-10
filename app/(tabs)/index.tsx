@@ -263,11 +263,13 @@ export default function Index() {
             Lat {location.coords.latitude.toFixed(5)} · Lon{" "}
             {location.coords.longitude.toFixed(5)}
           </Text>
-          <Text style={styles.metaText}>
-            {t("home.accuracy", {
-              value: Math.round(location.coords.accuracy ?? 0),
-            })}
-          </Text>
+          {location.coords.accuracy != null && (
+            <Text style={styles.metaText}>
+              {t("home.accuracy", {
+                value: Math.round(location.coords.accuracy),
+              })}
+            </Text>
+          )}
           <Pressable
             style={styles.secondaryButton}
             onPress={() => {
@@ -294,7 +296,7 @@ export default function Index() {
 
       {lastUpdated && (
         <Text style={styles.metaText}>
-          {t("home.lastUpdated", { time: lastUpdated.toLocaleTimeString() })}
+          {t("home.lastUpdated", { time: lastUpdated.toLocaleTimeString(i18n.language, { hour: "2-digit", minute: "2-digit" }) })}
         </Text>
       )}
 
