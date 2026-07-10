@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -82,11 +82,18 @@ export default function EmergencyScreen() {
   const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch } =
     useEmergencyPlaces();
 
-  // Cancel any in-progress search when the user navigates away from this tab.
+  // Auto-load nearby emergency services the first time the SOS screen opens, so
+  // hospitals/police are ready without the user tapping "Find" under stress.
+  // Cancel any in-progress search when they navigate away.
+  const autoLoadedRef = useRef(false);
   useFocusEffect(
     useCallback(() => {
+      if (!autoLoadedRef.current) {
+        autoLoadedRef.current = true;
+        loadPlaces();
+      }
       return () => { cancelSearch(); };
-    }, [cancelSearch])
+    }, [loadPlaces, cancelSearch])
   );
 
   // UI state
