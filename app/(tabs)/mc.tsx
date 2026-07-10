@@ -93,6 +93,31 @@ const CATEGORY_ICONS: Record<Category, string> = {
   atm_bank:     "🏧",
 };
 
+// ── Category display ───────────────────────────────────────────────────────────
+
+/** Emoji + readable name for the OSM values returned across MC categories. */
+const MC_CATEGORY_LABEL: Record<string, string> = {
+  fuel: "⛽ Fuel Station",
+  car_repair: "🔧 Car Repair",
+  motorcycle_repair: "🏍️ MC Repair",
+  motorcycle: "🏍️ Motorcycle Shop",
+  bicycle: "🚲 Bicycle Shop",
+  car_parts: "🔩 Car Parts",
+  tyres: "🛞 Tyres",
+  parking: "🅿️ Parking",
+  atm: "🏧 ATM",
+  bank: "🏦 Bank",
+  stadium: "🏟️ Stadium",
+  sports_centre: "🏟️ Sports Centre",
+  track: "🏁 Track",
+  fitness_centre: "💪 Fitness Centre",
+  golf_course: "⛳ Golf Course",
+};
+
+const formatMcCategory = (category: string): string =>
+  MC_CATEGORY_LABEL[category] ??
+  `🔧 ${category.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}`;
+
 // ── OSM item mapping ───────────────────────────────────────────────────────────
 
 const mapMcElement = (
@@ -291,6 +316,7 @@ export default function McScreen() {
         onClose={closeInfo}
         mapsButtonLabel={mapsButtonLabel}
         formatNote={formatNote}
+        formatCategoryLabel={formatMcCategory}
       />
       <View style={styles.header}>
         <View style={styles.headerGlow} />
@@ -444,7 +470,7 @@ export default function McScreen() {
                 <View style={styles.placeInfo}>
                   <Text style={styles.bodyText}>{place.name}</Text>
                   <View style={styles.tagRow}>
-                    <Text style={styles.metaText}>{place.category}</Text>
+                    <Text style={styles.metaText}>{formatMcCategory(place.category)}</Text>
                     {place.note && (
                       <Text style={styles.highlightTag}>{place.note === "FREE_PARKING" ? t("garage.freeParking") : place.note}</Text>
                     )}
