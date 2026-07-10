@@ -21,6 +21,20 @@ const CACHE_KEY = "cache_hotels_v2";
 
 const buildSearchQuery = () => SEARCH_QUERY;
 
+/** Emoji + readable name for the accommodation category buckets. */
+const CATEGORY_LABEL: Record<string, string> = {
+  hotel: "🏨 Hotel",
+  motel: "🏩 Motel",
+  hostel: "🛏️ Hostel",
+  guest_house: "🏡 Guest House",
+  camp_site: "🏕️ Campsite",
+  resort: "🏖️ Resort",
+};
+
+const formatCategory = (category: string): string =>
+  CATEGORY_LABEL[category] ??
+  `🛏️ ${category.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}`;
+
 const mapPlaceItem = (item: OsmPlaceItem, userLat: number, userLon: number): Place | null => {
   const lat = item.position?.lat;
   const lon = item.position?.lng;
@@ -56,6 +70,7 @@ export default function HotelsScreen() {
       buildSearchQuery={buildSearchQuery}
       mapPlaceItem={mapPlaceItem}
       i18nPrefix="sleep"
+      formatCategoryLabel={formatCategory}
       renderExtraListTag={(place) =>
         place.stars ? (
           <Text style={{ color: "#ff6600", fontSize: 12, fontWeight: "700" }}>
