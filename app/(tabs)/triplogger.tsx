@@ -22,7 +22,8 @@ import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
 import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
-import { OSM_TILE_URL, OSM_USER_AGENT, TRIP_MAX_GPS_ACCURACY_M } from "../../lib/config";
+import { OSM_USER_AGENT, TRIP_MAX_GPS_ACCURACY_M } from "../../lib/config";
+import { boundsOf, buildTiles, computeTileLayout, padBounds, projectToScreen } from "../../lib/osmTiles";
 import { mapMatchRoute, downsampleCoords } from "../../lib/mapMatch";
 import { storage } from "../../lib/storage";
 import {
@@ -105,8 +106,11 @@ export default function TripLoggerScreen() {
     if (recording) return;
     let active = true;
     const startLiveWatch = async () => {
-      const { status } = await requestForegroundPermission();
-      if (!active || status === "denied") return;
+      // Check-only: don't pop the OS permission dialog just because the tab
+      // was opened. The prompt (with disclosure) happens when Start is tapped;
+      // the idle speedometer simply stays at rest until permission exists.
+      const { status } = await Location.getForegroundPermissionsAsync();
+      if (!active || status !== "granted") return;
       liveSpeedWatchRef.current = await Location.watchPositionAsync(
         { accuracy: Location.Accuracy.Balanced, timeInterval: 1500 },
         (loc) => {
@@ -138,7 +142,7 @@ export default function TripLoggerScreen() {
       liveSpeedWatchRef.current?.remove();
       liveSpeedWatchRef.current = null;
     };
-  }, [requestForegroundPermission, recording]);
+  }, [recording]);
 
   // Release the recording watcher and keep-awake lock if the screen unmounts
   // mid-ride so they don't leak (the checkpoint above allows later recovery).
@@ -868,16 +872,10 @@ const StatBox = memo(function StatBox({
   );
 });
 
-// ── OSM tile helpers ──────────────────────────────────────────────────────────
-
-/** Standard OSM/Web Mercator tile size in pixels. */
-const TILE_PX = 256;
-
-/** Highest zoom level considered when auto-selecting a zoom for the route preview. */
-const MAX_TILE_ZOOM = 16;
-
-/** Lowest zoom level considered when auto-selecting a zoom for the route preview. */
-const MIN_TILE_ZOOM = 5;
+// ── RideMapPreview ────────────────────────────────────────────────────────────
+// Tile math comes from lib/osmTiles.ts (shared with POIMap); the preview keeps
+// its historical parameters via TileLayoutOptions: a fixed 4×3 tile cap and a
+// minimum zoom of 5.
 
 /** Maximum number of tiles allowed horizontally in the preview grid. */
 const MAX_TILES_ACROSS = 4;
@@ -885,36 +883,8 @@ const MAX_TILES_ACROSS = 4;
 /** Maximum number of tiles allowed vertically in the preview grid. */
 const MAX_TILES_DOWN = 3;
 
-/** Fractional tile X for a longitude at zoom z. */
-const lngToTileFrac = (lng: number, z: number): number =>
-  ((lng + 180) / 360) * Math.pow(2, z);
-
-/** Fractional tile Y for a latitude at zoom z (Web Mercator). */
-const latToTileFrac = (lat: number, z: number): number => {
-  const sinLat = Math.sin((lat * Math.PI) / 180);
-  return (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * Math.pow(2, z);
-};
-
-/** Build a tile image URL from the OSM template. */
-const tileUrl = (z: number, x: number, y: number): string =>
-  OSM_TILE_URL.replace("{z}", String(z)).replace("{x}", String(x)).replace("{y}", String(y));
-
-/**
- * Choose the highest zoom level where the padded bounding box fits within
- * at most `MAX_TILES_ACROSS` tiles horizontally and `MAX_TILES_DOWN` vertically.
- */
-const chooseBestZoom = (
-  minLat: number, maxLat: number, minLon: number, maxLon: number,
-): number => {
-  for (let z = MAX_TILE_ZOOM; z >= MIN_TILE_ZOOM; z--) {
-    const tileW = lngToTileFrac(maxLon, z) - lngToTileFrac(minLon, z);
-    const tileH = latToTileFrac(minLat, z) - latToTileFrac(maxLat, z);
-    if (tileW <= MAX_TILES_ACROSS && tileH <= MAX_TILES_DOWN) return z;
-  }
-  return MIN_TILE_ZOOM;
-};
-
-// ── RideMapPreview ────────────────────────────────────────────────────────────
+/** Lowest zoom level considered when auto-selecting a zoom for the route preview. */
+const MIN_PREVIEW_ZOOM = 5;
 
 /** Height reserved for the modal header when the map is shown full-screen. */
 const FULLSCREEN_MAP_HEADER_OFFSET = 100;
@@ -948,79 +918,31 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
   );
 
   // Find the padded bounding box that contains the whole route.
-  const bounds = useMemo(() => {
-    let minLat = pts[0].latitude, maxLat = pts[0].latitude;
-    let minLon = pts[0].longitude, maxLon = pts[0].longitude;
-    for (const p of pts) {
-      if (p.latitude < minLat) minLat = p.latitude;
-      if (p.latitude > maxLat) maxLat = p.latitude;
-      if (p.longitude < minLon) minLon = p.longitude;
-      if (p.longitude > maxLon) maxLon = p.longitude;
-    }
-    // Pad the bounding box to show map context around the route.
-    const latPad = (maxLat - minLat) * ROUTE_PAD || 0.005;
-    const lonPad = (maxLon - minLon) * ROUTE_PAD || 0.005;
-    return {
-      padMinLat: minLat - latPad,
-      padMaxLat: maxLat + latPad,
-      padMinLon: minLon - lonPad,
-      padMaxLon: maxLon + lonPad,
-    };
+  const paddedBounds = useMemo(() => {
+    const b = boundsOf(pts);
+    return b ? padBounds(b, ROUTE_PAD, 0.005) : null;
   }, [pts]);
-  const { padMinLat, padMaxLat, padMinLon, padMaxLon } = bounds;
 
   const [containerWidth, setContainerWidth] = useState(0);
 
   // Compute tile grid and scale when container size is known
   const layout = useMemo(() => {
-    if (containerWidth === 0) return null;
-    const z = chooseBestZoom(padMinLat, padMaxLat, padMinLon, padMaxLon);
-    const txMinFrac = lngToTileFrac(padMinLon, z);
-    const txMaxFrac = lngToTileFrac(padMaxLon, z);
-    const tyMinFrac = latToTileFrac(padMaxLat, z); // smaller y = more northern
-    const tyMaxFrac = latToTileFrac(padMinLat, z);
-    const txStart = Math.floor(txMinFrac);
-    const txEnd = Math.floor(txMaxFrac);
-    const tyStart = Math.floor(tyMinFrac);
-    const tyEnd = Math.floor(tyMaxFrac);
-    // Natural canvas size if tiles were rendered at full resolution
-    const worldW = (txEnd - txStart + 1) * TILE_PX;
-    const worldH = (tyEnd - tyStart + 1) * TILE_PX;
-    // Scale to fit container (preserve aspect ratio)
-    const scale = Math.min(containerWidth / worldW, MAP_HEIGHT / worldH);
-    const offsetX = (containerWidth - worldW * scale) / 2;
-    const offsetY = (MAP_HEIGHT - worldH * scale) / 2;
-    return { z, txStart, tyStart, txEnd, tyEnd, scale, offsetX, offsetY };
-  }, [containerWidth, padMinLat, padMaxLat, padMinLon, padMaxLon, MAP_HEIGHT]);
+    if (!paddedBounds) return null;
+    return computeTileLayout(paddedBounds, containerWidth, MAP_HEIGHT, {
+      maxAcross: MAX_TILES_ACROSS,
+      maxDown: MAX_TILES_DOWN,
+      minZoom: MIN_PREVIEW_ZOOM,
+    });
+  }, [containerWidth, paddedBounds, MAP_HEIGHT]);
 
   /** Convert a GPS point to screen [x, y] using the same Mercator projection as the tiles. */
   const toScreen = useCallback((p: GpsPoint): [number, number] | null => {
     if (!layout) return null;
-    const { z, txStart, tyStart, scale, offsetX, offsetY } = layout;
-    const x = offsetX + (lngToTileFrac(p.longitude, z) - txStart) * TILE_PX * scale;
-    const y = offsetY + (latToTileFrac(p.latitude, z) - tyStart) * TILE_PX * scale;
-    return [x, y];
+    return projectToScreen(layout, p.latitude, p.longitude);
   }, [layout]);
 
   // Build tile list
-  const tiles = useMemo(() => {
-    if (!layout) return [];
-    const { z, txStart, txEnd, tyStart, tyEnd, scale, offsetX, offsetY } = layout;
-    const renderedSize = TILE_PX * scale;
-    const list: { key: string; url: string; x: number; y: number; size: number }[] = [];
-    for (let tx = txStart; tx <= txEnd; tx++) {
-      for (let ty = tyStart; ty <= tyEnd; ty++) {
-        list.push({
-          key: `${z}-${tx}-${ty}`,
-          url: tileUrl(z, tx, ty),
-          x: offsetX + (tx - txStart) * renderedSize,
-          y: offsetY + (ty - tyStart) * renderedSize,
-          size: renderedSize,
-        });
-      }
-    }
-    return list;
-  }, [layout]);
+  const tiles = useMemo(() => (layout ? buildTiles(layout) : []), [layout]);
 
   // Build route segments
   const segments = useMemo(() => {

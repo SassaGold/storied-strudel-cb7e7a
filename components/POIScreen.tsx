@@ -117,8 +117,16 @@ export default function POIScreen({
   const hapticMedium = () =>
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => null);
 
-  const categoryDisplay = (cat: string) =>
-    formatCategoryLabel ? formatCategoryLabel(cat) : cat;
+  // Translate the category via the screen's i18n block (e.g. food.categories.cafe),
+  // falling back to the screen-provided English formatter (or the raw value).
+  // Owning the lookup here means each screen only supplies its plain formatter.
+  const categoryDisplay = useCallback(
+    (cat: string) =>
+      t(`${i18nPrefix}.categories.${cat}`, {
+        defaultValue: formatCategoryLabel ? formatCategoryLabel(cat) : cat,
+      }),
+    [t, i18nPrefix, formatCategoryLabel]
+  );
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
@@ -142,7 +150,7 @@ export default function POIScreen({
         wikiExtract={wikiExtract}
         wikiLoading={wikiLoading}
         onClose={closeInfo}
-        formatCategoryLabel={formatCategoryLabel}
+        formatCategoryLabel={categoryDisplay}
         renderExtraRows={renderExtraModalRows}
       />
 

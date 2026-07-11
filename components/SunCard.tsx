@@ -1,6 +1,7 @@
 // ── components/SunCard.tsx ────────────────────────────────────────────────────
 // Sunrise / sunset / daylight card for the RIDER HQ screen.
 
+import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { type SunTimes, type PolarState, formatTime, formatDuration } from "../lib/sun";
@@ -11,7 +12,8 @@ type Props = {
 };
 
 /** Renders the sunrise, sunset and total daylight duration card. */
-export function SunCard({ sunTimes, polarState }: Props) {
+// memo: HQ screen re-renders on unrelated state; props only change on refresh.
+export const SunCard = memo(function SunCard({ sunTimes, polarState }: Props) {
   const { t } = useTranslation();
 
   // Polar day/night: no sunrise/sunset to show — explain why instead of hiding.
@@ -51,7 +53,7 @@ export function SunCard({ sunTimes, polarState }: Props) {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

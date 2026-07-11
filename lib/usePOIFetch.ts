@@ -11,7 +11,7 @@ import { HTTP_FETCH_TIMEOUT_MS, OVERPASS_DEFAULT_TIMEOUT_MS, OVERPASS_RETRY_ATTE
 import { fetchOsmPlaces, type OsmPlaceItem } from "./osmPlaces";
 import { useLocationPermission } from "./locationPermission";
 import { CACHE_TTL_MS, fetchWithTimeout, parseWikiTag, withRetry } from "./overpass";
-import { storage } from "./storage";
+import { readTimedCache, writeTimedCache } from "./storage";
 import { getCurrentPositionWithTimeout } from "./location";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -108,20 +108,13 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     } = optionsRef.current;
 
     // Serve cached data immediately so the user sees something while refreshing.
-    try {
-      const raw = await storage.getItem(cacheKey);
-      if (activeCallRef.current !== callId) return;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const ts: number = parsed?.ts;
-        const data: Place[] = parsed?.data;
-        if (Array.isArray(data) && data.length > 0 && typeof ts === "number" && Date.now() - ts < CACHE_TTL_MS) {
-          setPlaces(data);
-          setFromCache(true);
-          setCacheTs(ts);
-        }
-      }
-    } catch {}
+    const hit = await readTimedCache<Place>(cacheKey, CACHE_TTL_MS);
+    if (activeCallRef.current !== callId) return;
+    if (hit) {
+      setPlaces(hit.data);
+      setFromCache(true);
+      setCacheTs(hit.ts);
+    }
 
     if (activeCallRef.current !== callId) return;
     setLoading(true);
@@ -185,9 +178,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       setPlaces(sorted);
       setFromCache(false);
       setCacheTs(null);
-      try {
-        await storage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: sorted }));
-      } catch {}
+      await writeTimedCache(cacheKey, sorted);
     } catch (err) {
       if (activeCallRef.current !== callId) return;
       console.error("[usePOIFetch] loadPlaces failed:", err);

@@ -41,9 +41,9 @@ export function boundsOf(points: { latitude: number; longitude: number }[]): Bou
 }
 
 /** Pad a bounding box by a fraction of its extent (with a small minimum). */
-export function padBounds(b: Bounds, pad = 0.2): Bounds {
-  const latPad = (b.maxLat - b.minLat) * pad || 0.01;
-  const lonPad = (b.maxLon - b.minLon) * pad || 0.01;
+export function padBounds(b: Bounds, pad = 0.2, minPad = 0.01): Bounds {
+  const latPad = (b.maxLat - b.minLat) * pad || minPad;
+  const lonPad = (b.maxLon - b.minLon) * pad || minPad;
   return {
     minLat: b.minLat - latPad,
     maxLat: b.maxLat + latPad,
@@ -53,13 +53,13 @@ export function padBounds(b: Bounds, pad = 0.2): Bounds {
 }
 
 /** Highest zoom where the box fits within `across`×`down` tiles. */
-function chooseBestZoom(b: Bounds, across: number, down: number): number {
-  for (let z = MAX_TILE_ZOOM; z >= MIN_TILE_ZOOM; z--) {
+function chooseBestZoom(b: Bounds, across: number, down: number, minZoom = MIN_TILE_ZOOM): number {
+  for (let z = MAX_TILE_ZOOM; z >= minZoom; z--) {
     const tileW = lngToTileFrac(b.maxLon, z) - lngToTileFrac(b.minLon, z);
     const tileH = latToTileFrac(b.minLat, z) - latToTileFrac(b.maxLat, z);
     if (tileW <= across && tileH <= down) return z;
   }
-  return MIN_TILE_ZOOM;
+  return minZoom;
 }
 
 export type TileLayout = {
@@ -67,6 +67,11 @@ export type TileLayout = {
   txStart: number; tyStart: number; txEnd: number; tyEnd: number;
   scale: number; offsetX: number; offsetY: number;
 };
+
+/** Optional overrides for computeTileLayout (used by the ride route preview,
+ *  which caps its tile grid at a fixed size instead of deriving it from the
+ *  container). */
+export type TileLayoutOptions = { maxAcross?: number; maxDown?: number; minZoom?: number };
 
 /**
  * Compute the tile grid + scale to fit a padded bounding box into a container
@@ -76,11 +81,12 @@ export function computeTileLayout(
   bounds: Bounds,
   containerWidth: number,
   containerHeight: number,
+  opts: TileLayoutOptions = {},
 ): TileLayout | null {
   if (containerWidth <= 0 || containerHeight <= 0) return null;
-  const across = Math.max(1, Math.round(containerWidth / TILE_PX) + 1);
-  const down = Math.max(1, Math.round(containerHeight / TILE_PX) + 1);
-  const z = chooseBestZoom(bounds, across, down);
+  const across = opts.maxAcross ?? Math.max(1, Math.round(containerWidth / TILE_PX) + 1);
+  const down = opts.maxDown ?? Math.max(1, Math.round(containerHeight / TILE_PX) + 1);
+  const z = chooseBestZoom(bounds, across, down, opts.minZoom);
   const txStart = Math.floor(lngToTileFrac(bounds.minLon, z));
   const txEnd = Math.floor(lngToTileFrac(bounds.maxLon, z));
   const tyStart = Math.floor(latToTileFrac(bounds.maxLat, z)); // smaller y = more northern

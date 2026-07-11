@@ -1,4 +1,3 @@
-import { useTranslation } from "react-i18next";
 import POIScreen from "../../components/POIScreen";
 import {
     type OsmPlaceItem,
@@ -66,14 +65,13 @@ const mapPlaceItem = (item: OsmPlaceItem, userLat: number, userLon: number): Pla
 };
 
 export default function AttractionsScreen() {
-  const { t } = useTranslation();
   return (
     <POIScreen
       cacheKey={CACHE_KEY}
       buildSearchQuery={buildSearchQuery}
       mapPlaceItem={mapPlaceItem}
       i18nPrefix="explore"
-      formatCategoryLabel={(cat) => t(`explore.categories.${cat}`, { defaultValue: formatCategory(cat) })}
+      formatCategoryLabel={formatCategory}
     />
   );
 }

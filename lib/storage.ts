@@ -41,3 +41,38 @@ export const storage: AsyncStorageLike = {
     await nativeStorage.removeItem(key);
   },
 };
+
+/**
+ * Read a `{ ts, data }` cache envelope written with `writeTimedCache` (or the
+ * equivalent inline JSON.stringify). Returns null when the key is absent, the
+ * payload is malformed, `data` is empty, or the entry is older than `ttlMs`.
+ * Shared by the POI/emergency/MC screens so the cache format lives in one place.
+ */
+export async function readTimedCache<T>(
+  key: string,
+  ttlMs: number
+): Promise<{ data: T[]; ts: number } | null> {
+  try {
+    const raw = await storage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const ts: number = parsed?.ts;
+    const data: T[] = parsed?.data;
+    if (
+      Array.isArray(data) &&
+      data.length > 0 &&
+      typeof ts === "number" &&
+      Date.now() - ts < ttlMs
+    ) {
+      return { data, ts };
+    }
+  } catch {}
+  return null;
+}
+
+/** Write a `{ ts, data }` cache envelope for `readTimedCache`. Never throws. */
+export async function writeTimedCache<T>(key: string, data: T[]): Promise<void> {
+  try {
+    await storage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  } catch {}
+}

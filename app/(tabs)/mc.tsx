@@ -25,7 +25,7 @@ import {
 } from "../../lib/osmPlaces";
 import { CACHE_TTL_MS, haversineMeters } from "../../lib/overpass";
 import { fmtDistShort, useSettings } from "../../lib/settings";
-import { storage } from "../../lib/storage";
+import { readTimedCache, storage } from "../../lib/storage";
 import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
 import PlaceInfoModal from "../../components/PlaceInfoModal";
 import POIMap from "../../components/POIMap";
@@ -202,27 +202,12 @@ const buildQuery = (category: Category): string => {
   return "atm|bank";
 };
 
+/** Storage key for a category's cached places (also used by usePOIFetch). */
+const mcCacheKey = (category: Category): string => `cache_mc_v2_${category}`;
+
 /** Read a category's cached places; returns null when absent, invalid, or expired. */
-const readMcCache = async (
-  category: Category
-): Promise<{ data: Place[]; ts: number } | null> => {
-  try {
-    const raw = await storage.getItem(`cache_mc_v2_${category}`);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    const ts: number = parsed?.ts;
-    const data: Place[] = parsed?.data;
-    if (
-      Array.isArray(data) &&
-      data.length > 0 &&
-      typeof ts === "number" &&
-      Date.now() - ts < CACHE_TTL_MS
-    ) {
-      return { data, ts };
-    }
-  } catch {}
-  return null;
-};
+const readMcCache = (category: Category) =>
+  readTimedCache<Place>(mcCacheKey(category), CACHE_TTL_MS);
 
 const fallbackLabel = (category: Category): string => {
   if (category === "services") return "MC Service";
@@ -265,7 +250,7 @@ export default function McScreen() {
     openInfo,
     closeInfo,
   } = usePOIFetch({
-    cacheKey: `cache_mc_v2_${selected}`,
+    cacheKey: mcCacheKey(selected),
     buildSearchQuery: () => buildQuery(selected),
     mapPlaceItem: (item, lat, lon) => mapMcElement(item, lat, lon, selected),
     locationErrorMsg: t("garage.locationError"),

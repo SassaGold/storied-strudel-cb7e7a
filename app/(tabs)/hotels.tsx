@@ -70,7 +70,7 @@ export default function HotelsScreen() {
       buildSearchQuery={buildSearchQuery}
       mapPlaceItem={mapPlaceItem}
       i18nPrefix="sleep"
-      formatCategoryLabel={(cat) => t(`sleep.categories.${cat}`, { defaultValue: formatCategory(cat) })}
+      formatCategoryLabel={formatCategory}
       renderExtraListTag={(place) =>
         place.stars ? (
           <Text style={{ color: "#ff6600", fontSize: 12, fontWeight: "700" }}>
