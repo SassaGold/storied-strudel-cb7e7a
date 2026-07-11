@@ -123,92 +123,21 @@ Recommended evidence for Play review:
 
 ## 🚀 Building & Submitting
 
-### Automated (recommended)
-
-Submission is fully automated via GitHub Actions:
-
-| Step | Trigger | Workflow |
-|------|---------|----------|
-| 1. Build production AAB | Push a `v*` tag **or** run "EAS Build" manually | `.github/workflows/eas-build.yml` |
-| 2. Submit to Play Store (internal track) | Runs automatically after "EAS Build" succeeds | `.github/workflows/eas-submit-android.yml` |
-
-To release a new version end-to-end:
+Releases are built with EAS and uploaded to the Play Console manually
+(the previous GitHub Actions build/submit pipeline was removed by choice):
 
 ```bash
 # 1. Bump the version (updates app.json + package.json)
 npm run version:patch   # or version:minor / version:major
 
-# 2. Commit the version bump
-git add app.json package.json
-git commit -m "chore: bump version to $(node -p "require('./package.json').version")"
+# 2. Commit the version bump and merge it to master
 
-# 3. Tag and push — this triggers EAS Build, which then triggers EAS Submit
-git tag v$(node -p "require('./package.json').version")
-git push && git push --tags
+# 3. Build the production AAB (versionCode auto-increments remotely)
+npx eas-cli build --platform android --profile production --non-interactive --no-wait
+
+# 4. Download the AAB from https://expo.dev and upload it in
+#    Google Play Console → Production (or a testing track) → Create release
 ```
 
-After CI submits the build, open **Google Play Console → Testing → Internal testing** and promote the release to the desired track (alpha → beta → production).
-
-#### Required repository secrets
-
-Set these under **Settings → Secrets → Actions** in your GitHub repository:
-
-| Secret | Description |
-|--------|-------------|
-| `EXPO_TOKEN` | Expo personal access token (already needed for EAS Build) |
-| `GOOGLE_SERVICE_ACCOUNT_KEY_JSON` | Base64-encoded Google Play service account JSON key (see below) |
-
-**How to create `GOOGLE_SERVICE_ACCOUNT_KEY_JSON`:**
-
-1. Go to [Google Play Console](https://play.google.com/console) → **Setup → API access**
-2. Link to a Google Cloud project (or create one)
-3. Create a service account with the **Release Manager** role
-4. Download the JSON key file
-5. Base64-encode it and save as a GitHub secret:
-
-```bash
-base64 -w 0 your-service-account-key.json
-# Copy the output and paste it as the GOOGLE_SERVICE_ACCOUNT_KEY_JSON secret value
-```
-
-#### Manual trigger
-
-You can also submit to a specific track without waiting for a build:
-
-1. Go to **Actions → EAS Submit — Android (Play Store)**
-2. Click **Run workflow**
-3. Choose the target track: `internal`, `alpha`, `beta`, or `production`
-
----
-
-### Manual (fallback)
-
-If you prefer to submit manually:
-
-```bash
-# 1. Install EAS CLI
-npm install -g eas-cli
-
-# 2. Log in to your Expo account
-eas login
-
-# 3. Build production AAB (Android App Bundle)
-eas build --profile production --platform android
-
-# 4. Submit the latest build to the internal track
-eas submit --platform android --profile production --latest
-```
-
----
-
-## 📋 App Update Workflow
-
-After first submission, for each new version:
-
-1. Run `npm run version:patch` (or `minor`/`major`) to bump `app.json` + `package.json`
-2. Commit the version bump
-3. Push a `v*` tag — GitHub Actions builds and submits automatically
-4. Promote the internal release to production in Play Console
-
-> **Note:** `"autoIncrement": true` in `eas.json` automatically increments `versionCode` on each EAS production build.
+> **Note:** `"autoIncrement": true` in `eas.json` automatically increments `versionCode` on each EAS production build, so the version bump must be merged to master **before** building.
 

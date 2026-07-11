@@ -415,11 +415,6 @@
     "openLink": "Öppna ↗",
     "legal": "JURIDISKT",
     "legalBody": "All extern data används i enlighet med villkoren och licenserna för varje respektive källa. OpenStreetMap-data används under Open Database License (ODbL). Väderdata från Open-Meteo används under CC BY 4.0.",
-    "updateCheck": "🔄 Sök efter uppdatering",
-    "updateAvailable": "⬇️ Uppdatering tillgänglig — installerar…",
-    "updateLatest": "✅ Du är uppdaterad",
-    "updateError": "❌ Uppdateringskontroll misslyckades",
-    "updateRestart": "⬇️ Uppdatering klar — tryck för att starta om",
     "privacyPolicyLink": "📄 Integritetspolicy",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Din nuvarande adress hämtas via Nominatim API (OpenStreetMap). Ingen API-nyckel krävs."

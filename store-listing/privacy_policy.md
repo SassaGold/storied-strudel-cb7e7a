@@ -77,7 +77,6 @@ The app uses the following third-party services. No personal data is sent to any
 | Overpass API | POI queries | [wiki.openstreetmap.org/wiki/Overpass_API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
 | Open-Meteo | Weather forecasts | [open-meteo.com/en/terms](https://open-meteo.com/en/terms) |
 | Wikipedia REST API | Place descriptions | [wikimedia.org/wiki/Privacy_policy](https://foundation.wikimedia.org/wiki/Privacy_policy) |
-| Expo Updates | Over-the-air app updates | [expo.dev/privacy](https://expo.dev/privacy) |
 
 ---
 
