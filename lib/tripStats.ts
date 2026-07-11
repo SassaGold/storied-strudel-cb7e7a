@@ -2,6 +2,7 @@
 // Route distance/stats math and display helpers, extracted from
 // app/(tabs)/triplogger.tsx so they can be unit-tested without the component.
 
+import { downsampleCoords } from "./mapMatch";
 import { haversineMeters } from "./overpass";
 
 export type GpsPoint = { latitude: number; longitude: number; timestamp: number };
@@ -26,6 +27,13 @@ export const MIN_MOVE_M = 3;
 
 /** Rides shorter than this are discarded as noise on stop (km). */
 export const MIN_RIDE_KM = 0.01;
+
+/** Cap on route points persisted per ride. Distance/stats are computed from
+ *  the full route first; only the stored polyline is thinned. 2000 points is
+ *  one point every ~15 s on an 8-hour ride — well above what the map preview
+ *  (≤500 points) or a GPX consumer needs, while keeping the AsyncStorage blob
+ *  bounded. */
+export const MAX_SAVED_ROUTE_POINTS = 2000;
 
 /** Next stable ride number = one more than the highest existing seq. */
 export const nextRideSeq = (rides: SavedRide[]): number =>
@@ -84,7 +92,7 @@ export const buildRide = (
     distanceKm: Math.round(distanceKm * 100) / 100,
     durationMs,
     avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10,
-    route,
+    route: downsampleCoords(route, MAX_SAVED_ROUTE_POINTS),
     seq,
     ...(maxSpeedKmh != null && maxSpeedKmh > 0
       ? { maxSpeedKmh: Math.round(maxSpeedKmh * 10) / 10 }
