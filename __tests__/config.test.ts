@@ -74,7 +74,10 @@ describe("API URL constants", () => {
 
   it("OSM_TILE_URL is a valid HTTPS URL template containing {z}, {x}, {y} placeholders", () => {
     expect(OSM_TILE_URL).toMatch(/^https:\/\//);
-    expect(OSM_TILE_URL).toContain("openstreetmap.org");
+    // Must NOT point at tile.openstreetmap.org — the OSMF server blocks
+    // distributed apps per its tile usage policy (serves "Access blocked" tiles).
+    expect(OSM_TILE_URL).not.toContain("tile.openstreetmap.org");
+    expect(OSM_TILE_URL).toContain("openstreetmap.de");
     expect(OSM_TILE_URL).toContain("{z}");
     expect(OSM_TILE_URL).toContain("{x}");
     expect(OSM_TILE_URL).toContain("{y}");
