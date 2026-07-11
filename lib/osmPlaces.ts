@@ -62,6 +62,14 @@ export async function fetchOsmPlaces(
   // value across every supported OSM key. "key=value" tokens (e.g.
   // "club=motorcycle", "highway=raceway") match that exact key only — needed for
   // tags that don't live under the generic keys.
+  // Escape regex metacharacters so token values match literally inside the
+  // Overpass regex ["key"~"^(v1|v2)$"]. Double backslash: Overpass QL unescapes
+  // string literals once before the regex engine sees them ("\\." → \. → literal dot).
+  const escapeValue = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\\\$&");
+  // OSM keys are plain identifiers (letters/digits/underscore/colon); anything
+  // else would break out of the quoted key in the query, so reject it.
+  const isSafeKey = (s: string): boolean => /^[A-Za-z0-9_:]+$/.test(s);
+
   const tokens = amenities.split("|").map((s) => s.trim()).filter(Boolean);
   const plainValues: string[] = [];
   const keyedValues: Record<string, string[]> = {};
@@ -70,12 +78,12 @@ export async function fetchOsmPlaces(
     if (eq > 0) {
       const key = tok.slice(0, eq).trim();
       const value = tok.slice(eq + 1).trim();
-      if (key && value) {
+      if (key && value && isSafeKey(key)) {
         if (!keyedValues[key]) keyedValues[key] = [];
-        keyedValues[key].push(value);
+        keyedValues[key].push(escapeValue(value));
       }
     } else {
-      plainValues.push(tok);
+      plainValues.push(escapeValue(tok));
     }
   }
 

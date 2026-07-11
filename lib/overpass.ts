@@ -3,6 +3,7 @@
 
 import {
   EARTH_RADIUS_M,
+  OSM_USER_AGENT,
   OVERPASS_ENDPOINTS,
   OVERPASS_DEFAULT_TIMEOUT_MS,
   CACHE_TTL_MS as CACHE_TTL_MS_CFG,
@@ -87,6 +88,10 @@ export async function fetchOverpass(
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          // OSM usage etiquette: identify the app (also sent to Nominatim,
+          // OSRM and the tile servers). Reduces the risk of being throttled.
+          "User-Agent": OSM_USER_AGENT,
+          Accept: "application/json",
         },
         body: `data=${encodeURIComponent(query)}`,
         signal: controller.signal,
@@ -111,6 +116,31 @@ export async function fetchOverpass(
     }
   }
   throw new Error(lastError ?? "Overpass request failed");
+}
+
+/**
+ * fetch() with an AbortController timeout — a stalled socket otherwise hangs
+ * forever (React Native fetch has no default timeout). Used for all non-Overpass
+ * HTTP calls (Nominatim, Open-Meteo, OSRM, Wikipedia); fetchOverpass has its own
+ * per-mirror timeout handling above.
+ */
+export async function fetchWithTimeout(
+  url: string,
+  init: RequestInit = {},
+  timeoutMs: number = OVERPASS_DEFAULT_TIMEOUT_MS
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("Timeout");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 /**

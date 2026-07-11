@@ -9,11 +9,13 @@
  */
 
 import {
+  HTTP_FETCH_TIMEOUT_MS,
   OSM_USER_AGENT,
   OSRM_MATCH_BASE_URL,
   OSRM_MATCH_RADIUS_M,
   OSRM_MAX_COORDS_PER_REQUEST,
 } from "./config";
+import { fetchWithTimeout } from "./overpass";
 
 type Coordinate = { latitude: number; longitude: number; timestamp?: number };
 
@@ -104,9 +106,13 @@ export async function mapMatchRoute(points: Coordinate[]): Promise<LatLng[]> {
     `?overview=full&geometries=polyline${timestampsParam}${radiusesParam}`;
 
   try {
-    const response = await fetch(url, {
-      headers: { "User-Agent": OSM_USER_AGENT },
-    });
+    // Timeout-guarded: the public OSRM demo server is frequently overloaded and
+    // a stalled socket would otherwise hang this request indefinitely.
+    const response = await fetchWithTimeout(
+      url,
+      { headers: { "User-Agent": OSM_USER_AGENT } },
+      HTTP_FETCH_TIMEOUT_MS
+    );
 
     if (!response.ok) {
       // Fall back to original points on HTTP error

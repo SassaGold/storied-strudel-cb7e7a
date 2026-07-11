@@ -7,10 +7,10 @@
 import * as Location from "expo-location";
 import { useCallback, useRef, useState } from "react";
 import { Linking } from "react-native";
-import { OVERPASS_DEFAULT_TIMEOUT_MS, POI_EXPANDED_RADIUS_FACTOR, POI_MAX_DISPLAY, POI_MAX_RADIUS_M, WIKIPEDIA_SUMMARY_URL } from "./config";
+import { HTTP_FETCH_TIMEOUT_MS, OVERPASS_DEFAULT_TIMEOUT_MS, OVERPASS_RETRY_ATTEMPTS, POI_EXPANDED_RADIUS_FACTOR, POI_MAX_DISPLAY, POI_MAX_RADIUS_M, WIKIPEDIA_SUMMARY_URL } from "./config";
 import { fetchOsmPlaces, type OsmPlaceItem } from "./osmPlaces";
 import { useLocationPermission } from "./locationPermission";
-import { CACHE_TTL_MS, parseWikiTag, withRetry } from "./overpass";
+import { CACHE_TTL_MS, fetchWithTimeout, parseWikiTag, withRetry } from "./overpass";
 import { storage } from "./storage";
 import { getCurrentPositionWithTimeout } from "./location";
 
@@ -156,8 +156,11 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       // Fetch and map POIs within a given radius (metres).
       const fetchWithinRadius = async (radiusM: number): Promise<Place[]> => {
         const amenities = buildSearchQuery(latitude, longitude, radiusM);
+        // OVERPASS_RETRY_ATTEMPTS (not the default 3): fetchOsmPlaces already
+        // cycles Overpass mirrors internally, so retries compound.
         const items = await withRetry(
-          () => fetchOsmPlaces(amenities, latitude, longitude, radiusM, fetchLimit, fetchTimeoutMs)
+          () => fetchOsmPlaces(amenities, latitude, longitude, radiusM, fetchLimit, fetchTimeoutMs),
+          OVERPASS_RETRY_ATTEMPTS
         );
         return items
           .map((item) => mapPlaceItem(item, latitude, longitude))
@@ -208,7 +211,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       setWikiLoading(true);
       const { lang, title } = parseWikiTag(place.wikipedia);
       // Wikipedia REST API — free, no API key required
-      fetch(WIKIPEDIA_SUMMARY_URL(lang, title))
+      fetchWithTimeout(WIKIPEDIA_SUMMARY_URL(lang, title), {}, HTTP_FETCH_TIMEOUT_MS)
         .then((r) => {
           if (!r.ok) throw new Error(`Wikipedia HTTP ${r.status}`);
           return r.json();

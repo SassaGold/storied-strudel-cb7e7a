@@ -37,6 +37,9 @@ export const OVERPASS_DEFAULT_TIMEOUT_MS = 40_000;
 /** Overpass timeout for road-condition queries (faster, smaller result set). */
 export const OVERPASS_ROAD_TIMEOUT_MS = 15_000;
 
+/** Timeout for plain HTTP fetches (Nominatim, Open-Meteo, OSRM, Wikipedia). */
+export const HTTP_FETCH_TIMEOUT_MS = 15_000;
+
 /** Search radius for emergency POIs (metres). */
 export const EMERGENCY_SEARCH_RADIUS_M = 10_000;
 
@@ -93,6 +96,10 @@ export const CACHE_TTL_MS = 30 * 60 * 1_000;
 
 /** Default maximum number of attempts for `withRetry`. */
 export const RETRY_MAX_ATTEMPTS = 3;
+
+/** Retry attempts for Overpass-backed calls: fetchOverpass already cycles up
+ *  to 3 mirrors per attempt, so full retries would compound (3 × 3 × timeout). */
+export const OVERPASS_RETRY_ATTEMPTS = 2;
 
 /** Initial back-off delay for `withRetry` (ms). Doubles on each retry. */
 export const RETRY_INITIAL_DELAY_MS = 500;
