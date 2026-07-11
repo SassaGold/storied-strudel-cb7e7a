@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useState } from "react";
 import { PRIVACY_POLICY_URL } from "../../lib/config";
+import { COLORS } from "../../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -91,7 +92,7 @@ export default function AboutScreen() {
           accessibilityLabel={t("common.back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Ionicons name="arrow-back" size={18} color="#ff6600" />
+          <Ionicons name="arrow-back" size={18} color={COLORS.brand} />
           <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
         </Pressable>
       </View>
@@ -212,7 +213,7 @@ export default function AboutScreen() {
           accessibilityLabel={updateStatus === "ready" ? t("about.updateRestart") : t("about.updateCheck")}
         >
           {updateStatus === "checking" ? (
-            <ActivityIndicator size="small" color="#ff6600" />
+            <ActivityIndicator size="small" color={COLORS.brand} />
           ) : (
             <Text style={styles.updateBtnText}>
               {updateStatus === "ready"    ? t("about.updateRestart") :
@@ -230,7 +231,7 @@ export default function AboutScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0a" },
+  container: { flex: 1, backgroundColor: COLORS.bg },
 
   header: {
     paddingTop: 16,
@@ -238,7 +239,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     backgroundColor: "#111",
     borderBottomWidth: 2,
-    borderBottomColor: "#ff6600",
+    borderBottomColor: COLORS.brand,
   },
   backBtn: {
     alignSelf: "flex-end",
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,102,0,0.35)",
   },
   backBtnLabel: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 13,
     fontWeight: "600",
     letterSpacing: 0.5,
@@ -266,13 +267,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "800",
     letterSpacing: 2,
-    color: "#ff6600",
+    color: COLORS.brand,
     marginBottom: 4,
   },
   title: {
     fontSize: 28,
     fontWeight: "900",
-    color: "#fff",
+    color: COLORS.white,
     letterSpacing: 1,
   },
   subtitle: {
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
 
   section: { marginBottom: 20 },
   sectionTitle: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontWeight: "900",
     fontSize: 12,
     letterSpacing: 2,
@@ -298,12 +299,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     padding: 14,
     marginBottom: 10,
   },
   cardTitle: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "800",
     fontSize: 15,
     marginBottom: 8,
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "#2a2a2a",
+    backgroundColor: COLORS.border,
     marginVertical: 10,
   },
 
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: "#2a2a2a",
+    borderTopColor: COLORS.border,
   },
   linkRowPressed: { opacity: 0.6 },
   linkLabel: {
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     fontFamily: "monospace" as const,
   },
   linkAction: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 12,
     fontWeight: "700",
   },
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   chip: {
-    backgroundColor: "#2a2a2a",
+    backgroundColor: COLORS.border,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   versionValue: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 12,
     fontWeight: "700",
     fontFamily: "monospace" as const,
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
   },
   updateBtnPressed: { opacity: 0.7 },
   updateBtnText: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontWeight: "700",
     fontSize: 14,
   },

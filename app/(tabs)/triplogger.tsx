@@ -34,6 +34,7 @@ import {
   type GpsPoint,
   type SavedRide,
 } from "../../lib/tripStats";
+import { COLORS } from "../../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -343,7 +344,7 @@ export default function TripLoggerScreen() {
             foregroundService: {
               notificationTitle: t("triplog.notifTitle"),
               notificationBody: t("triplog.notifBody"),
-              notificationColor: "#ff6600",
+              notificationColor: COLORS.brand,
             },
           });
         }
@@ -782,9 +783,9 @@ const SpeedGauge = memo(function SpeedGauge({
 
   // Color: green → yellow → orange → red
   const gaugeColor =
-    pct > 0.85 ? "#ef4444" :
+    pct > 0.85 ? COLORS.danger :
     pct > 0.6  ? "#f97316" :
-    pct > 0.3  ? "#fbbf24" : "#22c55e";
+    pct > 0.3  ? "#fbbf24" : COLORS.success;
 
   return (
     <View
@@ -833,7 +834,7 @@ const SpeedGauge = memo(function SpeedGauge({
           alignItems: "center",
           justifyContent: "center",
           borderWidth: 1,
-          borderColor: "#2a2a2a",
+          borderColor: COLORS.border,
         }}
       >
         <Text
@@ -995,7 +996,7 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
               top: seg.my - 1.5,
               width: seg.length,
               height: 3,
-              backgroundColor: "#ff6600",
+              backgroundColor: COLORS.brand,
               transform: [{ rotate: `${seg.angle}deg` }],
             }}
           />
@@ -1010,9 +1011,9 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
           width: 10,
           height: 10,
           borderRadius: 5,
-          backgroundColor: "#22c55e",
+          backgroundColor: COLORS.success,
           borderWidth: 2,
-          borderColor: "#fff",
+          borderColor: COLORS.white,
         }} />
       )}
       {/* End dot (red) */}
@@ -1024,9 +1025,9 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
           width: 10,
           height: 10,
           borderRadius: 5,
-          backgroundColor: "#ef4444",
+          backgroundColor: COLORS.danger,
           borderWidth: 2,
-          borderColor: "#fff",
+          borderColor: COLORS.white,
         }} />
       )}
     </View>
@@ -1034,26 +1035,26 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0a0a0a" },
+  container: { flex: 1, backgroundColor: COLORS.bg },
   header: {
     paddingTop: 16,
     paddingHorizontal: 20,
     paddingBottom: 16,
     backgroundColor: "#111",
     borderBottomWidth: 2,
-    borderBottomColor: "#ff6600",
+    borderBottomColor: COLORS.brand,
   },
   badge: {
     fontSize: 11,
     fontWeight: "800",
     letterSpacing: 2,
-    color: "#ff6600",
+    color: COLORS.brand,
     marginBottom: 4,
   },
   title: {
     fontSize: 28,
     fontWeight: "900",
-    color: "#fff",
+    color: COLORS.white,
     letterSpacing: 1,
   },
   subtitle: {
@@ -1069,7 +1070,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     padding: 20,
     marginBottom: 20,
     alignItems: "center",
@@ -1084,11 +1085,11 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     marginRight: 8,
   },
   trackingText: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontWeight: "800",
     fontSize: 12,
     letterSpacing: 2,
@@ -1115,7 +1116,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 22,
     fontWeight: "900",
-    color: "#ff6600",
+    color: COLORS.brand,
     fontVariant: ["tabular-nums"],
   },
   statUnit: {
@@ -1151,22 +1152,22 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   startBtn: {
-    backgroundColor: "#22c55e",
-    shadowColor: "#22c55e",
+    backgroundColor: COLORS.success,
+    shadowColor: COLORS.success,
   },
   stopBtn: {
-    backgroundColor: "#ef4444",
-    shadowColor: "#ef4444",
+    backgroundColor: COLORS.danger,
+    shadowColor: COLORS.danger,
   },
   mainBtnPressed: { opacity: 0.8 },
   mainBtnText: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "900",
     fontSize: 20,
     letterSpacing: 2,
   },
   errorText: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 13,
     marginBottom: 12,
     textAlign: "center",
@@ -1180,13 +1181,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontWeight: "900",
     fontSize: 13,
     letterSpacing: 2,
   },
   clearAllText: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 12,
     fontWeight: "700",
   },
@@ -1204,13 +1205,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     marginBottom: 14,
     overflow: "hidden",
   },
   rideCardAccent: {
     height: 3,
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     width: "100%",
   },
   rideCardHeader: {
@@ -1223,11 +1224,11 @@ const styles = StyleSheet.create({
   },
   rideTitleBtn: { flexShrink: 1, marginRight: 8 },
   rideTitle: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "800",
     fontSize: 14,
   },
-  rideRenameHint: { color: "#ff6600", fontSize: 13 },
+  rideRenameHint: { color: COLORS.brand, fontSize: 13 },
   rideDate: {
     color: "#666",
     fontSize: 11,
@@ -1247,7 +1248,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   rideStatChipValue: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontWeight: "800",
     fontSize: 14,
     fontVariant: ["tabular-nums"],
@@ -1280,7 +1281,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   rideBtnText: {
-    color: "#22c55e",
+    color: COLORS.success,
     fontSize: 12,
     fontWeight: "700",
   },
@@ -1299,10 +1300,10 @@ const styles = StyleSheet.create({
   },
   mapBtnActive: {
     backgroundColor: "rgba(255,102,0,0.18)",
-    borderColor: "#ff6600",
+    borderColor: COLORS.brand,
   },
   mapBtnText: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 12,
     fontWeight: "700",
   },
@@ -1320,13 +1321,13 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   mapExpandHintText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 11,
     fontWeight: "600",
   },
   mapModal: {
     flex: 1,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
   },
   mapModalHeader: {
     flexDirection: "row",
@@ -1337,10 +1338,10 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     backgroundColor: "#111",
     borderBottomWidth: 2,
-    borderBottomColor: "#ff6600",
+    borderBottomColor: COLORS.brand,
   },
   mapModalTitle: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "700",
   },
@@ -1353,7 +1354,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   mapModalCloseText: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 18,
     fontWeight: "700",
   },
@@ -1376,18 +1377,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     padding: 20,
     width: "100%",
     gap: 14,
   },
-  renameTitle: { color: "#fff", fontSize: 16, fontWeight: "800", letterSpacing: 1 },
+  renameTitle: { color: COLORS.white, fontSize: 16, fontWeight: "800", letterSpacing: 1 },
   renameInput: {
     backgroundColor: "#111",
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.35)",
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 15,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -1396,6 +1397,6 @@ const styles = StyleSheet.create({
   renameBtn: { flex: 1, borderRadius: 8, paddingVertical: 11, alignItems: "center" },
   renameCancelBtn: { backgroundColor: "#111", borderWidth: 1, borderColor: "#333" },
   renameCancelText: { color: "#888", fontWeight: "700", fontSize: 14 },
-  renameSaveBtn: { backgroundColor: "#ff6600" },
+  renameSaveBtn: { backgroundColor: COLORS.brand },
   renameSaveText: { color: "#000", fontWeight: "800", fontSize: 14 },
 });

@@ -36,7 +36,9 @@
     "readWikipedia": "📖 Läs på Wikipedia",
     "cachedResults": "📡 Visar cachade resultat — tryck uppdatera för senaste",
     "fuelTypes": "⛽ Bränsletyper",
-    "cacheAge": "Data från {{count}} min sedan"
+    "cacheAge": "Data från {{count}} min sedan",
+    "ok": "OK",
+    "infoAbout": "Info: {{name}}"
   },
   "language": {
     "label": "🌍 Språk",
@@ -329,7 +331,8 @@
     "quickActionTorch": "Ficklampa",
     "quickActionInstructions": "Instruktioner",
     "locationCopied": "📍 Kopierat!",
-    "locationCopiedMsg": "Din platslänk har kopierats till urklippet."
+    "locationCopiedMsg": "Din platslänk har kopierats till urklippet.",
+    "shareLocationShort": "Dela min plats"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",

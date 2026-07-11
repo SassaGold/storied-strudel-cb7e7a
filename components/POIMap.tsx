@@ -14,6 +14,7 @@ import {
   projectToScreen,
 } from "../lib/osmTiles";
 
+import { COLORS } from "../lib/theme";
 type Marker = { id: string; latitude: number; longitude: number };
 
 type Props<T extends Marker> = {
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
   },
   userDot: {
     position: "absolute",
@@ -105,21 +106,21 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     backgroundColor: "#3b82f6",
     borderWidth: 2,
-    borderColor: "#fff",
+    borderColor: COLORS.white,
   },
   marker: {
     position: "absolute",
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     borderWidth: 2,
-    borderColor: "#fff",
+    borderColor: COLORS.white,
     alignItems: "center",
     justifyContent: "center",
   },
   markerText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 12,
     fontWeight: "900",
   },

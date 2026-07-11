@@ -1,3 +1,4 @@
+import { COLORS } from "./theme";
 // ── Weather utilities ─────────────────────────────────────────────────────────
 // Pure, side-effect-free functions used by the RIDER HQ screen.
 // All functions here are easily unit-testable with no native dependencies.
@@ -191,11 +192,11 @@ export const ridingSuitability = (
 
   score = Math.max(0, Math.min(100, score));
 
-  if (score >= 80) return { score, labelKey: "home.suitability.great", color: "#22c55e" };
+  if (score >= 80) return { score, labelKey: "home.suitability.great", color: COLORS.success };
   if (score >= 60) return { score, labelKey: "home.suitability.good", color: "#84cc16" };
-  if (score >= 40) return { score, labelKey: "home.suitability.fair", color: "#f59e0b" };
+  if (score >= 40) return { score, labelKey: "home.suitability.fair", color: COLORS.warning };
   if (score >= 20) return { score, labelKey: "home.suitability.poor", color: "#f97316" };
-  return { score, labelKey: "home.suitability.dangerous", color: "#ef4444" };
+  return { score, labelKey: "home.suitability.dangerous", color: COLORS.danger };
 };
 
 /**

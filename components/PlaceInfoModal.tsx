@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { parseWikiTag } from "../lib/overpass";
 import { type Place } from "../lib/usePOIFetch";
 
+import { COLORS } from "../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
@@ -32,6 +33,17 @@ export interface PlaceInfoModalProps {
   formatNote?: (note: string) => string;
   /** Extra rows rendered after the category/note rows (e.g. hotel stars). */
   renderExtraRows?: (place: Place) => ReactNode;
+  /** When set and the place has a phone number, a prominent call button is shown
+   *  above the maps action (used by the SOS screen). */
+  callButtonLabel?: string;
+  /** Handler for the call button and the phone-row link. When omitted, taps
+   *  open `tel:` directly. */
+  onCallPhone?: (phone: string) => void;
+  /** Open the maps action at the place's coordinates instead of a name search
+   *  (navigation to a facility, rather than looking up reviews). */
+  mapsUseCoordinates?: boolean;
+  /** Overrides the default "no contact info" message. */
+  noContactInfoText?: string;
 }
 
 export default function PlaceInfoModal({
@@ -43,10 +55,19 @@ export default function PlaceInfoModal({
   formatCategoryLabel,
   formatNote,
   renderExtraRows,
+  callButtonLabel,
+  onCallPhone,
+  mapsUseCoordinates,
+  noContactInfoText,
 }: PlaceInfoModalProps) {
   const { t } = useTranslation();
 
   const close = () => { hapticLight(); onClose(); };
+  const callPhone = (phone: string) => {
+    if (onCallPhone) { onCallPhone(phone); return; }
+    hapticLight();
+    Linking.openURL(`tel:${phone}`).catch(() => null);
+  };
   const categoryLabel = place && (formatCategoryLabel ? formatCategoryLabel(place.category) : place.category);
 
   const hasContactInfo =
@@ -83,7 +104,7 @@ export default function PlaceInfoModal({
               <Text style={styles.modalLabel}>{t("common.phone")}</Text>
               <Text
                 style={styles.modalLink}
-                onPress={() => { hapticLight(); Linking.openURL(`tel:${place.phone}`).catch(() => null); }}
+                onPress={() => callPhone(place.phone!)}
                 accessibilityRole="link"
                 accessibilityLabel={`${t("common.phone")} ${place.phone}`}
               >
@@ -150,7 +171,7 @@ export default function PlaceInfoModal({
           )}
 
           {!hasContactInfo && (
-            <Text style={styles.modalNoInfo}>{t("common.noContactInfo")}</Text>
+            <Text style={styles.modalNoInfo}>{noContactInfoText ?? t("common.noContactInfo")}</Text>
           )}
 
           {place?.wikipedia && wikiLoading && (
@@ -165,9 +186,25 @@ export default function PlaceInfoModal({
           )}
 
           <View style={styles.modalActions}>
+            {callButtonLabel && place?.phone && (
+              <Pressable
+                style={[styles.modalActionButton, styles.modalActionButtonCall]}
+                onPress={() => callPhone(place.phone!)}
+                accessibilityRole="button"
+                accessibilityLabel={callButtonLabel}
+              >
+                <Text style={[styles.modalActionButtonText, styles.modalActionButtonTextCall]}>{callButtonLabel}</Text>
+              </Pressable>
+            )}
             <Pressable
               style={styles.modalActionButton}
-              onPress={() => { hapticLight(); Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place?.name ?? "")}`).catch(() => null); }}
+              onPress={() => {
+                hapticLight();
+                const query = mapsUseCoordinates && place
+                  ? `${place.latitude},${place.longitude}`
+                  : encodeURIComponent(place?.name ?? "");
+                Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`).catch(() => null);
+              }}
               accessibilityRole="button"
               accessibilityLabel={mapsButtonLabel ?? t("common.reviewsGoogle")}
             >
@@ -207,16 +244,16 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   modalCard: {
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     borderRadius: 10,
     padding: 22,
     width: "100%",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     gap: 12,
   },
   modalTitle: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 4,
@@ -228,18 +265,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalLabel: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 13,
   },
   modalValue: {
-    color: "#c8c8c8",
+    color: COLORS.body,
     fontSize: 13,
     fontWeight: "500",
     flexShrink: 1,
     textAlign: "right",
   },
   modalLink: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 13,
     fontWeight: "500",
     flexShrink: 1,
@@ -252,7 +289,7 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   modalLoadingText: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 13,
     fontStyle: "italic",
   },
@@ -288,8 +325,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(250,204,21,0.1)",
     borderColor: "rgba(250,204,21,0.3)",
   },
+  modalActionButtonCall: {
+    backgroundColor: "rgba(239,68,68,0.15)",
+    borderColor: "rgba(239,68,68,0.5)",
+  },
+  modalActionButtonTextCall: {
+    color: COLORS.danger,
+  },
   modalActionButtonText: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -311,13 +355,13 @@ const styles = StyleSheet.create({
     borderColor: "rgba(34,197,94,0.35)",
   },
   fuelTypeBadgeText: {
-    color: "#22c55e",
+    color: COLORS.success,
     fontSize: 11,
     fontWeight: "700",
   },
   modalClose: {
     marginTop: 8,
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     borderRadius: 6,
     paddingVertical: 10,
     alignItems: "center",
