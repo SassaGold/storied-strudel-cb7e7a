@@ -202,6 +202,28 @@ const buildQuery = (category: Category): string => {
   return "atm|bank";
 };
 
+/** Read a category's cached places; returns null when absent, invalid, or expired. */
+const readMcCache = async (
+  category: Category
+): Promise<{ data: Place[]; ts: number } | null> => {
+  try {
+    const raw = await storage.getItem(`cache_mc_v2_${category}`);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    const ts: number = parsed?.ts;
+    const data: Place[] = parsed?.data;
+    if (
+      Array.isArray(data) &&
+      data.length > 0 &&
+      typeof ts === "number" &&
+      Date.now() - ts < CACHE_TTL_MS
+    ) {
+      return { data, ts };
+    }
+  } catch {}
+  return null;
+};
+
 const fallbackLabel = (category: Category): string => {
   if (category === "services") return "MC Service";
   if (category === "fuel") return "Fuel Station";
@@ -263,11 +285,22 @@ export default function McScreen() {
   // save effects below don't overwrite persisted values during startup.
   const initDoneRef = useRef(false);
 
+  // Latest selected category — lets async cache reads bail out if the user
+  // switched tiles again before the read resolved.
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+
+  // Cache-hydration generation. Bumped on every tile switch, Find press and
+  // pull-to-refresh so a slow AsyncStorage read can never overwrite newer
+  // results (e.g. a fresh network fetch) with stale cached data.
+  const hydrateGenRef = useRef(0);
+
   // On mount: restore the last selected category and its cached results so the
   // user sees the same state they left, without having to press "Find" again.
   // All AsyncStorage reads are completed first, then all state updates are
   // applied in one synchronous block so React batches them into a single render.
   useEffect(() => {
+    const gen = hydrateGenRef.current;
     (async () => {
       try {
         const savedSelected = await storage.getItem(MC_SELECTED_KEY);
@@ -277,8 +310,14 @@ export default function McScreen() {
             : "services";
 
         // Populate places from cache (valid entries only — no network request).
-        const cacheKey = `cache_mc_v2_${restoredCategory}`;
-        const raw = await storage.getItem(cacheKey);
+        const hit = await readMcCache(restoredCategory);
+
+        // Bail out if the user already tapped a tile (or searched) while the
+        // restore was in flight — their choice wins over the persisted one.
+        if (hydrateGenRef.current !== gen) {
+          initDoneRef.current = true;
+          return;
+        }
 
         // Apply all state updates in one synchronous block so that React
         // batches them into a single render, preventing an intermediate render
@@ -286,20 +325,10 @@ export default function McScreen() {
         if (restoredCategory !== "services") {
           setSelected(restoredCategory);
         }
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          const ts: number = parsed?.ts;
-          const data: Place[] = parsed?.data;
-          if (
-            Array.isArray(data) &&
-            data.length > 0 &&
-            typeof ts === "number" &&
-            Date.now() - ts < CACHE_TTL_MS
-          ) {
-            setPlaces(data);
-            setFromCache(true);
-            setCacheTs(ts);
-          }
+        if (hit) {
+          setPlaces(hit.data);
+          setFromCache(true);
+          setCacheTs(hit.ts);
         }
       } catch {}
       initDoneRef.current = true;
@@ -334,6 +363,7 @@ export default function McScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    hydrateGenRef.current++; // invalidate any in-flight cache hydration
     try { await loadPlaces(); } finally { setRefreshing(false); }
   }, [loadPlaces]);
 
@@ -386,6 +416,17 @@ export default function McScreen() {
                 setPlaces([]);
                 setError(null);
                 setNameSearch("");
+                // Hydrate the newly selected category from its cache (if fresh)
+                // so previously found results reappear without pressing "Find".
+                // The generation check also protects against a slow read
+                // resolving after the user has started a fresh search.
+                const gen = ++hydrateGenRef.current;
+                readMcCache(key).then((hit) => {
+                  if (!hit || selectedRef.current !== key || hydrateGenRef.current !== gen) return;
+                  setPlaces(hit.data);
+                  setFromCache(true);
+                  setCacheTs(hit.ts);
+                });
               }}
               accessibilityRole="button"
               accessibilityLabel={t(`garage.titles.${key}`)}
@@ -401,7 +442,7 @@ export default function McScreen() {
 
       <Pressable
         style={[styles.primaryButton, loading && styles.primaryButtonDisabled]}
-        onPress={() => { hapticMedium(); loadPlaces(); }}
+        onPress={() => { hapticMedium(); hydrateGenRef.current++; loadPlaces(); }}
         disabled={loading}
         accessibilityRole="button"
         accessibilityLabel={t("garage.findButton", { title: sectionTitle })}

@@ -196,7 +196,15 @@
     "searching": "Nabije accommodatie zoeken…",
     "locationError": "Locatietoestemming vereist voor accommodatie.",
     "loadError": "Accommodatie kon niet worden geladen. Probeer opnieuw.",
-    "noResults": "Geen slaapplaatsen gevonden. Tik op de knop om te zoeken."
+    "noResults": "Geen slaapplaatsen gevonden. Tik op de knop om te zoeken.",
+    "categories": {
+      "hotel": "🏨 Hotel",
+      "motel": "🏩 Motel",
+      "hostel": "🛏️ Hostel",
+      "guest_house": "🏡 Pension",
+      "camp_site": "🏕️ Camping",
+      "resort": "🏖️ Resort"
+    }
   },
   "explore": {
     "badge": "🗺️ WEGSTOPS",
@@ -206,7 +214,22 @@
     "searching": "Nabije attracties zoeken…",
     "locationError": "Locatietoestemming vereist voor attracties.",
     "loadError": "Attracties konden niet worden geladen. Probeer opnieuw.",
-    "noResults": "Geen wegstops gevonden. Tik op de knop om te zoeken."
+    "noResults": "Geen wegstops gevonden. Tik op de knop om te zoeken.",
+    "categories": {
+      "attraction": "🎡 Attractie",
+      "museum": "🏛️ Museum",
+      "gallery": "🖼️ Galerie",
+      "artwork": "🎨 Kunstwerk",
+      "viewpoint": "🔭 Uitzichtpunt",
+      "zoo": "🦁 Dierentuin",
+      "theme_park": "🎢 Pretpark",
+      "castle": "🏰 Kasteel",
+      "fort": "🏰 Fort",
+      "monument": "🗿 Monument",
+      "memorial": "🕯️ Gedenkteken",
+      "ruins": "🏚️ Ruïnes",
+      "park": "🌳 Park"
+    }
   },
   "garage": {
     "badge": "🔧 UITRUSTEN",
@@ -348,7 +371,10 @@
     "notifBody": "Je rit wordt op de achtergrond opgenomen.",
     "viewRoute": "🗺️ Route bekijken",
     "hideRoute": "▲ Route verbergen",
-    "tapToExpand": "Tik om te vergroten"
+    "tapToExpand": "Tik om te vergroten",
+    "notifDisabledTitle": "Meldingen zijn uitgeschakeld",
+    "notifDisabledMsg": "Trip Logger heeft meldingen nodig zodat Android de actieve opname in het meldingenpaneel kan tonen.",
+    "openSettings": "Instellingen openen"
   },
   "about": {
     "badge": "ℹ️ OVER",

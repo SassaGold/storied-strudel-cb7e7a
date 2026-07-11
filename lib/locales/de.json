@@ -196,7 +196,15 @@
     "searching": "Suche nahe Unterkünfte…",
     "locationError": "Standortberechtigung für Unterkunftssuche erforderlich.",
     "loadError": "Unterkünfte konnten nicht geladen werden. Bitte erneut versuchen.",
-    "noResults": "Keine Unterkünfte in der Nähe. Tippe auf die Schaltfläche zum Suchen."
+    "noResults": "Keine Unterkünfte in der Nähe. Tippe auf die Schaltfläche zum Suchen.",
+    "categories": {
+      "hotel": "🏨 Hotel",
+      "motel": "🏩 Motel",
+      "hostel": "🛏️ Hostel",
+      "guest_house": "🏡 Pension",
+      "camp_site": "🏕️ Campingplatz",
+      "resort": "🏖️ Resort"
+    }
   },
   "explore": {
     "badge": "🗺️ ROUTENSTOPPS",
@@ -206,7 +214,22 @@
     "searching": "Suche nahe Attraktionen…",
     "locationError": "Standortberechtigung für Attraktionssuche erforderlich.",
     "loadError": "Attraktionen konnten nicht geladen werden. Bitte erneut versuchen.",
-    "noResults": "Keine Routenstopps gefunden. Tippe auf die Schaltfläche zum Suchen."
+    "noResults": "Keine Routenstopps gefunden. Tippe auf die Schaltfläche zum Suchen.",
+    "categories": {
+      "attraction": "🎡 Attraktion",
+      "museum": "🏛️ Museum",
+      "gallery": "🖼️ Galerie",
+      "artwork": "🎨 Kunstwerk",
+      "viewpoint": "🔭 Aussichtspunkt",
+      "zoo": "🦁 Zoo",
+      "theme_park": "🎢 Freizeitpark",
+      "castle": "🏰 Burg",
+      "fort": "🏰 Festung",
+      "monument": "🗿 Denkmal",
+      "memorial": "🕯️ Gedenkstätte",
+      "ruins": "🏚️ Ruine",
+      "park": "🌳 Park"
+    }
   },
   "garage": {
     "badge": "🔧 AUSRÜSTEN",
@@ -348,7 +371,10 @@
     "notifBody": "Deine Fahrt wird im Hintergrund aufgezeichnet.",
     "viewRoute": "🗺️ Route anzeigen",
     "hideRoute": "▲ Route ausblenden",
-    "tapToExpand": "Zum Vergrößern tippen"
+    "tapToExpand": "Zum Vergrößern tippen",
+    "notifDisabledTitle": "Benachrichtigungen sind deaktiviert",
+    "notifDisabledMsg": "Trip Logger benötigt aktivierte Benachrichtigungen, damit Android die laufende Aufzeichnung in der Benachrichtigungsleiste anzeigen kann.",
+    "openSettings": "Einstellungen öffnen"
   },
   "about": {
     "badge": "ℹ️ ÜBER",

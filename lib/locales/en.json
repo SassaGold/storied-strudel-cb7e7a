@@ -196,7 +196,15 @@
     "searching": "Searching nearby accommodation…",
     "locationError": "Location permission is required to find accommodation.",
     "loadError": "Unable to load accommodation. Please try again.",
-    "noResults": "No crash pads found nearby. Tap the button above to search."
+    "noResults": "No crash pads found nearby. Tap the button above to search.",
+    "categories": {
+      "hotel": "🏨 Hotel",
+      "motel": "🏩 Motel",
+      "hostel": "🛏️ Hostel",
+      "guest_house": "🏡 Guest House",
+      "camp_site": "🏕️ Campsite",
+      "resort": "🏖️ Resort"
+    }
   },
   "explore": {
     "badge": "🗺️ ROAD STOPS",
@@ -206,7 +214,22 @@
     "searching": "Searching nearby attractions…",
     "locationError": "Location permission is required to find attractions.",
     "loadError": "Unable to load attractions. Please try again.",
-    "noResults": "No roadside stops found. Tap the button above to search."
+    "noResults": "No roadside stops found. Tap the button above to search.",
+    "categories": {
+      "attraction": "🎡 Attraction",
+      "museum": "🏛️ Museum",
+      "gallery": "🖼️ Gallery",
+      "artwork": "🎨 Artwork",
+      "viewpoint": "🔭 Viewpoint",
+      "zoo": "🦁 Zoo",
+      "theme_park": "🎢 Theme Park",
+      "castle": "🏰 Castle",
+      "fort": "🏰 Fort",
+      "monument": "🗿 Monument",
+      "memorial": "🕯️ Memorial",
+      "ruins": "🏚️ Ruins",
+      "park": "🌳 Park"
+    }
   },
   "garage": {
     "badge": "🔧 GEAR UP",
@@ -348,7 +371,10 @@
     "notifBody": "Recording your ride in the background.",
     "viewRoute": "🗺️ View Route",
     "hideRoute": "▲ Hide Route",
-    "tapToExpand": "Tap to expand"
+    "tapToExpand": "Tap to expand",
+    "notifDisabledTitle": "Notifications are disabled",
+    "notifDisabledMsg": "Trip Logger needs notifications enabled so Android can show the active recording in the notification shade.",
+    "openSettings": "Open Settings"
   },
   "about": {
     "badge": "ℹ️ ABOUT",

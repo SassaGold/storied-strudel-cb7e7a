@@ -106,19 +106,21 @@ export async function fetchOsmPlaces(
     const data = await fetchOverpass(query, timeoutMs);
     const elements = Array.isArray(data.elements) ? data.elements : [];
 
-    return elements
-      .slice(0, limit)
+    const items = elements
       .map((elem: OsmPlace): OsmPlaceItem | null => {
         let itemLat = elem.lat;
         let itemLon = elem.lon;
 
-        // For ways and relations, use center if available
-        if (!itemLat && elem.center) {
+        // For ways and relations, use center if available. Use == null (not
+        // falsy) checks so lat/lon 0 (equator / prime meridian) stay valid.
+        if (itemLat == null && elem.center) {
           itemLat = elem.center.lat;
           itemLon = elem.center.lon;
         }
 
-        if (!itemLat || !itemLon) return null;
+        if (itemLat == null || itemLon == null || !Number.isFinite(itemLat) || !Number.isFinite(itemLon)) {
+          return null;
+        }
 
         const tags = elem.tags || {};
         const name = tags.name || tags.operator || "POI";
@@ -161,8 +163,13 @@ export async function fetchOsmPlaces(
         };
       })
       .filter(Boolean) as OsmPlaceItem[];
+    // The query already caps results server-side ("out center N"); this slice
+    // is only a safety net for over-returning mirrors. limit <= 0 means
+    // unlimited (the query is built uncapped), so don't slice to zero.
+    return limit > 0 ? items.slice(0, limit) : items;
   } catch (err) {
-    if (err instanceof Error && err.message.includes("timeout")) {
+    // fetchOverpass throws Error("Timeout") — match case-insensitively.
+    if (err instanceof Error && /timeout/i.test(err.message)) {
       throw new Error("Overpass Places timeout");
     }
     throw err;

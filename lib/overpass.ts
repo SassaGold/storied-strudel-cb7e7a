@@ -114,6 +114,16 @@ export async function fetchOverpass(
 }
 
 /**
+ * True when an error thrown by fetchOverpass (or a wrapper such as
+ * fetchOsmPlaces) represents a network/timeout failure rather than a data
+ * problem. Kept next to fetchOverpass so the message strings it matches live
+ * in one module.
+ */
+export function isOverpassNetworkError(err: unknown): boolean {
+  return err instanceof Error && /timeout|network error/i.test(err.message);
+}
+
+/**
  * Retry a promise-returning function with exponential back-off.
  *
  * @param fn             Function returning a Promise. Called up to `maxAttempts` times.

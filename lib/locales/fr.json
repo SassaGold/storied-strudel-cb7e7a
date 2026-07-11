@@ -196,7 +196,15 @@
     "searching": "Recherche d'hébergements proches…",
     "locationError": "Permission de localisation requise pour l'hébergement.",
     "loadError": "Impossible de charger les hébergements. Réessayez.",
-    "noResults": "Aucun hébergement trouvé. Appuyez sur le bouton pour chercher."
+    "noResults": "Aucun hébergement trouvé. Appuyez sur le bouton pour chercher.",
+    "categories": {
+      "hotel": "🏨 Hôtel",
+      "motel": "🏩 Motel",
+      "hostel": "🛏️ Auberge",
+      "guest_house": "🏡 Chambre d’hôtes",
+      "camp_site": "🏕️ Camping",
+      "resort": "🏖️ Resort"
+    }
   },
   "explore": {
     "badge": "🗺️ ÉTAPES ROUTE",
@@ -206,7 +214,22 @@
     "searching": "Recherche d'attractions proches…",
     "locationError": "Permission de localisation requise pour les attractions.",
     "loadError": "Impossible de charger les attractions. Réessayez.",
-    "noResults": "Aucune étape trouvée. Appuyez sur le bouton pour chercher."
+    "noResults": "Aucune étape trouvée. Appuyez sur le bouton pour chercher.",
+    "categories": {
+      "attraction": "🎡 Attraction",
+      "museum": "🏛️ Musée",
+      "gallery": "🖼️ Galerie",
+      "artwork": "🎨 Œuvre d’art",
+      "viewpoint": "🔭 Point de vue",
+      "zoo": "🦁 Zoo",
+      "theme_park": "🎢 Parc d’attractions",
+      "castle": "🏰 Château",
+      "fort": "🏰 Fort",
+      "monument": "🗿 Monument",
+      "memorial": "🕯️ Mémorial",
+      "ruins": "🏚️ Ruines",
+      "park": "🌳 Parc"
+    }
   },
   "garage": {
     "badge": "🔧 S'ÉQUIPER",
@@ -348,7 +371,10 @@
     "notifBody": "Enregistrement de votre trajet en arrière-plan.",
     "viewRoute": "🗺️ Voir l'itinéraire",
     "hideRoute": "▲ Masquer l'itinéraire",
-    "tapToExpand": "Appuyez pour agrandir"
+    "tapToExpand": "Appuyez pour agrandir",
+    "notifDisabledTitle": "Les notifications sont désactivées",
+    "notifDisabledMsg": "Trip Logger a besoin des notifications activées pour qu’Android puisse afficher l’enregistrement en cours dans la barre de notifications.",
+    "openSettings": "Ouvrir les réglages"
   },
   "about": {
     "badge": "ℹ️ À PROPOS",

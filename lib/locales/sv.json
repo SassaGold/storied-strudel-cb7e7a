@@ -196,7 +196,15 @@
     "searching": "Söker övernattningar i närheten…",
     "locationError": "Platstillstånd krävs för att hitta övernattningar.",
     "loadError": "Kan inte ladda övernattningar. Försök igen.",
-    "noResults": "Inga övernattningar hittades i närheten. Tryck på knappen ovan för att söka."
+    "noResults": "Inga övernattningar hittades i närheten. Tryck på knappen ovan för att söka.",
+    "categories": {
+      "hotel": "🏨 Hotell",
+      "motel": "🏩 Motell",
+      "hostel": "🛏️ Vandrarhem",
+      "guest_house": "🏡 Pensionat",
+      "camp_site": "🏕️ Campingplats",
+      "resort": "🏖️ Resort"
+    }
   },
   "explore": {
     "badge": "🗺️ VÄGSTOPP",
@@ -206,7 +214,22 @@
     "searching": "Söker attraktioner i närheten…",
     "locationError": "Platstillstånd krävs för att hitta attraktioner.",
     "loadError": "Kan inte ladda attraktioner. Försök igen.",
-    "noResults": "Inga vägstopp hittades. Tryck på knappen ovan för att söka."
+    "noResults": "Inga vägstopp hittades. Tryck på knappen ovan för att söka.",
+    "categories": {
+      "attraction": "🎡 Sevärdhet",
+      "museum": "🏛️ Museum",
+      "gallery": "🖼️ Galleri",
+      "artwork": "🎨 Konstverk",
+      "viewpoint": "🔭 Utsiktsplats",
+      "zoo": "🦁 Djurpark",
+      "theme_park": "🎢 Nöjespark",
+      "castle": "🏰 Slott",
+      "fort": "🏰 Fästning",
+      "monument": "🗿 Monument",
+      "memorial": "🕯️ Minnesmärke",
+      "ruins": "🏚️ Ruiner",
+      "park": "🌳 Park"
+    }
   },
   "garage": {
     "badge": "🔧 RUSTA UPP",
@@ -348,7 +371,10 @@
     "notifBody": "Spelar in din tur i bakgrunden.",
     "viewRoute": "🗺️ Visa rutt",
     "hideRoute": "▲ Dölj rutt",
-    "tapToExpand": "Tryck för att förstora"
+    "tapToExpand": "Tryck för att förstora",
+    "notifDisabledTitle": "Aviseringar är avstängda",
+    "notifDisabledMsg": "Trip Logger behöver aviseringar aktiverade så att Android kan visa den pågående inspelningen i aviseringsfältet.",
+    "openSettings": "Öppna inställningar"
   },
   "about": {
     "badge": "ℹ️ OM",

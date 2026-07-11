@@ -196,7 +196,15 @@
     "searching": "Søker etter overnattingssteder i nærheten…",
     "locationError": "Plasseringstillatelse er nødvendig for å finne overnattingssteder.",
     "loadError": "Kan ikke laste inn overnattingssteder. Prøv igjen.",
-    "noResults": "Ingen overnattingssteder funnet i nærheten. Trykk på knappen ovenfor for å søke."
+    "noResults": "Ingen overnattingssteder funnet i nærheten. Trykk på knappen ovenfor for å søke.",
+    "categories": {
+      "hotel": "🏨 Hotell",
+      "motel": "🏩 Motell",
+      "hostel": "🛏️ Vandrerhjem",
+      "guest_house": "🏡 Gjestehus",
+      "camp_site": "🏕️ Campingplass",
+      "resort": "🏖️ Resort"
+    }
   },
   "explore": {
     "badge": "🗺️ VEISTOPP",
@@ -206,7 +214,22 @@
     "searching": "Søker etter attraksjoner i nærheten…",
     "locationError": "Plasseringstillatelse er nødvendig for å finne attraksjoner.",
     "loadError": "Kan ikke laste inn attraksjoner. Prøv igjen.",
-    "noResults": "Ingen veistopp funnet. Trykk på knappen ovenfor for å søke."
+    "noResults": "Ingen veistopp funnet. Trykk på knappen ovenfor for å søke.",
+    "categories": {
+      "attraction": "🎡 Attraksjon",
+      "museum": "🏛️ Museum",
+      "gallery": "🖼️ Galleri",
+      "artwork": "🎨 Kunstverk",
+      "viewpoint": "🔭 Utsiktspunkt",
+      "zoo": "🦁 Dyrehage",
+      "theme_park": "🎢 Fornøyelsespark",
+      "castle": "🏰 Slott",
+      "fort": "🏰 Festning",
+      "monument": "🗿 Monument",
+      "memorial": "🕯️ Minnesmerke",
+      "ruins": "🏚️ Ruiner",
+      "park": "🌳 Park"
+    }
   },
   "garage": {
     "badge": "🔧 RUS OPP",
@@ -348,7 +371,10 @@
     "notifBody": "Tar opp turen din i bakgrunnen.",
     "viewRoute": "🗺️ Vis rute",
     "hideRoute": "▲ Skjul rute",
-    "tapToExpand": "Trykk for å utvide"
+    "tapToExpand": "Trykk for å utvide",
+    "notifDisabledTitle": "Varsler er slått av",
+    "notifDisabledMsg": "Trip Logger trenger varsler aktivert slik at Android kan vise det aktive opptaket i varslingsfeltet.",
+    "openSettings": "Åpne innstillinger"
   },
   "about": {
     "badge": "ℹ️ OM",

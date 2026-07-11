@@ -73,9 +73,11 @@ const formatDuration = (ms: number): string => {
   return `${m}:${String(s).padStart(2, "0")}`;
 };
 
-const formatDate = (iso: string): string => {
+const formatDate = (iso: string, locale?: string): string => {
   const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
+  // Use the app's selected language (i18n.language) rather than the device
+  // locale so ride dates match the rest of the UI.
+  return d.toLocaleDateString(locale, {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -261,6 +263,22 @@ export default function TripLoggerScreen() {
   }, []);
 
   const loadRides = useCallback(async () => {
+    // If a previous mount left the background task running (screen unmounted
+    // mid-ride), stop it before recovering: otherwise the OS foreground service
+    // stays alive with no Stop button, and keeps appending points that the next
+    // Start would wipe. The checkpoint recovery below preserves the ride data.
+    // Never touch the task while a recording is actively in progress.
+    try {
+      if (
+        !recordingRef.current &&
+        isLocationTaskDefined() &&
+        (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME))
+      ) {
+        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+      }
+    } catch {
+      // Task manager unavailable (Expo Go) — nothing to stop.
+    }
     let existing: SavedRide[] = [];
     try {
       const raw = await storage.getItem(STORAGE_KEY);
@@ -330,12 +348,12 @@ export default function TripLoggerScreen() {
         }
         if (!notif.granted && notif.status !== "granted") {
           Alert.alert(
-            "Notifications are disabled",
-            "Trip Logger needs notifications enabled so Android can show active recording in the notification shade.",
+            t("triplog.notifDisabledTitle"),
+            t("triplog.notifDisabledMsg"),
             [
-              { text: "Cancel", style: "cancel" },
+              { text: t("triplog.cancel"), style: "cancel" },
               {
-                text: "Open Settings",
+                text: t("triplog.openSettings"),
                 onPress: () => { Linking.openSettings().catch(() => null); },
               },
             ]
@@ -681,7 +699,7 @@ export default function TripLoggerScreen() {
                     <Text style={styles.rideRenameHint}>  ✎</Text>
                   </Text>
                 </Pressable>
-                <Text style={styles.rideDate}>{formatDate(ride.date)}</Text>
+                <Text style={styles.rideDate}>{formatDate(ride.date, i18n.language)}</Text>
               </View>
               {/* Stat chips */}
               <View style={styles.rideStatChips}>

@@ -63,7 +63,16 @@ export function computeSunTimes(
   };
 
   const sunrise = toDate(utcRise);
-  const sunset = toDate(utcSet);
+  let sunset = toDate(utcSet);
+  // calcUTCHour normalizes to [0,24), so at eastern longitudes the sunset's UTC
+  // hour can wrap past midnight and land "before" sunrise on the same UTC date.
+  // The sunset then really occurs on the next UTC day — shift it forward so the
+  // daylight duration stays positive. Strictly "<": equal rounded times mean a
+  // genuine ~0-minute daylight day (a ~24h wrap is impossible here because the
+  // polar-day case already returned null), which must not become 24h.
+  if (sunset.getTime() < sunrise.getTime()) {
+    sunset = new Date(sunset.getTime() + 86400000);
+  }
   const daylightMinutes = Math.round((sunset.getTime() - sunrise.getTime()) / 60000);
   return { sunrise, sunset, daylightMinutes };
 }
