@@ -9,9 +9,11 @@ import {
     FORECAST_DAYS,
     FORECAST_DISPLAY_DAYS,
     HOURLY_SLOTS,
+    HTTP_FETCH_TIMEOUT_MS,
     NOMINATIM_REVERSE_GEOCODING_BASE_URL,
     OPEN_METEO_BASE_URL,
     OSM_USER_AGENT,
+    OVERPASS_RETRY_ATTEMPTS,
     OVERPASS_ROAD_TIMEOUT_MS,
     ROAD_ALERTS_MAX,
     ROAD_MAX_RESULTS,
@@ -22,7 +24,7 @@ import {
 import { useLocationPermission } from "./locationPermission";
 import { getCurrentPositionWithTimeout } from "./location";
 import { storage } from "./storage";
-import { fetchOverpass, withRetry } from "./overpass";
+import { fetchOverpass, fetchWithTimeout, withRetry } from "./overpass";
 import { type RoadAlert, ROAD_TYPES, haversineKm } from "./roads";
 import { useSettings } from "./settings";
 import { type SunTimes, type PolarState, computeSunTimes, computeSunState } from "./sun";
@@ -149,9 +151,10 @@ export function useRiderHQ(): RiderHQState {
 
       // ── Nominatim Reverse Geocoding — free OSM, retried up to 3 times ────
       const addressPromise = withRetry(() =>
-        fetch(
+        fetchWithTimeout(
           `${NOMINATIM_REVERSE_GEOCODING_BASE_URL}?lat=${latitude}&lon=${longitude}&format=json&zoom=10&addressdetails=1`,
-          { headers: { "User-Agent": OSM_USER_AGENT } }
+          { headers: { "User-Agent": OSM_USER_AGENT } },
+          HTTP_FETCH_TIMEOUT_MS
         )
           .then((r) => {
             if (!r.ok) throw new Error(`Nominatim Geocoding ${r.status}`);
@@ -170,12 +173,14 @@ export function useRiderHQ(): RiderHQState {
 
       // ── Open-Meteo — free weather API, retried up to 3 times ─────────────
       const weatherPromise = withRetry(() =>
-        fetch(
+        fetchWithTimeout(
           `${OPEN_METEO_BASE_URL}?latitude=${latitude.toFixed(4)}&longitude=${longitude.toFixed(4)}` +
           `&current=temperature_2m,apparent_temperature,wind_speed_10m,wind_direction_10m,relative_humidity_2m,precipitation,weather_code,precipitation_probability` +
           `&hourly=temperature_2m,weather_code,precipitation_probability` +
           `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
-          `&forecast_days=${FORECAST_DAYS}&timezone=auto`
+          `&forecast_days=${FORECAST_DAYS}&timezone=auto`,
+          {},
+          HTTP_FETCH_TIMEOUT_MS
         ).then((r) => {
           if (!r.ok) throw new Error(`Open-Meteo ${r.status}`);
           return r.json();
@@ -272,7 +277,13 @@ export function useRiderHQ(): RiderHQState {
         `node["construction"~"."](around:${roadRadiusM},${lat},${lon});` +
         `);out center ${ROAD_MAX_RESULTS};`;
 
-      const roadPromise = fetchOverpass(roadQuery, OVERPASS_ROAD_TIMEOUT_MS)
+      // Retried like address/weather — a transient 429/timeout shouldn't drop
+      // road alerts for the whole refresh while the other cards get retries.
+      // OVERPASS_RETRY_ATTEMPTS: fetchOverpass already cycles mirrors per call.
+      const roadPromise = withRetry(
+        () => fetchOverpass(roadQuery, OVERPASS_ROAD_TIMEOUT_MS),
+        OVERPASS_RETRY_ATTEMPTS
+      )
         .then((data) => {
           const elements: any[] = data.elements ?? [];
           return elements

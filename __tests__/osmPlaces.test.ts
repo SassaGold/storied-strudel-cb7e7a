@@ -188,6 +188,44 @@ describe("fetchOsmPlaces query syntax", () => {
     }
   });
 
+  it("matches key=value tokens against that exact key only", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({ elements: [] }),
+    }) as unknown as typeof fetch;
+
+    await fetchOsmPlaces("club=motorcycle|highway=raceway", 51.5, 0.0, 5000, 50, 10000);
+
+    const capturedBody = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
+    const query = decodeURIComponent(capturedBody.replace(/^data=/, ""));
+
+    expect(query).toContain(`["club"~"^(motorcycle)$"]`);
+    expect(query).toContain(`["highway"~"^(raceway)$"]`);
+    // key=value tokens must NOT be matched against the generic keys
+    expect(query).not.toContain(`["amenity"~"^(motorcycle`);
+  });
+
+  it("escapes regex metacharacters in values and rejects unsafe keys", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({ elements: [] }),
+    }) as unknown as typeof fetch;
+
+    await fetchOsmPlaces('fast.food|bad"key=x', 51.5, 0.0, 5000, 50, 10000);
+
+    const capturedBody = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
+    const query = decodeURIComponent(capturedBody.replace(/^data=/, ""));
+
+    // Dot escaped for the Overpass regex (double backslash survives QL unescaping)
+    expect(query).toContain("fast\\\\.food");
+    // A key containing a quote must not reach the query
+    expect(query).not.toContain('bad"key');
+  });
+
   it("generates 'out center;' with no number when limit is 0", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

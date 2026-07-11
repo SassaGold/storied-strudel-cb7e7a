@@ -14,6 +14,7 @@ import {
   EMERGENCY_MAX_RESULTS,
   EMERGENCY_MAX_DISPLAY,
   OVERPASS_DEFAULT_TIMEOUT_MS,
+  OVERPASS_RETRY_ATTEMPTS,
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
 import { storage } from "./storage";
@@ -162,15 +163,19 @@ export function useEmergencyPlaces() {
 
       // Fetch emergency amenities within a given radius and map them to places.
       const fetchWithinRadius = async (radiusM: number): Promise<EmergencyPlace[]> => {
-        const items = await withRetry(() =>
-          fetchOsmPlaces(
-            EMERGENCY_AMENITY_TYPES,
-            latitude,
-            longitude,
-            radiusM,
-            EMERGENCY_MAX_RESULTS,
-            OVERPASS_DEFAULT_TIMEOUT_MS
-          )
+        // OVERPASS_RETRY_ATTEMPTS (not the default 3): fetchOsmPlaces already
+        // cycles Overpass mirrors internally, so retries compound.
+        const items = await withRetry(
+          () =>
+            fetchOsmPlaces(
+              EMERGENCY_AMENITY_TYPES,
+              latitude,
+              longitude,
+              radiusM,
+              EMERGENCY_MAX_RESULTS,
+              OVERPASS_DEFAULT_TIMEOUT_MS
+            ),
+          OVERPASS_RETRY_ATTEMPTS
         );
         return items
           .map((item) => {
