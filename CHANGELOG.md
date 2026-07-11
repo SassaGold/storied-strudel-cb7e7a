@@ -1,5 +1,29 @@
 # Changelog
 
+## v1.2.3 — Patch Release (2026-07-10)
+
+Feature and cleanup batch. Emoji + readable category labels on MC Garage results and place-info modals; map-matched road routes shown for saved trips (OSRM); tap-to-expand full-screen trip map; Netlify web deploys retired (`netlify.toml` removed). Includes all merged improvement batches since 1.2.2: offline cache banners with age, pull-to-refresh across data screens, and POI map/list view toggle powered by OSM tiles.
+
+---
+
+## v1.2.2 — Patch Release (2026-07-10)
+
+Fixed two shipped UI regressions caught in visual verification: the SOS button no longer shows two emergency numbers at once (locale strings carried a hardcoded number next to the dynamic locale-aware one), and the weather Wind/Precip labels no longer contradict unit-aware values ("7 km/h" under a "(m/s)" label). All 9 locales corrected.
+
+---
+
+## v1.2.1 — Patch Release (2026-07-10)
+
+Safety, robustness and accessibility batches: locale-aware emergency number on the SOS button (911/999/000/111/112 by country), GPS timeouts on all position reads (no more stuck spinners), trip-logger crash recovery via ride checkpointing, low-accuracy GPS point filtering, missing trip-logger error translations in 8 locales plus a locale-parity test, imperial unit coverage for wind/precipitation/road distances, and accessibility roles/labels across modals and controls.
+
+---
+
+## v1.2.0 — Patch Release (2026-07-09)
+
+Repaired broken POI and SOS searches (Overpass query fixes) and added a rural fallback that automatically widens the search radius when nothing is found nearby.
+
+---
+
 ## v1.1.7 — Patch Release (2026-05-10)
 
 Completed the migration from HERE Maps to OpenStreetMap/Nominatim throughout the entire app. Removed all remaining HERE references from source code, comments, locale strings, and the About screen data-sources card. The `hereApiKey.ts` helper file was deleted (unused). The About screen now correctly credits Nominatim and links to `nominatim.openstreetmap.org`. No API keys are required for any feature.

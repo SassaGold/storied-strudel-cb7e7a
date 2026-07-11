@@ -25,6 +25,7 @@ expo-env.d.ts
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
 
 # macOS
 .DS_Store
@@ -42,9 +43,6 @@ app-example
 # generated native folders
 /ios
 /android
-
-# Local Netlify folder
-.netlify
 
 # Google Play service account key (never commit — decoded at CI runtime)
 google-service-account.json
