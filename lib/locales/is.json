@@ -415,11 +415,6 @@
     "openLink": "Opna ↗",
     "legal": "LAGALEGT",
     "legalBody": "Öll ytri gögn eru notuð í samræmi við skilmála og leyfi hverrar heimildar. OpenStreetMap-gögn eru notuð undir Open Database License (ODbL). Veðurgögn frá Open-Meteo eru notuð undir CC BY 4.0.",
-    "updateCheck": "🔄 Leita að uppfærslu",
-    "updateAvailable": "⬇️ Uppfærsla tiltæk — setur upp…",
-    "updateLatest": "✅ Þú ert uppfærður",
-    "updateError": "❌ Uppfærsluleit mistókst",
-    "updateRestart": "⬇️ Uppfærsla tilbúin — ýttu til að endurræsa",
     "privacyPolicyLink": "📄 Persónuverndarstefna",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Núverandi staðsetningarfang þitt er fengið með Nominatim API (OpenStreetMap). Engin API-lykill þarf."

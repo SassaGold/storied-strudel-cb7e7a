@@ -79,14 +79,6 @@
         "projectId": "c4cd3804-55c8-43d6-84cf-62d30b0fb6e2"
       }
     },
-    "owner": "sassagold",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/c4cd3804-55c8-43d6-84cf-62d30b0fb6e2",
-      "enabled": true,
-      "checkAutomatically": "ON_LOAD"
-    }
+    "owner": "sassagold"
   }
 }

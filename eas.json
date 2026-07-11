@@ -6,35 +6,14 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "channel": "development"
+      "distribution": "internal"
     },
     "preview": {
       "distribution": "internal",
-      "autoIncrement": true,
-      "channel": "preview"
+      "autoIncrement": true
     },
     "production": {
-      "autoIncrement": true,
-      "channel": "production"
-    }
-  },
-  "submit": {
-    "production": {
-      "android": {
-        "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "production",
-        "releaseStatus": "completed",
-        "changesNotSentForReview": false
-      }
-    },
-    "closed-testing": {
-      "android": {
-        "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "alpha",
-        "releaseStatus": "draft",
-        "changesNotSentForReview": true
-      }
+      "autoIncrement": true
     }
   }
 }

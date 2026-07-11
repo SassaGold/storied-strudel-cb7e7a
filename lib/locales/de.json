@@ -415,11 +415,6 @@
     "openLink": "Öffnen ↗",
     "legal": "RECHTLICHES",
     "legalBody": "Alle externen Daten werden gemäß den Bedingungen und Lizenzen jeder Quelle verwendet. OpenStreetMap-Daten werden unter der Open Database License (ODbL) verwendet. Wetterdaten von Open-Meteo werden unter CC BY 4.0 verwendet.",
-    "updateCheck": "🔄 Nach Update suchen",
-    "updateAvailable": "⬇️ Update verfügbar — wird installiert…",
-    "updateLatest": "✅ Du bist aktuell",
-    "updateError": "❌ Update-Prüfung fehlgeschlagen",
-    "updateRestart": "⬇️ Update bereit — zum Neustart tippen",
     "privacyPolicyLink": "📄 Datenschutzerklärung",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Deine aktuelle Adresse wird über die Nominatim API (OpenStreetMap) ermittelt. Kein API-Schlüssel erforderlich."

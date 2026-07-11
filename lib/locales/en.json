@@ -415,11 +415,6 @@
     "openLink": "Open ↗",
     "legal": "LEGAL",
     "legalBody": "All external data is used in accordance with the terms and licenses of each respective source. OpenStreetMap data is used under the Open Database License (ODbL). Weather data from Open-Meteo is used under CC BY 4.0.",
-    "updateCheck": "🔄 Check for Update",
-    "updateAvailable": "⬇️ Update available — installing…",
-    "updateLatest": "✅ You're up to date",
-    "updateError": "❌ Update check failed",
-    "updateRestart": "⬇️ Update ready — tap to restart",
     "privacyPolicyLink": "📄 Privacy Policy",
     "osm": "OpenStreetMap / Nominatim",
     "osmDesc": "Your current location address is reverse-geocoded using the Nominatim API (OpenStreetMap). No API key required."
