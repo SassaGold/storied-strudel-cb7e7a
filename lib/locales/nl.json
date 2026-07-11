@@ -36,7 +36,9 @@
     "readWikipedia": "📖 Lees op Wikipedia",
     "cachedResults": "📡 Gecachede resultaten — tik op vernieuwen voor nieuwste",
     "fuelTypes": "⛽ Brandstofsoorten",
-    "cacheAge": "Gegevens van {{count}} min geleden"
+    "cacheAge": "Gegevens van {{count}} min geleden",
+    "ok": "OK",
+    "infoAbout": "Info: {{name}}"
   },
   "language": {
     "label": "🌍 Taal",
@@ -329,7 +331,8 @@
     "quickActionTorch": "Zaklamp",
     "quickActionInstructions": "Instructies",
     "locationCopied": "📍 Gekopieerd!",
-    "locationCopiedMsg": "Jouw locatielink is naar het klembord gekopieerd."
+    "locationCopiedMsg": "Jouw locatielink is naar het klembord gekopieerd.",
+    "shareLocationShort": "Deel Mijn Locatie"
   },
   "triplog": {
     "badge": "🏍️ RITLOGGER",

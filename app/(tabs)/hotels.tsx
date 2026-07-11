@@ -12,6 +12,7 @@ import {
 import { haversineMeters } from "../../lib/overpass";
 import type { Place } from "../../lib/usePOIFetch";
 
+import { COLORS } from "../../lib/theme";
 // ── Hotels / Accommodation POI tab ────────────────────────────────────────────
 
 const SEARCH_QUERY =
@@ -73,7 +74,7 @@ export default function HotelsScreen() {
       formatCategoryLabel={formatCategory}
       renderExtraListTag={(place) =>
         place.stars ? (
-          <Text style={{ color: "#ff6600", fontSize: 12, fontWeight: "700" }}>
+          <Text style={{ color: COLORS.brand, fontSize: 12, fontWeight: "700" }}>
             {place.stars}★
           </Text>
         ) : null
@@ -81,8 +82,8 @@ export default function HotelsScreen() {
       renderExtraModalRows={(place) =>
         place.stars ? (
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <Text style={{ color: "#666666", fontSize: 13 }}>{t("common.stars")}</Text>
-            <Text style={{ color: "#c8c8c8", fontSize: 13, fontWeight: "500" }}>{place.stars}★</Text>
+            <Text style={{ color: COLORS.muted, fontSize: 13 }}>{t("common.stars")}</Text>
+            <Text style={{ color: COLORS.body, fontSize: 13, fontWeight: "500" }}>{place.stars}★</Text>
           </View>
         ) : null
       }

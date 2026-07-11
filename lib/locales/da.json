@@ -36,7 +36,9 @@
     "readWikipedia": "📖 Læs på Wikipedia",
     "cachedResults": "📡 Viser cachelagrede resultater — tryk opdater for seneste",
     "fuelTypes": "⛽ Brændstoftyper",
-    "cacheAge": "Data fra {{count}} min siden"
+    "cacheAge": "Data fra {{count}} min siden",
+    "ok": "OK",
+    "infoAbout": "Info: {{name}}"
   },
   "language": {
     "label": "🌍 Sprog",
@@ -329,7 +331,8 @@
     "quickActionTorch": "Lommelygte",
     "quickActionInstructions": "Instruktioner",
     "locationCopied": "📍 Kopieret!",
-    "locationCopiedMsg": "Dit placeringlink er kopieret til udklipsholderen."
+    "locationCopiedMsg": "Dit placeringlink er kopieret til udklipsholderen.",
+    "shareLocationShort": "Del min placering"
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",

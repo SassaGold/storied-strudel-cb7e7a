@@ -7,11 +7,18 @@ import { Platform } from "react-native";
 import { SettingsProvider } from "../lib/settings";
 import { LocationPermissionProvider } from "../lib/locationPermission";
 import { ErrorBoundary } from "../components/ErrorBoundary";
+import { pruneStaleCaches } from "../lib/storage";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Notifications: typeof import("expo-notifications") | null = (() => { try { return require("expo-notifications"); } catch { return null; } })();
 
 export default function RootLayout() {
+  // Fire-and-forget: sweep week-old / orphaned cache_* entries so retired
+  // versioned keys don't accumulate in AsyncStorage forever.
+  useEffect(() => {
+    pruneStaleCaches();
+  }, []);
+
   useEffect(() => {
     if (Platform.OS !== "android" || !Notifications) return;
     Notifications.setNotificationChannelAsync("trip-logger", {

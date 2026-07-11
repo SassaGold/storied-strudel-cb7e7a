@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { COLORS } from "../../lib/theme";
 /** Wraps each tab icon to add a coloured top-bar indicator when focused */
 function TabIcon({
   name,
@@ -44,11 +45,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#ff6600",
+        tabBarActiveTintColor: COLORS.brand,
         tabBarInactiveTintColor: "#555555",
         tabBarStyle: {
-          backgroundColor: "#0a0a0a",
-          borderTopColor: "#ff6600",
+          backgroundColor: COLORS.bg,
+          borderTopColor: COLORS.brand,
           borderTopWidth: 2,
           height: 64 + insets.bottom,
           paddingBottom: 8 + insets.bottom,
@@ -127,11 +128,11 @@ export default function TabLayout() {
         name="emergency"
         options={{
           title: t("tabs.sos"),
-          tabBarActiveTintColor: "#ef4444",
+          tabBarActiveTintColor: COLORS.danger,
           tabBarIcon: ({ focused }) => (
             <TabIcon
               name="alert-circle"
-              color={focused ? "#ef4444" : "#555555"}
+              color={focused ? COLORS.danger : "#555555"}
               focused={focused}
             />
           ),

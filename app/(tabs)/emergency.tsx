@@ -23,7 +23,9 @@ import { getCurrentPositionWithTimeout } from "../../lib/location";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyPlaces";
 import POIMap from "../../components/POIMap";
+import PlaceInfoModal from "../../components/PlaceInfoModal";
 import { useLocationPermission } from "../../lib/locationPermission";
+import { COLORS } from "../../lib/theme";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -59,16 +61,16 @@ const EMERGENCY_NUMBERS = [
 ];
 
 /** Initiates a phone call; falls back to an alert if the device cannot handle it. */
-const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: string, callFailedTitle: string, callFailedMsg: string) => {
+const callNumber = (number: string, cannotCallTitle: string, cannotCallMsg: string, callFailedTitle: string, callFailedMsg: string, okLabel: string) => {
   Linking.canOpenURL(`tel:${number}`)
     .then((supported) => {
       if (supported) {
         return Linking.openURL(`tel:${number}`);
       }
-      Alert.alert(cannotCallTitle, cannotCallMsg, [{ text: "OK" }]);
+      Alert.alert(cannotCallTitle, cannotCallMsg, [{ text: okLabel }]);
     })
     .catch(() => {
-      Alert.alert(callFailedTitle, callFailedMsg, [{ text: "OK" }]);
+      Alert.alert(callFailedTitle, callFailedMsg, [{ text: okLabel }]);
     });
 };
 
@@ -145,7 +147,8 @@ export default function EmergencyScreen() {
       t("sos.cannotCall"),
       t("sos.cannotCallMsg", { number }),
       t("sos.callFailed"),
-      t("sos.callFailedMsg", { number })
+      t("sos.callFailedMsg", { number }),
+      t("common.ok")
     );
   }, [t]);
 
@@ -194,7 +197,7 @@ export default function EmergencyScreen() {
       style={styles.scrollView}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.brand} colors={[COLORS.brand]} />
       }
     >
       {/* ── Torch Screen Overlay ─────────────────────────────────── */}
@@ -221,115 +224,31 @@ export default function EmergencyScreen() {
         </View>
       </Modal>
 
-      {/* Info Modal */}
-      <Modal
-        visible={infoPlace !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setInfoPlace(null)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}
-        >
-          <Pressable style={styles.modalCard} onPress={() => {}} accessibilityViewIsModal>
-            <Text style={styles.modalTitle} accessibilityRole="header">{infoPlace?.name}</Text>
-            <View style={styles.modalRow}>
-              <Text style={styles.modalLabel}>{t("common.type")}</Text>
-              <Text style={styles.modalValue}>
-                {t(`sos.categoryLabels.${infoPlace?.category}`, { defaultValue: formatCategory(infoPlace?.category ?? "") })}
+      {/* Info Modal — shared component; call button + coordinate navigation. */}
+      <PlaceInfoModal
+        place={infoPlace}
+        wikiExtract={null}
+        wikiLoading={false}
+        onClose={() => setInfoPlace(null)}
+        mapsButtonLabel={t("sos.navigateThere")}
+        mapsUseCoordinates
+        formatCategoryLabel={(cat) =>
+          t(`sos.categoryLabels.${cat}`, { defaultValue: formatCategory(cat) })
+        }
+        noContactInfoText={t("common.noContactInfoEmergency")}
+        callButtonLabel={t("sos.callNow")}
+        onCallPhone={call}
+        renderExtraRows={(p) =>
+          p.distanceMeters !== undefined ? (
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+              <Text style={{ color: COLORS.muted, fontSize: 13 }}>{t("common.distance")}</Text>
+              <Text style={{ color: COLORS.body, fontSize: 13, fontWeight: "500" }}>
+                {fmtDistShort(p.distanceMeters ?? 0, settings.unitSystem)}
               </Text>
             </View>
-            {infoPlace?.distanceMeters !== undefined && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.distance")}</Text>
-                <Text style={styles.modalValue}>
-                  {fmtDistShort(infoPlace.distanceMeters ?? 0, settings.unitSystem)}
-                </Text>
-              </View>
-            )}
-            {infoPlace?.phone && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.phone")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  onPress={() => call(infoPlace.phone!)}
-                >
-                  {infoPlace.phone}
-                </Text>
-              </View>
-            )}
-            {infoPlace?.address && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.address")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.address}</Text>
-              </View>
-            )}
-            {infoPlace?.openingHours && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.hours")}</Text>
-                <Text style={styles.modalValue}>{infoPlace.openingHours}</Text>
-              </View>
-            )}
-            {infoPlace?.website && (
-              <View style={styles.modalRow}>
-                <Text style={styles.modalLabel}>{t("common.website")}</Text>
-                <Text
-                  style={styles.modalLink}
-                  numberOfLines={1}
-                  onPress={() =>
-                    { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(infoPlace.website!).catch(() => null); }
-                  }
-                >
-                  {infoPlace.website.replace(/^https?:\/\/(www\.)?/, "")}
-                </Text>
-              </View>
-            )}
-            {!infoPlace?.phone &&
-              !infoPlace?.address &&
-              !infoPlace?.website && (
-                <Text style={styles.modalNoInfo}>
-                  {t("common.noContactInfoEmergency")}
-                </Text>
-              )}
-            <View style={styles.modalActions}>
-              {infoPlace?.phone && (
-                <Pressable
-                  style={[styles.modalActionButton, styles.modalCallButton]}
-                  onPress={() => call(infoPlace.phone!)}
-                >
-                  <Text
-                    style={[
-                      styles.modalActionButtonText,
-                      styles.modalCallButtonText,
-                    ]}
-                  >
-                    {t("sos.callNow")}
-                  </Text>
-                </Pressable>
-              )}
-              <Pressable
-                style={styles.modalActionButton}
-                onPress={() =>
-                  { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); Linking.openURL(
-                    `https://www.google.com/maps/search/?api=1&query=${infoPlace?.latitude},${infoPlace?.longitude}`
-                  ).catch(() => null); }
-                }
-              >
-                <Text style={styles.modalActionButtonText}>
-                  {t("sos.navigateThere")}
-                </Text>
-              </Pressable>
-            </View>
-            <Pressable
-              style={styles.modalClose}
-              onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(null); }}
-            >
-              <Text style={styles.modalCloseText}>{t("common.close")}</Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+          ) : null
+        }
+      />
 
       {/* Header */}
       <View style={styles.header}>
@@ -376,7 +295,7 @@ export default function EmergencyScreen() {
             accessibilityLabel={t("sos.shareLocation")}
           >
             <Text style={styles.quickActionEmoji}>📍</Text>
-            <Text style={styles.quickActionLabel}>{t("sos.shareLocation").replace("📍 ", "")}</Text>
+            <Text style={styles.quickActionLabel}>{t("sos.shareLocationShort")}</Text>
           </Pressable>
           {/* Torch Screen */}
           <Pressable
@@ -435,7 +354,7 @@ export default function EmergencyScreen() {
 
       {loading && (
         <View style={styles.loadingRow}>
-          <ActivityIndicator size="small" color="#ef4444" />
+          <ActivityIndicator size="small" color={COLORS.danger} />
           <Text style={styles.loadingText}>{t("sos.searching")}</Text>
         </View>
       )}
@@ -563,7 +482,7 @@ export default function EmergencyScreen() {
                         onPress={(e) => { e.stopPropagation(); Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => null); setInfoPlace(place); }}
                         hitSlop={8}
                         accessibilityRole="button"
-                        accessibilityLabel={`Info: ${place.name}`}
+                        accessibilityLabel={t("common.infoAbout", { name: place.name })}
                       >
                         <Text style={styles.infoButtonText}>ⓘ</Text>
                       </Pressable>
@@ -587,12 +506,12 @@ export default function EmergencyScreen() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
   },
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
   },
   // ── Header ──────────────────────────────────────────────────────────
   header: {
@@ -626,7 +545,7 @@ const styles = StyleSheet.create({
   headerBadge: {
     alignSelf: "flex-start",
     backgroundColor: "rgba(239,68,68,0.18)",
-    color: "#ef4444",
+    color: COLORS.danger,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -636,13 +555,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   title: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 38,
     fontWeight: "800",
     letterSpacing: 4,
   },
   subtitle: {
-    color: "#c8c8c8",
+    color: COLORS.body,
     marginTop: 6,
     fontSize: 15,
   },
@@ -656,7 +575,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sosCardTitle: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 13,
     fontWeight: "800",
     letterSpacing: 0.8,
@@ -683,7 +602,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   sosNumber: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 18,
     fontWeight: "800",
     letterSpacing: 1,
@@ -696,12 +615,12 @@ const styles = StyleSheet.create({
   },
   // ── Buttons ─────────────────────────────────────────────────────────
   primaryButton: {
-    backgroundColor: "#ef4444",
+    backgroundColor: COLORS.danger,
     paddingVertical: 13,
     borderRadius: 6,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#ef4444",
+    shadowColor: COLORS.danger,
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
@@ -711,7 +630,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   primaryButtonText: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 15,
     fontWeight: "800",
     letterSpacing: 0.6,
@@ -724,7 +643,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    color: "#c8c8c8",
+    color: COLORS.body,
   },
   errorText: {
     color: "#f87171",
@@ -747,30 +666,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 6,
     alignItems: "center",
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: "rgba(239,68,68,0.25)",
   },
   segmentButtonActive: {
-    backgroundColor: "#ef4444",
-    borderColor: "#ef4444",
+    backgroundColor: COLORS.danger,
+    borderColor: COLORS.danger,
   },
   segmentText: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 12,
     fontWeight: "700",
   },
   segmentTextActive: {
-    color: "#ffffff",
+    color: COLORS.white,
   },
   // ── Section card ─────────────────────────────────────────────────────
   sectionCard: {
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     padding: 16,
     borderRadius: 10,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     shadowColor: "#000000",
     shadowOpacity: 0.5,
     shadowRadius: 16,
@@ -778,7 +697,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   cardTitle: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "800",
     marginBottom: 4,
@@ -791,7 +710,7 @@ const styles = StyleSheet.create({
   },
   // ── Place row ────────────────────────────────────────────────────────
   placeRow: {
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
     padding: 12,
     borderRadius: 8,
     marginBottom: 10,
@@ -799,9 +718,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     borderLeftWidth: 3,
-    borderLeftColor: "#ef4444",
+    borderLeftColor: COLORS.danger,
     shadowColor: "#000000",
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -823,16 +742,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   categoryTag: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 12,
     fontWeight: "600",
   },
   placeAddress: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 12,
   },
   placePhone: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 13,
     fontWeight: "700",
     textDecorationLine: "underline",
@@ -850,99 +769,9 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   infoButtonText: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 20,
     lineHeight: 22,
-  },
-  // ── Modal ────────────────────────────────────────────────────────────
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalCard: {
-    backgroundColor: "#141414",
-    borderRadius: 10,
-    padding: 22,
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "rgba(239,68,68,0.4)",
-    gap: 12,
-  },
-  modalTitle: {
-    color: "#ffffff",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  modalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 8,
-  },
-  modalLabel: {
-    color: "#666666",
-    fontSize: 13,
-  },
-  modalValue: {
-    color: "#c8c8c8",
-    fontSize: 13,
-    fontWeight: "500",
-    flexShrink: 1,
-    textAlign: "right",
-  },
-  modalLink: {
-    color: "#ef4444",
-    fontSize: 13,
-    fontWeight: "500",
-    flexShrink: 1,
-    textAlign: "right",
-    textDecorationLine: "underline",
-  },
-  modalNoInfo: {
-    color: "#555555",
-    fontSize: 13,
-    fontStyle: "italic",
-  },
-  modalActions: {
-    gap: 8,
-  },
-  modalActionButton: {
-    backgroundColor: "rgba(239,68,68,0.12)",
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(239,68,68,0.4)",
-  },
-  modalCallButton: {
-    backgroundColor: "#ef4444",
-    borderColor: "#ef4444",
-  },
-  modalActionButtonText: {
-    color: "#ef4444",
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  modalCallButtonText: {
-    color: "#ffffff",
-    fontWeight: "800",
-    fontSize: 15,
-  },
-  modalClose: {
-    marginTop: 8,
-    backgroundColor: "#ef4444",
-    borderRadius: 6,
-    paddingVertical: 10,
-    alignItems: "center",
-  },
-  modalCloseText: {
-    color: "#ffffff",
-    fontWeight: "800",
-    fontSize: 15,
   },
   viewToggleRow: {
     flexDirection: "row",
@@ -954,21 +783,21 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     borderRadius: 6,
     alignItems: "center",
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: "rgba(239,68,68,0.25)",
   },
   viewToggleBtnActive: {
-    backgroundColor: "#ef4444",
-    borderColor: "#ef4444",
+    backgroundColor: COLORS.danger,
+    borderColor: COLORS.danger,
   },
   viewToggleText: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 14,
     fontWeight: "700",
   },
   viewToggleTextActive: {
-    color: "#ffffff",
+    color: COLORS.white,
   },
   cacheBanner: {
     backgroundColor: "rgba(255,153,0,0.12)",
@@ -980,7 +809,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,153,0,0.3)",
   },
   cacheBannerText: {
-    color: "#f59e0b",
+    color: COLORS.warning,
     fontSize: 13,
     fontWeight: "500",
   },
@@ -994,18 +823,18 @@ const styles = StyleSheet.create({
     borderColor: "rgba(239,68,68,0.4)",
   },
   shareButtonText: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 14,
     fontWeight: "700",
   },
   // ── Large SOS button ─────────────────────────────────────────────
   bigSosButton: {
-    backgroundColor: "#ef4444",
+    backgroundColor: COLORS.danger,
     borderRadius: 20,
     paddingVertical: 20,
     alignItems: "center",
     marginBottom: 14,
-    shadowColor: "#ef4444",
+    shadowColor: COLORS.danger,
     shadowOpacity: 0.55,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
@@ -1018,13 +847,13 @@ const styles = StyleSheet.create({
     fontSize: 28,
   },
   bigSosText: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "900",
     fontSize: 22,
     letterSpacing: 2,
   },
   bigSosNumber: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "900",
     fontSize: 30,
     letterSpacing: 3,
@@ -1041,7 +870,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   quickActionsTitle: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 1.5,
@@ -1063,7 +892,7 @@ const styles = StyleSheet.create({
   },
   quickActionBtnActive: {
     backgroundColor: "rgba(239,68,68,0.25)",
-    borderColor: "#ef4444",
+    borderColor: COLORS.danger,
   },
   quickActionEmoji: {
     fontSize: 22,
@@ -1077,7 +906,7 @@ const styles = StyleSheet.create({
   // ── Torch overlay ────────────────────────────────────────────────
   torchOverlay: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: COLORS.white,
     alignItems: "center",
     justifyContent: "flex-end",
     paddingBottom: 80,
@@ -1103,7 +932,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     maxHeight: "80%",
     borderTopWidth: 2,
-    borderColor: "#ef4444",
+    borderColor: COLORS.danger,
   },
   instructionsHeader: {
     flexDirection: "row",
@@ -1111,16 +940,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#2a2a2a",
+    borderBottomColor: COLORS.border,
   },
   instructionsTitle: {
-    color: "#fff",
+    color: COLORS.white,
     fontWeight: "900",
     fontSize: 18,
     letterSpacing: 0.5,
   },
   instructionsClose: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontWeight: "700",
     fontSize: 14,
   },

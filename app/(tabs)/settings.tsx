@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
 import i18n, { saveLanguage, SUPPORTED_LANGS } from "../../lib/i18n";
+import { COLORS } from "../../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -58,7 +59,7 @@ export default function SettingsScreen() {
           accessibilityLabel={t("common.back")}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Ionicons name="arrow-back" size={18} color="#ff6600" />
+          <Ionicons name="arrow-back" size={18} color={COLORS.brand} />
           <Text style={styles.backBtnLabel} accessibilityElementsHidden importantForAccessibility="no">{t("common.back")}</Text>
         </Pressable>
       </View>
@@ -188,12 +189,12 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
   },
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
   },
   header: {
     marginTop: 18,
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
   headerBadge: {
     alignSelf: "flex-start",
     backgroundColor: "rgba(255,102,0,0.18)",
-    color: "#ff6600",
+    color: COLORS.brand,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -252,13 +253,13 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,102,0,0.35)",
   },
   backBtnLabel: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 13,
     fontWeight: "600",
     letterSpacing: 0.5,
   },
   title: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 26,
     fontWeight: "900",
     letterSpacing: 0.5,
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#111111",
   },
   sectionTitle: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 1,
@@ -308,8 +309,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   chipActive: {
-    backgroundColor: "#ff6600",
-    borderColor: "#ff6600",
+    backgroundColor: COLORS.brand,
+    borderColor: COLORS.brand,
   },
   chipPressed: {
     opacity: 0.75,
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   chipTextActive: {
-    color: "#ffffff",
+    color: COLORS.white,
   },
   tabChip: {
     paddingHorizontal: 12,
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   clearCacheButtonText: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 13,
     fontWeight: "700",
     letterSpacing: 0.3,

@@ -36,7 +36,9 @@
     "readWikipedia": "📖 Lesa á Wikipediu",
     "cachedResults": "📡 Sýni geymd niðurstöður — uppfærðu til að fá nýjustu",
     "fuelTypes": "⛽ Eldsneytistegundir",
-    "cacheAge": "Gögn frá {{count}} mín síðan"
+    "cacheAge": "Gögn frá {{count}} mín síðan",
+    "ok": "Í lagi",
+    "infoAbout": "Upplýsingar: {{name}}"
   },
   "language": {
     "label": "🌍 Tungumál",
@@ -329,7 +331,8 @@
     "quickActionTorch": "Ljós",
     "quickActionInstructions": "Leiðbeiningar",
     "locationCopied": "📍 Afritað!",
-    "locationCopiedMsg": "Staðsetningartengilinn þinn hefur verið afritaður á klippiborðið."
+    "locationCopiedMsg": "Staðsetningartengilinn þinn hefur verið afritaður á klippiborðið.",
+    "shareLocationShort": "Deila staðsetningu minni"
   },
   "triplog": {
     "badge": "🏍️ FERÐASKRÁ",

@@ -10,8 +10,13 @@ interface AsyncStorageLike {
   removeItem(key: string): Promise<void>;
 }
 
+interface AsyncStorageNative extends AsyncStorageLike {
+  getAllKeys(): Promise<readonly string[]>;
+  multiRemove(keys: readonly string[]): Promise<void>;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const nativeStorage: AsyncStorageLike | null = (() => {
+const nativeStorage: AsyncStorageNative | null = (() => {
   try {
     return require("@react-native-async-storage/async-storage").default;
   } catch {
@@ -74,5 +79,36 @@ export async function readTimedCache<T>(
 export async function writeTimedCache<T>(key: string, data: T[]): Promise<void> {
   try {
     await storage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  } catch {}
+}
+
+/** Cache entries older than this are deleted by pruneStaleCaches. */
+const CACHE_PRUNE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1_000; // 7 days
+
+/**
+ * Delete stale `cache_*` entries on app boot. Old versioned keys (e.g. a
+ * retired `cache_hotels_v1`) stop being rewritten when the key version bumps,
+ * so they age past the cutoff and get removed here instead of leaking in
+ * AsyncStorage forever. Unparsable payloads are removed immediately.
+ * Never throws; runs fire-and-forget.
+ */
+export async function pruneStaleCaches(): Promise<void> {
+  if (!nativeStorage) return;
+  try {
+    const keys = (await nativeStorage.getAllKeys()).filter((k) => k.startsWith("cache_"));
+    const toRemove: string[] = [];
+    for (const key of keys) {
+      try {
+        const raw = await nativeStorage.getItem(key);
+        if (!raw) continue;
+        const ts = JSON.parse(raw)?.ts;
+        if (typeof ts !== "number" || Date.now() - ts > CACHE_PRUNE_MAX_AGE_MS) {
+          toRemove.push(key);
+        }
+      } catch {
+        toRemove.push(key); // unparsable → junk
+      }
+    }
+    if (toRemove.length > 0) await nativeStorage.multiRemove(toRemove);
   } catch {}
 }

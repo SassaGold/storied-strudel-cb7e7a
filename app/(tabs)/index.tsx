@@ -22,6 +22,7 @@ import { WeatherCard } from "../../components/WeatherCard";
 import { SunCard } from "../../components/SunCard";
 import { RoadConditionsCard } from "../../components/RoadConditionsCard";
 
+import { COLORS } from "../../lib/theme";
 const Haptics: typeof import("expo-haptics") | null = (() => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -114,7 +115,7 @@ export default function Index() {
         { paddingTop: insets.top + 20, paddingBottom: insets.bottom + 40 },
       ]}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.brand} colors={[COLORS.brand]} />
       }
     >
       {/* ── Header ───────────────────────────────────────────────── */}
@@ -372,8 +373,8 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  scrollView: { flex: 1, backgroundColor: "#0a0a0a", overflow: "hidden" },
-  container: { padding: 20, backgroundColor: "#0a0a0a" },
+  scrollView: { flex: 1, backgroundColor: COLORS.bg, overflow: "hidden" },
+  container: { padding: 20, backgroundColor: COLORS.bg },
   // ── Header ──────────────────────────────────────────────────────
   header: {
     marginTop: 18,
@@ -428,7 +429,7 @@ const styles = StyleSheet.create({
   },
   logoMoto: { fontSize: 16, lineHeight: 20, textAlign: "center", marginRight: 6 },
   logoTitle: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 16,
     fontWeight: "900",
     letterSpacing: 1.8,
@@ -449,12 +450,12 @@ const styles = StyleSheet.create({
   },
   // ── Buttons ──────────────────────────────────────────────────────
   primaryButton: {
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     paddingVertical: 13,
     borderRadius: 6,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#ff6600",
+    shadowColor: COLORS.brand,
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
@@ -469,13 +470,13 @@ const styles = StyleSheet.create({
   secondaryButton: {
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#ff6600",
+    borderColor: COLORS.brand,
     backgroundColor: "rgba(255,102,0,0.08)",
     paddingVertical: 8,
     borderRadius: 10,
     alignItems: "center",
   },
-  secondaryButtonText: { color: "#ff6600", fontSize: 14, fontWeight: "700" },
+  secondaryButtonText: { color: COLORS.brand, fontSize: 14, fontWeight: "700" },
   // ── Loading / error ───────────────────────────────────────────────
   loadingRow: {
     flexDirection: "row",
@@ -483,16 +484,16 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 10,
   },
-  loadingText: { color: "#c8c8c8" },
+  loadingText: { color: COLORS.body },
   errorText: { color: "#f87171", marginBottom: 12 },
   // ── Generic card ──────────────────────────────────────────────────
   card: {
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     shadowColor: "#000000",
     shadowOpacity: 0.4,
     shadowRadius: 12,
@@ -500,14 +501,14 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   cardTitle: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "800",
     marginBottom: 8,
     letterSpacing: 1,
   },
-  bodyText: { color: "#c8c8c8", fontSize: 15, marginBottom: 4 },
-  metaText: { color: "#666666", fontSize: 13 },
+  bodyText: { color: COLORS.body, fontSize: 15, marginBottom: 4 },
+  metaText: { color: COLORS.muted, fontSize: 13 },
   // ── Language modal ────────────────────────────────────────────────
   langModalOverlay: {
     flex: 1,
@@ -524,7 +525,7 @@ const styles = StyleSheet.create({
     width: 260,
   },
   langModalTitle: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 14,
     fontWeight: "700",
     letterSpacing: 1,
@@ -542,7 +543,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   langModalOptionActive: {
-    borderColor: "#ff6600",
+    borderColor: COLORS.brand,
     backgroundColor: "rgba(255,102,0,0.12)",
   },
   langModalOptionPressed: { backgroundColor: "rgba(255,102,0,0.22)" },
@@ -552,10 +553,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
   },
-  langModalOptionTextActive: { color: "#ff6600" },
+  langModalOptionTextActive: { color: COLORS.brand },
   // ── Quick nav grid ────────────────────────────────────────────────
   quickNavLabel: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1.2,
@@ -571,9 +572,9 @@ const styles = StyleSheet.create({
   },
   quickNavBtn: {
     width: "47%",
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     borderRadius: 14,
     paddingVertical: 8,
     alignItems: "center",
@@ -582,11 +583,11 @@ const styles = StyleSheet.create({
   },
   quickNavBtnPressed: {
     backgroundColor: "rgba(255,102,0,0.12)",
-    borderColor: "#ff6600",
+    borderColor: COLORS.brand,
   },
   quickNavEmoji: { fontSize: 20 },
   quickNavText: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 12,
     fontWeight: "800",
     letterSpacing: 1,
@@ -595,7 +596,7 @@ const styles = StyleSheet.create({
     width: "47%",
     backgroundColor: "rgba(239,68,68,0.12)",
     borderWidth: 2,
-    borderColor: "#ef4444",
+    borderColor: COLORS.danger,
     borderRadius: 14,
     paddingVertical: 8,
     alignItems: "center",
@@ -604,7 +605,7 @@ const styles = StyleSheet.create({
   },
   quickNavBtnSosPressed: { backgroundColor: "rgba(239,68,68,0.25)" },
   quickNavTextSos: {
-    color: "#ef4444",
+    color: COLORS.danger,
     fontSize: 15,
     fontWeight: "900",
     letterSpacing: 2,

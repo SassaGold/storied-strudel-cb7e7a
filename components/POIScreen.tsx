@@ -23,6 +23,7 @@ import PlaceInfoModal from "./PlaceInfoModal";
 import POIMap from "./POIMap";
 
 
+import { COLORS } from "../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
@@ -141,7 +142,7 @@ export default function POIScreen({
       style={styles.scrollView}
       contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ff6600" colors={["#ff6600"]} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.brand} colors={[COLORS.brand]} />
       }
     >
       {/* ── Info modal ── */}
@@ -255,7 +256,7 @@ export default function POIScreen({
                   onPress={(e) => { e.stopPropagation(); hapticLight(); openInfo(place); }}
                   hitSlop={8}
                   accessibilityRole="button"
-                  accessibilityLabel={`Info: ${place.name}`}
+                  accessibilityLabel={t("common.infoAbout", { name: place.name })}
                 >
                   <Text style={styles.infoButtonText}>ⓘ</Text>
                 </Pressable>
@@ -272,12 +273,12 @@ export default function POIScreen({
 const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
   },
   container: {
     padding: 20,
     paddingBottom: 40,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
   },
   header: {
     marginTop: 18,
@@ -310,7 +311,7 @@ const styles = StyleSheet.create({
   headerBadge: {
     alignSelf: "flex-start",
     backgroundColor: "rgba(255,102,0,0.18)",
-    color: "#ff6600",
+    color: COLORS.brand,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -320,23 +321,23 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   title: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 28,
     fontWeight: "800",
     letterSpacing: 2,
   },
   subtitle: {
-    color: "#c8c8c8",
+    color: COLORS.body,
     marginTop: 6,
     fontSize: 15,
   },
   primaryButton: {
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     paddingVertical: 13,
     borderRadius: 6,
     alignItems: "center",
     marginBottom: 16,
-    shadowColor: "#ff6600",
+    shadowColor: COLORS.brand,
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
@@ -355,23 +356,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loadingText: {
-    color: "#c8c8c8",
+    color: COLORS.body,
   },
   errorText: {
     color: "#f87171",
     marginBottom: 12,
   },
   bodyText: {
-    color: "#c8c8c8",
+    color: COLORS.body,
     fontSize: 15,
     marginBottom: 12,
   },
   metaText: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 13,
   },
   placeRow: {
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     padding: 14,
     borderRadius: 8,
     marginBottom: 10,
@@ -379,9 +380,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     borderLeftWidth: 3,
-    borderLeftColor: "#ff6600",
+    borderLeftColor: COLORS.brand,
     shadowColor: "#000000",
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -405,7 +406,7 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   infoButtonText: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 20,
     lineHeight: 22,
   },
@@ -419,16 +420,16 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
     borderRadius: 6,
     alignItems: "center",
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.25)",
   },
   viewToggleBtnActive: {
-    backgroundColor: "#ff6600",
-    borderColor: "#ff6600",
+    backgroundColor: COLORS.brand,
+    borderColor: COLORS.brand,
   },
   viewToggleText: {
-    color: "#666666",
+    color: COLORS.muted,
     fontSize: 14,
     fontWeight: "700",
   },
@@ -445,7 +446,7 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,153,0,0.3)",
   },
   cacheBannerText: {
-    color: "#f59e0b",
+    color: COLORS.warning,
     fontSize: 13,
     fontWeight: "500",
   },

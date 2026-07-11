@@ -6,6 +6,7 @@ import { Component } from "react";
 import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { COLORS } from "../lib/theme";
 type Props = {
   children: ReactNode;
   /** Heading shown in the fallback UI (default: "Something went wrong") */
@@ -73,13 +74,13 @@ export class ErrorBoundary extends Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
     alignItems: "center",
     justifyContent: "center",
     padding: 32,
   },
   emoji: { fontSize: 48, marginBottom: 16 },
-  title: { color: "#fff", fontSize: 20, fontWeight: "800", marginBottom: 8 },
+  title: { color: COLORS.white, fontSize: 20, fontWeight: "800", marginBottom: 8 },
   message: {
     color: "#888",
     fontSize: 13,
@@ -87,11 +88,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   btn: {
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     paddingHorizontal: 28,
     paddingVertical: 12,
     borderRadius: 24,
   },
   btnPressed: { opacity: 0.75 },
-  btnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
+  btnText: { color: COLORS.white, fontWeight: "700", fontSize: 15 },
 });

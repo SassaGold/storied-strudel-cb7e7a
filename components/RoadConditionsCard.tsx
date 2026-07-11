@@ -16,6 +16,7 @@ import { type RoadAlert, humanizeConstructionType } from "../lib/roads";
 import { fmtDistShort, type UnitSystem } from "../lib/settings";
 import { KM_TO_MILES } from "../lib/config";
 
+import { COLORS } from "../lib/theme";
 const Haptics: typeof import("expo-haptics") | null = (() => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -56,7 +57,7 @@ export const RoadConditionsCard = memo(function RoadConditionsCard({
 
       {loading ? (
         <View style={styles.loadingRow}>
-          <ActivityIndicator size="small" color="#ff6600" />
+          <ActivityIndicator size="small" color={COLORS.brand} />
           <Text style={styles.loadingText}>{t("home.roadConditionsLoading")}</Text>
         </View>
       ) : roadAlerts.length === 0 ? (
@@ -155,21 +156,21 @@ export const RoadConditionsCard = memo(function RoadConditionsCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     shadowColor: "#000000",
     shadowOpacity: 0.4,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
   },
-  roadAlertCard: { borderColor: "#f59e0b", borderWidth: 1 },
+  roadAlertCard: { borderColor: COLORS.warning, borderWidth: 1 },
   cardTitle: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "800",
     marginBottom: 8,
@@ -181,10 +182,10 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 10,
   },
-  loadingText: { color: "#c8c8c8" },
-  roadConditionsAllClear: { color: "#22c55e", fontSize: 14, marginBottom: 4 },
+  loadingText: { color: COLORS.body },
+  roadConditionsAllClear: { color: COLORS.success, fontSize: 14, marginBottom: 4 },
   roadConditionsCount: {
-    color: "#f59e0b",
+    color: COLORS.warning,
     fontSize: 13,
     fontWeight: "700",
     marginBottom: 10,
@@ -208,7 +209,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   roadAlertType: {
-    color: "#f59e0b",
+    color: COLORS.warning,
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 0.5,
@@ -220,22 +221,22 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     flexShrink: 0,
   },
-  roadAlertName: { color: "#c8c8c8", fontSize: 13, marginTop: 2 },
+  roadAlertName: { color: COLORS.body, fontSize: 13, marginTop: 2 },
   roadAlertDesc: {
     color: "#a3a3a3",
     fontSize: 12,
     marginTop: 2,
     fontStyle: "italic",
   },
-  roadAlertMapHint: { color: "#f59e0b", fontSize: 11, marginTop: 4, opacity: 0.75 },
+  roadAlertMapHint: { color: COLORS.warning, fontSize: 11, marginTop: 4, opacity: 0.75 },
   secondaryButton: {
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#ff6600",
+    borderColor: COLORS.brand,
     backgroundColor: "rgba(255,102,0,0.08)",
     paddingVertical: 8,
     borderRadius: 10,
     alignItems: "center",
   },
-  secondaryButtonText: { color: "#ff6600", fontSize: 14, fontWeight: "700" },
+  secondaryButtonText: { color: COLORS.brand, fontSize: 14, fontWeight: "700" },
 });

@@ -36,7 +36,9 @@
     "readWikipedia": "📖 Auf Wikipedia lesen",
     "cachedResults": "📡 Zwischengespeicherte Ergebnisse — aktualisieren für neueste",
     "fuelTypes": "⛽ Kraftstoffarten",
-    "cacheAge": "Daten von vor {{count}} Min"
+    "cacheAge": "Daten von vor {{count}} Min",
+    "ok": "OK",
+    "infoAbout": "Info: {{name}}"
   },
   "language": {
     "label": "🌍 Sprache",
@@ -329,7 +331,8 @@
     "quickActionTorch": "Licht",
     "quickActionInstructions": "Anweisungen",
     "locationCopied": "📍 Kopiert!",
-    "locationCopiedMsg": "Dein Standortlink wurde in die Zwischenablage kopiert."
+    "locationCopiedMsg": "Dein Standortlink wurde in die Zwischenablage kopiert.",
+    "shareLocationShort": "Standort teilen"
   },
   "triplog": {
     "badge": "🏍️ TOUR",

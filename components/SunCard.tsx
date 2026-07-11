@@ -6,6 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { type SunTimes, type PolarState, formatTime, formatDuration } from "../lib/sun";
 
+import { COLORS } from "../lib/theme";
 type Props = {
   sunTimes: SunTimes;
   polarState?: PolarState | null;
@@ -57,12 +58,12 @@ export const SunCard = memo(function SunCard({ sunTimes, polarState }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#141414",
+    backgroundColor: COLORS.card,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
     shadowColor: "#000000",
     shadowOpacity: 0.4,
     shadowRadius: 12,
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   cardTitle: {
-    color: "#ffffff",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "800",
     marginBottom: 8,
@@ -78,21 +79,21 @@ const styles = StyleSheet.create({
   },
   sunTimesRow: {
     flexDirection: "row",
-    backgroundColor: "#0a0a0a",
+    backgroundColor: COLORS.bg,
     borderRadius: 8,
     paddingVertical: 12,
     marginTop: 14,
     borderWidth: 1,
-    borderColor: "#2a2a2a",
+    borderColor: COLORS.border,
   },
   sunTimesItem: { flex: 1, alignItems: "center" },
   sunTimesDivider: {
     width: 1,
-    backgroundColor: "#2a2a2a",
+    backgroundColor: COLORS.border,
     marginVertical: 4,
   },
   sunTimesEmoji: { fontSize: 22, marginBottom: 4 },
-  sunTimesValue: { color: "#ff6600", fontSize: 16, fontWeight: "800" },
-  sunTimesLabel: { color: "#666666", fontSize: 12, marginTop: 2 },
-  polarText: { color: "#c8c8c8", fontSize: 14, marginTop: 10, lineHeight: 20 },
+  sunTimesValue: { color: COLORS.brand, fontSize: 16, fontWeight: "800" },
+  sunTimesLabel: { color: COLORS.muted, fontSize: 12, marginTop: 2 },
+  polarText: { color: COLORS.body, fontSize: 14, marginTop: 10, lineHeight: 20 },
 });

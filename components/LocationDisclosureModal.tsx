@@ -2,6 +2,7 @@ import { Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "r
 import { useTranslation } from "react-i18next";
 import { PRIVACY_POLICY_URL } from "../lib/config";
 
+import { COLORS } from "../lib/theme";
 interface Props {
   visible: boolean;
   onAllow: () => void;
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   title: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: 0.5,
@@ -104,27 +105,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   body: {
-    color: "#c8c8c8",
+    color: COLORS.body,
     fontSize: 14,
     lineHeight: 20,
     textAlign: "center",
     marginBottom: 8,
   },
   privacyLink: {
-    color: "#ff6600",
+    color: COLORS.brand,
     fontSize: 13,
     textDecorationLine: "underline",
     textAlign: "center",
     marginBottom: 12,
   },
   allowBtn: {
-    backgroundColor: "#ff6600",
+    backgroundColor: COLORS.brand,
     paddingVertical: 11,
     borderRadius: 10,
     alignItems: "center",
     width: "100%",
     marginBottom: 8,
-    shadowColor: "#ff6600",
+    shadowColor: COLORS.brand,
     shadowOpacity: 0.25,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
