@@ -22,6 +22,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..');
 const APP_JSON = path.join(ROOT, 'app.json');
 const PKG_JSON = path.join(ROOT, 'package.json');
+const README = path.join(ROOT, 'README.md');
 
 const type = (process.argv[2] || 'patch').toLowerCase();
 if (!['patch', 'minor', 'major'].includes(type)) {
@@ -61,21 +62,6 @@ const next = bumpSemver(current, type);
 // ── Update ───────────────────────────────────────────────────────────────────
 
 appJson.expo.version = next;
-
-// Keep ios.buildNumber in sync (increment as integer string)
-const hasBuildNumber =
-  appJson.expo.ios && appJson.expo.ios.buildNumber !== undefined;
-if (hasBuildNumber) {
-  const currentBuild = parseInt(appJson.expo.ios.buildNumber, 10);
-  if (isNaN(currentBuild)) {
-    console.error(
-      `Invalid ios.buildNumber "${appJson.expo.ios.buildNumber}" — must be a numeric string.`
-    );
-    process.exit(1);
-  }
-  appJson.expo.ios.buildNumber = String(currentBuild + 1);
-}
-
 pkgJson.version = next;
 
 // ── Write ────────────────────────────────────────────────────────────────────
@@ -83,7 +69,15 @@ pkgJson.version = next;
 writeJson(APP_JSON, appJson);
 writeJson(PKG_JSON, pkgJson);
 
-console.log(`Version bumped (${type}): ${current} → ${next}`);
-if (hasBuildNumber) {
-  console.log(`iOS buildNumber updated to: ${appJson.expo.ios.buildNumber}`);
+// Keep the README's version banner in sync so it can't go stale.
+try {
+  const readme = fs.readFileSync(README, 'utf8');
+  const updated = readme
+    .replace(/Current version: \d+\.\d+\.\d+/, `Current version: ${next}`)
+    .replace(/user-facing version \(`\d+\.\d+\.\d+`\)/, `user-facing version (\`${next}\`)`);
+  if (updated !== readme) fs.writeFileSync(README, updated, 'utf8');
+} catch {
+  // README is cosmetic — never fail the bump over it.
 }
+
+console.log(`Version bumped (${type}): ${current} → ${next}`);

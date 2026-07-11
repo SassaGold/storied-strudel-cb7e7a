@@ -12,6 +12,8 @@
   "common": {
     "loading": "Laden...",
     "back": "← Zurück",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "tryAgain": "Erneut versuchen",
     "searching": "Suchen...",
     "close": "Schließen",
     "openInMaps": "IN KARTEN ÖFFNEN",
