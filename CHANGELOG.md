@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.4 — Feature Release (2026-07-11)
+
+Full-app review release (PRs #92–#99). New rider features: **GPX export** per saved ride (share to Strava/Komoot/Garmin), **pause/resume recording** (fuel stops no longer end the ride or skew stats), **max speed** per ride and **lifetime totals** (rides/distance/time), and the Garage tab now auto-loads like the other tabs. Bug fixes: forecast timezone handling (dropped/duplicated days far from UTC), SOS network-error message that could never appear, negative daylight duration at eastern longitudes, MC category results now restore from cache when switching tiles, and a background-recording task leak after leaving the Trip tab mid-ride. Under the hood: CI actually runs now (was watching the wrong branch) with a new typecheck step, timeouts on all external API calls, Overpass query hardening, a central color theme, a shared SOS info modal with call button, week-old cache pruning, 49 new unit tests (288 total), and 21 new translations × 9 languages.
+
+---
+
 ## v1.2.3 — Patch Release (2026-07-10)
 
 Feature and cleanup batch. Emoji + readable category labels on MC Garage results and place-info modals; map-matched road routes shown for saved trips (OSRM); tap-to-expand full-screen trip map; Netlify web deploys retired (`netlify.toml` removed). Includes all merged improvement batches since 1.2.2: offline cache banners with age, pull-to-refresh across data screens, and POI map/list view toggle powered by OSM tiles.
