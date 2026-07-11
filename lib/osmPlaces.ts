@@ -160,12 +160,14 @@ export async function fetchOsmPlaces(
           ],
           contacts: hasContactData ? [primaryContact] : undefined,
           openingHours: openingHours ? [{ text: [openingHours] }] : undefined,
+          // OSM address tags live in the `addr:` namespace (addr:street etc.),
+          // not as bare keys.
           address: {
-            label: [tags.street, tags.housenumber].filter(Boolean).join(" "),
-            street: tags.street,
-            houseNumber: tags.housenumber,
-            city: tags.city || tags.town || tags.village,
-            countryName: tags.country,
+            label: [tags["addr:street"], tags["addr:housenumber"]].filter(Boolean).join(" "),
+            street: tags["addr:street"],
+            houseNumber: tags["addr:housenumber"],
+            city: tags["addr:city"] || tags["addr:place"],
+            countryName: tags["addr:country"],
           },
           tags,
         };

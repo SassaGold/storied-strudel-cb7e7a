@@ -7,6 +7,9 @@ import { haversineMeters } from "./overpass";
 
 export type GpsPoint = { latitude: number; longitude: number; timestamp: number };
 
+/** A [start, end] epoch-ms interval during which the ride was paused. */
+export type PausedInterval = [number, number];
+
 export type SavedRide = {
   id: string;
   date: string; // ISO string
@@ -61,14 +64,24 @@ export const formatDate = (iso: string, locale?: string): string => {
   });
 };
 
-/** Sum a route's great-circle distance in km, ignoring < 3 m GPS jitter. */
-export const routeDistanceKm = (route: GpsPoint[]): number => {
+/**
+ * Sum a route's great-circle distance in km, ignoring < 3 m GPS jitter.
+ * Segments that span a paused interval are skipped: no points are recorded
+ * while paused, so the leg from the last pre-pause point to the first
+ * post-resume point is ground covered while NOT riding and must not count
+ * (the live odometer already excludes it — this keeps the recomputed saved
+ * distance consistent with what the rider saw).
+ */
+export const routeDistanceKm = (
+  route: GpsPoint[],
+  pausedIntervals: PausedInterval[] = []
+): number => {
   let km = 0;
   for (let i = 1; i < route.length; i++) {
-    const d = haversineMeters(
-      route[i - 1].latitude, route[i - 1].longitude,
-      route[i].latitude, route[i].longitude,
-    );
+    const a = route[i - 1];
+    const b = route[i];
+    if (pausedIntervals.some(([s, e]) => a.timestamp <= e && b.timestamp >= s)) continue;
+    const d = haversineMeters(a.latitude, a.longitude, b.latitude, b.longitude);
     if (d >= MIN_MOVE_M) km += d / 1000;
   }
   return km;
@@ -80,9 +93,10 @@ export const buildRide = (
   startTime: number | null,
   endTime: number,
   seq: number,
-  maxSpeedKmh?: number
+  maxSpeedKmh?: number,
+  pausedIntervals: PausedInterval[] = []
 ): SavedRide | null => {
-  const distanceKm = routeDistanceKm(route);
+  const distanceKm = routeDistanceKm(route, pausedIntervals);
   if (distanceKm <= MIN_RIDE_KM) return null;
   const durationMs = startTime ? Math.max(0, endTime - startTime) : 0;
   const avgSpeedKmh = durationMs > 0 ? distanceKm / (durationMs / 3_600_000) : 0;

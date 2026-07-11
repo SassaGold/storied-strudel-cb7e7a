@@ -376,7 +376,7 @@
     "hideRoute": "▲ Ocultar Ruta",
     "tapToExpand": "Toca para ampliar",
     "notifDisabledTitle": "Las notificaciones están desactivadas",
-    "notifDisabledMsg": "Trip Logger necesita las notificaciones activadas para que Android pueda mostrar la grabación activa en la barra de notificaciones.",
+    "notifDeniedContinueMsg": "La grabación seguirá funcionando, pero Android no mostrará la notificación del viaje en curso mientras la app esté en segundo plano. Puedes activar las notificaciones en los ajustes del sistema.",
     "openSettings": "Abrir Ajustes",
     "exportGpx": "📤 GPX",
     "exportFailed": "Error al exportar",

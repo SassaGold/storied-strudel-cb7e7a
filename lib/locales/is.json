@@ -376,7 +376,7 @@
     "hideRoute": "▲ Fela leið",
     "tapToExpand": "Ýttu til að stækka",
     "notifDisabledTitle": "Slökkt er á tilkynningum",
-    "notifDisabledMsg": "Trip Logger þarf tilkynningar virkar svo Android geti sýnt virka upptöku í tilkynningastikunni.",
+    "notifDeniedContinueMsg": "Upptakan virkar áfram, en Android sýnir ekki tilkynninguna um ferðina í gangi meðan appið er í bakgrunni. Þú getur kveikt á tilkynningum í kerfisstillingum.",
     "openSettings": "Opna stillingar",
     "exportGpx": "📤 GPX",
     "exportFailed": "Útflutningur mistókst",

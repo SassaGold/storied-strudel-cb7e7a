@@ -376,7 +376,7 @@
     "hideRoute": "▲ Dölj rutt",
     "tapToExpand": "Tryck för att förstora",
     "notifDisabledTitle": "Aviseringar är avstängda",
-    "notifDisabledMsg": "Trip Logger behöver aviseringar aktiverade så att Android kan visa den pågående inspelningen i aviseringsfältet.",
+    "notifDeniedContinueMsg": "Inspelningen fungerar fortfarande, men Android visar inte aviseringen om den pågående turen medan appen är i bakgrunden. Du kan aktivera aviseringar i systeminställningarna.",
     "openSettings": "Öppna inställningar",
     "exportGpx": "📤 GPX",
     "exportFailed": "Export misslyckades",

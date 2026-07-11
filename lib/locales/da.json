@@ -376,7 +376,7 @@
     "hideRoute": "▲ Skjul rute",
     "tapToExpand": "Tryk for at udvide",
     "notifDisabledTitle": "Notifikationer er slået fra",
-    "notifDisabledMsg": "Trip Logger har brug for notifikationer slået til, så Android kan vise den aktive optagelse i notifikationspanelet.",
+    "notifDeniedContinueMsg": "Optagelsen fungerer stadig, men Android viser ikke notifikationen om den igangværende tur, mens appen er i baggrunden. Du kan slå notifikationer til i systemindstillingerne.",
     "openSettings": "Åbn indstillinger",
     "exportGpx": "📤 GPX",
     "exportFailed": "Eksport mislykkedes",

@@ -376,7 +376,7 @@
     "hideRoute": "▲ Route verbergen",
     "tapToExpand": "Tik om te vergroten",
     "notifDisabledTitle": "Meldingen zijn uitgeschakeld",
-    "notifDisabledMsg": "Trip Logger heeft meldingen nodig zodat Android de actieve opname in het meldingenpaneel kan tonen.",
+    "notifDeniedContinueMsg": "De opname blijft werken, maar Android toont de melding van de lopende rit niet terwijl de app op de achtergrond is. Je kunt meldingen inschakelen in de systeeminstellingen.",
     "openSettings": "Instellingen openen",
     "exportGpx": "📤 GPX",
     "exportFailed": "Exporteren mislukt",

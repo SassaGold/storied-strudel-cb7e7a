@@ -23,6 +23,7 @@ export type HourlyForecast = {
 export type WeatherInfo = {
   temperatureC?: number;
   feelsLikeC?: number;
+  /** Wind speed in km/h (Open-Meteo's default wind_speed_unit). */
   windSpeed?: number;
   windDirection?: number;
   humidity?: number;
@@ -141,6 +142,16 @@ export const weatherEmoji = (sym?: string): string => {
 
 // ── Riding analysis ───────────────────────────────────────────────────────────
 
+// Wind thresholds in km/h. windSpeed arrives in km/h from Open-Meteo; these
+// were originally written as m/s values (10/15), which made a gentle breeze
+// trigger "gusty winds".
+/** Noticeably windy for a rider — crosswind gusts start to matter. */
+export const WIND_GUSTY_KMH = 36; // ≈ 10 m/s
+/** Strong wind — riding significantly affected. */
+export const WIND_STRONG_KMH = 54; // ≈ 15 m/s
+/** Light-breeze threshold used only for the suitability score. */
+const WIND_BREEZY_KMH = 25; // ≈ 7 m/s
+
 /**
  * Return a list of i18n warning-key strings for the given weather conditions.
  * Returns an empty array when weather is undefined.
@@ -156,8 +167,8 @@ export const buildAlerts = (weather?: WeatherInfo): string[] => {
   else if (temp <= 5)  alerts.push("home.alerts.cold");
   if (temp >= 35)      alerts.push("home.alerts.extremeHeat");
   else if (temp >= 30) alerts.push("home.alerts.highHeat");
-  if (wind >= 15)      alerts.push("home.alerts.strongWinds");
-  else if (wind >= 10) alerts.push("home.alerts.gustyWinds");
+  if (wind >= WIND_STRONG_KMH)     alerts.push("home.alerts.strongWinds");
+  else if (wind >= WIND_GUSTY_KMH) alerts.push("home.alerts.gustyWinds");
   if (rainChance >= 60) alerts.push("home.alerts.rainExpected");
 
   return alerts;
@@ -180,9 +191,9 @@ export const ridingSuitability = (
   else if (temp >= 35) score -= 20;
   else if (temp >= 30) score -= 10;
 
-  if (wind >= 15) score -= 30;
-  else if (wind >= 10) score -= 15;
-  else if (wind >= 7) score -= 8;
+  if (wind >= WIND_STRONG_KMH) score -= 30;
+  else if (wind >= WIND_GUSTY_KMH) score -= 15;
+  else if (wind >= WIND_BREEZY_KMH) score -= 8;
 
   if (precip >= 5) score -= 20;
   else if (precip >= 1) score -= 10;
@@ -213,7 +224,7 @@ export const buildRecommendations = (weather?: WeatherInfo): string[] => {
   if (temp <= 0)        recs.push("home.recs.thermalGear");
   else if (temp <= 10)  recs.push("home.recs.layerUp");
   if (temp >= 30)       recs.push("home.recs.lightGear");
-  if (wind >= 10)       recs.push("home.recs.secureLuggage");
+  if (wind >= WIND_GUSTY_KMH) recs.push("home.recs.secureLuggage");
   if (rainChance >= 60) recs.push("home.recs.rainGear");
 
   return recs;
