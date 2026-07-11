@@ -384,7 +384,11 @@
     "maxSpeed": "Max",
     "totalRides": "Turer",
     "totalDistance": "Total distans",
-    "totalTime": "Total tid"
+    "totalTime": "Total tid",
+    "pause": "PAUS",
+    "resume": "FORTSÄTT",
+    "pausedHint": "Pausad — tid och distans är pausade",
+    "stopShort": "STOPP"
   },
   "about": {
     "badge": "ℹ️ OM",

@@ -384,7 +384,11 @@
     "maxSpeed": "Hám.",
     "totalRides": "Ferðir",
     "totalDistance": "Heildarvegalengd",
-    "totalTime": "Heildartími"
+    "totalTime": "Heildartími",
+    "pause": "HLÉ",
+    "resume": "HALDA ÁFRAM",
+    "pausedHint": "Í hléi — tími og vegalengd eru í bið",
+    "stopShort": "STOPP"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",

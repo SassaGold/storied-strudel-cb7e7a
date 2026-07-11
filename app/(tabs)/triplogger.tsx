@@ -71,6 +71,7 @@ export default function TripLoggerScreen() {
 
   // Recording state
   const [recording, setRecording] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [route, setRoute] = useState<GpsPoint[]>([]);
   const [distanceKm, setDistanceKm] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -103,6 +104,20 @@ export default function TripLoggerScreen() {
   const recordingRef = useRef(false);
   /** Highest reliable speed observed during the current recording (km/h). */
   const maxSpeedRef = useRef(0);
+  // ── Pause bookkeeping ──
+  // While paused the recording watcher keeps running (live speed stays visible)
+  // but appends no points. On resume, startTimeRef is shifted forward by the
+  // paused duration, which keeps the timer, checkpoints and final ride stats
+  // consistent without special-casing them.
+  const pausedRef = useRef(false);
+  /** Epoch ms when the current pause began, or null when not paused. */
+  const pauseStartedAtRef = useRef<number | null>(null);
+  /** Paused [start, end] intervals — used to drop background points recorded
+   *  during a pause when the route is merged on stop. */
+  const pausedIntervalsRef = useRef<[number, number][]>([]);
+  /** True right after a resume: the next accepted point must not add distance
+   *  (the rider may have rolled a short way while paused). */
+  const skipNextDistanceRef = useRef(false);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const prevSpeedPointRef = useRef<{ latitude: number; longitude: number; timestamp: number } | null>(null);
   const lastCheckpointRef = useRef(0);
@@ -256,9 +271,10 @@ export default function TripLoggerScreen() {
     loadRides();
   }, [loadRides]);
 
-  // Timer tick
+  // Timer tick — frozen while paused (startTime is shifted forward on resume,
+  // so the displayed elapsed time excludes the paused stretch).
   useEffect(() => {
-    if (recording && startTime !== null) {
+    if (recording && !paused && startTime !== null) {
       timerRef.current = setInterval(() => {
         setElapsedMs(Date.now() - startTime);
       }, 1000);
@@ -266,11 +282,11 @@ export default function TripLoggerScreen() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [recording, startTime]);
+  }, [recording, paused, startTime]);
 
-  // Recording pulse animation
+  // Recording pulse animation (steady while paused)
   useEffect(() => {
-    if (recording) {
+    if (recording && !paused) {
       const pulse = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, { toValue: 0.25, duration: 600, useNativeDriver: true }),
@@ -282,7 +298,7 @@ export default function TripLoggerScreen() {
     } else {
       pulseAnim.setValue(1);
     }
-  }, [recording, pulseAnim]);
+  }, [recording, paused, pulseAnim]);
 
   const startRecording = useCallback(async () => {
     setPermError(false);
@@ -325,6 +341,11 @@ export default function TripLoggerScreen() {
       routeRef.current = [];
       distRef.current = 0;
       maxSpeedRef.current = 0;
+      pausedRef.current = false;
+      pauseStartedAtRef.current = null;
+      pausedIntervalsRef.current = [];
+      skipNextDistanceRef.current = false;
+      setPaused(false);
       const now = Date.now();
       startTimeRef.current = now;
       setRoute([]);
@@ -394,6 +415,9 @@ export default function TripLoggerScreen() {
             // inflate the recorded distance. Speed/accuracy are still shown above.
             if (acc != null && acc > TRIP_MAX_GPS_ACCURACY_M) return;
 
+            // Paused: keep the live speed display but record nothing.
+            if (pausedRef.current) return;
+
             // Track the ride's top speed from reliable fixes only (a bad fix
             // past this guard would otherwise fake a huge max).
             if (speedKmh != null && speedKmh > maxSpeedRef.current) {
@@ -406,11 +430,23 @@ export default function TripLoggerScreen() {
               const dist = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
               // Ignore jitter: only count if moved >= 3 m
               if (dist >= 3) {
-                distRef.current += dist / 1000;
-                setDistanceKm(distRef.current);
-                routeRef.current = [...routeRef.current, newPoint];
-                setRoute([...routeRef.current]);
-                checkpointRide();
+                if (skipNextDistanceRef.current) {
+                  // First point after a resume: re-anchor the track without
+                  // counting the way rolled while paused as ridden distance.
+                  skipNextDistanceRef.current = false;
+                  routeRef.current = [...routeRef.current, newPoint];
+                  setRoute([...routeRef.current]);
+                  checkpointRide();
+                } else {
+                  distRef.current += dist / 1000;
+                  setDistanceKm(distRef.current);
+                  routeRef.current = [...routeRef.current, newPoint];
+                  setRoute([...routeRef.current]);
+                  checkpointRide();
+                }
+              } else if (skipNextDistanceRef.current) {
+                // Rider didn't move during the pause — nothing to re-anchor.
+                skipNextDistanceRef.current = false;
               }
             } else {
               routeRef.current = [newPoint];
@@ -430,6 +466,34 @@ export default function TripLoggerScreen() {
       Alert.alert(t("triplog.startErrorTitle"), t("triplog.startErrorMsg"));
     }
   }, [t, requestForegroundPermission, requestBackgroundPermission, checkpointRide, clearCheckpoint]);
+
+  /** Pause the recording: time and distance stop accumulating; GPS stays on so
+   *  the speedometer keeps working and resume is instant. */
+  const pauseRecording = useCallback(() => {
+    if (pausedRef.current) return;
+    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium)?.catch(() => null);
+    pausedRef.current = true;
+    pauseStartedAtRef.current = Date.now();
+    setPaused(true);
+  }, []);
+
+  /** Resume after a pause. startTimeRef is shifted forward by the paused
+   *  duration so elapsed time / avg speed / checkpoints all exclude the stop. */
+  const resumeRecording = useCallback(() => {
+    if (!pausedRef.current) return;
+    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Medium)?.catch(() => null);
+    const pausedAt = pauseStartedAtRef.current ?? Date.now();
+    const now = Date.now();
+    pausedIntervalsRef.current.push([pausedAt, now]);
+    if (startTimeRef.current != null) {
+      startTimeRef.current += now - pausedAt;
+      setStartTime(startTimeRef.current);
+    }
+    pausedRef.current = false;
+    pauseStartedAtRef.current = null;
+    skipNextDistanceRef.current = true;
+    setPaused(false);
+  }, []);
 
   const stopRecording = useCallback(async () => {
     try {
@@ -457,6 +521,21 @@ export default function TripLoggerScreen() {
       setRecording(false);
       // Don't clear speed — live watcher will continue updating it after recording stops
 
+      // Stopping while paused: close the open pause interval and shift the
+      // start forward like resume would, so the final duration excludes it.
+      if (pausedRef.current) {
+        const pausedAt = pauseStartedAtRef.current ?? Date.now();
+        const now = Date.now();
+        pausedIntervalsRef.current.push([pausedAt, now]);
+        if (startTimeRef.current != null) startTimeRef.current += now - pausedAt;
+        pausedRef.current = false;
+        pauseStartedAtRef.current = null;
+        setPaused(false);
+      }
+      const pausedIntervals = pausedIntervalsRef.current;
+      const inPausedInterval = (ts: number) =>
+        pausedIntervals.some(([s, e]) => ts >= s && ts <= e);
+
       // Merge foreground + background points, deduplicate by timestamp, recalculate distance.
       let mergedRoute = [...routeRef.current];
       try {
@@ -464,7 +543,11 @@ export default function TripLoggerScreen() {
         if (raw) {
           const bgPoints: BgPoint[] = JSON.parse(raw);
           const fgTsSet = new Set(routeRef.current.map((p) => p.timestamp));
-          const uniqueBg = bgPoints.filter((p) => !fgTsSet.has(p.timestamp));
+          // Drop background points captured while the ride was paused — the
+          // foreground watcher already skipped that stretch.
+          const uniqueBg = bgPoints.filter(
+            (p) => !fgTsSet.has(p.timestamp) && !inPausedInterval(p.timestamp)
+          );
           mergedRoute = [...routeRef.current, ...uniqueBg].sort((a, b) => a.timestamp - b.timestamp);
         }
         await storage.removeItem(BG_POINTS_KEY);
@@ -650,22 +733,56 @@ export default function TripLoggerScreen() {
             </Text>
           )}
 
-          {/* Start / Stop button — large, rounded, bold color */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.mainBtn,
-              recording ? styles.stopBtn : styles.startBtn,
-              pressed && styles.mainBtnPressed,
-            ]}
-            onPress={() => { (recording ? stopRecording() : startRecording()).catch(() => null); }}
-            accessibilityRole="button"
-            accessibilityLabel={recording ? t("triplog.stop") : t("triplog.start")}
-            accessibilityState={{ selected: recording }}
-          >
-            <Text style={styles.mainBtnText}>
-              {recording ? `⏹  ${t("triplog.stop")}` : `▶  ${t("triplog.start")}`}
-            </Text>
-          </Pressable>
+          {/* Start button, or Pause/Resume + Stop while recording */}
+          {!recording ? (
+            <Pressable
+              style={({ pressed }) => [
+                styles.mainBtn,
+                styles.startBtn,
+                pressed && styles.mainBtnPressed,
+              ]}
+              onPress={() => { startRecording().catch(() => null); }}
+              accessibilityRole="button"
+              accessibilityLabel={t("triplog.start")}
+            >
+              <Text style={styles.mainBtnText}>{`▶  ${t("triplog.start")}`}</Text>
+            </Pressable>
+          ) : (
+            <View style={styles.recordingBtnRow}>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.mainBtn,
+                  styles.recordingRowBtn,
+                  paused ? styles.resumeBtn : styles.pauseBtn,
+                  pressed && styles.mainBtnPressed,
+                ]}
+                onPress={() => { if (paused) resumeRecording(); else pauseRecording(); }}
+                accessibilityRole="button"
+                accessibilityLabel={paused ? t("triplog.resume") : t("triplog.pause")}
+                accessibilityState={{ selected: paused }}
+              >
+                <Text style={[styles.mainBtnText, styles.recordingRowBtnText]}>
+                  {paused ? `▶  ${t("triplog.resume")}` : `⏸  ${t("triplog.pause")}`}
+                </Text>
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.mainBtn,
+                  styles.recordingRowBtn,
+                  styles.stopBtn,
+                  pressed && styles.mainBtnPressed,
+                ]}
+                onPress={() => { stopRecording().catch(() => null); }}
+                accessibilityRole="button"
+                accessibilityLabel={t("triplog.stop")}
+              >
+                <Text style={[styles.mainBtnText, styles.recordingRowBtnText]}>{`⏹  ${t("triplog.stopShort")}`}</Text>
+              </Pressable>
+            </View>
+          )}
+          {recording && paused && (
+            <Text style={styles.pausedHint}>⏸ {t("triplog.pausedHint")}</Text>
+          )}
         </View>
 
         {/* Ride History */}
@@ -1256,6 +1373,35 @@ const styles = StyleSheet.create({
   stopBtn: {
     backgroundColor: COLORS.danger,
     shadowColor: COLORS.danger,
+  },
+  pauseBtn: {
+    backgroundColor: COLORS.warning,
+    shadowColor: COLORS.warning,
+  },
+  resumeBtn: {
+    backgroundColor: COLORS.success,
+    shadowColor: COLORS.success,
+  },
+  recordingBtnRow: {
+    flexDirection: "row",
+    gap: 10,
+    width: "100%",
+  },
+  recordingRowBtn: {
+    flex: 1,
+    width: undefined,
+    paddingHorizontal: 8,
+  },
+  recordingRowBtnText: {
+    fontSize: 15,
+    letterSpacing: 0.5,
+  },
+  pausedHint: {
+    color: COLORS.warning,
+    fontSize: 13,
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: 10,
   },
   mainBtnPressed: { opacity: 0.8 },
   mainBtnText: {

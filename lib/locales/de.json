@@ -384,7 +384,11 @@
     "maxSpeed": "Max",
     "totalRides": "Fahrten",
     "totalDistance": "Gesamtdistanz",
-    "totalTime": "Gesamtzeit"
+    "totalTime": "Gesamtzeit",
+    "pause": "PAUSE",
+    "resume": "WEITER",
+    "pausedHint": "Pausiert — Zeit und Distanz sind angehalten",
+    "stopShort": "STOPP"
   },
   "about": {
     "badge": "ℹ️ ÜBER",
