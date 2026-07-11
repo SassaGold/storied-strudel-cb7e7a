@@ -17,7 +17,7 @@ import {
   OVERPASS_RETRY_ATTEMPTS,
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
-import { storage } from "./storage";
+import { readTimedCache, writeTimedCache } from "./storage";
 import { getCurrentPositionWithTimeout } from "./location";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -94,25 +94,20 @@ export function useEmergencyPlaces() {
     let staleData: EmergencyPlace[] | null = null;
     let staleTs = 0;
 
-    // Show cached results immediately while fetching fresh data
-    try {
-      const raw = await storage.getItem(CACHE_KEY);
-      if (activeCallRef.current !== callId) return;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const ts: number = parsed?.ts;
-        const data: EmergencyPlace[] = parsed?.data;
-        if (Array.isArray(data) && data.length > 0 && typeof ts === "number") {
-          staleData = data;
-          staleTs = ts;
-          if (Date.now() - ts < CACHE_TTL_MS) {
-            setPlaces(data);
-            setFromCache(true);
-            setCacheTs(ts);
-          }
-        }
+    // Show cached results immediately while fetching fresh data.
+    // Infinity TTL: even an expired entry is kept as the stale fallback;
+    // freshness for display is checked against CACHE_TTL_MS below.
+    const hit = await readTimedCache<EmergencyPlace>(CACHE_KEY, Infinity);
+    if (activeCallRef.current !== callId) return;
+    if (hit) {
+      staleData = hit.data;
+      staleTs = hit.ts;
+      if (Date.now() - hit.ts < CACHE_TTL_MS) {
+        setPlaces(hit.data);
+        setFromCache(true);
+        setCacheTs(hit.ts);
       }
-    } catch {}
+    }
 
     if (activeCallRef.current !== callId) return;
     setLoading(true);
@@ -214,12 +209,7 @@ export function useEmergencyPlaces() {
       setPlaces(sorted);
       setFromCache(false);
       setCacheTs(null);
-      try {
-        await storage.setItem(
-          CACHE_KEY,
-          JSON.stringify({ ts: Date.now(), data: sorted })
-        );
-      } catch {}
+      await writeTimedCache(CACHE_KEY, sorted);
     } catch (err) {
       if (activeCallRef.current !== callId) return;
       // Fall back to expired cache rather than leaving the SOS list empty when

@@ -45,11 +45,15 @@ const STORAGE_KEY = "app_settings_v1";
 interface SettingsCtx {
   settings: AppSettings;
   setSetting: <K extends keyof AppSettings>(key: K, val: AppSettings[K]) => void;
+  /** True once the persisted settings have been read from storage. Until then
+   *  `settings` holds DEFAULT_SETTINGS, which may differ from the saved values. */
+  isLoaded: boolean;
 }
 
 const SettingsContext = createContext<SettingsCtx>({
   settings: DEFAULT_SETTINGS,
   setSetting: () => {},
+  isLoaded: false,
 });
 
 export function useSettings() {
@@ -58,6 +62,7 @@ export function useSettings() {
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -70,6 +75,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch {}
+      setIsLoaded(true);
     })();
   }, []);
 
@@ -83,7 +89,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   // Memoize the context value so consumers only re-render when settings change,
   // not on every provider render.
-  const value = useMemo(() => ({ settings, setSetting }), [settings, setSetting]);
+  const value = useMemo(() => ({ settings, setSetting, isLoaded }), [settings, setSetting, isLoaded]);
 
   return createElement(SettingsContext.Provider, { value }, children);
 }

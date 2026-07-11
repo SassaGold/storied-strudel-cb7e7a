@@ -1,6 +1,7 @@
 // ── components/RoadConditionsCard.tsx ────────────────────────────────────────
 // Road construction / conditions card for the RIDER HQ screen.
 
+import { memo } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -33,7 +34,8 @@ type Props = {
 };
 
 /** Renders a card listing nearby road-construction alerts sourced from Overpass. */
-export function RoadConditionsCard({
+// memo: HQ screen re-renders on unrelated state; props only change on refresh.
+export const RoadConditionsCard = memo(function RoadConditionsCard({
   loading,
   roadAlerts,
   searchRadiusKm,
@@ -149,7 +151,7 @@ export function RoadConditionsCard({
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {

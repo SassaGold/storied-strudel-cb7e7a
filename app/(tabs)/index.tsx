@@ -40,9 +40,10 @@ const LOGO_FONT = Platform.select({
 export default function Index() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
-  const { settings } = useSettings();
+  const { settings, isLoaded } = useSettings();
   const insets = useSafeAreaInsets();
   const hasNavigated = useRef(false);
+  const autoLoadedRef = useRef(false);
   const [langModalVisible, setLangModalVisible] = useState(false);
 
   const {
@@ -60,26 +61,36 @@ export default function Index() {
     cancelSearch,
   } = useRiderHQ();
 
-  // Auto-load on mount
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  // Cancel any in-progress data fetch when the user navigates away from this tab.
+  // Auto-load on the first focus AFTER the persisted settings are known.
+  // Previously loadData() fired unconditionally on mount, wasting a GPS fix and
+  // three network calls when the default-tab redirect below immediately
+  // navigated away. hasNavigated covers the user returning here later.
+  // (Defined before the redirect effect so a same-commit re-run cannot see
+  // hasNavigated already set.)
   useFocusEffect(
     useCallback(() => {
+      if (
+        isLoaded &&
+        !autoLoadedRef.current &&
+        (settings.defaultTab === "index" || hasNavigated.current)
+      ) {
+        autoLoadedRef.current = true;
+        loadData();
+      }
+      // Cancel any in-progress data fetch when the user navigates away.
       return () => { cancelSearch(); };
-    }, [cancelSearch])
+    }, [isLoaded, settings.defaultTab, loadData, cancelSearch])
   );
 
-  // Navigate to default tab once
+  // Navigate to default tab once, after settings have been read from storage
+  // (before that, defaultTab is still the DEFAULT_SETTINGS value).
   useEffect(() => {
-    if (hasNavigated.current) return;
+    if (!isLoaded || hasNavigated.current) return;
+    hasNavigated.current = true;
     if (settings.defaultTab !== "index") {
-      hasNavigated.current = true;
       router.replace(`/${settings.defaultTab}` as any);
     }
-  }, [settings.defaultTab, router]);
+  }, [isLoaded, settings.defaultTab, router]);
 
   const openMaps = useCallback(() => {
     if (!location) return;

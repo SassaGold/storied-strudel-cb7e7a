@@ -2,6 +2,7 @@
 // Weather card, riding suitability badge, alerts, recommendations, hourly and
 // 3-day forecast cards for the RIDER HQ screen.
 
+import { memo } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useSettings, fmtTemp, fmtSpeed, fmtPrecip } from "../lib/settings";
@@ -39,7 +40,10 @@ type Props = {
  * Renders weather details, riding suitability, alerts, recommendations,
  * hourly forecast and 3-day forecast — all derived from a single WeatherInfo.
  */
-export function WeatherCard({ weather, weatherUrl }: Props) {
+// memo: the HQ screen re-renders on unrelated state (refresh spinner, language
+// modal); props only change when a refresh lands, so skip re-running the whole
+// weather subtree (alerts/suitability/recommendations) in between.
+export const WeatherCard = memo(function WeatherCard({ weather, weatherUrl }: Props) {
   const { t, i18n } = useTranslation();
   const { settings } = useSettings();
 
@@ -191,37 +195,37 @@ export function WeatherCard({ weather, weatherUrl }: Props) {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t("home.forecast")}</Text>
           <View style={styles.forecastCardsRow}>
-            {weather.forecast.slice(0, 3).map((day) => (
-              <View key={day.date} style={styles.forecastCard}>
-                <Text style={styles.forecastCardDay}>
-                  {formatForecastDate(day.date, i18n.language).split(",")[0]}
-                </Text>
-                <Text style={styles.forecastCardDate}>
-                  {formatForecastDate(day.date, i18n.language).split(",")[1]?.trim() ?? ""}
-                </Text>
-                <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
-                <Text style={styles.forecastCardCondition}>
-                  {t(formatWeatherCode(day.weatherCode), {
-                    defaultValue: formatWeatherCode(day.weatherCode),
-                  })}
-                </Text>
-                <Text style={styles.forecastCardTemp}>
-                  {fmtTemp(day.maxTempC, settings.unitSystem, true)} /{" "}
-                  {fmtTemp(day.minTempC, settings.unitSystem, true)}
-                </Text>
-                <View style={styles.forecastCardRainRow}>
-                  <Text style={styles.forecastCardRain}>
-                    💧 {day.precipitationProbability}%
+            {weather.forecast.slice(0, 3).map((day) => {
+              // One Intl format per card; the helper composes "weekday, date".
+              const [weekday, monthDay] = formatForecastDate(day.date, i18n.language).split(",");
+              return (
+                <View key={day.date} style={styles.forecastCard}>
+                  <Text style={styles.forecastCardDay}>{weekday}</Text>
+                  <Text style={styles.forecastCardDate}>{monthDay?.trim() ?? ""}</Text>
+                  <Text style={styles.forecastCardEmoji}>{weatherEmoji(day.weatherCode)}</Text>
+                  <Text style={styles.forecastCardCondition}>
+                    {t(formatWeatherCode(day.weatherCode), {
+                      defaultValue: formatWeatherCode(day.weatherCode),
+                    })}
                   </Text>
+                  <Text style={styles.forecastCardTemp}>
+                    {fmtTemp(day.maxTempC, settings.unitSystem, true)} /{" "}
+                    {fmtTemp(day.minTempC, settings.unitSystem, true)}
+                  </Text>
+                  <View style={styles.forecastCardRainRow}>
+                    <Text style={styles.forecastCardRain}>
+                      💧 {day.precipitationProbability}%
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         </View>
       )}
     </>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
