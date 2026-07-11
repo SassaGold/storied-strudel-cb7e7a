@@ -25,9 +25,10 @@ type LatLng = { latitude: number; longitude: number };
 /**
  * Decode a Google-encoded polyline string (precision 5) into an array of coordinates.
  * OSRM returns geometries in this format by default.
+ * Exported for unit testing.
  * @see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
  */
-function decodePolyline(encoded: string): LatLng[] {
+export function decodePolyline(encoded: string): LatLng[] {
   const points: LatLng[] = [];
   let index = 0;
   let lat = 0;

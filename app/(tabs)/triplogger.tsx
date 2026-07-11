@@ -25,6 +25,14 @@ import { useLocationPermission } from "../../lib/locationPermission";
 import { OSM_TILE_URL, OSM_USER_AGENT, TRIP_MAX_GPS_ACCURACY_M } from "../../lib/config";
 import { mapMatchRoute, downsampleCoords } from "../../lib/mapMatch";
 import { storage } from "../../lib/storage";
+import {
+  buildRide,
+  formatDate,
+  formatDuration,
+  nextRideSeq,
+  type GpsPoint,
+  type SavedRide,
+} from "../../lib/tripStats";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -44,77 +52,6 @@ const CHECKPOINT_INTERVAL_MS = 15_000;
 const MAX_SAVED_RIDES = 100;
 
 type Checkpoint = { startTime: number; distanceKm: number; route: GpsPoint[] };
-
-type GpsPoint = { latitude: number; longitude: number; timestamp: number };
-
-type SavedRide = {
-  id: string;
-  date: string; // ISO string
-  distanceKm: number;
-  durationMs: number;
-  avgSpeedKmh: number;
-  route: GpsPoint[];
-  /** Stable ride number assigned at save time (doesn't renumber on delete). */
-  seq?: number;
-  /** Optional user-given name; falls back to "Ride {seq}" when absent. */
-  name?: string;
-};
-
-/** Next stable ride number = one more than the highest existing seq. */
-const nextRideSeq = (rides: SavedRide[]): number =>
-  rides.reduce((max, r) => Math.max(max, r.seq ?? 0), 0) + 1;
-
-const formatDuration = (ms: number): string => {
-  const totalSec = Math.floor(ms / 1000);
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  const s = totalSec % 60;
-  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-  return `${m}:${String(s).padStart(2, "0")}`;
-};
-
-const formatDate = (iso: string, locale?: string): string => {
-  const d = new Date(iso);
-  // Use the app's selected language (i18n.language) rather than the device
-  // locale so ride dates match the rest of the UI.
-  return d.toLocaleDateString(locale, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
-/** Sum a route's great-circle distance in km, ignoring < 3 m GPS jitter. */
-const routeDistanceKm = (route: GpsPoint[]): number => {
-  let km = 0;
-  for (let i = 1; i < route.length; i++) {
-    const d = haversineMeters(
-      route[i - 1].latitude, route[i - 1].longitude,
-      route[i].latitude, route[i].longitude,
-    );
-    if (d >= 3) km += d / 1000;
-  }
-  return km;
-};
-
-/** Build a SavedRide from a route + timing, or null if it's too short (< ~10 m). */
-const buildRide = (route: GpsPoint[], startTime: number | null, endTime: number, seq: number): SavedRide | null => {
-  const distanceKm = routeDistanceKm(route);
-  if (distanceKm <= 0.01) return null;
-  const durationMs = startTime ? Math.max(0, endTime - startTime) : 0;
-  const avgSpeedKmh = durationMs > 0 ? distanceKm / (durationMs / 3_600_000) : 0;
-  return {
-    id: String(endTime),
-    date: new Date(endTime).toISOString(),
-    distanceKm: Math.round(distanceKm * 100) / 100,
-    durationMs,
-    avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10,
-    route,
-    seq,
-  };
-};
 
 export default function TripLoggerScreen() {
   const { t, i18n } = useTranslation();
