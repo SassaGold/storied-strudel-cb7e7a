@@ -190,8 +190,14 @@ export const PRIVACY_POLICY_URL = "https://sassagold.com/privacy";
 
 // ── Map tiles ─────────────────────────────────────────────────────────────────
 
-/** OSM raster tile URL template. Replace {z}/{x}/{y} with zoom and tile coordinates. */
-export const OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+/**
+ * OSM raster tile URL template. Replace {z}/{x}/{y} with zoom and tile coordinates.
+ * Uses the FOSSGIS-run openstreetmap.de server: the OSMF's tile.openstreetmap.org
+ * blocks distributed apps per its usage policy (served us "Access blocked" tiles),
+ * while the .de server permits moderate app use.
+ * @see https://www.fossgis.de/news/2020-01-31_faq_tileserver/
+ */
+export const OSM_TILE_URL = "https://tile.openstreetmap.de/{z}/{x}/{y}.png";
 
 /**
  * User-Agent header required by OSM tile and Nominatim usage policies.
