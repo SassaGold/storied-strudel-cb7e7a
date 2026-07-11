@@ -4,6 +4,7 @@
 import {
   buildRide,
   formatDuration,
+  MAX_SAVED_ROUTE_POINTS,
   nextRideSeq,
   routeDistanceKm,
   type GpsPoint,
@@ -96,6 +97,22 @@ describe("buildRide", () => {
     const ride = buildRide(route, now + 5_000, now, 1);
     expect(ride).not.toBeNull();
     expect(ride!.durationMs).toBe(0);
+  });
+
+  it("keeps short routes intact but caps very long stored routes", () => {
+    const start = now - 3_600_000;
+    const short = [pointNorthOf(59.9, 0, start), pointNorthOf(59.9, 500, now)];
+    expect(buildRide(short, start, now, 1)!.route).toHaveLength(2);
+
+    const long = Array.from({ length: MAX_SAVED_ROUTE_POINTS + 500 }, (_, i) =>
+      pointNorthOf(59.9, i * 5, start + i * 1000),
+    );
+    const ride = buildRide(long, start, now, 1)!;
+    expect(ride.route).toHaveLength(MAX_SAVED_ROUTE_POINTS);
+    // First/last points survive and distance reflects the FULL route.
+    expect(ride.route[0]).toEqual(long[0]);
+    expect(ride.route[ride.route.length - 1]).toEqual(long[long.length - 1]);
+    expect(ride.distanceKm).toBeCloseTo(routeDistanceKm(long), 1);
   });
 });
 

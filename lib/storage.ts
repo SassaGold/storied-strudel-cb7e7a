@@ -8,6 +8,8 @@ interface AsyncStorageLike {
   getItem(key: string): Promise<string | null>;
   setItem(key: string, value: string): Promise<void>;
   removeItem(key: string): Promise<void>;
+  getAllKeys(): Promise<readonly string[]>;
+  multiRemove(keys: readonly string[]): Promise<void>;
 }
 
 interface AsyncStorageNative extends AsyncStorageLike {
@@ -44,6 +46,14 @@ export const storage: AsyncStorageLike = {
   async removeItem(key) {
     if (!nativeStorage) return;
     await nativeStorage.removeItem(key);
+  },
+  async getAllKeys() {
+    if (!nativeStorage) return [];
+    return nativeStorage.getAllKeys();
+  },
+  async multiRemove(keys) {
+    if (!nativeStorage || keys.length === 0) return;
+    await nativeStorage.multiRemove(keys);
   },
 };
 

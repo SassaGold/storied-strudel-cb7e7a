@@ -14,8 +14,14 @@
 import { storage } from "./storage";
 
 export const LOCATION_TASK_NAME = "whereami-bg-location";
-/** AsyncStorage key where background GPS points are accumulated during a trip. */
+/** Legacy single-blob AsyncStorage key (pre-chunking). Still read and cleared
+ *  so points from a ride recorded under an older app version aren't lost. */
 export const BG_POINTS_KEY = "triplogger_bg_points_v1";
+/** Prefix for chunked background-point keys: `<prefix><chunkIndex>`. */
+const BG_CHUNK_PREFIX = "triplogger_bg_chunk_v2:";
+/** Points per chunk before a new chunk is started. Keeps each background
+ *  write O(chunk) instead of re-serializing the whole ride every batch. */
+const BG_CHUNK_MAX_POINTS = 200;
 
 export type BgPoint = { latitude: number; longitude: number; timestamp: number };
 
@@ -33,6 +39,71 @@ export function isLocationTaskDefined(): boolean {
   }
 }
 
+// In-memory write cursor for the current chunk. If the background JS context
+// is killed and restarted mid-ride, the cursor re-derives from existing keys
+// (previous chunks stay untouched, so no points are lost).
+let chunkIndex: number | null = null;
+let chunkPoints: BgPoint[] = [];
+
+async function listChunkKeys(): Promise<string[]> {
+  const keys = await storage.getAllKeys();
+  return keys.filter((k) => k.startsWith(BG_CHUNK_PREFIX));
+}
+
+async function nextChunkIndex(): Promise<number> {
+  let max = -1;
+  for (const key of await listChunkKeys()) {
+    const n = Number(key.slice(BG_CHUNK_PREFIX.length));
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return max + 1;
+}
+
+/** Append a batch of points to the current chunk. Exported for the task
+ *  callback below and for unit tests. */
+export async function appendBgPoints(newPoints: BgPoint[]): Promise<void> {
+  if (newPoints.length === 0) return;
+  if (chunkIndex === null) {
+    chunkIndex = await nextChunkIndex();
+    chunkPoints = [];
+  }
+  chunkPoints.push(...newPoints);
+  await storage.setItem(BG_CHUNK_PREFIX + chunkIndex, JSON.stringify(chunkPoints));
+  if (chunkPoints.length >= BG_CHUNK_MAX_POINTS) {
+    chunkIndex += 1;
+    chunkPoints = [];
+  }
+}
+
+/** Read all background points recorded so far (all chunks + the legacy
+ *  single-blob key), sorted by timestamp. Never throws. */
+export async function readBgPoints(): Promise<BgPoint[]> {
+  const points: BgPoint[] = [];
+  try {
+    const raws = await Promise.all([
+      storage.getItem(BG_POINTS_KEY),
+      ...(await listChunkKeys()).map((k) => storage.getItem(k)),
+    ]);
+    for (const raw of raws) {
+      if (!raw) continue;
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) points.push(...parsed);
+      } catch {}
+    }
+  } catch {}
+  return points.sort((a, b) => a.timestamp - b.timestamp);
+}
+
+/** Delete all stored background points and reset the write cursor. Never throws. */
+export async function clearBgPoints(): Promise<void> {
+  chunkIndex = null;
+  chunkPoints = [];
+  try {
+    await storage.multiRemove([BG_POINTS_KEY, ...(await listChunkKeys())]);
+  } catch {}
+}
+
 try {
   TaskManager?.defineTask(
     LOCATION_TASK_NAME,
@@ -41,16 +112,12 @@ try {
       const { locations } = data;
       if (!locations?.length) return;
       try {
-        const raw = await storage.getItem(BG_POINTS_KEY);
-        const existing: BgPoint[] = raw ? (JSON.parse(raw) as BgPoint[]) : [];
-        const newPoints: BgPoint[] = locations.map((loc: any) => ({
-          latitude: loc.coords.latitude,
-          longitude: loc.coords.longitude,
-          timestamp: loc.timestamp,
-        }));
-        await storage.setItem(
-          BG_POINTS_KEY,
-          JSON.stringify([...existing, ...newPoints]),
+        await appendBgPoints(
+          locations.map((loc: any) => ({
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+            timestamp: loc.timestamp,
+          })),
         );
       } catch {
         // Silently ignore storage failures in the background task — there is no

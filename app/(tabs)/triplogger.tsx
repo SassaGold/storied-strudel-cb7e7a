@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
+  AppState,
   Dimensions,
   Image,
   Linking,
@@ -14,13 +15,14 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import * as Location from "expo-location";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useSettings, fmtDist, fmtSpeed } from "../../lib/settings";
+import { useSettings, fmtDist, fmtSpeed, type UnitSystem } from "../../lib/settings";
 import { haversineMeters } from "../../lib/overpass";
-import { LOCATION_TASK_NAME, BG_POINTS_KEY, isLocationTaskDefined, type BgPoint } from "../../lib/locationTask";
+import { LOCATION_TASK_NAME, clearBgPoints, isLocationTaskDefined, readBgPoints } from "../../lib/locationTask";
 import { useLocationPermission } from "../../lib/locationPermission";
 import { OSM_USER_AGENT, TRIP_MAX_GPS_ACCURACY_M } from "../../lib/config";
 import { boundsOf, buildTiles, computeTileLayout, padBounds, projectToScreen } from "../../lib/osmTiles";
@@ -30,6 +32,7 @@ import {
   buildRide,
   formatDate,
   formatDuration,
+  MAX_SAVED_ROUTE_POINTS,
   nextRideSeq,
   rideTotals,
   type GpsPoint,
@@ -72,7 +75,10 @@ export default function TripLoggerScreen() {
   // Recording state
   const [recording, setRecording] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [route, setRoute] = useState<GpsPoint[]>([]);
+  // Number of recorded points. The points themselves live only in routeRef —
+  // holding the growing array in state would copy it and re-render the whole
+  // screen on every GPS fix.
+  const [pointCount, setPointCount] = useState(0);
   const [distanceKm, setDistanceKm] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -97,6 +103,12 @@ export default function TripLoggerScreen() {
 
   const watchRef = useRef<Location.LocationSubscription | null>(null);
   const liveSpeedWatchRef = useRef<Location.LocationSubscription | null>(null);
+  /** True while startRecording is between entry and its watcher being live —
+   *  blocks a second Start tap from racing the first. */
+  const startingRef = useRef(false);
+  /** Bumped by stop/unmount so an in-flight watchPositionAsync from a stale
+   *  start can detect it lost the race and release its subscription. */
+  const watchGenRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const routeRef = useRef<GpsPoint[]>([]);
   const distRef = useRef(0);
@@ -125,11 +137,22 @@ export default function TripLoggerScreen() {
   // Keep recordingRef in sync so the live speed watcher can check it without stale closure
   useEffect(() => { recordingRef.current = recording; }, [recording]);
 
+  // The tab stays mounted once visited, so the idle speedometer's GPS watcher
+  // must stop whenever the screen isn't actually visible — otherwise it would
+  // keep the GPS radio on forever (battery) while the user is on another tab
+  // or the app is backgrounded.
+  const isFocused = useIsFocused();
+  const [appActive, setAppActive] = useState(AppState.currentState !== "background");
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (s) => setAppActive(s === "active"));
+    return () => sub.remove();
+  }, []);
+
   // Live speed watcher so the speedometer shows current speed when NOT recording.
   // During a recording the recording watcher already provides speed, so we skip
   // this one to avoid a redundant second GPS subscription (battery).
   useEffect(() => {
-    if (recording) return;
+    if (recording || !isFocused || !appActive) return;
     let active = true;
     const startLiveWatch = async () => {
       // Check-only: don't pop the OS permission dialog just because the tab
@@ -137,7 +160,7 @@ export default function TripLoggerScreen() {
       // the idle speedometer simply stays at rest until permission exists.
       const { status } = await Location.getForegroundPermissionsAsync();
       if (!active || status !== "granted") return;
-      liveSpeedWatchRef.current = await Location.watchPositionAsync(
+      const sub = await Location.watchPositionAsync(
         { accuracy: Location.Accuracy.Balanced, timeInterval: 1500 },
         (loc) => {
           try {
@@ -161,6 +184,13 @@ export default function TripLoggerScreen() {
           }
         }
       );
+      // The effect may have been cleaned up while watchPositionAsync was in
+      // flight — release the subscription instead of leaking it.
+      if (!active) {
+        sub.remove();
+        return;
+      }
+      liveSpeedWatchRef.current = sub;
     };
     startLiveWatch().catch(() => null);
     return () => {
@@ -168,12 +198,16 @@ export default function TripLoggerScreen() {
       liveSpeedWatchRef.current?.remove();
       liveSpeedWatchRef.current = null;
     };
-  }, [recording]);
+  }, [recording, isFocused, appActive]);
 
   // Release the recording watcher and keep-awake lock if the screen unmounts
   // mid-ride so they don't leak (the checkpoint above allows later recovery).
   useEffect(() => {
     return () => {
+      // watchGenRef is a plain counter, not a node ref — bumping the *latest*
+      // value on unmount is exactly the point (invalidates in-flight starts).
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      watchGenRef.current++;
       watchRef.current?.remove();
       watchRef.current = null;
       deactivateKeepAwake();
@@ -194,7 +228,9 @@ export default function TripLoggerScreen() {
     const cp: Checkpoint = {
       startTime: startTimeRef.current ?? now,
       distanceKm: distRef.current,
-      route: routeRef.current,
+      // Thin very long rides so the periodic checkpoint write stays bounded;
+      // recovery fidelity matches what buildRide would persist anyway.
+      route: downsampleCoords(routeRef.current, MAX_SAVED_ROUTE_POINTS),
     };
     storage.setItem(CHECKPOINT_KEY, JSON.stringify(cp)).catch(() => null);
   }, []);
@@ -214,13 +250,12 @@ export default function TripLoggerScreen() {
       const cp: Checkpoint = JSON.parse(raw);
       let route = Array.isArray(cp.route) ? cp.route : [];
       try {
-        const bgRaw = await storage.getItem(BG_POINTS_KEY);
-        if (bgRaw) {
-          const bg: BgPoint[] = JSON.parse(bgRaw);
+        const bg = await readBgPoints();
+        if (bg.length > 0) {
           const fgTs = new Set(route.map((p) => p.timestamp));
           route = [...route, ...bg.filter((p) => !fgTs.has(p.timestamp))].sort((a, b) => a.timestamp - b.timestamp);
         }
-        await storage.removeItem(BG_POINTS_KEY);
+        await clearBgPoints();
       } catch {}
       const lastTs = route.length > 0 ? route[route.length - 1].timestamp : cp.startTime;
       return buildRide(route, cp.startTime, lastTs, seq);
@@ -301,6 +336,11 @@ export default function TripLoggerScreen() {
   }, [recording, paused, pulseAnim]);
 
   const startRecording = useCallback(async () => {
+    // A second tap while the permission dialogs are still up would run the
+    // whole start sequence again and orphan the first watcher.
+    if (startingRef.current || recordingRef.current) return;
+    startingRef.current = true;
+    const gen = ++watchGenRef.current;
     setPermError(false);
     try {
       const { status } = await requestForegroundPermission();
@@ -348,19 +388,18 @@ export default function TripLoggerScreen() {
       setPaused(false);
       const now = Date.now();
       startTimeRef.current = now;
-      setRoute([]);
+      setPointCount(0);
       setDistanceKm(0);
       setElapsedMs(0);
       setStartTime(now);
       setCurrentSpeedKmh(null);
       // Keep screen on during the ride so the odometer stays visible.
       await activateKeepAwakeAsync().catch(() => null);
+      recordingRef.current = true;
       setRecording(true);
 
       // Clear any stale background points + checkpoint from a previous session.
-      try { await storage.removeItem(BG_POINTS_KEY); } catch {
-        // Stale data will be deduplicated on stop; not critical.
-      }
+      await clearBgPoints();
       clearCheckpoint();
 
       // Start the background location task (Android foreground service).
@@ -385,7 +424,7 @@ export default function TripLoggerScreen() {
         // Foreground-only tracking (watchPositionAsync below) will still work.
       }
 
-      watchRef.current = await Location.watchPositionAsync(
+      const sub = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.BestForNavigation,
           distanceInterval: 5,       // emit every 5 m moved
@@ -434,14 +473,14 @@ export default function TripLoggerScreen() {
                   // First point after a resume: re-anchor the track without
                   // counting the way rolled while paused as ridden distance.
                   skipNextDistanceRef.current = false;
-                  routeRef.current = [...routeRef.current, newPoint];
-                  setRoute([...routeRef.current]);
+                  routeRef.current.push(newPoint);
+                  setPointCount(routeRef.current.length);
                   checkpointRide();
                 } else {
                   distRef.current += dist / 1000;
                   setDistanceKm(distRef.current);
-                  routeRef.current = [...routeRef.current, newPoint];
-                  setRoute([...routeRef.current]);
+                  routeRef.current.push(newPoint);
+                  setPointCount(routeRef.current.length);
                   checkpointRide();
                 }
               } else if (skipNextDistanceRef.current) {
@@ -450,7 +489,7 @@ export default function TripLoggerScreen() {
               }
             } else {
               routeRef.current = [newPoint];
-              setRoute([newPoint]);
+              setPointCount(1);
               checkpointRide();
             }
           } catch {
@@ -459,11 +498,21 @@ export default function TripLoggerScreen() {
           }
         },
       );
+      // Stop/unmount may have won the race while watchPositionAsync was in
+      // flight — release the fresh subscription instead of leaking it.
+      if (watchGenRef.current !== gen) {
+        sub.remove();
+        return;
+      }
+      watchRef.current = sub;
     } catch {
       // Catch-all: prevent unhandled promise rejection from crashing the app on
       // Android production builds. Reset recording state and show a friendly alert.
+      recordingRef.current = false;
       setRecording(false);
       Alert.alert(t("triplog.startErrorTitle"), t("triplog.startErrorMsg"));
+    } finally {
+      startingRef.current = false;
     }
   }, [t, requestForegroundPermission, requestBackgroundPermission, checkpointRide, clearCheckpoint]);
 
@@ -497,6 +546,8 @@ export default function TripLoggerScreen() {
 
   const stopRecording = useCallback(async () => {
     try {
+      // Invalidate any in-flight start so it can't install a watcher after stop.
+      watchGenRef.current++;
       // Release the screen-on lock now that the ride is finished.
       deactivateKeepAwake();
       if (watchRef.current) {
@@ -518,6 +569,7 @@ export default function TripLoggerScreen() {
         // Non-critical: the task will stop automatically when the app is terminated.
       }
 
+      recordingRef.current = false;
       setRecording(false);
       // Don't clear speed — live watcher will continue updating it after recording stops
 
@@ -539,9 +591,8 @@ export default function TripLoggerScreen() {
       // Merge foreground + background points, deduplicate by timestamp, recalculate distance.
       let mergedRoute = [...routeRef.current];
       try {
-        const raw = await storage.getItem(BG_POINTS_KEY);
-        if (raw) {
-          const bgPoints: BgPoint[] = JSON.parse(raw);
+        const bgPoints = await readBgPoints();
+        if (bgPoints.length > 0) {
           const fgTsSet = new Set(routeRef.current.map((p) => p.timestamp));
           // Drop background points captured while the ride was paused — the
           // foreground watcher already skipped that stretch.
@@ -550,7 +601,7 @@ export default function TripLoggerScreen() {
           );
           mergedRoute = [...routeRef.current, ...uniqueBg].sort((a, b) => a.timestamp - b.timestamp);
         }
-        await storage.removeItem(BG_POINTS_KEY);
+        await clearBgPoints();
       } catch {
         // Keep foreground-only route if background data cannot be read.
       }
@@ -573,6 +624,7 @@ export default function TripLoggerScreen() {
       // Catch-all: prevent unhandled rejection from crashing the app on Android
       // production builds. Ensure recording state is cleared and inform the user.
       deactivateKeepAwake();
+      recordingRef.current = false;
       setRecording(false);
       Alert.alert(t("triplog.stopErrorTitle"), t("triplog.stopErrorMsg"));
     }
@@ -727,9 +779,9 @@ export default function TripLoggerScreen() {
             </Text>
           )}
 
-          {recording && route.length > 1 && (
+          {recording && pointCount > 1 && (
             <Text style={styles.accuracyText}>
-              {t("triplog.points", { count: route.length })}
+              {t("triplog.points", { count: pointCount })}
             </Text>
           )}
 
@@ -785,136 +837,20 @@ export default function TripLoggerScreen() {
           )}
         </View>
 
-        {/* Ride History */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{t("triplog.history")}</Text>
-          {rides.length > 0 && (
-            <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); confirmClearAll(); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("triplog.clearAll")}>
-              <Text style={styles.clearAllText}>{t("triplog.clearAll")}</Text>
-            </Pressable>
-          )}
-        </View>
-
-        {/* Lifetime totals across the saved history */}
-        {rides.length > 0 && (() => {
-          const totals = rideTotals(rides);
-          return (
-            <View style={styles.totalsRow}>
-              <View style={styles.totalsItem}>
-                <Text style={styles.totalsValue}>{totals.count}</Text>
-                <Text style={styles.totalsLabel}>{t("triplog.totalRides")}</Text>
-              </View>
-              <View style={styles.totalsDivider} />
-              <View style={styles.totalsItem}>
-                <Text style={styles.totalsValue}>{fmtDist(totals.distanceKm, settings.unitSystem)}</Text>
-                <Text style={styles.totalsLabel}>{t("triplog.totalDistance")}</Text>
-              </View>
-              <View style={styles.totalsDivider} />
-              <View style={styles.totalsItem}>
-                <Text style={styles.totalsValue}>{formatDuration(totals.durationMs)}</Text>
-                <Text style={styles.totalsLabel}>{t("triplog.totalTime")}</Text>
-              </View>
-            </View>
-          );
-        })()}
-
-        {rides.length === 0 ? (
-          <Text style={styles.emptyText}>{t("triplog.noRides")}</Text>
-        ) : (
-          rides.map((ride, idx) => (
-            <View key={ride.id} style={styles.rideCard}>
-              {/* Orange accent top strip */}
-              <View style={styles.rideCardAccent} />
-              {/* Card header: title (tap to rename) + date */}
-              <View style={styles.rideCardHeader}>
-                <Pressable
-                  onPress={() => openRename(ride)}
-                  hitSlop={8}
-                  style={styles.rideTitleBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("triplog.rename")}
-                >
-                  <Text style={styles.rideTitle}>
-                    🏍️ {ride.name?.trim() || t("triplog.rideLabel", { n: ride.seq ?? (rides.length - idx) })}
-                    <Text style={styles.rideRenameHint}>  ✎</Text>
-                  </Text>
-                </Pressable>
-                <Text style={styles.rideDate}>{formatDate(ride.date, i18n.language)}</Text>
-              </View>
-              {/* Stat chips */}
-              <View style={styles.rideStatChips}>
-                <View style={styles.rideStatChip}>
-                  <Text style={styles.rideStatChipValue}>{fmtDist(ride.distanceKm, settings.unitSystem)}</Text>
-                  <Text style={styles.rideStatChipLabel}>📏 {t("triplog.distance")}</Text>
-                </View>
-                <View style={styles.rideStatChip}>
-                  <Text style={styles.rideStatChipValue}>{formatDuration(ride.durationMs)}</Text>
-                  <Text style={styles.rideStatChipLabel}>⏱ {t("triplog.duration")}</Text>
-                </View>
-                <View style={styles.rideStatChip}>
-                  <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.avgSpeedKmh, settings.unitSystem)}</Text>
-                  <Text style={styles.rideStatChipLabel}>⚡ {t("triplog.avgSpeed")}</Text>
-                </View>
-                {ride.maxSpeedKmh != null && (
-                  <View style={styles.rideStatChip}>
-                    <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.maxSpeedKmh, settings.unitSystem)}</Text>
-                    <Text style={styles.rideStatChipLabel}>🚀 {t("triplog.maxSpeed")}</Text>
-                  </View>
-                )}
-              </View>
-              {/* Action buttons */}
-              <View style={styles.rideActions}>
-                {ride.route.length > 1 && (
-                  <Pressable
-                    style={[styles.rideBtn, styles.mapBtn, expandedMaps.has(ride.id) && styles.mapBtnActive]}
-                    onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); toggleMap(ride.id); }}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={expandedMaps.has(ride.id) ? t("triplog.hideRoute") : t("triplog.viewRoute")}
-                  >
-                    <Text style={[styles.rideBtnText, styles.mapBtnText]}>
-                      {expandedMaps.has(ride.id) ? t("triplog.hideRoute") : t("triplog.viewRoute")}
-                    </Text>
-                  </Pressable>
-                )}
-                {ride.route.length > 1 && (
-                  <Pressable
-                    style={[styles.rideBtn, styles.exportBtn]}
-                    onPress={() => exportRide(ride)}
-                    hitSlop={8}
-                    accessibilityRole="button"
-                    accessibilityLabel={t("triplog.exportGpx")}
-                  >
-                    <Text style={[styles.rideBtnText, styles.exportBtnText]}>{t("triplog.exportGpx")}</Text>
-                  </Pressable>
-                )}
-                <Pressable
-                  style={[styles.rideBtn, styles.deleteBtn]}
-                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); deleteRide(ride.id); }}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("triplog.deleteRide")}
-                >
-                  <Text style={[styles.rideBtnText, styles.deleteBtnText]}>{t("triplog.deleteRide")}</Text>
-                </Pressable>
-              </View>
-              {/* Route map preview */}
-              {expandedMaps.has(ride.id) && ride.route.length > 1 && (
-                <View style={styles.rideMapContainer}>
-                  <Pressable
-                    onPress={() => setFullscreenRide(ride)}
-                    accessibilityLabel={t("triplog.viewRoute")}
-                  >
-                    <RideMapPreview route={ride.route} />
-                    <View style={styles.mapExpandHint}>
-                      <Text style={styles.mapExpandHintText}>⤢ {t("triplog.tapToExpand")}</Text>
-                    </View>
-                  </Pressable>
-                </View>
-              )}
-            </View>
-          ))
-        )}
+        {/* Ride History — memoized so the per-fix state updates during a
+            recording don't re-reconcile the whole list on every GPS tick. */}
+        <RideHistorySection
+          rides={rides}
+          expandedMaps={expandedMaps}
+          unitSystem={settings.unitSystem}
+          language={i18n.language}
+          onToggleMap={toggleMap}
+          onOpenRename={openRename}
+          onExport={exportRide}
+          onDelete={deleteRide}
+          onClearAll={confirmClearAll}
+          onFullscreen={setFullscreenRide}
+        />
 
         <View style={styles.bottomPad} />
       </ScrollView>
@@ -977,6 +913,164 @@ export default function TripLoggerScreen() {
     </View>
   );
 }
+
+const RideHistorySection = memo(function RideHistorySection({
+  rides,
+  expandedMaps,
+  unitSystem,
+  language,
+  onToggleMap,
+  onOpenRename,
+  onExport,
+  onDelete,
+  onClearAll,
+  onFullscreen,
+}: {
+  rides: SavedRide[];
+  expandedMaps: Set<string>;
+  unitSystem: UnitSystem;
+  language: string;
+  onToggleMap: (id: string) => void;
+  onOpenRename: (ride: SavedRide) => void;
+  onExport: (ride: SavedRide) => void;
+  onDelete: (id: string) => void;
+  onClearAll: () => void;
+  onFullscreen: (ride: SavedRide) => void;
+}) {
+  const { t } = useTranslation();
+  const totals = useMemo(() => rideTotals(rides), [rides]);
+
+  return (
+    <>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{t("triplog.history")}</Text>
+        {rides.length > 0 && (
+          <Pressable onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); onClearAll(); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={t("triplog.clearAll")}>
+            <Text style={styles.clearAllText}>{t("triplog.clearAll")}</Text>
+          </Pressable>
+        )}
+      </View>
+
+      {/* Lifetime totals across the saved history */}
+      {rides.length > 0 && (
+        <View style={styles.totalsRow}>
+          <View style={styles.totalsItem}>
+            <Text style={styles.totalsValue}>{totals.count}</Text>
+            <Text style={styles.totalsLabel}>{t("triplog.totalRides")}</Text>
+          </View>
+          <View style={styles.totalsDivider} />
+          <View style={styles.totalsItem}>
+            <Text style={styles.totalsValue}>{fmtDist(totals.distanceKm, unitSystem)}</Text>
+            <Text style={styles.totalsLabel}>{t("triplog.totalDistance")}</Text>
+          </View>
+          <View style={styles.totalsDivider} />
+          <View style={styles.totalsItem}>
+            <Text style={styles.totalsValue}>{formatDuration(totals.durationMs)}</Text>
+            <Text style={styles.totalsLabel}>{t("triplog.totalTime")}</Text>
+          </View>
+        </View>
+      )}
+
+      {rides.length === 0 ? (
+        <Text style={styles.emptyText}>{t("triplog.noRides")}</Text>
+      ) : (
+        rides.map((ride, idx) => (
+          <View key={ride.id} style={styles.rideCard}>
+            {/* Orange accent top strip */}
+            <View style={styles.rideCardAccent} />
+            {/* Card header: title (tap to rename) + date */}
+            <View style={styles.rideCardHeader}>
+              <Pressable
+                onPress={() => onOpenRename(ride)}
+                hitSlop={8}
+                style={styles.rideTitleBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t("triplog.rename")}
+              >
+                <Text style={styles.rideTitle}>
+                  🏍️ {ride.name?.trim() || t("triplog.rideLabel", { n: ride.seq ?? (rides.length - idx) })}
+                  <Text style={styles.rideRenameHint}>  ✎</Text>
+                </Text>
+              </Pressable>
+              <Text style={styles.rideDate}>{formatDate(ride.date, language)}</Text>
+            </View>
+            {/* Stat chips */}
+            <View style={styles.rideStatChips}>
+              <View style={styles.rideStatChip}>
+                <Text style={styles.rideStatChipValue}>{fmtDist(ride.distanceKm, unitSystem)}</Text>
+                <Text style={styles.rideStatChipLabel}>📏 {t("triplog.distance")}</Text>
+              </View>
+              <View style={styles.rideStatChip}>
+                <Text style={styles.rideStatChipValue}>{formatDuration(ride.durationMs)}</Text>
+                <Text style={styles.rideStatChipLabel}>⏱ {t("triplog.duration")}</Text>
+              </View>
+              <View style={styles.rideStatChip}>
+                <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.avgSpeedKmh, unitSystem)}</Text>
+                <Text style={styles.rideStatChipLabel}>⚡ {t("triplog.avgSpeed")}</Text>
+              </View>
+              {ride.maxSpeedKmh != null && (
+                <View style={styles.rideStatChip}>
+                  <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.maxSpeedKmh, unitSystem)}</Text>
+                  <Text style={styles.rideStatChipLabel}>🚀 {t("triplog.maxSpeed")}</Text>
+                </View>
+              )}
+            </View>
+            {/* Action buttons */}
+            <View style={styles.rideActions}>
+              {ride.route.length > 1 && (
+                <Pressable
+                  style={[styles.rideBtn, styles.mapBtn, expandedMaps.has(ride.id) && styles.mapBtnActive]}
+                  onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); onToggleMap(ride.id); }}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={expandedMaps.has(ride.id) ? t("triplog.hideRoute") : t("triplog.viewRoute")}
+                >
+                  <Text style={[styles.rideBtnText, styles.mapBtnText]}>
+                    {expandedMaps.has(ride.id) ? t("triplog.hideRoute") : t("triplog.viewRoute")}
+                  </Text>
+                </Pressable>
+              )}
+              {ride.route.length > 1 && (
+                <Pressable
+                  style={[styles.rideBtn, styles.exportBtn]}
+                  onPress={() => onExport(ride)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("triplog.exportGpx")}
+                >
+                  <Text style={[styles.rideBtnText, styles.exportBtnText]}>{t("triplog.exportGpx")}</Text>
+                </Pressable>
+              )}
+              <Pressable
+                style={[styles.rideBtn, styles.deleteBtn]}
+                onPress={() => { Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null); onDelete(ride.id); }}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t("triplog.deleteRide")}
+              >
+                <Text style={[styles.rideBtnText, styles.deleteBtnText]}>{t("triplog.deleteRide")}</Text>
+              </Pressable>
+            </View>
+            {/* Route map preview */}
+            {expandedMaps.has(ride.id) && ride.route.length > 1 && (
+              <View style={styles.rideMapContainer}>
+                <Pressable
+                  onPress={() => onFullscreen(ride)}
+                  accessibilityLabel={t("triplog.viewRoute")}
+                >
+                  <RideMapPreview route={ride.route} />
+                  <View style={styles.mapExpandHint}>
+                    <Text style={styles.mapExpandHintText}>⤢ {t("triplog.tapToExpand")}</Text>
+                  </View>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        ))
+      )}
+    </>
+  );
+});
 
 const SpeedGauge = memo(function SpeedGauge({
   speedKmh,
