@@ -46,7 +46,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: COLORS.brand,
-        tabBarInactiveTintColor: "#555555",
+        tabBarInactiveTintColor: COLORS.muted,
         tabBarStyle: {
           backgroundColor: COLORS.bg,
           borderTopColor: COLORS.brand,
@@ -132,7 +132,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <TabIcon
               name="alert-circle"
-              color={focused ? COLORS.danger : "#555555"}
+              color={focused ? COLORS.danger : COLORS.muted}
               focused={focused}
             />
           ),

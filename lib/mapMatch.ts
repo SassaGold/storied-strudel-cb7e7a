@@ -74,6 +74,20 @@ export function downsampleCoords<T>(coords: T[], max: number): T[] {
   return result;
 }
 
+// Session cache keyed on the route array itself: a saved ride keeps the same
+// route reference for its lifetime, so the inline preview and the fullscreen
+// modal share one OSRM request instead of refetching on every expand.
+const matchCache = new WeakMap<Coordinate[], LatLng[]>();
+
+/** `mapMatchRoute` with a per-route-instance session cache. */
+export async function mapMatchRouteCached(points: Coordinate[]): Promise<LatLng[]> {
+  const hit = matchCache.get(points);
+  if (hit) return hit;
+  const result = await mapMatchRoute(points);
+  matchCache.set(points, result);
+  return result;
+}
+
 /**
  * Call OSRM map-match API to snap GPS points to the road network.
  * Returns the matched road geometry as an array of LatLng points.

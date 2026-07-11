@@ -3,7 +3,6 @@ import {
   Alert,
   Animated,
   AppState,
-  Dimensions,
   Image,
   Linking,
   Modal,
@@ -13,6 +12,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
@@ -26,7 +26,7 @@ import { LOCATION_TASK_NAME, clearBgPoints, isLocationTaskDefined, readBgPoints 
 import { useLocationPermission } from "../../lib/locationPermission";
 import { OSM_USER_AGENT, TRIP_MAX_GPS_ACCURACY_M } from "../../lib/config";
 import { boundsOf, buildTiles, computeTileLayout, padBounds, projectToScreen } from "../../lib/osmTiles";
-import { mapMatchRoute, downsampleCoords } from "../../lib/mapMatch";
+import { mapMatchRouteCached, downsampleCoords } from "../../lib/mapMatch";
 import { storage } from "../../lib/storage";
 import {
   buildRide,
@@ -914,7 +914,7 @@ export default function TripLoggerScreen() {
               value={renameText}
               onChangeText={setRenameText}
               placeholder={t("triplog.renamePlaceholder")}
-              placeholderTextColor="#555555"
+              placeholderTextColor={COLORS.muted}
               maxLength={60}
               autoFocus
               returnKeyType="done"
@@ -1172,15 +1172,15 @@ const SpeedGauge = memo(function SpeedGauge({
           style={{
             fontSize: Math.round(size * 0.25),
             fontWeight: "900",
-            color: speedKmh != null ? gaugeColor : "#444",
+            color: speedKmh != null ? gaugeColor : COLORS.muted,
             fontVariant: ["tabular-nums"],
             lineHeight: Math.round(size * 0.27),
           }}
         >
           {speedKmh != null ? Math.round(speedKmh) : "—"}
         </Text>
-        <Text style={{ fontSize: 12, color: "#777", fontWeight: "600" }}>{unit}</Text>
-        <Text style={{ fontSize: 9, color: "#444", letterSpacing: 1.5, marginTop: 2 }}>{label}</Text>
+        <Text style={{ fontSize: 12, color: COLORS.muted, fontWeight: "600" }}>{unit}</Text>
+        <Text style={{ fontSize: 9, color: COLORS.muted, letterSpacing: 1.5, marginTop: 2 }}>{label}</Text>
       </View>
     </View>
   );
@@ -1222,16 +1222,23 @@ const MIN_PREVIEW_ZOOM = 5;
 const FULLSCREEN_MAP_HEADER_OFFSET = 100;
 
 const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false }: { route: GpsPoint[]; fullscreen?: boolean }) {
-  const MAP_HEIGHT = fullscreen ? Dimensions.get("window").height - FULLSCREEN_MAP_HEADER_OFFSET : 200;
+  const { t } = useTranslation();
+  // Track rotation — a one-shot Dimensions.get would leave the fullscreen map
+  // sized for the old orientation ("orientation": "default" allows rotating).
+  const { height: windowHeight } = useWindowDimensions();
+  const MAP_HEIGHT = fullscreen ? windowHeight - FULLSCREEN_MAP_HEADER_OFFSET : 200;
   /** Extra space around the route so map context is visible (fraction of extent). */
   const ROUTE_PAD = 0.3;
 
-  // Use map-matched (road-snapped) route for display
+  // Use map-matched (road-snapped) route for display. The cached variant makes
+  // collapse/re-expand and the fullscreen modal reuse one OSRM response.
   const [matchedRoute, setMatchedRoute] = useState<{ latitude: number; longitude: number }[] | null>(null);
+  /** Number of map tiles that failed to load (offline / tile server down). */
+  const [tileErrors, setTileErrors] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
-    mapMatchRoute(route).then((matched) => {
+    mapMatchRouteCached(route).then((matched) => {
       if (!cancelled) setMatchedRoute(matched);
     });
     return () => { cancelled = true; };
@@ -1276,6 +1283,9 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
   // Build tile list
   const tiles = useMemo(() => (layout ? buildTiles(layout) : []), [layout]);
 
+  // A new tile set (layout/zoom change) gets a fresh error count.
+  useEffect(() => { setTileErrors(0); }, [tiles]);
+
   // Build route segments
   const segments = useMemo(() => {
     if (!layout) return [];
@@ -1306,6 +1316,7 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
         <Image
           key={tile.key}
           source={{ uri: tile.url, headers: { "User-Agent": OSM_USER_AGENT } }}
+          onError={() => setTileErrors((n) => n + 1)}
           style={{
             position: "absolute",
             left: tile.x,
@@ -1315,6 +1326,12 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
           }}
         />
       ))}
+      {/* All tiles failed (offline / tile server down) — explain the black box */}
+      {tiles.length > 0 && tileErrors >= tiles.length && (
+        <View style={styles.mapUnavailableOverlay} pointerEvents="none">
+          <Text style={styles.mapUnavailableText}>{t("common.mapUnavailable")}</Text>
+        </View>
+      )}
       {/* Route line segments */}
       {segments.map((seg, i) => {
         if (!seg || seg.length < 0.5) return null;
@@ -1458,7 +1475,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 9,
-    color: "#555",
+    color: COLORS.muted,
     fontWeight: "700",
     letterSpacing: 1,
     marginTop: 3,
@@ -1466,7 +1483,7 @@ const styles = StyleSheet.create({
   },
   accuracyText: {
     fontSize: 11,
-    color: "#555",
+    color: COLORS.muted,
     textAlign: "center",
     marginBottom: 4,
   },
@@ -1552,7 +1569,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   emptyText: {
-    color: "#555",
+    color: COLORS.muted,
     fontSize: 13,
     textAlign: "center",
     marginTop: 8,
@@ -1590,7 +1607,7 @@ const styles = StyleSheet.create({
   },
   rideRenameHint: { color: COLORS.brand, fontSize: 13 },
   rideDate: {
-    color: "#666",
+    color: COLORS.muted,
     fontSize: 11,
   },
   // Stat chips grid
@@ -1614,7 +1631,7 @@ const styles = StyleSheet.create({
     fontVariant: ["tabular-nums"],
   },
   rideStatChipLabel: {
-    color: "#555",
+    color: COLORS.muted,
     fontSize: 10,
     marginTop: 3,
     textAlign: "center",
@@ -1646,7 +1663,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   deleteBtnText: {
-    color: "#666",
+    color: COLORS.muted,
   },
   mapBtn: {
     flex: 1,
@@ -1713,6 +1730,18 @@ const styles = StyleSheet.create({
   rideMapContainer: {
     paddingHorizontal: 14,
     paddingBottom: 14,
+  },
+  mapUnavailableOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mapUnavailableText: {
+    color: COLORS.muted,
+    fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center",
+    paddingHorizontal: 20,
   },
   mapExpandHint: {
     position: "absolute",

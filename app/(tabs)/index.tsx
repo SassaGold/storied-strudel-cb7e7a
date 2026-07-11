@@ -347,6 +347,8 @@ export default function Index() {
               );
               router.navigate(route);
             }}
+            accessibilityRole="button"
+            accessibilityLabel={t(key)}
           >
             <Text style={styles.quickNavEmoji}>{emoji}</Text>
             <Text style={styles.quickNavText}>{t(key)}</Text>
@@ -363,6 +365,8 @@ export default function Index() {
             );
             router.navigate("/emergency");
           }}
+          accessibilityRole="button"
+          accessibilityLabel={t("tabs.sos")}
         >
           <Text style={styles.quickNavEmoji}>🆘</Text>
           <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>

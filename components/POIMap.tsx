@@ -2,8 +2,9 @@
 // Renders a set of places as numbered markers over OSM raster tiles. Shares the
 // Web-Mercator projection used by the trip-logger route preview.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { OSM_USER_AGENT } from "../lib/config";
 import {
   type Bounds,
@@ -33,7 +34,10 @@ export default function POIMap<T extends Marker>({
   markerLabel,
   height = 320,
 }: Props<T>) {
+  const { t } = useTranslation();
   const [width, setWidth] = useState(0);
+  /** Number of map tiles that failed to load (offline / tile server down). */
+  const [tileErrors, setTileErrors] = useState(0);
 
   const bounds: Bounds | null = useMemo(() => {
     const pts = [...places, ...(userLocation ? [userLocation] : [])];
@@ -48,6 +52,9 @@ export default function POIMap<T extends Marker>({
 
   const tiles = useMemo(() => (layout ? buildTiles(layout) : []), [layout]);
 
+  // A new tile set (layout/zoom change) gets a fresh error count.
+  useEffect(() => { setTileErrors(0); }, [tiles]);
+
   return (
     <View
       style={[styles.container, { height }]}
@@ -58,9 +65,17 @@ export default function POIMap<T extends Marker>({
         <Image
           key={tile.key}
           source={{ uri: tile.url, headers: { "User-Agent": OSM_USER_AGENT } }}
+          onError={() => setTileErrors((n) => n + 1)}
           style={{ position: "absolute", left: tile.x, top: tile.y, width: tile.size, height: tile.size }}
         />
       ))}
+
+      {/* All tiles failed (offline / tile server down) — explain the black box */}
+      {tiles.length > 0 && tileErrors >= tiles.length && (
+        <View style={styles.mapUnavailableOverlay} pointerEvents="none">
+          <Text style={styles.mapUnavailableText}>{t("common.mapUnavailable")}</Text>
+        </View>
+      )}
 
       {/* User location (blue dot) */}
       {layout && userLocation && (() => {
@@ -78,6 +93,8 @@ export default function POIMap<T extends Marker>({
             key={place.id}
             style={[styles.marker, { left: x - 13, top: y - 13 }]}
             onPress={() => onPressPlace?.(place)}
+            // 26 px marker is below the 44 px minimum touch target
+            hitSlop={10}
             accessibilityRole="button"
             accessibilityLabel={markerLabel ? markerLabel(place, i) : String(i + 1)}
           >
@@ -123,5 +140,17 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 12,
     fontWeight: "900",
+  },
+  mapUnavailableOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mapUnavailableText: {
+    color: COLORS.muted,
+    fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center",
+    paddingHorizontal: 20,
   },
 });
