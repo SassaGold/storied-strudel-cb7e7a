@@ -20,8 +20,9 @@ export const COLORS = {
   white: "#ffffff",
   /** Body text. */
   body: "#c8c8c8",
-  /** Muted / secondary text. */
-  muted: "#666666",
+  /** Muted / secondary text. Kept at ≥4.5:1 (WCAG AA) against bg/card —
+   *  the previous #666666 was ~3:1 and unreadable in sunlight on a bike. */
+  muted: "#8f8f8f",
   /** Success / positive (green). */
   success: "#22c55e",
   /** Danger / SOS (red). */
