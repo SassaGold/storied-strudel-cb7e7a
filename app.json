@@ -10,12 +10,6 @@
     "newArchEnabled": true,
     "android": {
       "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION",
-        "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_LOCATION",
-        "POST_NOTIFICATIONS",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_BACKGROUND_LOCATION",
@@ -70,7 +64,6 @@
           }
         }
       ],
-      "expo-web-browser",
       "./plugins/withAndroidEdgeToEdge",
       "./plugins/withMaterialVersion",
       "expo-font",

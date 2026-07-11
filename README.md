@@ -1,166 +1,28 @@
 # Where Am I — Biker Companion App 🏍️
 
-A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, emergency services), log your trips, and more. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, and Dutch.
+A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, parking, clubs & tracks, ATMs), log your rides with GPS, and get riding weather, road conditions and emergency tools. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, and Dutch.
 
-> **Current version: 2.0.0** — live on Netlify and saved permanently in this GitHub repository.
-
----
-
-## How your build is already saved (and how to keep it safe)
-
-**Your code is your build.** Every time a change is pushed to GitHub, it is permanently saved in this repository. The Netlify site is built automatically from this same code.
-
-### What "saved" means in practice
-
-| Where | What it contains | How to restore |
-|-------|-----------------|----------------|
-| **GitHub repository** | All source code, every version ever committed | Clone the repo again |
-| **Git tags** | Named snapshots (e.g. `v2.0.0`) | `git checkout v2.0.0` |
-| **Netlify** | The compiled web build (HTML/JS/CSS) | Redeploy from GitHub at any time |
-
-### How to download a full copy to your own computer right now
-
-1. Install [Git](https://git-scm.com) and [Node.js 18+](https://nodejs.org) if you haven't already.
-2. Open a terminal (Command Prompt / Terminal) and run:
-   ```bash
-   git clone https://github.com/SassaGold/storied-strudel-cb7e7a.git
-   cd storied-strudel-cb7e7a
-   npm install
-   ```
-3. That's it — you now have a complete copy on your computer. Run `npm run web` to see it working locally.
-
-### How to make an extra offline backup (optional)
-
-```bash
-# After cloning, zip the whole folder:
-# Windows — right-click the folder → "Send to" → "Compressed (zipped) folder"
-# Mac     — right-click → "Compress"
-# Linux   — zip -r whereami-backup.zip storied-strudel-cb7e7a/
-```
-
-Keep this zip on a USB drive or cloud storage (Google Drive, Dropbox) for extra safety.
+> **Current version: 1.2.3** (see [CHANGELOG.md](CHANGELOG.md)) — distributed as an Android app via Google Play, built in the cloud with [EAS Build](https://docs.expo.dev/build/introduction/).
 
 ---
 
-## Publishing to Google Play Store
+## The app at a glance
 
-### Play Store Readiness — Full Checklist
+| Tab | What it does |
+|-----|-------------|
+| **Rider HQ** | Your location, live weather + 3-day/hourly forecast, sunrise/sunset, road conditions & alerts |
+| **Food / Sleep / Explore** | Nearby restaurants, accommodation and attractions (OpenStreetMap Overpass), list or map view |
+| **Garage** | MC services, fuel stations (with fuel types), parking, MC clubs & race tracks, ATMs, sports & fitness |
+| **Trip** | GPS ride logger with background recording, crash recovery, map-matched route preview and ride history |
+| **SOS** | Locale-aware emergency number, nearby hospitals/pharmacies/police, share-location tools |
 
-> See [`store-listing/PLAY_STORE_CHECKLIST.md`](store-listing/PLAY_STORE_CHECKLIST.md) for the full step-by-step checklist.
-
-#### ✅ Already done (in-code)
-
-| Item | Status |
-|------|--------|
-| Android package name `com.sassagold.whereami` | ✅ Done |
-| App version `2.0.0` | ✅ Done |
-| Android `versionCode` (auto-incremented by EAS) | ✅ Done |
-| Adaptive icon (foreground + background + monochrome) | ✅ Done |
-| Splash screen (light & dark mode) | ✅ Done |
-| Required permissions (`FINE_LOCATION`, `BACKGROUND_LOCATION`, `FOREGROUND_SERVICE`) | ✅ Done |
-| iOS & Android permission usage descriptions | ✅ Done |
-| EAS Build configured with production profile + `autoIncrement` | ✅ Done |
-| Error boundaries wrapping the full app tree | ✅ Done |
-| No hardcoded API keys or secrets | ✅ Done |
-| No analytics, crash reporters, or ad SDKs | ✅ Done |
-| 9-language i18n (EN/ES/DE/FR/IS/NO/SV/DA/NL) | ✅ Done |
-| Privacy statement in About screen with Privacy Policy link | ✅ Done |
-| Store listing files created (`store-listing/`) | ✅ Done |
-
-Because Trip Logger records GPS while the app is backgrounded, Google Play Console should be answered with:
-- **Foreground service permissions:** Yes
-- **Foreground service type:** `location`
-
-#### ⚠️ Still needed (account & asset setup — no code required)
-
-| Step | What | Cost |
-|------|------|------|
-| 1 | Google Play Developer account | US $25 one-time |
-| 2 | Host privacy policy at a public URL | Free |
-| 3 | Screenshots (min. 2, recommended 5–8) | Free |
-| 4 | Feature graphic 1024×500 px | Free |
-| 5 | Fill in Play Console store listing | Free |
+All data comes from free, no-API-key services: OpenStreetMap (Nominatim, Overpass, tiles), Open-Meteo weather, OSRM map matching, and Wikipedia summaries.
 
 ---
 
-### Step-by-step: publish to Google Play
-
-#### Step 1 — Create an Expo account
-
-1. Go to [expo.dev](https://expo.dev) and create a free account.
-2. In your terminal, log in:
-   ```bash
-   npm install -g eas-cli
-   eas login
-   ```
-
-#### Step 2 — Build the production Android AAB (App Bundle)
-
-An AAB is the file Google Play requires (it's like a ZIP of your app).
-
-```bash
-# In the project folder on your computer:
-eas build --profile production --platform android
-```
-
-- EAS builds in the cloud — you don't need Android Studio installed.
-- The build takes about 10–15 minutes.
-- When done, EAS gives you a download link for the `.aab` file.
-
-#### Step 4 — Create a Google Play Developer account
-
-1. Go to [play.google.com/console](https://play.google.com/console).
-2. Pay the one-time **US $25** registration fee.
-3. Complete your developer profile.
-
-#### Step 5 — Create a new app in Play Console
-
-1. Click **"Create app"**.
-2. Fill in:
-   - App name: `Where Am I`
-   - Default language: English
-   - App or game: **App**
-   - Free or paid: **Free**
-3. Accept the declarations and click **"Create app"**.
-
-#### Step 6 — Upload your AAB and fill in the store listing
-
-1. Go to **Production → Releases → Create new release**.
-2. Upload the `.aab` file you downloaded from EAS.
-3. Fill in the **Store listing**:
-   - Short description (80 chars): *"Biker companion: find POIs, log rides, SOS emergency tools"*
-   - Full description: describe all 9 tabs
-   - Screenshots: take at least 2 phone screenshots (required)
-   - Feature graphic: 1024×500 px banner image (required)
-4. Fill in **App content** (privacy policy URL required — you can use a free generator at [privacypolicytemplate.net](https://privacypolicytemplate.net)).
-5. Set **Content rating** by answering the questionnaire.
-
-#### Step 7 — Submit for review
-
-1. Click **"Review release"** → **"Start rollout to Production"**.
-2. Google reviews the app — typically **1–3 days** for a first submission.
-3. Once approved, your app is live on the Play Store! 🎉
-
----
-
-### Updating the app after it's published
-
-Every time you want to release a new version:
-
-1. Increment the version in `app.json` (e.g. `"version": "2.1.0"`).
-2. Push to GitHub.
-3. Run `eas build --profile production --platform android` again.
-4. Upload the new AAB in Play Console → create a new release.
-
-The `"autoIncrement": true` in `eas.json` handles the Android `versionCode` automatically.
-
----
-
-## Running this project on your own computer
+## Running the project locally
 
 ### Prerequisites
-
-Before you begin, make sure you have the following installed:
 
 | Tool | Minimum version | Download |
 |------|----------------|----------|
@@ -168,115 +30,82 @@ Before you begin, make sure you have the following installed:
 | **Node.js** | 18 LTS or newer | https://nodejs.org |
 | **npm** | included with Node.js | — |
 
-Verify your versions:
-```bash
-node --version   # should print v18 or higher
-npm --version
-git --version
-```
-
-### 1 — Clone the repository
+### Setup
 
 ```bash
 git clone https://github.com/SassaGold/storied-strudel-cb7e7a.git
 cd storied-strudel-cb7e7a
-```
-
-### 2 — Install dependencies
-
-```bash
 npm install
 ```
 
-### 3 — Configure environment variables (optional)
+No API keys are required.
 
-The app uses **OpenStreetMap (Nominatim, Overpass)** for map tiles, reverse geocoding, and POI search — all free and open-source services that require **no API key**.
-
-```bash
-cp .env.example .env
-# No additional setup required!
-```
-
-The `.env` file is git-ignored and must never be committed.
-
-### 4 — Choose how to run the app
-
-#### Option A — Web browser (quickest, no extra setup)
+### Run it
 
 ```bash
-npm run web
-# or
-npx expo start --web
+# Web browser (quickest; GPS and some native features are limited)
+npm run web        # open http://localhost:8081
+
+# Android emulator or connected device (full feature set)
+npm run android    # requires Android Studio / an AVD or a device with USB debugging
 ```
 
-Open http://localhost:8081 in your browser. Most UI and logic works; native map tiles and GPS are limited in the browser.
-
-#### Option B — Android emulator
-
-1. Install [Android Studio](https://developer.android.com/studio) and create an Android Virtual Device (AVD).
-2. Start your AVD from the Device Manager in Android Studio.
-3. In the project folder, run:
-   ```bash
-   npm run android
-   # or
-   npx expo run:android
-   ```
-   Expo will build a debug APK, install it on the emulator, and launch it automatically.
-
-#### Option C — iOS Simulator (macOS only)
-
-> The iPhone Simulator requires **macOS** and **Xcode**. It cannot run on Windows or Linux.
-
-1. Install [Xcode](https://developer.apple.com/xcode/) from the Mac App Store and open it once to accept the licence.
-2. Run:
-   ```bash
-   npm run ios
-   # or
-   npx expo run:ios
-   ```
-
-> **Simulating GPS** — the simulator has no real GPS. Set a fake location from the Xcode menu:  
-> `Simulator → Features → Location → Custom Location…`
-
-#### Option D — Physical device via EAS cloud build
-
-If you don't want to install Android Studio or Xcode, you can use [EAS Build](https://expo.dev/eas) (free tier available) to build in the cloud and install on a real device:
-
-```bash
-# install the EAS CLI
-npm install -g eas-cli
-
-# build for Android (generates an APK/AAB you can sideload)
-npx eas build --profile development --platform android
-
-# build for iOS (requires an Apple Developer account)
-npx eas build --profile development --platform ios
-```
+> **Native modules note:** Trip Logger's background recording uses `expo-task-manager` / `expo-location` foreground services, which are not available in the Expo Go sandbox. Use `npm run android` (development build) to test the full app.
 
 ---
 
 ## Development
 
-### Available scripts
-
 | Command | What it does |
 |---------|-------------|
 | `npm run web` | Start the app in a web browser |
 | `npm run android` | Build and run on an Android emulator / device |
-| `npm run ios` | Build and run on iOS Simulator (macOS only) |
-| `npm run start` | Start the Expo dev server (note: Expo Go has limited native module support — see below) |
-| `npm run lint` | Run the ESLint linter |
+| `npm start` | Start the Expo dev server |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript (`tsc --noEmit`, strict mode) |
+| `npm test` | Jest test suite (locales parity, Overpass, weather, sun, roads, tiles…) |
+| `npm run version:patch` / `:minor` / `:major` | Bump the version in `app.json` + `package.json` |
 
-### Note on native modules
-
-This app uses native modules (`react-native-maps`, `expo-location`) that are **not** supported in the standard Expo Go sandbox. To test the full app you need a development build (`npm run android` / `npm run ios`) or a physical device build via EAS.
+CI (GitHub Actions, [.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint + typecheck + tests on every push and PR to `master`.
 
 ---
+
+## Building & releasing to Google Play
+
+Builds are done in the cloud with EAS — no Android Studio needed:
+
+```bash
+npm install -g eas-cli
+eas login
+
+# Production AAB (Google Play upload format)
+eas build --platform android --profile production
+```
+
+- `eas.json` uses `appVersionSource: "remote"` with `autoIncrement`, so the Android `versionCode` is bumped automatically on every build.
+- The user-facing version (`1.2.3`) lives in `app.json`/`package.json` — bump it with `npm run version:patch` **before** building, since `runtimeVersion.policy: "appVersion"` ties updates to it.
+- When the build finishes, download the `.aab` from the EAS build page and upload it in Play Console → **Production → Create new release**.
+
+Play Console data-safety answers for this app: location collected (foreground + background for Trip Logger), foreground service type `location`, no ads/analytics/crash reporters, no data shared with third parties.
+
+Store listing assets and the full submission checklist live in [`store-listing/`](store-listing/).
+
+---
+
+## Project structure
+
+```
+app/(tabs)/        Screens (Expo Router file-based routing)
+components/        Shared UI (POIScreen, POIMap, PlaceInfoModal, weather cards…)
+lib/               Hooks & services (Overpass, weather, sun, trip task, i18n, settings)
+lib/locales/       9 locale files (a Jest test enforces key parity with en.json)
+__tests__/         Jest suites
+store-listing/     Play Store texts & checklist
+.github/workflows/ CI (lint+typecheck+test) and EAS build/submit pipelines
+```
 
 ## Learn more
 
 - [Expo documentation](https://docs.expo.dev/)
-- [Android Studio emulator guide](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS Simulator guide](https://docs.expo.dev/workflow/ios-simulator/)
 - [EAS Build](https://docs.expo.dev/build/introduction/)
-- [Discord community](https://chat.expo.dev)
+- [Android emulator guide](https://docs.expo.dev/workflow/android-studio-emulator/)
