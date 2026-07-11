@@ -377,7 +377,14 @@
     "tapToExpand": "Tryk for at udvide",
     "notifDisabledTitle": "Notifikationer er slået fra",
     "notifDisabledMsg": "Trip Logger har brug for notifikationer slået til, så Android kan vise den aktive optagelse i notifikationspanelet.",
-    "openSettings": "Åbn indstillinger"
+    "openSettings": "Åbn indstillinger",
+    "exportGpx": "📤 GPX",
+    "exportFailed": "Eksport mislykkedes",
+    "exportFailedMsg": "GPX-filen kunne ikke oprettes eller deles på denne enhed.",
+    "maxSpeed": "Maks",
+    "totalRides": "Ture",
+    "totalDistance": "Samlet distance",
+    "totalTime": "Samlet tid"
   },
   "about": {
     "badge": "ℹ️ OM",

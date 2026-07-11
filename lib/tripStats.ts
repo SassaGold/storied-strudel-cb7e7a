@@ -17,6 +17,8 @@ export type SavedRide = {
   seq?: number;
   /** Optional user-given name; falls back to "Ride {seq}" when absent. */
   name?: string;
+  /** Highest speed observed during the ride (km/h). Absent on legacy rides. */
+  maxSpeedKmh?: number;
 };
 
 /** GPS jitter threshold: point-to-point moves below this are ignored (metres). */
@@ -69,7 +71,8 @@ export const buildRide = (
   route: GpsPoint[],
   startTime: number | null,
   endTime: number,
-  seq: number
+  seq: number,
+  maxSpeedKmh?: number
 ): SavedRide | null => {
   const distanceKm = routeDistanceKm(route);
   if (distanceKm <= MIN_RIDE_KM) return null;
@@ -83,5 +86,19 @@ export const buildRide = (
     avgSpeedKmh: Math.round(avgSpeedKmh * 10) / 10,
     route,
     seq,
+    ...(maxSpeedKmh != null && maxSpeedKmh > 0
+      ? { maxSpeedKmh: Math.round(maxSpeedKmh * 10) / 10 }
+      : {}),
   };
+};
+
+/** Lifetime totals across the saved ride history. */
+export const rideTotals = (rides: SavedRide[]) => {
+  let distanceKm = 0;
+  let durationMs = 0;
+  for (const r of rides) {
+    distanceKm += r.distanceKm;
+    durationMs += r.durationMs;
+  }
+  return { count: rides.length, distanceKm, durationMs };
 };

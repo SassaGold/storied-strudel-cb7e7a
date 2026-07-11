@@ -377,7 +377,14 @@
     "tapToExpand": "Appuyez pour agrandir",
     "notifDisabledTitle": "Les notifications sont désactivées",
     "notifDisabledMsg": "Trip Logger a besoin des notifications activées pour qu’Android puisse afficher l’enregistrement en cours dans la barre de notifications.",
-    "openSettings": "Ouvrir les réglages"
+    "openSettings": "Ouvrir les réglages",
+    "exportGpx": "📤 GPX",
+    "exportFailed": "Échec de l’export",
+    "exportFailedMsg": "Impossible de créer ou de partager le fichier GPX sur cet appareil.",
+    "maxSpeed": "Max",
+    "totalRides": "Trajets",
+    "totalDistance": "Distance totale",
+    "totalTime": "Temps total"
   },
   "about": {
     "badge": "ℹ️ À PROPOS",

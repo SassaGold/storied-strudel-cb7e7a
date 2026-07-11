@@ -227,6 +227,9 @@ export default function McScreen() {
   const insets = useSafeAreaInsets();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
+  // Flips true when the mount restore has finished (state twin of initDoneRef,
+  // so the auto-load effect below can react to it).
+  const [initDone, setInitDone] = useState(false);
   // MC categories keep fixed radii per category to improve relevance for each POI type
   // (e.g. broader radius for tracks/services, tighter for ATM/bank), independent of global settings.searchRadiusKm.
   const effectiveSearchRadiusKm = CATEGORY_RADIUS_M[selected] / 1000;
@@ -302,6 +305,7 @@ export default function McScreen() {
         // restore was in flight — their choice wins over the persisted one.
         if (hydrateGenRef.current !== gen) {
           initDoneRef.current = true;
+          setInitDone(true);
           return;
         }
 
@@ -318,9 +322,21 @@ export default function McScreen() {
         }
       } catch {}
       initDoneRef.current = true;
+      setInitDone(true);
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto-load once after the restore completes, so the Garage behaves like the
+  // other data tabs (results appear without pressing "Find"). loadPlaces serves
+  // the cache first, then refreshes from the network.
+  const autoLoadedRef = useRef(false);
+  useEffect(() => {
+    if (!initDone || autoLoadedRef.current) return;
+    autoLoadedRef.current = true;
+    loadPlaces();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initDone]);
 
   // Persist selected category whenever it changes (skip during initial restore).
   useEffect(() => {
