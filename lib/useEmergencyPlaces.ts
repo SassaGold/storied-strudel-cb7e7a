@@ -5,7 +5,7 @@
 import { useCallback, useRef, useState } from "react";
 import * as Location from "expo-location";
 import { useTranslation } from "react-i18next";
-import { haversineMeters, withRetry, CACHE_TTL_MS } from "./overpass";
+import { haversineMeters, isOverpassNetworkError, withRetry, CACHE_TTL_MS } from "./overpass";
 import { fetchOsmPlaces, type OsmPlaceItem, osmItemOpeningHours, osmItemPhone, osmItemWebsite } from "./osmPlaces";
 import {
   EMERGENCY_AMENITY_TYPES,
@@ -224,7 +224,11 @@ export function useEmergencyPlaces() {
         setFromCache(true);
         setCacheTs(staleTs);
       } else {
-        const isNetwork = err instanceof TypeError && String(err).includes("fetch");
+        // fetchOverpass normalizes failures to Error("Network error"/"Timeout");
+        // a raw fetch TypeError is also possible from other call paths.
+        const isNetwork =
+          isOverpassNetworkError(err) ||
+          (err instanceof TypeError && String(err).includes("fetch"));
         setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
       }
     } finally {

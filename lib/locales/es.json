@@ -196,7 +196,15 @@
     "searching": "Buscando alojamiento cercano…",
     "locationError": "Se requiere permiso de ubicación para buscar alojamiento.",
     "loadError": "No se pudo cargar alojamientos. Inténtalo de nuevo.",
-    "noResults": "No se encontró alojamiento cerca. Pulsa el botón para buscar."
+    "noResults": "No se encontró alojamiento cerca. Pulsa el botón para buscar.",
+    "categories": {
+      "hotel": "🏨 Hotel",
+      "motel": "🏩 Motel",
+      "hostel": "🛏️ Albergue",
+      "guest_house": "🏡 Casa de huéspedes",
+      "camp_site": "🏕️ Camping",
+      "resort": "🏖️ Resort"
+    }
   },
   "explore": {
     "badge": "🗺️ PARADAS RUTA",
@@ -206,7 +214,22 @@
     "searching": "Buscando atracciones cercanas…",
     "locationError": "Se requiere permiso de ubicación para buscar atracciones.",
     "loadError": "No se pudo cargar atracciones. Inténtalo de nuevo.",
-    "noResults": "No se encontraron paradas. Pulsa el botón para buscar."
+    "noResults": "No se encontraron paradas. Pulsa el botón para buscar.",
+    "categories": {
+      "attraction": "🎡 Atracción",
+      "museum": "🏛️ Museo",
+      "gallery": "🖼️ Galería",
+      "artwork": "🎨 Obra de arte",
+      "viewpoint": "🔭 Mirador",
+      "zoo": "🦁 Zoológico",
+      "theme_park": "🎢 Parque de atracciones",
+      "castle": "🏰 Castillo",
+      "fort": "🏰 Fuerte",
+      "monument": "🗿 Monumento",
+      "memorial": "🕯️ Memorial",
+      "ruins": "🏚️ Ruinas",
+      "park": "🌳 Parque"
+    }
   },
   "garage": {
     "badge": "🔧 EQUÍPATE",
@@ -348,7 +371,10 @@
     "notifBody": "Grabando tu viaje en segundo plano.",
     "viewRoute": "🗺️ Ver Ruta",
     "hideRoute": "▲ Ocultar Ruta",
-    "tapToExpand": "Toca para ampliar"
+    "tapToExpand": "Toca para ampliar",
+    "notifDisabledTitle": "Las notificaciones están desactivadas",
+    "notifDisabledMsg": "Trip Logger necesita las notificaciones activadas para que Android pueda mostrar la grabación activa en la barra de notificaciones.",
+    "openSettings": "Abrir Ajustes"
   },
   "about": {
     "badge": "ℹ️ ACERCA DE",

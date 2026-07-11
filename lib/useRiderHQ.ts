@@ -189,6 +189,11 @@ export function useRiderHQ(): RiderHQState {
           const precipitation: number = current.precipitation ?? 0;
           const precipProbability: number = current.precipitation_probability ?? 0;
 
+          // With timezone=auto, all daily dates and hourly times in the response
+          // are in the *location's* local timezone, not UTC and not the device's.
+          // utc_offset_seconds lets us convert both ways for comparisons.
+          const utcOffsetMs: number = (data.utc_offset_seconds ?? 0) * 1000;
+
           // Forecast (skip today)
           const daily = data.daily ?? {};
           const times: string[] = daily.time ?? [];
@@ -197,7 +202,9 @@ export function useRiderHQ(): RiderHQState {
           const minTemps: number[] = daily.temperature_2m_min ?? [];
           const rainProbs: number[] = daily.precipitation_probability_max ?? [];
 
-          const today = new Date().toISOString().slice(0, 10);
+          // "Today" as seen at the forecast location (not UTC): shift the epoch
+          // by the location offset before taking the ISO date.
+          const today = new Date(Date.now() + utcOffsetMs).toISOString().slice(0, 10);
           const forecast: ForecastDay[] = [];
           for (let i = 0; i < times.length; i++) {
             if (times[i] <= today) continue;
@@ -221,8 +228,11 @@ export function useRiderHQ(): RiderHQState {
           const nowMs = Date.now();
           const hourly: HourlyForecast[] = [];
           for (let i = 0; i < hourlyTimes.length && hourly.length < HOURLY_SLOTS; i++) {
+            // hourlyTimes are timezone-naive location-local strings ("2026-07-11T14:00");
+            // parse as UTC then remove the location offset to get the real instant.
+            const slotMs = Date.parse(`${hourlyTimes[i]}Z`) - utcOffsetMs;
             if (
-              new Date(hourlyTimes[i]).getTime() > nowMs &&
+              slotMs > nowMs &&
               hourlyTemps[i] !== undefined &&
               hourlyCodes[i] !== undefined
             ) {

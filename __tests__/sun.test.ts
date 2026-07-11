@@ -60,6 +60,21 @@ describe("computeSunTimes", () => {
     expect(result!.daylightMinutes).toBe(diffMins);
   });
 
+  it("daylight stays positive at eastern longitudes (UTC day-wrap)", () => {
+    // At far-eastern longitudes the sunset's UTC hour wraps past midnight and
+    // can normalize to "before" the sunrise; regression test for the negative
+    // daylightMinutes bug. Tokyo (35.7°N, 139.7°E) and Auckland (-36.8, 174.8).
+    for (const [lat, lon] of [[35.7, 139.7], [-36.85, 174.76]] as const) {
+      for (const month of [0, 3, 6, 9]) {
+        const result = computeSunTimes(lat, lon, new Date(2024, month, 15));
+        expect(result).not.toBeNull();
+        expect(result!.daylightMinutes).toBeGreaterThan(0);
+        expect(result!.daylightMinutes).toBeLessThan(24 * 60);
+        expect(result!.sunrise.getTime()).toBeLessThan(result!.sunset.getTime());
+      }
+    }
+  });
+
   it("returns null for polar locations with midnight sun (summer, high north)", () => {
     // Svalbard (78°N) in mid-June should have midnight sun → no sunset
     const midSummer = new Date(2024, 5, 21); // June 21

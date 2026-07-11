@@ -196,7 +196,15 @@
     "searching": "Leitar að nálægu gistirými…",
     "locationError": "Staðsetningarleyfi er nauðsynlegt til að finna gistingu.",
     "loadError": "Ekki tókst að hlaða gistingu. Reyndu aftur.",
-    "noResults": "Engin gisting fundust nálægt. Ýttu á hnappinn til að leita."
+    "noResults": "Engin gisting fundust nálægt. Ýttu á hnappinn til að leita.",
+    "categories": {
+      "hotel": "🏨 Hótel",
+      "motel": "🏩 Mótel",
+      "hostel": "🛏️ Farfuglaheimili",
+      "guest_house": "🏡 Gistiheimili",
+      "camp_site": "🏕️ Tjaldsvæði",
+      "resort": "🏖️ Dvalarstaður"
+    }
   },
   "explore": {
     "badge": "🗺️ VEGARSTOPP",
@@ -206,7 +214,22 @@
     "searching": "Leitar að nálægum kennileitum…",
     "locationError": "Staðsetningarleyfi er nauðsynlegt til að finna kennileiti.",
     "loadError": "Ekki tókst að hlaða kennileitum. Reyndu aftur.",
-    "noResults": "Engir vegarstopp fundust. Ýttu á hnappinn til að leita."
+    "noResults": "Engir vegarstopp fundust. Ýttu á hnappinn til að leita.",
+    "categories": {
+      "attraction": "🎡 Áhugaverður staður",
+      "museum": "🏛️ Safn",
+      "gallery": "🖼️ Gallerí",
+      "artwork": "🎨 Listaverk",
+      "viewpoint": "🔭 Útsýnisstaður",
+      "zoo": "🦁 Dýragarður",
+      "theme_park": "🎢 Skemmtigarður",
+      "castle": "🏰 Kastali",
+      "fort": "🏰 Virki",
+      "monument": "🗿 Minnisvarði",
+      "memorial": "🕯️ Minningarreitur",
+      "ruins": "🏚️ Rústir",
+      "park": "🌳 Garður"
+    }
   },
   "garage": {
     "badge": "🔧 BÚAST UNDIR",
@@ -348,7 +371,10 @@
     "notifBody": "Tek upp ferðina þína í bakgrunni.",
     "viewRoute": "🗺️ Skoða leið",
     "hideRoute": "▲ Fela leið",
-    "tapToExpand": "Ýttu til að stækka"
+    "tapToExpand": "Ýttu til að stækka",
+    "notifDisabledTitle": "Slökkt er á tilkynningum",
+    "notifDisabledMsg": "Trip Logger þarf tilkynningar virkar svo Android geti sýnt virka upptöku í tilkynningastikunni.",
+    "openSettings": "Opna stillingar"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",
