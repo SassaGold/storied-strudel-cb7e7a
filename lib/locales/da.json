@@ -384,7 +384,11 @@
     "maxSpeed": "Maks",
     "totalRides": "Ture",
     "totalDistance": "Samlet distance",
-    "totalTime": "Samlet tid"
+    "totalTime": "Samlet tid",
+    "pause": "PAUSE",
+    "resume": "FORTSÆT",
+    "pausedHint": "Sat på pause — tid og distance er standset",
+    "stopShort": "STOP"
   },
   "about": {
     "badge": "ℹ️ OM",

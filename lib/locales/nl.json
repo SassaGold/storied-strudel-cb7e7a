@@ -384,7 +384,11 @@
     "maxSpeed": "Max",
     "totalRides": "Ritten",
     "totalDistance": "Totale afstand",
-    "totalTime": "Totale tijd"
+    "totalTime": "Totale tijd",
+    "pause": "PAUZE",
+    "resume": "HERVATTEN",
+    "pausedHint": "Gepauzeerd — tijd en afstand staan stil",
+    "stopShort": "STOP"
   },
   "about": {
     "badge": "ℹ️ OVER",
