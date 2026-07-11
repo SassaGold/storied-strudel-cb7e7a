@@ -12,6 +12,8 @@
   "common": {
     "loading": "Indlæser...",
     "back": "← Tilbage",
+    "errorTitle": "Noget gik galt",
+    "tryAgain": "Prøv igen",
     "searching": "Søger...",
     "close": "Luk",
     "openInMaps": "ÅBN I KORT",

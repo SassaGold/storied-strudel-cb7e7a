@@ -12,6 +12,8 @@
   "common": {
     "loading": "Laster...",
     "back": "← Tilbake",
+    "errorTitle": "Noe gikk galt",
+    "tryAgain": "Prøv igjen",
     "searching": "Søker...",
     "close": "Lukk",
     "openInMaps": "ÅPNE I KART",

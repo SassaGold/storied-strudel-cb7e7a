@@ -6,11 +6,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
 import i18n, { saveLanguage, SUPPORTED_LANGS } from "../../lib/i18n";
+import { storage } from "../../lib/storage";
 import { COLORS } from "../../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const AsyncStorage: any = (() => { try { return require("@react-native-async-storage/async-storage").default; } catch { return null; } })();
 
 const RADIUS_OPTIONS = [2, 5, 10, 15, 20] as const;
 
@@ -32,12 +31,8 @@ export default function SettingsScreen() {
 
   const clearCache = async () => {
     try {
-      if (!AsyncStorage) return;
-      const keys = await AsyncStorage.getAllKeys();
-      const cacheKeys = keys.filter((k: string) => k.startsWith("cache_"));
-      if (cacheKeys.length > 0) {
-        await AsyncStorage.multiRemove(cacheKeys);
-      }
+      const keys = await storage.getAllKeys();
+      await storage.multiRemove(keys.filter((k) => k.startsWith("cache_")));
       Alert.alert(t("settings.clearCacheSuccess"), t("settings.clearCacheSuccessMsg"));
     } catch {
       // silently ignore

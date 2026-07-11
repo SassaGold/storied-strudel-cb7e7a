@@ -12,6 +12,8 @@
   "common": {
     "loading": "Laden...",
     "back": "← Terug",
+    "errorTitle": "Er ging iets mis",
+    "tryAgain": "Opnieuw proberen",
     "searching": "Zoeken...",
     "close": "Sluiten",
     "openInMaps": "OPEN IN KAARTEN",

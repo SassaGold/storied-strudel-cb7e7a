@@ -12,6 +12,8 @@
   "common": {
     "loading": "Loading...",
     "back": "← Back",
+    "errorTitle": "Something went wrong",
+    "tryAgain": "Try Again",
     "searching": "Searching...",
     "close": "Close",
     "openInMaps": "OPEN IN MAPS",

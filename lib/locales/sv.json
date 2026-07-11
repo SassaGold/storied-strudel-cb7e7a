@@ -12,6 +12,8 @@
   "common": {
     "loading": "Laddar...",
     "back": "← Tillbaka",
+    "errorTitle": "Något gick fel",
+    "tryAgain": "Försök igen",
     "searching": "Söker...",
     "close": "Stäng",
     "openInMaps": "ÖPPNA I KARTA",

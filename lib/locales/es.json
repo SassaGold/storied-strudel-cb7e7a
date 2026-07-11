@@ -12,6 +12,8 @@
   "common": {
     "loading": "Cargando...",
     "back": "← Volver",
+    "errorTitle": "Algo salió mal",
+    "tryAgain": "Reintentar",
     "searching": "Buscando...",
     "close": "Cerrar",
     "openInMaps": "ABRIR EN MAPAS",

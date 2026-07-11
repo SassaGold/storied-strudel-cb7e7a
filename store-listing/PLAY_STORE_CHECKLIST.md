@@ -7,7 +7,7 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.whereami`
-- [x] App version: `1.1.7` (in `app.json` and `package.json`)
+- [x] App version: kept in sync in `app.json` + `package.json` + `README.md` by `npm run version:patch` (currently 1.2.4)
 - [x] Android `versionCode`: auto-incremented by EAS on each production build via `autoIncrement: true` in `eas.json`
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
@@ -20,8 +20,7 @@ Use this checklist before submitting to Google Play.
 - [x] Background location task implemented (`lib/locationTask.ts`) — writes GPS points to AsyncStorage while screen is locked
 - [x] Background task registered at app boot (`app/_layout.tsx`)
 - [x] Trip Logger requests background permission and starts `Location.startLocationUpdatesAsync` during a recording session
-- [x] iOS & Android permission usage descriptions written (in `app.json` `ios.infoPlist` and via `expo-location` plugin config)
-- [x] iOS background mode `location` declared in `app.json` → `ios.backgroundModes`
+- [x] Permission usage descriptions written via the `expo-location` plugin config in `app.json` (the app is Android-only; there is no `ios` config)
 - [x] EAS project linked (`eas.json`, project ID `c4cd3804-55c8-43d6-84cf-62d30b0fb6e2`)
 - [x] Production EAS build profile with `autoIncrement: true`
 - [x] Error boundaries wrapping the full app tree
@@ -44,8 +43,9 @@ Google Play requires a **publicly accessible URL** for your privacy policy.
 
 **✅ Using custom domain:** `https://sassagold.com/privacy`
 
-This URL is already set in `app.json` (`privacyPolicyUrl`) and in the About screen.
-Paste it into Google Play Console → App Content → Privacy Policy.
+The About screen links to this URL (`PRIVACY_POLICY_URL` in `lib/config.ts`); the
+source document lives at `docs/privacy-policy.html`.
+Paste the URL into Google Play Console → App Content → Privacy Policy.
 
 ### 2. Screenshots (Required)
 Google Play requires **at least 2 screenshots** per device type.

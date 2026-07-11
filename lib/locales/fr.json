@@ -12,6 +12,8 @@
   "common": {
     "loading": "Chargement...",
     "back": "← Retour",
+    "errorTitle": "Un problème est survenu",
+    "tryAgain": "Réessayer",
     "searching": "Recherche...",
     "close": "Fermer",
     "openInMaps": "OUVRIR DANS MAPS",

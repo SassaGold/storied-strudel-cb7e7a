@@ -2,7 +2,7 @@
 
 A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, parking, clubs & tracks, ATMs), log your rides with GPS, and get riding weather, road conditions and emergency tools. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, and Dutch.
 
-> **Current version: 1.2.3** (see [CHANGELOG.md](CHANGELOG.md)) — distributed as an Android app via Google Play, built in the cloud with [EAS Build](https://docs.expo.dev/build/introduction/).
+> **Current version: 1.2.4** (see [CHANGELOG.md](CHANGELOG.md)) — distributed as an Android app via Google Play, built in the cloud with [EAS Build](https://docs.expo.dev/build/introduction/).
 
 ---
 
@@ -64,7 +64,7 @@ npm run android    # requires Android Studio / an AVD or a device with USB debug
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript (`tsc --noEmit`, strict mode) |
 | `npm test` | Jest test suite (locales parity, Overpass, weather, sun, roads, tiles…) |
-| `npm run version:patch` / `:minor` / `:major` | Bump the version in `app.json` + `package.json` |
+| `npm run version:patch` / `:minor` / `:major` | Bump the version in `app.json` + `package.json` + `README.md` |
 
 CI (GitHub Actions, [.github/workflows/ci.yml](.github/workflows/ci.yml)) runs lint + typecheck + tests on every push and PR to `master`.
 
@@ -83,7 +83,7 @@ eas build --platform android --profile production
 ```
 
 - `eas.json` uses `appVersionSource: "remote"` with `autoIncrement`, so the Android `versionCode` is bumped automatically on every build.
-- The user-facing version (`1.2.3`) lives in `app.json`/`package.json` — bump it with `npm run version:patch` **before** building, since `runtimeVersion.policy: "appVersion"` ties updates to it.
+- The user-facing version (`1.2.4`) lives in `app.json`/`package.json` — bump it with `npm run version:patch` (which also updates this README) and merge to master **before** building.
 - When the build finishes, download the `.aab` from the EAS build page and upload it in Play Console → **Production → Create new release**.
 
 Play Console data-safety answers for this app: location collected (foreground + background for Trip Logger), foreground service type `location`, no ads/analytics/crash reporters, no data shared with third parties.
@@ -101,7 +101,7 @@ lib/               Hooks & services (Overpass, weather, sun, trip task, i18n, se
 lib/locales/       9 locale files (a Jest test enforces key parity with en.json)
 __tests__/         Jest suites
 store-listing/     Play Store texts & checklist
-.github/workflows/ CI (lint+typecheck+test) and EAS build/submit pipelines
+.github/workflows/ CI (lint+typecheck+test on master pushes/PRs)
 ```
 
 ## Learn more

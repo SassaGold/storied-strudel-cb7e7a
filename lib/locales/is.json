@@ -12,6 +12,8 @@
   "common": {
     "loading": "Hleður...",
     "back": "← Til baka",
+    "errorTitle": "Eitthvað fór úrskeiðis",
+    "tryAgain": "Reyna aftur",
     "searching": "Leitar...",
     "close": "Loka",
     "openInMaps": "OPNA Á KORTI",

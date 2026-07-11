@@ -42,6 +42,12 @@ export class ErrorBoundary extends Component<Props, State> {
     };
   }
 
+  componentDidCatch(error: unknown, errorInfo: { componentStack?: string | null }) {
+    // There is no crash reporter in this app — at least surface the error in
+    // dev tools / adb logcat instead of swallowing it silently.
+    console.error("ErrorBoundary caught a render error:", error, errorInfo?.componentStack ?? "");
+  }
+
   render() {
     const {
       title = "Something went wrong",
