@@ -377,7 +377,14 @@
     "tapToExpand": "Tik om te vergroten",
     "notifDisabledTitle": "Meldingen zijn uitgeschakeld",
     "notifDisabledMsg": "Trip Logger heeft meldingen nodig zodat Android de actieve opname in het meldingenpaneel kan tonen.",
-    "openSettings": "Instellingen openen"
+    "openSettings": "Instellingen openen",
+    "exportGpx": "📤 GPX",
+    "exportFailed": "Exporteren mislukt",
+    "exportFailedMsg": "Het GPX-bestand kon niet worden aangemaakt of gedeeld op dit apparaat.",
+    "maxSpeed": "Max",
+    "totalRides": "Ritten",
+    "totalDistance": "Totale afstand",
+    "totalTime": "Totale tijd"
   },
   "about": {
     "badge": "ℹ️ OVER",

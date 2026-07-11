@@ -377,7 +377,14 @@
     "tapToExpand": "Trykk for å utvide",
     "notifDisabledTitle": "Varsler er slått av",
     "notifDisabledMsg": "Trip Logger trenger varsler aktivert slik at Android kan vise det aktive opptaket i varslingsfeltet.",
-    "openSettings": "Åpne innstillinger"
+    "openSettings": "Åpne innstillinger",
+    "exportGpx": "📤 GPX",
+    "exportFailed": "Eksport mislyktes",
+    "exportFailedMsg": "Kunne ikke opprette eller dele GPX-filen på denne enheten.",
+    "maxSpeed": "Maks",
+    "totalRides": "Turer",
+    "totalDistance": "Total distanse",
+    "totalTime": "Total tid"
   },
   "about": {
     "badge": "ℹ️ OM",

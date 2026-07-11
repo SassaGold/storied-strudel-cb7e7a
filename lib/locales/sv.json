@@ -377,7 +377,14 @@
     "tapToExpand": "Tryck för att förstora",
     "notifDisabledTitle": "Aviseringar är avstängda",
     "notifDisabledMsg": "Trip Logger behöver aviseringar aktiverade så att Android kan visa den pågående inspelningen i aviseringsfältet.",
-    "openSettings": "Öppna inställningar"
+    "openSettings": "Öppna inställningar",
+    "exportGpx": "📤 GPX",
+    "exportFailed": "Export misslyckades",
+    "exportFailedMsg": "Det gick inte att skapa eller dela GPX-filen på den här enheten.",
+    "maxSpeed": "Max",
+    "totalRides": "Turer",
+    "totalDistance": "Total distans",
+    "totalTime": "Total tid"
   },
   "about": {
     "badge": "ℹ️ OM",

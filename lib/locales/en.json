@@ -377,7 +377,14 @@
     "tapToExpand": "Tap to expand",
     "notifDisabledTitle": "Notifications are disabled",
     "notifDisabledMsg": "Trip Logger needs notifications enabled so Android can show the active recording in the notification shade.",
-    "openSettings": "Open Settings"
+    "openSettings": "Open Settings",
+    "exportGpx": "📤 GPX",
+    "exportFailed": "Export failed",
+    "exportFailedMsg": "Could not create or share the GPX file on this device.",
+    "maxSpeed": "Max",
+    "totalRides": "Rides",
+    "totalDistance": "Total distance",
+    "totalTime": "Total time"
   },
   "about": {
     "badge": "ℹ️ ABOUT",

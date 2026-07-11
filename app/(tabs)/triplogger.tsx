@@ -31,14 +31,22 @@ import {
   formatDate,
   formatDuration,
   nextRideSeq,
+  rideTotals,
   type GpsPoint,
   type SavedRide,
 } from "../../lib/tripStats";
+import { buildGpx, gpxFileName } from "../../lib/gpx";
 import { COLORS } from "../../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Notifications: typeof import("expo-notifications") | null = (() => { try { return require("expo-notifications"); } catch { return null; } })();
+// File writing + share sheet for GPX export. Loaded dynamically so a missing
+// native module (web, Expo Go variants) degrades gracefully instead of crashing.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const FileSystem: typeof import("expo-file-system/legacy") | null = (() => { try { return require("expo-file-system/legacy"); } catch { return null; } })();
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const Sharing: typeof import("expo-sharing") | null = (() => { try { return require("expo-sharing"); } catch { return null; } })();
 
 const STORAGE_KEY = "triplogger_rides_v1";
 
@@ -93,6 +101,8 @@ export default function TripLoggerScreen() {
   const distRef = useRef(0);
   const startTimeRef = useRef<number | null>(null);
   const recordingRef = useRef(false);
+  /** Highest reliable speed observed during the current recording (km/h). */
+  const maxSpeedRef = useRef(0);
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const prevSpeedPointRef = useRef<{ latitude: number; longitude: number; timestamp: number } | null>(null);
   const lastCheckpointRef = useRef(0);
@@ -314,6 +324,7 @@ export default function TripLoggerScreen() {
       // Reset state
       routeRef.current = [];
       distRef.current = 0;
+      maxSpeedRef.current = 0;
       const now = Date.now();
       startTimeRef.current = now;
       setRoute([]);
@@ -366,20 +377,28 @@ export default function TripLoggerScreen() {
 
             // Update speed — use native GPS speed if available, otherwise calculate from GPS delta
             const prev = routeRef.current[routeRef.current.length - 1];
+            let speedKmh: number | null = null;
             if (speed != null && speed >= 0) {
-              setCurrentSpeedKmh(speed * 3.6);
+              speedKmh = speed * 3.6;
             } else if (prev) {
               const distM = haversineMeters(prev.latitude, prev.longitude, latitude, longitude);
               const dtSec = (ts - prev.timestamp) / 1000;
               if (dtSec > 0.5) {
-                setCurrentSpeedKmh(distM > 1 ? (distM / dtSec) * 3.6 : 0);
+                speedKmh = distM > 1 ? (distM / dtSec) * 3.6 : 0;
               }
             }
+            if (speedKmh != null) setCurrentSpeedKmh(speedKmh);
             setAccuracy(acc ?? null);
 
             // Discard unreliable fixes — a poor GPS fix that "jumps" would
             // inflate the recorded distance. Speed/accuracy are still shown above.
             if (acc != null && acc > TRIP_MAX_GPS_ACCURACY_M) return;
+
+            // Track the ride's top speed from reliable fixes only (a bad fix
+            // past this guard would otherwise fake a huge max).
+            if (speedKmh != null && speedKmh > maxSpeedRef.current) {
+              maxSpeedRef.current = speedKmh;
+            }
 
             const newPoint: GpsPoint = { latitude, longitude, timestamp: ts };
 
@@ -454,7 +473,7 @@ export default function TripLoggerScreen() {
       }
 
       // Recompute distance/stats from the merged route and persist the ride.
-      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now(), nextRideSeq(rides));
+      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now(), nextRideSeq(rides), maxSpeedRef.current);
       // The ride is finalized — drop the crash-recovery checkpoint.
       clearCheckpoint();
 
@@ -481,6 +500,45 @@ export default function TripLoggerScreen() {
     setRides(updated);
     await saveRides(updated);
   }, [rides, saveRides]);
+
+  /** Export a ride as a GPX 1.1 file and open the OS share sheet
+   *  (browser download on web). */
+  const exportRide = useCallback(async (ride: SavedRide) => {
+    Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null);
+    try {
+      const name = ride.name?.trim() || t("triplog.rideLabel", { n: ride.seq ?? 0 });
+      const gpx = buildGpx(ride.route, name);
+      const fileName = gpxFileName(ride.seq, ride.date);
+
+      if (Platform.OS === "web") {
+        // Browser: trigger a plain file download.
+        const doc: any = (globalThis as any).document;
+        if (!doc) throw new Error("no DOM");
+        const blob = new Blob([gpx], { type: "application/gpx+xml" });
+        const url = URL.createObjectURL(blob);
+        const a = doc.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+        return;
+      }
+
+      if (!FileSystem || !Sharing || !(await Sharing.isAvailableAsync())) {
+        Alert.alert(t("triplog.exportFailed"), t("triplog.exportFailedMsg"), [{ text: t("common.ok") }]);
+        return;
+      }
+      const uri = `${FileSystem.cacheDirectory}${fileName}`;
+      await FileSystem.writeAsStringAsync(uri, gpx);
+      await Sharing.shareAsync(uri, {
+        mimeType: "application/gpx+xml",
+        dialogTitle: name,
+        UTI: "com.topografix.gpx",
+      });
+    } catch {
+      Alert.alert(t("triplog.exportFailed"), t("triplog.exportFailedMsg"), [{ text: t("common.ok") }]);
+    }
+  }, [t]);
 
   const openRename = useCallback((ride: SavedRide) => {
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null);
@@ -620,6 +678,29 @@ export default function TripLoggerScreen() {
           )}
         </View>
 
+        {/* Lifetime totals across the saved history */}
+        {rides.length > 0 && (() => {
+          const totals = rideTotals(rides);
+          return (
+            <View style={styles.totalsRow}>
+              <View style={styles.totalsItem}>
+                <Text style={styles.totalsValue}>{totals.count}</Text>
+                <Text style={styles.totalsLabel}>{t("triplog.totalRides")}</Text>
+              </View>
+              <View style={styles.totalsDivider} />
+              <View style={styles.totalsItem}>
+                <Text style={styles.totalsValue}>{fmtDist(totals.distanceKm, settings.unitSystem)}</Text>
+                <Text style={styles.totalsLabel}>{t("triplog.totalDistance")}</Text>
+              </View>
+              <View style={styles.totalsDivider} />
+              <View style={styles.totalsItem}>
+                <Text style={styles.totalsValue}>{formatDuration(totals.durationMs)}</Text>
+                <Text style={styles.totalsLabel}>{t("triplog.totalTime")}</Text>
+              </View>
+            </View>
+          );
+        })()}
+
         {rides.length === 0 ? (
           <Text style={styles.emptyText}>{t("triplog.noRides")}</Text>
         ) : (
@@ -657,6 +738,12 @@ export default function TripLoggerScreen() {
                   <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.avgSpeedKmh, settings.unitSystem)}</Text>
                   <Text style={styles.rideStatChipLabel}>⚡ {t("triplog.avgSpeed")}</Text>
                 </View>
+                {ride.maxSpeedKmh != null && (
+                  <View style={styles.rideStatChip}>
+                    <Text style={styles.rideStatChipValue}>{fmtSpeed(ride.maxSpeedKmh, settings.unitSystem)}</Text>
+                    <Text style={styles.rideStatChipLabel}>🚀 {t("triplog.maxSpeed")}</Text>
+                  </View>
+                )}
               </View>
               {/* Action buttons */}
               <View style={styles.rideActions}>
@@ -671,6 +758,17 @@ export default function TripLoggerScreen() {
                     <Text style={[styles.rideBtnText, styles.mapBtnText]}>
                       {expandedMaps.has(ride.id) ? t("triplog.hideRoute") : t("triplog.viewRoute")}
                     </Text>
+                  </Pressable>
+                )}
+                {ride.route.length > 1 && (
+                  <Pressable
+                    style={[styles.rideBtn, styles.exportBtn]}
+                    onPress={() => exportRide(ride)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("triplog.exportGpx")}
+                  >
+                    <Text style={[styles.rideBtnText, styles.exportBtnText]}>{t("triplog.exportGpx")}</Text>
                   </Pressable>
                 )}
                 <Pressable
@@ -1306,6 +1404,49 @@ const styles = StyleSheet.create({
     color: COLORS.brand,
     fontSize: 12,
     fontWeight: "700",
+  },
+  exportBtn: {
+    flex: 1,
+    backgroundColor: "rgba(59,130,246,0.08)",
+    borderWidth: 1,
+    borderColor: "rgba(59,130,246,0.35)",
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: "center",
+  },
+  exportBtnText: {
+    color: "#3b82f6",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  totalsRow: {
+    flexDirection: "row",
+    backgroundColor: COLORS.card,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingVertical: 12,
+    marginBottom: 14,
+  },
+  totalsItem: {
+    flex: 1,
+    alignItems: "center",
+    gap: 2,
+  },
+  totalsDivider: {
+    width: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: 2,
+  },
+  totalsValue: {
+    color: COLORS.brand,
+    fontSize: 15,
+    fontWeight: "800",
+  },
+  totalsLabel: {
+    color: COLORS.muted,
+    fontSize: 11,
   },
   rideMapContainer: {
     paddingHorizontal: 14,

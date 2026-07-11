@@ -377,7 +377,14 @@
     "tapToExpand": "Ýttu til að stækka",
     "notifDisabledTitle": "Slökkt er á tilkynningum",
     "notifDisabledMsg": "Trip Logger þarf tilkynningar virkar svo Android geti sýnt virka upptöku í tilkynningastikunni.",
-    "openSettings": "Opna stillingar"
+    "openSettings": "Opna stillingar",
+    "exportGpx": "📤 GPX",
+    "exportFailed": "Útflutningur mistókst",
+    "exportFailedMsg": "Ekki tókst að búa til eða deila GPX-skránni á þessu tæki.",
+    "maxSpeed": "Hám.",
+    "totalRides": "Ferðir",
+    "totalDistance": "Heildarvegalengd",
+    "totalTime": "Heildartími"
   },
   "about": {
     "badge": "ℹ️ UM FORRITIÐ",
