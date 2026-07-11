@@ -36,6 +36,7 @@ import {
   nextRideSeq,
   rideTotals,
   type GpsPoint,
+  type PausedInterval,
   type SavedRide,
 } from "../../lib/tripStats";
 import { buildGpx, gpxFileName } from "../../lib/gpx";
@@ -64,7 +65,15 @@ const CHECKPOINT_INTERVAL_MS = 15_000;
 /** Cap on saved rides kept in AsyncStorage; oldest are trimmed once exceeded. */
 const MAX_SAVED_RIDES = 100;
 
-type Checkpoint = { startTime: number; distanceKm: number; route: GpsPoint[] };
+type Checkpoint = {
+  startTime: number;
+  distanceKm: number;
+  route: GpsPoint[];
+  /** Closed pause intervals so a recovered ride excludes paused travel. */
+  pausedIntervals?: PausedInterval[];
+  /** Top speed observed so far, so recovery doesn't lose the stat. */
+  maxSpeedKmh?: number;
+};
 
 export default function TripLoggerScreen() {
   const { t, i18n } = useTranslation();
@@ -126,7 +135,7 @@ export default function TripLoggerScreen() {
   const pauseStartedAtRef = useRef<number | null>(null);
   /** Paused [start, end] intervals — used to drop background points recorded
    *  during a pause when the route is merged on stop. */
-  const pausedIntervalsRef = useRef<[number, number][]>([]);
+  const pausedIntervalsRef = useRef<PausedInterval[]>([]);
   /** True right after a resume: the next accepted point must not add distance
    *  (the rider may have rolled a short way while paused). */
   const skipNextDistanceRef = useRef(false);
@@ -231,6 +240,8 @@ export default function TripLoggerScreen() {
       // Thin very long rides so the periodic checkpoint write stays bounded;
       // recovery fidelity matches what buildRide would persist anyway.
       route: downsampleCoords(routeRef.current, MAX_SAVED_ROUTE_POINTS),
+      pausedIntervals: pausedIntervalsRef.current,
+      maxSpeedKmh: maxSpeedRef.current,
     };
     storage.setItem(CHECKPOINT_KEY, JSON.stringify(cp)).catch(() => null);
   }, []);
@@ -249,16 +260,22 @@ export default function TripLoggerScreen() {
       await storage.removeItem(CHECKPOINT_KEY);
       const cp: Checkpoint = JSON.parse(raw);
       let route = Array.isArray(cp.route) ? cp.route : [];
+      const pausedIntervals = Array.isArray(cp.pausedIntervals) ? cp.pausedIntervals : [];
+      const inPausedInterval = (ts: number) =>
+        pausedIntervals.some(([s, e]) => ts >= s && ts <= e);
       try {
         const bg = await readBgPoints();
         if (bg.length > 0) {
           const fgTs = new Set(route.map((p) => p.timestamp));
-          route = [...route, ...bg.filter((p) => !fgTs.has(p.timestamp))].sort((a, b) => a.timestamp - b.timestamp);
+          // Same filtering as a normal stop: drop background points captured
+          // while the ride was paused.
+          route = [...route, ...bg.filter((p) => !fgTs.has(p.timestamp) && !inPausedInterval(p.timestamp))]
+            .sort((a, b) => a.timestamp - b.timestamp);
         }
         await clearBgPoints();
       } catch {}
       const lastTs = route.length > 0 ? route[route.length - 1].timestamp : cp.startTime;
-      return buildRide(route, cp.startTime, lastTs, seq);
+      return buildRide(route, cp.startTime, lastTs, seq, cp.maxSpeedKmh, pausedIntervals);
     } catch {
       return null;
     }
@@ -355,18 +372,19 @@ export default function TripLoggerScreen() {
           notif = await Notifications.requestPermissionsAsync();
         }
         if (!notif.granted && notif.status !== "granted") {
+          // Denying the notification only hides the ongoing-trip notification;
+          // it must not block recording. Warn once and continue.
           Alert.alert(
             t("triplog.notifDisabledTitle"),
-            t("triplog.notifDisabledMsg"),
+            t("triplog.notifDeniedContinueMsg"),
             [
-              { text: t("triplog.cancel"), style: "cancel" },
+              { text: t("common.ok") },
               {
                 text: t("triplog.openSettings"),
                 onPress: () => { Linking.openSettings().catch(() => null); },
               },
             ]
           );
-          return;
         }
       }
 
@@ -607,7 +625,9 @@ export default function TripLoggerScreen() {
       }
 
       // Recompute distance/stats from the merged route and persist the ride.
-      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now(), nextRideSeq(rides), maxSpeedRef.current);
+      // pausedIntervals also excludes the leg rolled while paused from the
+      // recomputed distance, keeping it consistent with the live odometer.
+      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now(), nextRideSeq(rides), maxSpeedRef.current, pausedIntervals);
       // The ride is finalized — drop the crash-recovery checkpoint.
       clearCheckpoint();
 
@@ -642,7 +662,9 @@ export default function TripLoggerScreen() {
     Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(() => null);
     try {
       const name = ride.name?.trim() || t("triplog.rideLabel", { n: ride.seq ?? 0 });
-      const gpx = buildGpx(ride.route, name);
+      // ride.date is the ride's END time; metadata <time> should be the start.
+      const startedAt = new Date(ride.date).getTime() - ride.durationMs;
+      const gpx = buildGpx(ride.route, name, Number.isFinite(startedAt) ? startedAt : undefined);
       const fileName = gpxFileName(ride.seq, ride.date);
 
       if (Platform.OS === "web") {

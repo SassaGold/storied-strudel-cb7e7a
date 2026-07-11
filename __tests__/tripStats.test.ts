@@ -56,6 +56,29 @@ describe("routeDistanceKm", () => {
     const route = [pointNorthOf(59.9, 0, 0), pointNorthOf(59.9, 3.01, 1)];
     expect(routeDistanceKm(route)).toBeGreaterThan(0);
   });
+
+  it("skips the segment spanning a paused interval (way rolled while paused)", () => {
+    // Ride 500 m, pause at t=1000–2000 and roll 300 m, then ride 500 m more.
+    const route = [
+      pointNorthOf(59.9, 0, 0),
+      pointNorthOf(59.9, 500, 900),    // last point before the pause
+      pointNorthOf(59.9, 800, 2100),   // first point after resume (300 m rolled)
+      pointNorthOf(59.9, 1300, 3000),
+    ];
+    const full = routeDistanceKm(route);
+    const excludingPause = routeDistanceKm(route, [[1000, 2000]]);
+    expect(full).toBeCloseTo(1.3, 2);
+    expect(excludingPause).toBeCloseTo(1.0, 2);
+  });
+
+  it("does not skip segments entirely outside paused intervals", () => {
+    const route = [
+      pointNorthOf(59.9, 0, 0),
+      pointNorthOf(59.9, 500, 900),
+      pointNorthOf(59.9, 1000, 1800),
+    ];
+    expect(routeDistanceKm(route, [[5000, 6000]])).toBeCloseTo(1.0, 2);
+  });
 });
 
 describe("buildRide", () => {
@@ -97,6 +120,20 @@ describe("buildRide", () => {
     const ride = buildRide(route, now + 5_000, now, 1);
     expect(ride).not.toBeNull();
     expect(ride!.durationMs).toBe(0);
+  });
+
+  it("excludes paused-interval travel from the recomputed ride distance", () => {
+    const start = now - 300_000;
+    const route = [
+      pointNorthOf(59.9, 0, start),
+      pointNorthOf(59.9, 500, start + 60_000),
+      // 300 m rolled during a pause between +60 s and +120 s
+      pointNorthOf(59.9, 800, start + 130_000),
+      pointNorthOf(59.9, 1300, now),
+    ];
+    const ride = buildRide(route, start, now, 1, undefined, [[start + 61_000, start + 120_000]]);
+    expect(ride).not.toBeNull();
+    expect(ride!.distanceKm).toBeCloseTo(1.0, 1);
   });
 
   it("keeps short routes intact but caps very long stored routes", () => {

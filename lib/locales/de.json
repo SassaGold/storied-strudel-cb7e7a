@@ -376,7 +376,7 @@
     "hideRoute": "▲ Route ausblenden",
     "tapToExpand": "Zum Vergrößern tippen",
     "notifDisabledTitle": "Benachrichtigungen sind deaktiviert",
-    "notifDisabledMsg": "Trip Logger benötigt aktivierte Benachrichtigungen, damit Android die laufende Aufzeichnung in der Benachrichtigungsleiste anzeigen kann.",
+    "notifDeniedContinueMsg": "Die Aufzeichnung funktioniert weiterhin, aber Android zeigt die Benachrichtigung zur laufenden Fahrt nicht an, solange die App im Hintergrund ist. Du kannst Benachrichtigungen in den Systemeinstellungen aktivieren.",
     "openSettings": "Einstellungen öffnen",
     "exportGpx": "📤 GPX",
     "exportFailed": "Export fehlgeschlagen",

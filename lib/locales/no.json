@@ -376,7 +376,7 @@
     "hideRoute": "▲ Skjul rute",
     "tapToExpand": "Trykk for å utvide",
     "notifDisabledTitle": "Varsler er slått av",
-    "notifDisabledMsg": "Trip Logger trenger varsler aktivert slik at Android kan vise det aktive opptaket i varslingsfeltet.",
+    "notifDeniedContinueMsg": "Opptaket vil fortsatt fungere, men Android viser ikke varselet om den pågående turen mens appen er i bakgrunnen. Du kan slå på varsler i systeminnstillingene.",
     "openSettings": "Åpne innstillinger",
     "exportGpx": "📤 GPX",
     "exportFailed": "Eksport mislyktes",

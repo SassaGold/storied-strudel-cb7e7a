@@ -226,6 +226,42 @@ describe("fetchOsmPlaces query syntax", () => {
     expect(query).not.toContain('bad"key');
   });
 
+  it("maps addr:* namespace tags into the item address (bare keys don't exist in OSM)", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({
+        elements: [
+          {
+            type: "node",
+            id: 42,
+            lat: 51.5,
+            lon: 0.0,
+            tags: {
+              name: "Café Test",
+              amenity: "cafe",
+              "addr:street": "Karl Johans gate",
+              "addr:housenumber": "12B",
+              "addr:city": "Oslo",
+              "addr:country": "NO",
+            },
+          },
+        ],
+      }),
+    }) as unknown as typeof fetch;
+
+    const items = await fetchOsmPlaces("cafe", 51.5, 0.0, 5000, 50, 10000);
+    expect(items).toHaveLength(1);
+    expect(items[0].address).toEqual({
+      label: "Karl Johans gate 12B",
+      street: "Karl Johans gate",
+      houseNumber: "12B",
+      city: "Oslo",
+      countryName: "NO",
+    });
+  });
+
   it("generates 'out center;' with no number when limit is 0", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

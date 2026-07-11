@@ -175,14 +175,20 @@ describe("buildAlerts", () => {
     expect(result).not.toContain("home.alerts.extremeHeat");
   });
 
-  it("adds strongWinds at 15 m/s", () => {
-    const result = buildAlerts({ windSpeed: 15 });
+  it("adds strongWinds at 54 km/h (≈15 m/s)", () => {
+    const result = buildAlerts({ windSpeed: 54 });
     expect(result).toContain("home.alerts.strongWinds");
   });
 
-  it("adds gustyWinds at 10 m/s", () => {
-    const result = buildAlerts({ windSpeed: 10 });
+  it("adds gustyWinds at 36 km/h (≈10 m/s)", () => {
+    const result = buildAlerts({ windSpeed: 36 });
     expect(result).toContain("home.alerts.gustyWinds");
+    expect(result).not.toContain("home.alerts.strongWinds");
+  });
+
+  it("does not warn about a gentle 15 km/h breeze (regression: thresholds were m/s)", () => {
+    const result = buildAlerts({ windSpeed: 15 });
+    expect(result).not.toContain("home.alerts.gustyWinds");
     expect(result).not.toContain("home.alerts.strongWinds");
   });
 
@@ -199,7 +205,7 @@ describe("buildAlerts", () => {
   it("generates multiple alerts for combined conditions", () => {
     const result = buildAlerts({
       temperatureC: -3,
-      windSpeed: 16,
+      windSpeed: 60,
       precipitationProbability: 75,
     });
     expect(result).toContain("home.alerts.veryCold");
@@ -210,7 +216,7 @@ describe("buildAlerts", () => {
   it("all returned keys have entries in ALERT_ICONS", () => {
     const weather: WeatherInfo = {
       temperatureC: -3,
-      windSpeed: 16,
+      windSpeed: 60,
       precipitationProbability: 75,
     };
     const alerts = buildAlerts(weather);
@@ -244,7 +250,7 @@ describe("ridingSuitability", () => {
   it("returns dangerous for very cold + strong wind + rain", () => {
     const r = ridingSuitability({
       temperatureC: -5,
-      windSpeed: 18,
+      windSpeed: 60,
       precipitation: 6,
       precipitationProbability: 90,
     });
@@ -255,7 +261,7 @@ describe("ridingSuitability", () => {
   it("clamps score to [0, 100]", () => {
     const worst = ridingSuitability({
       temperatureC: -20,
-      windSpeed: 30,
+      windSpeed: 80,
       precipitation: 20,
       precipitationProbability: 100,
     });
@@ -274,8 +280,8 @@ describe("ridingSuitability", () => {
   });
 
   it("deducts for high winds", () => {
-    const windy = ridingSuitability({ temperatureC: 20, windSpeed: 15 });
-    const calm = ridingSuitability({ temperatureC: 20, windSpeed: 2 });
+    const windy = ridingSuitability({ temperatureC: 20, windSpeed: 54 });
+    const calm = ridingSuitability({ temperatureC: 20, windSpeed: 8 });
     expect(windy.score).toBeLessThan(calm.score);
   });
 });
@@ -301,8 +307,12 @@ describe("buildRecommendations", () => {
     expect(buildRecommendations({ temperatureC: 30 })).toContain("home.recs.lightGear");
   });
 
-  it("recommends secureLuggage at 10 m/s wind", () => {
-    expect(buildRecommendations({ windSpeed: 10 })).toContain("home.recs.secureLuggage");
+  it("recommends secureLuggage at 36 km/h wind", () => {
+    expect(buildRecommendations({ windSpeed: 36 })).toContain("home.recs.secureLuggage");
+  });
+
+  it("does not recommend secureLuggage for a light breeze", () => {
+    expect(buildRecommendations({ windSpeed: 15 })).not.toContain("home.recs.secureLuggage");
   });
 
   it("recommends rainGear at 60% rain chance", () => {
@@ -312,7 +322,7 @@ describe("buildRecommendations", () => {
   it("all returned keys have entries in REC_ICONS", () => {
     const recs = buildRecommendations({
       temperatureC: -2,
-      windSpeed: 12,
+      windSpeed: 40,
       precipitationProbability: 80,
     });
     for (const key of recs) {

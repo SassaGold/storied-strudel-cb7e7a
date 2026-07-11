@@ -376,7 +376,7 @@
     "hideRoute": "▲ Hide Route",
     "tapToExpand": "Tap to expand",
     "notifDisabledTitle": "Notifications are disabled",
-    "notifDisabledMsg": "Trip Logger needs notifications enabled so Android can show the active recording in the notification shade.",
+    "notifDeniedContinueMsg": "Recording will still work, but Android won't show the ongoing-trip notification while the app is in the background. You can enable notifications in system settings.",
     "openSettings": "Open Settings",
     "exportGpx": "📤 GPX",
     "exportFailed": "Export failed",
