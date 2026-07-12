@@ -4,6 +4,11 @@ import "../lib/locationTask";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { Platform } from "react-native";
+import {
+  useFonts,
+  Oswald_600SemiBold,
+  Oswald_700Bold,
+} from "@expo-google-fonts/oswald";
 import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
 import { SettingsProvider } from "../lib/settings";
@@ -27,6 +32,10 @@ function LocalizedErrorBoundary({ children }: { children: ReactNode }) {
 const Notifications: typeof import("expo-notifications") | null = (() => { try { return require("expo-notifications"); } catch { return null; } })();
 
 export default function RootLayout() {
+  // Display font for screen titles (see FONTS in lib/theme.ts). Rendering is
+  // gated below: referencing an unloaded font family throws on native.
+  const [fontsLoaded] = useFonts({ Oswald_600SemiBold, Oswald_700Bold });
+
   // Fire-and-forget: sweep week-old / orphaned cache_* entries so retired
   // versioned keys don't accumulate in AsyncStorage forever.
   useEffect(() => {
@@ -44,6 +53,9 @@ export default function RootLayout() {
       // Keep app startup resilient if notifications module/channel setup fails.
     });
   }, []);
+
+  // Native splash screen stays visible during this brief gap.
+  if (!fontsLoaded) return null;
 
   return (
     <LocalizedErrorBoundary>

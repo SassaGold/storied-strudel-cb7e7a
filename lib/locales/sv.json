@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} vägarbeten inom {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKARTA",
     "tapToOpenMaps": "Tryck för att öppna i Kartor",
+    "showAllAlerts": "Visa alla {{count}}",
+    "showFewerAlerts": "Visa färre",
     "roadTypes": {
       "service": "Serviceväg",
       "residential": "Bostadsgata",

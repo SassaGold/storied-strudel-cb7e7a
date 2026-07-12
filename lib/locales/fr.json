@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} chantier(s) détecté(s) dans {{radius}}",
     "openTrafficMap": "CARTE TRAFIC EN DIRECT",
     "tapToOpenMaps": "Appuyez pour ouvrir dans Maps",
+    "showAllAlerts": "Tout afficher ({{count}})",
+    "showFewerAlerts": "Afficher moins",
     "roadTypes": {
       "service": "Voie de Service",
       "residential": "Rue Résidentielle",

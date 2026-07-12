@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} wegwerk(en) binnen {{radius}} gedetecteerd",
     "openTrafficMap": "LIVE VERKEERSKAART",
     "tapToOpenMaps": "Tik om in Kaarten te openen",
+    "showAllAlerts": "Alle {{count}} tonen",
+    "showFewerAlerts": "Minder tonen",
     "suitability": {
       "great": "UITSTEKEND",
       "good": "GOED",

@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   },
   modalWikiSection: {
     backgroundColor: "rgba(255,255,255,0.04)",
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 10,
     gap: 4,
   },
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
   },
   modalActionButton: {
     backgroundColor: "rgba(255,102,0,0.12)",
-    borderRadius: 6,
+    borderRadius: 10,
     paddingVertical: 10,
     alignItems: "center",
     borderWidth: 1,
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
   modalClose: {
     marginTop: 8,
     backgroundColor: COLORS.brand,
-    borderRadius: 6,
+    borderRadius: 10,
     paddingVertical: 10,
     alignItems: "center",
   },

@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} roadwork(s) detected within {{radius}}",
     "openTrafficMap": "LIVE TRAFFIC MAP",
     "tapToOpenMaps": "Tap to open in Maps",
+    "showAllAlerts": "Show all {{count}}",
+    "showFewerAlerts": "Show fewer",
     "roadTypes": {
       "service": "Service Road",
       "residential": "Residential Road",

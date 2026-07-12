@@ -1,7 +1,7 @@
 // ── components/RoadConditionsCard.tsx ────────────────────────────────────────
 // Road construction / conditions card for the RIDER HQ screen.
 
-import { memo } from "react";
+import { memo, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Linking,
@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import type * as Location from "expo-location";
 import { type RoadAlert, humanizeConstructionType } from "../lib/roads";
@@ -34,6 +35,9 @@ type Props = {
   location?: Location.LocationObject | null;
 };
 
+/** Rows shown before the list collapses behind a "show all" toggle. */
+const MAX_COLLAPSED_ALERTS = 5;
+
 /** Renders a card listing nearby road-construction alerts sourced from Overpass. */
 // memo: HQ screen re-renders on unrelated state; props only change on refresh.
 export const RoadConditionsCard = memo(function RoadConditionsCard({
@@ -44,6 +48,29 @@ export const RoadConditionsCard = memo(function RoadConditionsCard({
   location,
 }: Props) {
   const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+
+  // Overpass often returns one alert per way-segment of the same roadwork, so
+  // a single street shows up 3–4 times. Merge rows that share type + street
+  // (keeping the nearest) and show a ×N multiplier instead.
+  const grouped = useMemo(() => {
+    const byKey = new Map<string, { alert: RoadAlert; count: number }>();
+    for (const alert of roadAlerts) {
+      const key = `${alert.type}|${alert.name ?? alert.ref ?? alert.id}`;
+      const entry = byKey.get(key);
+      if (!entry) {
+        byKey.set(key, { alert, count: 1 });
+      } else {
+        entry.count += 1;
+        if ((alert.distance ?? Infinity) < (entry.alert.distance ?? Infinity)) {
+          entry.alert = alert;
+        }
+      }
+    }
+    return [...byKey.values()];
+  }, [roadAlerts]);
+
+  const visible = expanded ? grouped : grouped.slice(0, MAX_COLLAPSED_ALERTS);
 
   // Radius label in the user's unit (e.g. "5 km" or "3.1 mi").
   const radiusLabel =
@@ -72,7 +99,7 @@ export const RoadConditionsCard = memo(function RoadConditionsCard({
               radius: radiusLabel,
             })}
           </Text>
-          {roadAlerts.map((alert) => {
+          {visible.map(({ alert, count }) => {
             const canOpen = alert.lat != null && alert.lon != null;
             const openInMaps = () => {
               if (!canOpen) return;
@@ -95,11 +122,17 @@ export const RoadConditionsCard = memo(function RoadConditionsCard({
                 }}
                 disabled={!canOpen}
               >
-                <Text style={styles.roadAlertEmoji}>🚧</Text>
+                <MaterialCommunityIcons
+                  name="traffic-cone"
+                  size={20}
+                  color={COLORS.warning}
+                  style={styles.roadAlertIcon}
+                />
                 <View style={styles.roadAlertInfo}>
                   <View style={styles.roadAlertHeader}>
                     <Text style={styles.roadAlertType}>
                       {humanizeConstructionType(alert.type, t)}
+                      {count > 1 ? ` ×${count}` : ""}
                     </Text>
                     {alert.distance != null && (
                       <Text style={styles.roadAlertDistance}>
@@ -116,17 +149,39 @@ export const RoadConditionsCard = memo(function RoadConditionsCard({
                     <Text style={styles.roadAlertDesc}>{alert.description}</Text>
                   ) : null}
                   {alert.operator ? (
-                    <Text style={styles.roadAlertDesc}>🏗️ {alert.operator}</Text>
+                    <Text style={styles.roadAlertDesc}>{alert.operator}</Text>
                   ) : null}
                   {canOpen && (
                     <Text style={styles.roadAlertMapHint}>
-                      📍 {t("home.tapToOpenMaps")}
+                      {t("home.tapToOpenMaps")}
                     </Text>
                   )}
                 </View>
               </Pressable>
             );
           })}
+          {grouped.length > MAX_COLLAPSED_ALERTS && (
+            <Pressable
+              style={({ pressed }) => [
+                styles.showMoreBtn,
+                pressed && styles.showMoreBtnPressed,
+              ]}
+              onPress={() => {
+                Haptics?.impactAsync(Haptics.ImpactFeedbackStyle.Light)?.catch(
+                  () => null
+                );
+                setExpanded((e) => !e);
+              }}
+              accessibilityRole="button"
+              accessibilityState={{ expanded }}
+            >
+              <Text style={styles.showMoreText}>
+                {expanded
+                  ? t("home.showFewerAlerts")
+                  : t("home.showAllAlerts", { count: grouped.length })}
+              </Text>
+            </Pressable>
+          )}
         </>
       )}
 
@@ -196,11 +251,11 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 8,
     backgroundColor: "rgba(245,158,11,0.08)",
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 8,
   },
   roadAlertRowPressed: { backgroundColor: "rgba(245,158,11,0.22)" },
-  roadAlertEmoji: { fontSize: 20, marginTop: 1 },
+  roadAlertIcon: { marginTop: 1 },
   roadAlertInfo: { flex: 1 },
   roadAlertHeader: {
     flexDirection: "row",
@@ -229,6 +284,16 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   roadAlertMapHint: { color: COLORS.warning, fontSize: 11, marginTop: 4, opacity: 0.75 },
+  showMoreBtn: {
+    marginTop: 2,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(245,158,11,0.4)",
+    alignItems: "center",
+  },
+  showMoreBtnPressed: { backgroundColor: "rgba(245,158,11,0.15)" },
+  showMoreText: { color: COLORS.warning, fontSize: 13, fontWeight: "700" },
   secondaryButton: {
     marginTop: 12,
     borderWidth: 1,
