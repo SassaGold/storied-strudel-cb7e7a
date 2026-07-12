@@ -89,7 +89,9 @@
     "roadConditions": "🚧 Vägförhållanden",
     "roadConditionsLoading": "Kontrollerar vägförhållanden…",
     "roadConditionsNone": "✅ Inga vägarbeten inom {{radius}}.",
-    "roadConditionsCount": "{{count}} vägarbeten inom {{radius}}",
+    "roadConditionsCount_one": "{{count}} vägarbete inom {{radius}}",
+
+    "roadConditionsCount_other": "{{count}} vägarbeten inom {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKARTA",
     "tapToOpenMaps": "Tryck för att öppna i Kartor",
     "showAllAlerts": "Visa alla {{count}}",
@@ -367,7 +369,9 @@
     "save": "Spara",
     "rideLabel": "Tur {{n}}",
     "accuracy": "GPS-noggrannhet {{value}} m",
-    "points": "{{count}} GPS-punkter",
+    "points_one": "{{count}} GPS-punkt",
+
+    "points_other": "{{count}} GPS-punkter",
     "tooShortTitle": "Tur inte sparad",
     "tooShortMsg": "Turen var under 10 m — inte sparad.",
     "speedLabel": "HASTIGHET",

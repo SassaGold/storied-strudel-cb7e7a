@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
   forecastCardEmoji: { fontSize: 30, marginBottom: 6 },
   forecastCardCondition: {
     color: COLORS.body,
-    fontSize: 10,
+    fontSize: 11,
     textAlign: "center",
     marginBottom: 6,
   },

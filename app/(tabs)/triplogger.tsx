@@ -1176,11 +1176,12 @@ const SpeedGauge = memo(function SpeedGauge({
             fontVariant: ["tabular-nums"],
             lineHeight: Math.round(size * 0.27),
           }}
+          maxFontSizeMultiplier={1.4}
         >
           {speedKmh != null ? Math.round(speedKmh) : "—"}
         </Text>
-        <Text style={{ fontSize: 12, color: COLORS.muted, fontWeight: "600" }}>{unit}</Text>
-        <Text style={{ fontSize: 9, color: COLORS.muted, letterSpacing: 1.5, marginTop: 2 }}>{label}</Text>
+        <Text style={{ fontSize: 12, color: COLORS.muted, fontWeight: "600" }} maxFontSizeMultiplier={1.4}>{unit}</Text>
+        <Text style={{ fontSize: 11, color: COLORS.muted, letterSpacing: 1.5, marginTop: 2 }} maxFontSizeMultiplier={1.4}>{label}</Text>
       </View>
     </View>
   );
@@ -1468,13 +1469,13 @@ const styles = StyleSheet.create({
     fontVariant: ["tabular-nums"],
   },
   statUnit: {
-    fontSize: 10,
+    fontSize: 11,
     color: "#888",
     fontWeight: "600",
     marginTop: 1,
   },
   statLabel: {
-    fontSize: 9,
+    fontSize: 11,
     color: COLORS.muted,
     fontWeight: "700",
     letterSpacing: 1,
@@ -1632,7 +1633,7 @@ const styles = StyleSheet.create({
   },
   rideStatChipLabel: {
     color: COLORS.muted,
-    fontSize: 10,
+    fontSize: 11,
     marginTop: 3,
     textAlign: "center",
   },
