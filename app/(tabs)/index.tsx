@@ -258,7 +258,7 @@ export default function Index() {
 
       {loading && (
         <View style={styles.loadingRow}>
-          <ActivityIndicator size="small" />
+          <ActivityIndicator size="small" color={COLORS.brand} />
           <Text style={styles.loadingText}>{t("home.fetchingData")}</Text>
         </View>
       )}

@@ -208,7 +208,7 @@ export default function POIScreen({
 
       {loading && (
         <View style={styles.loadingRow}>
-          <ActivityIndicator size="small" />
+          <ActivityIndicator size="small" color={COLORS.brand} />
           <Text style={styles.loadingText}>{t(`${i18nPrefix}.searching`)}</Text>
         </View>
       )}

@@ -41,6 +41,7 @@ import {
 } from "../../lib/tripStats";
 import { buildGpx, gpxFileName } from "../../lib/gpx";
 import { COLORS, FONTS } from "../../lib/theme";
+import HeaderBackdrop from "../../components/HeaderBackdrop";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -744,8 +745,9 @@ export default function TripLoggerScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
+      {/* Header — rounded gradient card, same pattern as the other screens */}
+      <View style={[styles.header, { marginTop: insets.top + 12 }]}>
+        <HeaderBackdrop />
         <Text style={styles.badge}>{t("triplog.badge")}</Text>
         <Text style={styles.title}>{t("triplog.title")}</Text>
         <Text style={styles.subtitle}>{t("triplog.subtitle")}</Text>
@@ -1386,19 +1388,26 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   header: {
-    paddingTop: 16,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: "#111",
-    borderBottomWidth: 2,
-    borderBottomColor: COLORS.brand,
+    marginHorizontal: 16,
+    marginBottom: 4,
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.4)",
+    overflow: "hidden",
+    backgroundColor: "#1a0900",
   },
   badge: {
-    fontSize: 11,
-    fontWeight: "800",
-    letterSpacing: 2,
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(255,102,0,0.18)",
     color: COLORS.brand,
-    marginBottom: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: "600",
+    marginBottom: 8,
+    letterSpacing: 0.4,
   },
   title: {
     fontSize: 30,
