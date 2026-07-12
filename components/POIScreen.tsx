@@ -7,12 +7,13 @@
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import {
   ActivityIndicator,
+  FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
+  type ListRenderItemInfo,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
@@ -139,14 +140,42 @@ export default function POIScreen({
 
   const view = settings.poiView;
 
-  return (
-    <ScrollView
-      style={styles.scrollView}
-      contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.brand} colors={[COLORS.brand]} />
-      }
+  // Row renderer for the virtualized list (rows only mount as they scroll in;
+  // Overpass searches can return dozens of places).
+  const renderPlace = ({ item: place }: ListRenderItemInfo<Place>) => (
+    <Pressable
+      style={styles.placeRow}
+      onPress={() => { hapticLight(); openInMaps(place); }}
+      accessibilityRole="button"
+      accessibilityLabel={place.name}
     >
+      <View style={styles.placeInfo}>
+        <Text style={styles.bodyText}>{place.name}</Text>
+        <View style={styles.tagRow}>
+          <Text style={styles.metaText}>{categoryDisplay(place.category)}</Text>
+          {renderExtraListTag ? renderExtraListTag(place) : null}
+        </View>
+      </View>
+      <View style={styles.placeRight}>
+        <Text style={styles.metaText}>
+          {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
+        </Text>
+        <Pressable
+          style={styles.infoButton}
+          onPress={(e) => { e.stopPropagation(); hapticLight(); openInfo(place); }}
+          hitSlop={8}
+          accessibilityRole="button"
+          accessibilityLabel={t("common.infoAbout", { name: place.name })}
+        >
+          <Text style={styles.infoButtonText}>ⓘ</Text>
+        </Pressable>
+      </View>
+    </Pressable>
+  );
+
+  // Everything above the rows scrolls with them as the list header.
+  const listHeader = (
+    <>
       {/* ── Info modal ── */}
       <PlaceInfoModal
         place={infoPlace}
@@ -225,50 +254,35 @@ export default function POIScreen({
         </View>
       )}
 
-      {/* ── Results ── */}
-      {places.length === 0 && loading ? null : places.length === 0 ? (
-        <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
-      ) : view === "map" ? (
+      {/* ── Map view renders inside the header; rows are the list itself ── */}
+      {view === "map" && places.length > 0 && (
         <POIMap
           places={places}
           userLocation={userLocation}
           onPressPlace={openInfo}
           markerLabel={(p) => p.name}
         />
-      ) : (
-        places.map((place) => (
-            <Pressable
-              key={place.id}
-              style={styles.placeRow}
-              onPress={() => { hapticLight(); openInMaps(place); }}
-              accessibilityRole="button"
-              accessibilityLabel={place.name}
-            >
-              <View style={styles.placeInfo}>
-                <Text style={styles.bodyText}>{place.name}</Text>
-                <View style={styles.tagRow}>
-                  <Text style={styles.metaText}>{categoryDisplay(place.category)}</Text>
-                  {renderExtraListTag ? renderExtraListTag(place) : null}
-                </View>
-              </View>
-              <View style={styles.placeRight}>
-                <Text style={styles.metaText}>
-                  {fmtDistShort(place.distanceMeters ?? 0, settings.unitSystem)}
-                </Text>
-                <Pressable
-                  style={styles.infoButton}
-                  onPress={(e) => { e.stopPropagation(); hapticLight(); openInfo(place); }}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("common.infoAbout", { name: place.name })}
-                >
-                  <Text style={styles.infoButtonText}>ⓘ</Text>
-                </Pressable>
-              </View>
-            </Pressable>
-          ))
       )}
-    </ScrollView>
+    </>
+  );
+
+  return (
+    <FlatList
+      style={styles.scrollView}
+      contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.brand} colors={[COLORS.brand]} />
+      }
+      data={view === "list" ? places : []}
+      keyExtractor={(place) => place.id}
+      renderItem={renderPlace}
+      ListHeaderComponent={listHeader}
+      ListEmptyComponent={
+        !loading && places.length === 0 ? (
+          <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
+        ) : null
+      }
+    />
   );
 }
 

@@ -89,7 +89,9 @@
     "roadConditions": "🚧 Condiciones de la carretera",
     "roadConditionsLoading": "Comprobando condiciones de la vía…",
     "roadConditionsNone": "✅ No se detectan obras en {{radius}}.",
-    "roadConditionsCount": "{{count}} obra(s) detectada(s) en {{radius}}",
+    "roadConditionsCount_one": "{{count}} obra detectada en {{radius}}",
+
+    "roadConditionsCount_other": "{{count}} obras detectadas en {{radius}}",
     "openTrafficMap": "MAPA DE TRÁFICO EN VIVO",
     "tapToOpenMaps": "Toca para abrir en Mapas",
     "showAllAlerts": "Mostrar todas ({{count}})",
@@ -367,7 +369,9 @@
     "save": "Guardar",
     "rideLabel": "Viaje {{n}}",
     "accuracy": "Precisión GPS {{value}} m",
-    "points": "{{count}} puntos GPS",
+    "points_one": "{{count}} punto GPS",
+
+    "points_other": "{{count}} puntos GPS",
     "tooShortTitle": "Viaje No Guardado",
     "tooShortMsg": "El viaje fue inferior a 10 m — no guardado.",
     "speedLabel": "VELOCIDAD",

@@ -89,7 +89,9 @@
     "roadConditions": "🚧 État des routes",
     "roadConditionsLoading": "Vérification des conditions routières…",
     "roadConditionsNone": "✅ Aucun chantier détecté dans un rayon de {{radius}}.",
-    "roadConditionsCount": "{{count}} chantier(s) détecté(s) dans {{radius}}",
+    "roadConditionsCount_one": "{{count}} chantier détecté dans {{radius}}",
+
+    "roadConditionsCount_other": "{{count}} chantiers détectés dans {{radius}}",
     "openTrafficMap": "CARTE TRAFIC EN DIRECT",
     "tapToOpenMaps": "Appuyez pour ouvrir dans Maps",
     "showAllAlerts": "Tout afficher ({{count}})",
@@ -367,7 +369,9 @@
     "save": "Enregistrer",
     "rideLabel": "Trajet {{n}}",
     "accuracy": "Précision GPS {{value}} m",
-    "points": "{{count}} points GPS",
+    "points_one": "{{count}} point GPS",
+
+    "points_other": "{{count}} points GPS",
     "tooShortTitle": "Trajet Non Enregistré",
     "tooShortMsg": "Le trajet était inférieur à 10 m — non enregistré.",
     "speedLabel": "VITESSE",

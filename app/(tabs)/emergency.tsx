@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   },
   sosRegion: {
     color: "#888888",
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "600",
     textAlign: "center",
   },
@@ -879,7 +879,7 @@ const styles = StyleSheet.create({
   },
   quickActionLabel: {
     color: "#cc4444",
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "700",
     textAlign: "center",
   },

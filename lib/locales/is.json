@@ -89,7 +89,9 @@
     "roadConditions": "🚧 Vegaskilyrði",
     "roadConditionsLoading": "Athuga vegaskilyrði…",
     "roadConditionsNone": "✅ Engar vegaframkvæmdir greindar í {{radius}}.",
-    "roadConditionsCount": "{{count}} vegaframkvæmd(ir) greindar í {{radius}}",
+    "roadConditionsCount_one": "{{count}} vegaframkvæmd greind í {{radius}}",
+
+    "roadConditionsCount_other": "{{count}} vegaframkvæmdir greindar í {{radius}}",
     "openTrafficMap": "UMFERÐARKORT",
     "tapToOpenMaps": "Ýttu til að opna í kortum",
     "showAllAlerts": "Sýna allar {{count}}",
@@ -367,7 +369,9 @@
     "save": "Vista",
     "rideLabel": "Ferð {{n}}",
     "accuracy": "GPS nákvæmni {{value}} m",
-    "points": "{{count}} GPS-punktar",
+    "points_one": "{{count}} GPS-punktur",
+
+    "points_other": "{{count}} GPS-punktar",
     "tooShortTitle": "Ferð Ekki Vistuð",
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",
     "speedLabel": "HRAÐI",

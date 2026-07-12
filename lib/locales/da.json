@@ -89,7 +89,9 @@
     "roadConditions": "🚧 Vejforhold",
     "roadConditionsLoading": "Tjekker vejforhold…",
     "roadConditionsNone": "✅ Ingen vejarbejde inden for {{radius}}.",
-    "roadConditionsCount": "{{count}} vejarbejde inden for {{radius}}",
+    "roadConditionsCount_one": "{{count}} vejarbejde inden for {{radius}}",
+
+    "roadConditionsCount_other": "{{count}} vejarbejder inden for {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKORT",
     "tapToOpenMaps": "Tryk for at åbne i Kort",
     "showAllAlerts": "Vis alle {{count}}",
@@ -367,7 +369,9 @@
     "save": "Gem",
     "rideLabel": "Tur {{n}}",
     "accuracy": "GPS-nøjagtighed {{value}} m",
-    "points": "{{count}} GPS-punkter",
+    "points_one": "{{count}} GPS-punkt",
+
+    "points_other": "{{count}} GPS-punkter",
     "tooShortTitle": "Tur ikke gemt",
     "tooShortMsg": "Turen var under 10 m — ikke gemt.",
     "speedLabel": "FART",

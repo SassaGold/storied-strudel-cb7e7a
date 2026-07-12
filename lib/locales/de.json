@@ -89,7 +89,9 @@
     "roadConditions": "🚧 Straßenverhältnisse",
     "roadConditionsLoading": "Straßenbedingungen prüfen…",
     "roadConditionsNone": "✅ Keine Baustellen in {{radius}}.",
-    "roadConditionsCount": "{{count}} Baustelle(n) in {{radius}} erkannt",
+    "roadConditionsCount_one": "{{count}} Baustelle in {{radius}} erkannt",
+
+    "roadConditionsCount_other": "{{count}} Baustellen in {{radius}} erkannt",
     "openTrafficMap": "LIVE-VERKEHRSKARTE",
     "tapToOpenMaps": "Zum Öffnen in Karten tippen",
     "showAllAlerts": "Alle {{count}} anzeigen",
@@ -367,7 +369,9 @@
     "save": "Speichern",
     "rideLabel": "Tour {{n}}",
     "accuracy": "GPS-Genauigkeit {{value}} m",
-    "points": "{{count}} GPS-Punkte",
+    "points_one": "{{count}} GPS-Punkt",
+
+    "points_other": "{{count}} GPS-Punkte",
     "tooShortTitle": "Fahrt Nicht Gespeichert",
     "tooShortMsg": "Fahrt war unter 10 m — nicht gespeichert.",
     "speedLabel": "TEMPO",

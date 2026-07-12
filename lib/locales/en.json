@@ -89,7 +89,9 @@
     "roadConditions": "🚧 Road Conditions",
     "roadConditionsLoading": "Checking road conditions…",
     "roadConditionsNone": "✅ No roadworks detected within {{radius}}.",
-    "roadConditionsCount": "{{count}} roadwork(s) detected within {{radius}}",
+    "roadConditionsCount_one": "{{count}} roadwork detected within {{radius}}",
+
+    "roadConditionsCount_other": "{{count}} roadworks detected within {{radius}}",
     "openTrafficMap": "LIVE TRAFFIC MAP",
     "tapToOpenMaps": "Tap to open in Maps",
     "showAllAlerts": "Show all {{count}}",
@@ -367,7 +369,9 @@
     "save": "Save",
     "rideLabel": "Ride {{n}}",
     "accuracy": "GPS accuracy {{value}} m",
-    "points": "{{count}} GPS points",
+    "points_one": "{{count}} GPS point",
+
+    "points_other": "{{count}} GPS points",
     "tooShortTitle": "Ride Not Saved",
     "tooShortMsg": "Ride was under 10 m — not saved.",
     "speedLabel": "SPEED",

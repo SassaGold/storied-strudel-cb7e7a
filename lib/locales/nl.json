@@ -89,7 +89,9 @@
     "roadConditions": "🚧 Wegomstandigheden",
     "roadConditionsLoading": "Wegomstandigheden controleren…",
     "roadConditionsNone": "✅ Geen wegwerkzaamheden binnen {{radius}}.",
-    "roadConditionsCount": "{{count}} wegwerk(en) binnen {{radius}} gedetecteerd",
+    "roadConditionsCount_one": "{{count}} wegwerk binnen {{radius}} gedetecteerd",
+
+    "roadConditionsCount_other": "{{count}} wegwerken binnen {{radius}} gedetecteerd",
     "openTrafficMap": "LIVE VERKEERSKAART",
     "tapToOpenMaps": "Tik om in Kaarten te openen",
     "showAllAlerts": "Alle {{count}} tonen",
@@ -367,7 +369,9 @@
     "save": "Opslaan",
     "rideLabel": "Rit {{n}}",
     "accuracy": "GPS-nauwkeurigheid {{value}} m",
-    "points": "{{count}} GPS-punten",
+    "points_one": "{{count}} GPS-punt",
+
+    "points_other": "{{count}} GPS-punten",
     "tooShortTitle": "Rit Niet Opgeslagen",
     "tooShortMsg": "Rit was onder 10 m — niet opgeslagen.",
     "speedLabel": "SNELHEID",
