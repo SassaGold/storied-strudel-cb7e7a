@@ -1,0 +1,65 @@
+Where Am I — The Motorcycle Rider's Companion 🏍️
+
+Everything you need on the road, in one clean app. Where Am I is built for motorcyclists who want live local information, smart trip logging, and peace of mind in emergencies — with no account, no ads, and no data collection.
+
+━━━━━━━━━━━━━━━━━━━━
+🧭 RIDER HQ
+━━━━━━━━━━━━━━━━━━━━
+Your live dashboard while riding. See your current address, live weather with hourly and 3-day forecasts, a riding-suitability score with practical recommendations, sunrise and sunset times, and road-condition alerts — all from your current GPS position.
+
+━━━━━━━━━━━━━━━━━━━━
+🍽️ FOOD STOPS
+━━━━━━━━━━━━━━━━━━━━
+Find restaurants, cafés, bars, bakeries and fast food nearby, sorted by distance. Tap any result for directions, contact info, or their website.
+
+━━━━━━━━━━━━━━━━━━━━
+🛏️ CRASH PADS
+━━━━━━━━━━━━━━━━━━━━
+Locate hotels, hostels, campsites and other places to sleep near your current position — perfect when the day's ride runs long.
+
+━━━━━━━━━━━━━━━━━━━━
+🏁 ROADSIDE STOPS
+━━━━━━━━━━━━━━━━━━━━
+Discover viewpoints, museums, landmarks and other stops worth pulling over for along your route.
+
+━━━━━━━━━━━━━━━━━━━━
+🔧 THE GARAGE
+━━━━━━━━━━━━━━━━━━━━
+Everything to keep you riding:
+• Motorcycle dealers, repair workshops & parts shops
+• Fuel stations (with fuel type info)
+• Parking — general and motorcycle-specific
+• MC clubs & racing tracks
+• ATMs & banks
+
+━━━━━━━━━━━━━━━━━━━━
+📏 TRIP LOGGER
+━━━━━━━━━━━━━━━━━━━━
+Record your rides with a live speed gauge, real-time distance and duration counters, and GPS route tracking that keeps working with the screen locked. Your full ride history is saved on your device — never uploaded anywhere.
+
+━━━━━━━━━━━━━━━━━━━━
+🆘 SOS / EMERGENCY
+━━━━━━━━━━━━━━━━━━━━
+A dedicated emergency screen, one tap away:
+• One-tap call to the local emergency number
+• Universal emergency numbers (112, 911, 999, 000, 111)
+• Nearest hospitals, police, fire stations & pharmacies
+• Location sharing via SMS or WhatsApp
+• Torch / flash screen for signalling
+• Step-by-step first aid for motorcycle accidents
+
+━━━━━━━━━━━━━━━━━━━━
+🌍 9 LANGUAGES
+━━━━━━━━━━━━━━━━━━━━
+Full interface in English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish and Dutch — switch instantly, remembered forever.
+
+━━━━━━━━━━━━━━━━━━━━
+🔒 PRIVACY — NO DATA COLLECTED
+━━━━━━━━━━━━━━━━━━━━
+• No account required
+• No ads, analytics or tracking
+• Your location is used only on-device
+• Ride logs stay on your device
+• Open data: OpenStreetMap, Open-Meteo, Wikipedia
+
+Ready to ride smarter? Download Where Am I, hit the road, and always know what's around the next bend. Questions or ideas? We answer every mail: support@sassagold.com

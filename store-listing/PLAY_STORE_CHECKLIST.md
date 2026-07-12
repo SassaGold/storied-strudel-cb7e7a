@@ -29,8 +29,8 @@ Use this checklist before submitting to Google Play.
 - [x] 9-language i18n (EN / ES / DE / FR / IS / NO / SV / DA / NL)
 - [x] Privacy statement in About screen (links to privacy policy)
 - [x] `store-listing/privacy_policy.md` created (covers background location, Trip Logger data, third-party APIs)
-- [x] `store-listing/short_description.txt` (72 chars ≤ 80 limit) ✓
-- [x] `store-listing/full_description.txt` (≤ 4000 chars) ✓
+- [x] Listing copy in `store-listing/locales/{en-US,no-NO,is-IS}/` (title ≤30, short ≤80, full ≤4000 — all verified) ✓
+- [x] Branded screenshots + feature graphics in `store-listing/graphics/` (rerun via `node scripts/render-store-assets.js`) ✓
 - [x] All map tiles served from OpenStreetMap (no Google Maps API key required)
 - [x] `edgeToEdgeEnabled: true` in `app.json` for Android 15+
 
@@ -47,40 +47,51 @@ The About screen links to this URL (`PRIVACY_POLICY_URL` in `lib/config.ts`); th
 source document lives at `docs/privacy-policy.html`.
 Paste the URL into Google Play Console → App Content → Privacy Policy.
 
-### 2. Screenshots (Required)
-Google Play requires **at least 2 screenshots** per device type.
-Recommended: 5–8 screenshots covering each major tab.
+### 2. Screenshots (Required) — ✅ GENERATED, ready to upload
+Branded 1080×1920 panels live in `store-listing/graphics/<locale>/screenshots/`
+(8 per locale: Rider HQ, SOS, Garage, Trip, Food, Sleep, Explore, Language).
+Regenerate any time with `node scripts/render-store-assets.js` (raw captures in
+`store-listing/raw/`).
 
-Dimensions: **1080 × 1920 px** (or 1080 × 2160 px) PNG or JPEG.
+Upload: Play Console → **Grow users → Store presence → Main store listing** →
+scroll to **Phone screenshots** → delete the old bare captures → upload all 8
+from `graphics/en-US/screenshots/` in numbered order.
 
-Suggested screenshots:
-1. Rider HQ / Home — map + weather card
-2. Food Stops — list of nearby restaurants
-3. Trip Logger — speed gauge in action
-4. SOS / Emergency screen
-5. Settings / Language picker
-
-Take screenshots using an Android emulator or physical device.
-
-### 3. Feature Graphic (Required)
-- Dimensions: **1024 × 500 px** PNG or JPEG
-- Shown at the top of your Play Store listing
-- Design with Where Am I branding (`#ff6600` orange accent, dark background)
+### 3. Feature Graphic (Required) — ✅ GENERATED, ready to upload
+`store-listing/graphics/<locale>/feature-graphic.png` (1024×500). Upload in the
+same Main store listing page under **Feature graphic**. This banner is what
+Play shows in search and promo placements — the listing currently has none.
 
 ### 4. Store Listing Entry
-In Google Play Console → Store Presence → Main Store Listing:
+In Google Play Console → **Grow users → Store presence → Main store listing**:
 
 | Field | Value |
 |-------|-------|
-| App name | `Where Am I` |
-| Short description | Copy from `store-listing/short_description.txt` |
-| Full description | Copy from `store-listing/full_description.txt` |
-| App icon | Upload `assets/images/icon.png` (1024×1024 px) |
-| Feature graphic | Create 1024×500 px banner |
+| App name | `store-listing/locales/en-US/title.txt` (27 chars) |
+| Short description | `store-listing/locales/en-US/short_description.txt` |
+| Full description | `store-listing/locales/en-US/full_description.txt` |
+| App icon | Keep current (or `assets/images/icon.png`, 1024×1024) |
+| Feature graphic | `store-listing/graphics/en-US/feature-graphic.png` |
+| Phone screenshots | `store-listing/graphics/en-US/screenshots/01..08` |
 | Category | **Travel & Local** |
 | Tags | motorcycle, biker, navigation, trip logger, POI |
-| Email | Your support email address |
+| Email | support@sassagold.com |
 | Privacy policy URL | Hosted URL from step 1 above |
+
+> ⚠️ The description currently LIVE on Play does not match this repo — it
+> promises "offline maps", "save routes" and "share highlights", which the app
+> does not have. Replace it with the text above to avoid review complaints.
+
+### 4b. Localized listings (Norwegian & Icelandic)
+On the Main store listing page, top-right language selector → **Manage
+translations → Add translations** → add **Norwegian (no-NO)** and
+**Icelandic (is-IS)**. For each, paste the three text files from
+`store-listing/locales/<locale>/` and upload the 8 screenshots + feature
+graphic from `store-listing/graphics/<locale>/`.
+
+### 4c. "What's new" release notes
+Use `store-listing/locales/en-US/whats-new-template.txt` as the pattern —
+lead with rider benefits, not internal notes like "Visual Overhaul Release".
 
 ### 5. Content Rating
 Complete the content rating questionnaire in Play Console.

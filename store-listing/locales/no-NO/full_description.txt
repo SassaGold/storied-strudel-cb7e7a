@@ -1,0 +1,65 @@
+Where Am I — motorsyklistens kompis 🏍️
+
+Alt du trenger på veien, i én ryddig app. Where Am I er laget for motorsyklister som vil ha lokal informasjon i sanntid, smart turlogging og trygghet i nødsituasjoner — uten konto, uten reklame og uten datainnsamling.
+
+━━━━━━━━━━━━━━━━━━━━
+🧭 RIDER HQ
+━━━━━━━━━━━━━━━━━━━━
+Ditt dashbord mens du kjører. Se gjeldende adresse, vær i sanntid med time- og 3-dagersvarsel, kjørbarhetsscore med praktiske anbefalinger, soloppgang og solnedgang, og varsler om veiforhold — alt fra din GPS-posisjon.
+
+━━━━━━━━━━━━━━━━━━━━
+🍽️ MATSTOPP
+━━━━━━━━━━━━━━━━━━━━
+Finn restauranter, kaféer, barer, bakerier og hurtigmat i nærheten, sortert etter avstand. Trykk på et resultat for veibeskrivelse, kontaktinfo eller nettside.
+
+━━━━━━━━━━━━━━━━━━━━
+🛏️ OVERNATTING
+━━━━━━━━━━━━━━━━━━━━
+Finn hoteller, vandrerhjem, campingplasser og andre soveplasser nær der du er — perfekt når dagens etappe blir lang.
+
+━━━━━━━━━━━━━━━━━━━━
+🏁 SEVERDIGHETER
+━━━━━━━━━━━━━━━━━━━━
+Oppdag utsiktspunkter, museer, landemerker og andre stopp verdt å svinge innom langs ruten.
+
+━━━━━━━━━━━━━━━━━━━━
+🔧 THE GARAGE
+━━━━━━━━━━━━━━━━━━━━
+Alt for å holde deg på veien:
+• MC-forhandlere, verksteder og delebutikker
+• Bensinstasjoner (med drivstofftype)
+• Parkering — vanlig og MC-spesifikk
+• MC-klubber og racingbaner
+• Minibanker og banker
+
+━━━━━━━━━━━━━━━━━━━━
+📏 REISEDAGBOK
+━━━━━━━━━━━━━━━━━━━━
+Loggfør turene dine med fartsmåler i sanntid, distanse- og tidstellere og GPS-sporing som fortsetter med låst skjerm. Hele kjørehistorikken lagres på enheten din — aldri lastet opp noe sted.
+
+━━━━━━━━━━━━━━━━━━━━
+🆘 SOS / NØD
+━━━━━━━━━━━━━━━━━━━━
+En egen nødskjerm, ett trykk unna:
+• Ettrykks-anrop til lokalt nødnummer
+• Universelle nødnumre (112, 911, 999, 000, 111)
+• Nærmeste sykehus, politi, brannstasjoner og apotek
+• Posisjonsdeling via SMS eller WhatsApp
+• Lommelykt / blinkende skjerm for signalisering
+• Førstehjelp steg for steg ved MC-ulykker
+
+━━━━━━━━━━━━━━━━━━━━
+🌍 9 SPRÅK
+━━━━━━━━━━━━━━━━━━━━
+Fullt grensesnitt på norsk, engelsk, spansk, tysk, fransk, islandsk, svensk, dansk og nederlandsk — bytt umiddelbart, huskes for alltid.
+
+━━━━━━━━━━━━━━━━━━━━
+🔒 PERSONVERN — INGEN DATA SAMLES INN
+━━━━━━━━━━━━━━━━━━━━
+• Ingen konto nødvendig
+• Ingen reklame, analyse eller sporing
+• Posisjonen din brukes kun på enheten
+• Turlogger blir på enheten din
+• Åpne data: OpenStreetMap, Open-Meteo, Wikipedia
+
+Klar for smartere turer? Last ned Where Am I, kjør ut, og vit alltid hva som venter rundt neste sving. Spørsmål eller idéer? Vi svarer på alt: support@sassagold.com
