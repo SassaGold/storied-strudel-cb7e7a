@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "expo-router";
@@ -8,19 +9,24 @@ import type { DefaultTab, UnitSystem } from "../../lib/settings";
 import i18n, { saveLanguage, SUPPORTED_LANGS } from "../../lib/i18n";
 import { storage } from "../../lib/storage";
 import { COLORS } from "../../lib/theme";
+import HeaderBackdrop from "../../components/HeaderBackdrop";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
 const RADIUS_OPTIONS = [2, 5, 10, 15, 20] as const;
 
-const DEFAULT_TAB_OPTIONS: { key: DefaultTab; emoji: string; labelKey: string }[] = [
-  { key: "index", emoji: "🧭", labelKey: "tabs.home" },
-  { key: "restaurants", emoji: "🍽️", labelKey: "tabs.food" },
-  { key: "hotels", emoji: "🛏️", labelKey: "tabs.sleep" },
-  { key: "attractions", emoji: "🏁", labelKey: "tabs.explore" },
-  { key: "mc", emoji: "⚙️", labelKey: "tabs.garage" },
-  { key: "triplogger", emoji: "📏", labelKey: "tabs.trip" },
-  { key: "emergency", emoji: "🆘", labelKey: "tabs.sos" },
+type IoniconName = ComponentProps<typeof Ionicons>["name"];
+
+// Icons mirror the tab bar (app/(tabs)/_layout.tsx) so the chips read as the
+// same destinations.
+const DEFAULT_TAB_OPTIONS: { key: DefaultTab; icon: IoniconName; labelKey: string }[] = [
+  { key: "index", icon: "compass", labelKey: "tabs.home" },
+  { key: "restaurants", icon: "restaurant", labelKey: "tabs.food" },
+  { key: "hotels", icon: "bed", labelKey: "tabs.sleep" },
+  { key: "attractions", icon: "flag", labelKey: "tabs.explore" },
+  { key: "mc", icon: "speedometer", labelKey: "tabs.garage" },
+  { key: "triplogger", icon: "navigate", labelKey: "tabs.trip" },
+  { key: "emergency", icon: "alert-circle", labelKey: "tabs.sos" },
 ];
 
 export default function SettingsScreen() {
@@ -42,8 +48,7 @@ export default function SettingsScreen() {
   return (
     <ScrollView style={styles.scrollView} contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}>
       <View style={styles.header}>
-        <View style={styles.headerGlow} />
-        <View style={styles.headerGlowSecondary} />
+        <HeaderBackdrop />
         <Text style={styles.headerBadge}>{t("settings.badge")}</Text>
         <Text style={styles.title}>{t("settings.title")}</Text>
         <Text style={styles.subtitle}>{t("settings.subtitle")}</Text>
@@ -114,7 +119,7 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>{t("settings.defaultTab")}</Text>
         <Text style={styles.sectionDesc}>{t("settings.defaultTabDesc")}</Text>
         <View style={styles.chipRow}>
-          {DEFAULT_TAB_OPTIONS.map(({ key, emoji, labelKey }) => (
+          {DEFAULT_TAB_OPTIONS.map(({ key, icon, labelKey }) => (
             <Pressable
               key={key}
               style={({ pressed }) => [
@@ -127,7 +132,11 @@ export default function SettingsScreen() {
               accessibilityRole="button"
               accessibilityState={{ selected: settings.defaultTab === key }}
             >
-              <Text style={styles.tabChipEmoji}>{emoji}</Text>
+              <Ionicons
+                name={icon}
+                size={14}
+                color={settings.defaultTab === key ? COLORS.white : COLORS.brand}
+              />
               <Text style={[styles.chipText, settings.defaultTab === key && styles.chipTextActive]}>
                 {t(labelKey)}
               </Text>
@@ -200,24 +209,6 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,102,0,0.4)",
     overflow: "hidden",
     backgroundColor: "#1a0900",
-  },
-  headerGlow: {
-    position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "rgba(255,102,0,0.55)",
-    top: -80,
-    right: -40,
-  },
-  headerGlowSecondary: {
-    position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(180,60,0,0.40)",
-    bottom: -60,
-    left: -20,
   },
   headerBadge: {
     alignSelf: "flex-start",
@@ -320,9 +311,6 @@ const styles = StyleSheet.create({
   },
   tabChip: {
     paddingHorizontal: 12,
-  },
-  tabChipEmoji: {
-    fontSize: 14,
   },
   clearCacheButton: {
     paddingVertical: 11,

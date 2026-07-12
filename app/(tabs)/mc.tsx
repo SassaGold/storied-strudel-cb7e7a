@@ -1,5 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useCallback, useEffect, useRef, useState, type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
 import {
     ActivityIndicator,
@@ -29,6 +30,7 @@ import { readTimedCache, storage } from "../../lib/storage";
 import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
 import PlaceInfoModal from "../../components/PlaceInfoModal";
 import POIMap from "../../components/POIMap";
+import HeaderBackdrop from "../../components/HeaderBackdrop";
 
 
 import { COLORS } from "../../lib/theme";
@@ -91,13 +93,13 @@ const CATEGORY_BG_ACTIVE: Record<Category, string> = {
   fitness:      "rgba(20,184,166,0.10)",
 };
 
-const CATEGORY_ICONS: Record<Category, string> = {
-  services:     "🛠️",
-  fuel:         "⛽",
-  parking:      "🅿️",
-  clubs_tracks: "🏁",
-  atm_bank:     "🏧",
-  fitness:      "💪",
+const CATEGORY_ICONS: Record<Category, ComponentProps<typeof MaterialCommunityIcons>["name"]> = {
+  services:     "wrench",
+  fuel:         "gas-station",
+  parking:      "parking",
+  clubs_tracks: "flag-checkered",
+  atm_bank:     "bank",
+  fitness:      "dumbbell",
 };
 
 // ── Category display ───────────────────────────────────────────────────────────
@@ -389,8 +391,7 @@ export default function McScreen() {
         formatCategoryLabel={formatMcCategory}
       />
       <View style={styles.header}>
-        <View style={styles.headerGlow} />
-        <View style={styles.headerGlowSecondary} />
+        <HeaderBackdrop />
         <Text style={styles.headerBadge}>{t("garage.badge")}</Text>
         <Text style={styles.title}>{t("garage.title")}</Text>
         <Text style={styles.subtitle}>
@@ -433,7 +434,12 @@ export default function McScreen() {
               accessibilityRole="button"
               accessibilityLabel={t(`garage.titles.${key}`)}
             >
-              <Text style={styles.segmentTileIcon}>{CATEGORY_ICONS[key]}</Text>
+              <MaterialCommunityIcons
+                name={CATEGORY_ICONS[key]}
+                size={28}
+                color={color}
+                style={styles.segmentTileIcon}
+              />
               <Text style={[styles.segmentTileText, isActive && { color }]}>
                 {t(`garage.titles.${key}`)}
               </Text>
@@ -608,24 +614,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#1a0900",
   },
-  headerGlow: {
-    position: "absolute",
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: "rgba(255,102,0,0.55)",
-    top: -90,
-    right: -50,
-  },
-  headerGlowSecondary: {
-    position: "absolute",
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: "rgba(180,60,0,0.40)",
-    bottom: -70,
-    left: -30,
-  },
   headerBadge: {
     alignSelf: "flex-start",
     backgroundColor: "rgba(255,102,0,0.18)",
@@ -689,7 +677,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   segmentTileIcon: {
-    fontSize: 28,
     marginBottom: 6,
   },
   segmentTileText: {

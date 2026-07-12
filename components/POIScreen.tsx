@@ -21,6 +21,7 @@ import { useSettings, fmtDistShort } from "../lib/settings";
 import { usePOIFetch, type Place, type BuildSearchQuery, type MapPlaceItem } from "../lib/usePOIFetch";
 import PlaceInfoModal from "./PlaceInfoModal";
 import POIMap from "./POIMap";
+import HeaderBackdrop from "./HeaderBackdrop";
 
 
 import { COLORS } from "../lib/theme";
@@ -157,8 +158,7 @@ export default function POIScreen({
 
       {/* ── Header ── */}
       <View style={styles.header}>
-        <View style={styles.headerGlow} />
-        <View style={styles.headerGlowSecondary} />
+        <HeaderBackdrop />
         <Text style={styles.headerBadge}>{t(`${i18nPrefix}.badge`)}</Text>
         <Text style={styles.title}>{t(`${i18nPrefix}.title`)}</Text>
         <Text style={styles.subtitle}>{t(`${i18nPrefix}.subtitle`)}</Text>
@@ -289,24 +289,6 @@ const styles = StyleSheet.create({
     borderColor: "rgba(255,102,0,0.4)",
     overflow: "hidden",
     backgroundColor: "#1a0900",
-  },
-  headerGlow: {
-    position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "rgba(255,102,0,0.55)",
-    top: -80,
-    right: -40,
-  },
-  headerGlowSecondary: {
-    position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(180,60,0,0.40)",
-    bottom: -60,
-    left: -20,
   },
   headerBadge: {
     alignSelf: "flex-start",

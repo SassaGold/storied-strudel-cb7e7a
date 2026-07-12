@@ -11,7 +11,7 @@
   },
   "common": {
     "loading": "Loading...",
-    "back": "← Back",
+    "back": "Back",
     "errorTitle": "Something went wrong",
     "tryAgain": "Try Again",
     "mapUnavailable": "Map unavailable — check your connection",

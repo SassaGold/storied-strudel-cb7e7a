@@ -11,7 +11,7 @@
   },
   "common": {
     "loading": "Laden...",
-    "back": "← Terug",
+    "back": "Terug",
     "errorTitle": "Er ging iets mis",
     "tryAgain": "Opnieuw proberen",
     "mapUnavailable": "Kaart niet beschikbaar — controleer je verbinding",

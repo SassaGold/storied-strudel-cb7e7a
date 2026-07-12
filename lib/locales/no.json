@@ -11,7 +11,7 @@
   },
   "common": {
     "loading": "Laster...",
-    "back": "← Tilbake",
+    "back": "Tilbake",
     "errorTitle": "Noe gikk galt",
     "tryAgain": "Prøv igjen",
     "mapUnavailable": "Kart utilgjengelig — sjekk tilkoblingen",
