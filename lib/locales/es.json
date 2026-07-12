@@ -11,7 +11,7 @@
   },
   "common": {
     "loading": "Cargando...",
-    "back": "← Volver",
+    "back": "Volver",
     "errorTitle": "Algo salió mal",
     "tryAgain": "Reintentar",
     "mapUnavailable": "Mapa no disponible — comprueba tu conexión",

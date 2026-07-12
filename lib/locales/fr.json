@@ -11,7 +11,7 @@
   },
   "common": {
     "loading": "Chargement...",
-    "back": "← Retour",
+    "back": "Retour",
     "errorTitle": "Un problème est survenu",
     "tryAgain": "Réessayer",
     "mapUnavailable": "Carte indisponible — vérifiez votre connexion",

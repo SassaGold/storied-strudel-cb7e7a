@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
@@ -21,6 +22,7 @@ import { useRiderHQ } from "../../lib/useRiderHQ";
 import { WeatherCard } from "../../components/WeatherCard";
 import { SunCard } from "../../components/SunCard";
 import { RoadConditionsCard } from "../../components/RoadConditionsCard";
+import HeaderBackdrop from "../../components/HeaderBackdrop";
 
 import { COLORS } from "../../lib/theme";
 const Haptics: typeof import("expo-haptics") | null = (() => {
@@ -120,8 +122,7 @@ export default function Index() {
     >
       {/* ── Header ───────────────────────────────────────────────── */}
       <View style={styles.header}>
-        <View style={styles.headerGlow} />
-        <View style={styles.headerGlowSecondary} />
+        <HeaderBackdrop />
         <View style={styles.headerTopRow}>
           <Pressable
             style={({ pressed }) => [
@@ -138,7 +139,7 @@ export default function Index() {
             accessibilityLabel={t("tabs.about")}
             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
           >
-            <Text style={styles.headerIconBtnText}>ℹ️</Text>
+            <Ionicons name="information-circle-outline" size={22} color={COLORS.brand} />
           </Pressable>
 
           <View style={styles.logoWrapper}>
@@ -162,7 +163,7 @@ export default function Index() {
               accessibilityLabel={t("language.label")}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Text style={styles.headerIconBtnText}>🌐</Text>
+              <Ionicons name="globe-outline" size={20} color={COLORS.brand} />
             </Pressable>
             <Pressable
               style={({ pressed }) => [
@@ -179,7 +180,7 @@ export default function Index() {
               accessibilityLabel={t("settings.title")}
               hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
             >
-              <Text style={styles.headerIconBtnText}>⚙️</Text>
+              <Ionicons name="settings-outline" size={20} color={COLORS.brand} />
             </Pressable>
           </View>
         </View>
@@ -328,13 +329,13 @@ export default function Index() {
       <View style={styles.quickNavGrid}>
         {(
           [
-            { route: "/restaurants", emoji: "🍽️", key: "tabs.food" },
-            { route: "/hotels", emoji: "🛏️", key: "tabs.sleep" },
-            { route: "/attractions", emoji: "🏁", key: "tabs.explore" },
-            { route: "/mc", emoji: "⚙️", key: "tabs.garage" },
-            { route: "/triplogger", emoji: "📏", key: "tabs.trip" },
+            { route: "/restaurants", icon: "restaurant", key: "tabs.food" },
+            { route: "/hotels", icon: "bed", key: "tabs.sleep" },
+            { route: "/attractions", icon: "flag", key: "tabs.explore" },
+            { route: "/mc", icon: "speedometer", key: "tabs.garage" },
+            { route: "/triplogger", icon: "navigate", key: "tabs.trip" },
           ] as const
-        ).map(({ route, emoji, key }) => (
+        ).map(({ route, icon, key }) => (
           <Pressable
             key={route}
             style={({ pressed }) => [
@@ -350,7 +351,7 @@ export default function Index() {
             accessibilityRole="button"
             accessibilityLabel={t(key)}
           >
-            <Text style={styles.quickNavEmoji}>{emoji}</Text>
+            <Ionicons name={icon} size={22} color={COLORS.brand} />
             <Text style={styles.quickNavText}>{t(key)}</Text>
           </Pressable>
         ))}
@@ -368,7 +369,7 @@ export default function Index() {
           accessibilityRole="button"
           accessibilityLabel={t("tabs.sos")}
         >
-          <Text style={styles.quickNavEmoji}>🆘</Text>
+          <Ionicons name="alert-circle" size={22} color={COLORS.danger} />
           <Text style={styles.quickNavTextSos}>{t("tabs.sos")}</Text>
         </Pressable>
       </View>
@@ -391,24 +392,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#1a0900",
   },
-  headerGlow: {
-    position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "rgba(255,102,0,0.55)",
-    top: -80,
-    right: -40,
-  },
-  headerGlowSecondary: {
-    position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(180,60,0,0.40)",
-    bottom: -60,
-    left: -20,
-  },
   headerTopRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -424,7 +407,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   headerIconBtnPressed: { backgroundColor: "rgba(255,102,0,0.40)" },
-  headerIconBtnText: { fontSize: 18 },
   logoWrapper: {
     flex: 1,
     flexDirection: "row",
@@ -589,7 +571,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,102,0,0.12)",
     borderColor: COLORS.brand,
   },
-  quickNavEmoji: { fontSize: 20 },
   quickNavText: {
     color: COLORS.white,
     fontSize: 12,

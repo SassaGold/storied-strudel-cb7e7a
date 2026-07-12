@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import * as Localization from "expo-localization";
 import { useTranslation } from "react-i18next";
@@ -25,6 +26,7 @@ import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyP
 import POIMap from "../../components/POIMap";
 import PlaceInfoModal from "../../components/PlaceInfoModal";
 import { useLocationPermission } from "../../lib/locationPermission";
+import HeaderBackdrop from "../../components/HeaderBackdrop";
 import { COLORS } from "../../lib/theme";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -252,8 +254,7 @@ export default function EmergencyScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerGlow} />
-        <View style={styles.headerGlowSecondary} />
+        <HeaderBackdrop tint="danger" />
         <Text style={styles.headerBadge}>{t("sos.badge")}</Text>
         <Text style={styles.title}>{t("sos.title")}</Text>
         <Text style={styles.subtitle}>
@@ -268,7 +269,7 @@ export default function EmergencyScreen() {
         accessibilityRole="button"
         accessibilityLabel={`${t("sos.callSos")} ${emergencyNumber}`}
       >
-        <Text style={styles.bigSosEmoji}>🆘</Text>
+        <Ionicons name="alert-circle" size={30} color={COLORS.white} />
         <Text style={styles.bigSosText}>{t("sos.callSos")}</Text>
         <Text style={styles.bigSosNumber}>{emergencyNumber}</Text>
       </Pressable>
@@ -284,7 +285,7 @@ export default function EmergencyScreen() {
             accessibilityRole="button"
             accessibilityLabel={`${t("sos.quickActionCall")} ${emergencyNumber}`}
           >
-            <Text style={styles.quickActionEmoji}>📞</Text>
+            <Ionicons name="call" size={22} color={COLORS.danger} />
             <Text style={styles.quickActionLabel}>{t("sos.quickActionCall")} {emergencyNumber}</Text>
           </Pressable>
           {/* Share Location */}
@@ -294,7 +295,7 @@ export default function EmergencyScreen() {
             accessibilityRole="button"
             accessibilityLabel={t("sos.shareLocation")}
           >
-            <Text style={styles.quickActionEmoji}>📍</Text>
+            <Ionicons name="location" size={22} color={COLORS.danger} />
             <Text style={styles.quickActionLabel}>{t("sos.shareLocationShort")}</Text>
           </Pressable>
           {/* Torch Screen */}
@@ -304,7 +305,7 @@ export default function EmergencyScreen() {
             accessibilityRole="button"
             accessibilityLabel={t("sos.torchScreen")}
           >
-            <Text style={styles.quickActionEmoji}>🔦</Text>
+            <Ionicons name="flashlight" size={22} color={COLORS.danger} />
             <Text style={styles.quickActionLabel}>{t("sos.quickActionTorch")}</Text>
           </Pressable>
           {/* Emergency Instructions */}
@@ -314,7 +315,7 @@ export default function EmergencyScreen() {
             accessibilityRole="button"
             accessibilityLabel={t("sos.emergencyInstructions")}
           >
-            <Text style={styles.quickActionEmoji}>📋</Text>
+            <Ionicons name="document-text" size={22} color={COLORS.danger} />
             <Text style={styles.quickActionLabel}>{t("sos.quickActionInstructions")}</Text>
           </Pressable>
         </View>
@@ -523,24 +524,6 @@ const styles = StyleSheet.create({
     borderColor: "rgba(239,68,68,0.4)",
     overflow: "hidden",
     backgroundColor: "#1a0000",
-  },
-  headerGlow: {
-    position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "rgba(239,68,68,0.55)",
-    top: -80,
-    right: -40,
-  },
-  headerGlowSecondary: {
-    position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(180,0,0,0.40)",
-    bottom: -60,
-    left: -20,
   },
   headerBadge: {
     alignSelf: "flex-start",
@@ -843,9 +826,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 12,
   },
-  bigSosEmoji: {
-    fontSize: 28,
-  },
   bigSosText: {
     color: COLORS.white,
     fontWeight: "900",
@@ -893,9 +873,6 @@ const styles = StyleSheet.create({
   quickActionBtnActive: {
     backgroundColor: "rgba(239,68,68,0.25)",
     borderColor: COLORS.danger,
-  },
-  quickActionEmoji: {
-    fontSize: 22,
   },
   quickActionLabel: {
     color: "#cc4444",

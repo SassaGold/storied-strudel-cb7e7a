@@ -55,10 +55,11 @@ export default function TabLayout() {
           paddingBottom: 8 + insets.bottom,
           paddingTop: 4,
         },
+        // No letterSpacing and a slightly smaller size so all 7 labels fit
+        // their slots without truncating ("RIDER …", "EXPLO…").
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: "700",
-          letterSpacing: 0.5,
         },
       }}
     >
