@@ -30,3 +30,14 @@ export const COLORS = {
   /** Warning / stale-data (amber). */
   warning: "#f59e0b",
 } as const;
+
+// ── Typography ───────────────────────────────────────────────────────────────
+// Oswald (condensed sans) is loaded once in app/_layout.tsx via
+// @expo-google-fonts/oswald. Body text stays on the system font; these
+// families are for screen titles and other display-sized text only.
+export const FONTS = {
+  /** Display face for big screen titles (FEED THE BEAST, THE GARAGE, …). */
+  display: "Oswald_700Bold",
+  /** Lighter display face for sub-headers / badges when needed. */
+  displayMedium: "Oswald_600SemiBold",
+} as const;

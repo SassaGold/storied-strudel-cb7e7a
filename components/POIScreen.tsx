@@ -22,9 +22,10 @@ import { usePOIFetch, type Place, type BuildSearchQuery, type MapPlaceItem } fro
 import PlaceInfoModal from "./PlaceInfoModal";
 import POIMap from "./POIMap";
 import HeaderBackdrop from "./HeaderBackdrop";
+import SkeletonList from "./SkeletonList";
 
 
-import { COLORS } from "../lib/theme";
+import { COLORS, FONTS } from "../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 
@@ -185,6 +186,9 @@ export default function POIScreen({
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
+      {/* ── Skeleton placeholders while the first search runs ── */}
+      {loading && places.length === 0 && <SkeletonList rows={5} />}
+
       {/* ── Cache banner ── */}
       {fromCache && places.length > 0 && (
         <View style={styles.cacheBanner}>
@@ -222,7 +226,7 @@ export default function POIScreen({
       )}
 
       {/* ── Results ── */}
-      {places.length === 0 && !loading ? (
+      {places.length === 0 && loading ? null : places.length === 0 ? (
         <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
       ) : view === "map" ? (
         <POIMap
@@ -304,9 +308,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: COLORS.white,
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: 2,
+    fontSize: 30,
+    fontFamily: FONTS.display,
+    letterSpacing: 1.5,
   },
   subtitle: {
     color: COLORS.body,
@@ -316,7 +320,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: COLORS.brand,
     paddingVertical: 13,
-    borderRadius: 6,
+    borderRadius: 12,
     alignItems: "center",
     marginBottom: 16,
     shadowColor: COLORS.brand,
@@ -356,7 +360,7 @@ const styles = StyleSheet.create({
   placeRow: {
     backgroundColor: COLORS.card,
     padding: 14,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -400,7 +404,7 @@ const styles = StyleSheet.create({
   viewToggleBtn: {
     flex: 1,
     paddingVertical: 9,
-    borderRadius: 6,
+    borderRadius: 10,
     alignItems: "center",
     backgroundColor: COLORS.card,
     borderWidth: 1,
@@ -420,7 +424,7 @@ const styles = StyleSheet.create({
   },
   cacheBanner: {
     backgroundColor: "rgba(255,153,0,0.12)",
-    borderRadius: 6,
+    borderRadius: 10,
     paddingVertical: 7,
     paddingHorizontal: 12,
     marginBottom: 10,

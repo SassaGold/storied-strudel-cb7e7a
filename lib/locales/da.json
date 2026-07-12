@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} vejarbejde inden for {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKORT",
     "tapToOpenMaps": "Tryk for at åbne i Kort",
+    "showAllAlerts": "Vis alle {{count}}",
+    "showFewerAlerts": "Vis færre",
     "roadTypes": {
       "service": "Servicevej",
       "residential": "Boliggade",

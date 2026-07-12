@@ -24,7 +24,7 @@ import { SunCard } from "../../components/SunCard";
 import { RoadConditionsCard } from "../../components/RoadConditionsCard";
 import HeaderBackdrop from "../../components/HeaderBackdrop";
 
-import { COLORS } from "../../lib/theme";
+import { COLORS, FONTS } from "../../lib/theme";
 const Haptics: typeof import("expo-haptics") | null = (() => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -416,11 +416,10 @@ const styles = StyleSheet.create({
   logoMoto: { fontSize: 16, lineHeight: 20, textAlign: "center", marginRight: 6 },
   logoTitle: {
     color: COLORS.brand,
-    fontSize: 16,
-    fontWeight: "900",
+    fontSize: 17,
     letterSpacing: 1.8,
     textAlign: "center",
-    fontFamily: LOGO_FONT,
+    fontFamily: FONTS.display,
     textShadowColor: "rgba(255,102,0,0.50)",
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 8,
@@ -438,7 +437,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: COLORS.brand,
     paddingVertical: 13,
-    borderRadius: 6,
+    borderRadius: 12,
     alignItems: "center",
     marginBottom: 16,
     shadowColor: COLORS.brand,

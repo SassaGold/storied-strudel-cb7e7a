@@ -27,7 +27,8 @@ import POIMap from "../../components/POIMap";
 import PlaceInfoModal from "../../components/PlaceInfoModal";
 import { useLocationPermission } from "../../lib/locationPermission";
 import HeaderBackdrop from "../../components/HeaderBackdrop";
-import { COLORS } from "../../lib/theme";
+import SkeletonList from "../../components/SkeletonList";
+import { COLORS, FONTS } from "../../lib/theme";
 // Safely load expo-haptics: may not be available in all environments
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -360,6 +361,8 @@ export default function EmergencyScreen() {
         </View>
       )}
 
+      {loading && places.length === 0 && <SkeletonList rows={4} tint="danger" />}
+
       {error && <Text style={styles.errorText}>{error}</Text>}
 
       {/* Cache banner */}
@@ -539,8 +542,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: COLORS.white,
-    fontSize: 38,
-    fontWeight: "800",
+    fontSize: 40,
+    fontFamily: FONTS.display,
     letterSpacing: 4,
   },
   subtitle: {
@@ -573,7 +576,7 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 60,
     backgroundColor: "rgba(239,68,68,0.12)",
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: "rgba(239,68,68,0.35)",
     paddingVertical: 10,
@@ -600,7 +603,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: COLORS.danger,
     paddingVertical: 13,
-    borderRadius: 6,
+    borderRadius: 12,
     alignItems: "center",
     marginBottom: 16,
     shadowColor: COLORS.danger,
@@ -647,7 +650,7 @@ const styles = StyleSheet.create({
   segmentButton: {
     paddingVertical: 8,
     paddingHorizontal: 10,
-    borderRadius: 6,
+    borderRadius: 10,
     alignItems: "center",
     backgroundColor: COLORS.card,
     borderWidth: 1,
@@ -695,7 +698,7 @@ const styles = StyleSheet.create({
   placeRow: {
     backgroundColor: COLORS.bg,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -764,7 +767,7 @@ const styles = StyleSheet.create({
   viewToggleBtn: {
     flex: 1,
     paddingVertical: 9,
-    borderRadius: 6,
+    borderRadius: 10,
     alignItems: "center",
     backgroundColor: COLORS.card,
     borderWidth: 1,
@@ -784,7 +787,7 @@ const styles = StyleSheet.create({
   },
   cacheBanner: {
     backgroundColor: "rgba(255,153,0,0.12)",
-    borderRadius: 6,
+    borderRadius: 10,
     paddingVertical: 7,
     paddingHorizontal: 12,
     marginBottom: 10,
@@ -799,7 +802,7 @@ const styles = StyleSheet.create({
   shareButton: {
     marginTop: 10,
     backgroundColor: "rgba(239,68,68,0.15)",
-    borderRadius: 6,
+    borderRadius: 10,
     paddingVertical: 9,
     alignItems: "center",
     borderWidth: 1,

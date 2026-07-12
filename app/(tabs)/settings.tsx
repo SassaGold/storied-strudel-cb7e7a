@@ -8,7 +8,7 @@ import { useSettings } from "../../lib/settings";
 import type { DefaultTab, UnitSystem } from "../../lib/settings";
 import i18n, { saveLanguage, SUPPORTED_LANGS } from "../../lib/i18n";
 import { storage } from "../../lib/storage";
-import { COLORS } from "../../lib/theme";
+import { COLORS, FONTS } from "../../lib/theme";
 import HeaderBackdrop from "../../components/HeaderBackdrop";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -246,9 +246,9 @@ const styles = StyleSheet.create({
   },
   title: {
     color: COLORS.white,
-    fontSize: 26,
-    fontWeight: "900",
-    letterSpacing: 0.5,
+    fontSize: 28,
+    fontFamily: FONTS.display,
+    letterSpacing: 1,
     marginBottom: 4,
   },
   subtitle: {

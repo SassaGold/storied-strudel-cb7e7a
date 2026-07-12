@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} vegaframkvæmd(ir) greindar í {{radius}}",
     "openTrafficMap": "UMFERÐARKORT",
     "tapToOpenMaps": "Ýttu til að opna í kortum",
+    "showAllAlerts": "Sýna allar {{count}}",
+    "showFewerAlerts": "Sýna færri",
     "roadTypes": {
       "service": "Þjónustuvegur",
       "residential": "Íbúðagata",

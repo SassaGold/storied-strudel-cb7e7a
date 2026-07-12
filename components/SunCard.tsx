@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   sunTimesRow: {
     flexDirection: "row",
     backgroundColor: COLORS.bg,
-    borderRadius: 8,
+    borderRadius: 10,
     paddingVertical: 12,
     marginTop: 14,
     borderWidth: 1,

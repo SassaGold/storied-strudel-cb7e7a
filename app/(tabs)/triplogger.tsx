@@ -40,7 +40,7 @@ import {
   type SavedRide,
 } from "../../lib/tripStats";
 import { buildGpx, gpxFileName } from "../../lib/gpx";
-import { COLORS } from "../../lib/theme";
+import { COLORS, FONTS } from "../../lib/theme";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -1308,7 +1308,7 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
 
   return (
     <View
-      style={{ height: MAP_HEIGHT, backgroundColor: "#0d0d0d", borderRadius: 8, overflow: "hidden" }}
+      style={{ height: MAP_HEIGHT, backgroundColor: "#0d0d0d", borderRadius: 10, overflow: "hidden" }}
       onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
     >
       {/* OSM map tiles */}
@@ -1400,8 +1400,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "900",
+    fontSize: 30,
+    fontFamily: FONTS.display,
     color: COLORS.white,
     letterSpacing: 1,
   },
@@ -1620,7 +1620,7 @@ const styles = StyleSheet.create({
   rideStatChip: {
     flex: 1,
     backgroundColor: "#111",
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 10,
     alignItems: "center",
   },
@@ -1645,7 +1645,7 @@ const styles = StyleSheet.create({
   },
   rideBtn: {
     flex: 1,
-    borderRadius: 8,
+    borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     alignItems: "center",
@@ -1670,7 +1670,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,102,0,0.08)",
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.35)",
-    borderRadius: 8,
+    borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     alignItems: "center",
@@ -1689,7 +1689,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(59,130,246,0.08)",
     borderWidth: 1,
     borderColor: "rgba(59,130,246,0.35)",
-    borderRadius: 8,
+    borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     alignItems: "center",
@@ -1817,7 +1817,7 @@ const styles = StyleSheet.create({
   renameTitle: { color: COLORS.white, fontSize: 16, fontWeight: "800", letterSpacing: 1 },
   renameInput: {
     backgroundColor: "#111",
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.35)",
     color: COLORS.white,
@@ -1826,7 +1826,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   renameActions: { flexDirection: "row", gap: 10 },
-  renameBtn: { flex: 1, borderRadius: 8, paddingVertical: 11, alignItems: "center" },
+  renameBtn: { flex: 1, borderRadius: 10, paddingVertical: 11, alignItems: "center" },
   renameCancelBtn: { backgroundColor: "#111", borderWidth: 1, borderColor: "#333" },
   renameCancelText: { color: "#888", fontWeight: "700", fontSize: 14 },
   renameSaveBtn: { backgroundColor: COLORS.brand },

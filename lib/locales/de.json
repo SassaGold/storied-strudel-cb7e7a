@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} Baustelle(n) in {{radius}} erkannt",
     "openTrafficMap": "LIVE-VERKEHRSKARTE",
     "tapToOpenMaps": "Zum Öffnen in Karten tippen",
+    "showAllAlerts": "Alle {{count}} anzeigen",
+    "showFewerAlerts": "Weniger anzeigen",
     "roadTypes": {
       "service": "Servicestraße",
       "residential": "Wohnstraße",

@@ -92,6 +92,8 @@
     "roadConditionsCount": "{{count}} veiarbeid oppdaget innen {{radius}}",
     "openTrafficMap": "LIVE TRAFIKKART",
     "tapToOpenMaps": "Trykk for å åpne i Kart",
+    "showAllAlerts": "Vis alle {{count}}",
+    "showFewerAlerts": "Vis færre",
     "roadTypes": {
       "service": "Servicevei",
       "residential": "Boliggate",

@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   weatherFeelsLike: { color: "#888888", fontSize: 13, marginTop: 2 },
   weatherStatsGrid: {
     backgroundColor: COLORS.bg,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
   hourlyCardsRow: { flexDirection: "row", gap: 8, paddingVertical: 4 },
   hourlyCard: {
     backgroundColor: COLORS.bg,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.border,
     paddingVertical: 10,
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   forecastCard: {
     flex: 1,
     backgroundColor: COLORS.bg,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.border,
     paddingVertical: 14,
