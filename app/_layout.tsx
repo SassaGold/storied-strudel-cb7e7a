@@ -15,10 +15,11 @@ import { SettingsProvider } from "../lib/settings";
 import { LocationPermissionProvider } from "../lib/locationPermission";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { pruneStaleCaches } from "../lib/storage";
+import { ensureInspectionChannel } from "../lib/notifications";
 
 /** ErrorBoundary is a class component and can't use hooks — this wrapper
  *  feeds it translated fallback strings so a crash screen isn't
- *  English-only in the 8 other supported languages. */
+ *  English-only in the other supported languages. */
 function LocalizedErrorBoundary({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   return (
@@ -52,6 +53,8 @@ export default function RootLayout() {
     }).catch(() => {
       // Keep app startup resilient if notifications module/channel setup fails.
     });
+    // HIGH-importance channel for Season inspection reminders.
+    ensureInspectionChannel();
   }, []);
 
   // Native splash screen stays visible during this brief gap.

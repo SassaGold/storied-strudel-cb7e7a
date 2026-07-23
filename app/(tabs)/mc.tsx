@@ -1,4 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useRef, useState, type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
@@ -228,6 +229,7 @@ export default function McScreen() {
   const { t } = useTranslation();
   const { settings, setSetting } = useSettings();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
   // Flips true when the mount restore has finished (state twin of initDoneRef,
@@ -399,6 +401,21 @@ export default function McScreen() {
           {t("garage.subtitle")}
         </Text>
       </View>
+
+      {/* Season entry — links to the winterize / spring-prep / inspection screen */}
+      <Pressable
+        style={styles.seasonEntry}
+        onPress={() => { hapticLight(); router.push("/season"); }}
+        accessibilityRole="button"
+        accessibilityLabel={t("season.entry.title")}
+      >
+        <MaterialCommunityIcons name="calendar-sync" size={26} color={COLORS.brand} />
+        <View style={styles.seasonEntryBody}>
+          <Text style={styles.seasonEntryTitle}>{t("season.entry.title")}</Text>
+          <Text style={styles.seasonEntrySubtitle}>{t("season.entry.subtitle")}</Text>
+        </View>
+        <MaterialCommunityIcons name="chevron-right" size={24} color={COLORS.muted} />
+      </Pressable>
 
       {/* Category selector — 2×3 icon tile grid */}
       <View style={styles.segmentRow}>
@@ -641,6 +658,31 @@ const styles = StyleSheet.create({
     color: COLORS.body,
     marginTop: 6,
     fontSize: 15,
+  },
+  seasonEntry: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: "rgba(255,102,0,0.35)",
+  },
+  seasonEntryBody: {
+    flex: 1,
+  },
+  seasonEntryTitle: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  seasonEntrySubtitle: {
+    color: COLORS.muted,
+    fontSize: 13,
+    marginTop: 2,
   },
   primaryButton: {
     backgroundColor: COLORS.brand,

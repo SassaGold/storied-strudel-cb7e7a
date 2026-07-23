@@ -46,14 +46,10 @@
   "language": {
     "label": "🌍 Language",
     "en": "🇬🇧 EN",
-    "es": "🇪🇸 ES",
-    "de": "🇩🇪 DE",
-    "fr": "🇫🇷 FR",
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA",
-    "nl": "🇳🇱 NL"
+    "da": "🇩🇰 DA"
   },
   "home": {
     "quickNav": "QUICK NAVIGATE",
@@ -90,7 +86,6 @@
     "roadConditionsLoading": "Checking road conditions…",
     "roadConditionsNone": "✅ No roadworks detected within {{radius}}.",
     "roadConditionsCount_one": "{{count}} roadwork detected within {{radius}}",
-
     "roadConditionsCount_other": "{{count}} roadworks detected within {{radius}}",
     "openTrafficMap": "LIVE TRAFFIC MAP",
     "tapToOpenMaps": "Tap to open in Maps",
@@ -284,6 +279,86 @@
     "searchGoogleMaps": "🗺️ Search on Google Maps",
     "freeParking": "Free parking"
   },
+  "season": {
+    "badge": "🏍️ SEASON",
+    "title": "MC SEASON",
+    "subtitle": "Winterize, spring-prep & stay on top of inspection.",
+    "entry": {
+      "title": "Season & Inspection",
+      "subtitle": "Winter storage, spring prep & inspection reminders"
+    },
+    "nudge": {
+      "winterize": "Autumn's here — time to put the bike away for winter.",
+      "springPrep": "Spring's coming — run through the wake-up checklist.",
+      "riding": "Riding season — enjoy it. Checklists are here when you need them.",
+      "offSeason": "Off-season — the bike's asleep. We'll nudge you come spring."
+    },
+    "panels": {
+      "winter": "Winter",
+      "spring": "Spring",
+      "inspection": "Inspection"
+    },
+    "bike": {
+      "title": "Your Bike",
+      "namePlaceholder": "Make & model (e.g. Yamaha MT-07)",
+      "country": "Country",
+      "firstRegistration": "First registration"
+    },
+    "country": {
+      "SE": "Sweden",
+      "NO": "Norway",
+      "DK": "Denmark",
+      "IS": "Iceland"
+    },
+    "checklist": {
+      "winterTitle": "Winter Storage",
+      "winterDesc": "Put the bike away right so it wakes up healthy in spring.",
+      "springTitle": "Spring Prep",
+      "springDesc": "Wake the bike up and check it over before the first ride.",
+      "completedOn": "Done {{date}}"
+    },
+    "items": {
+      "fuelStabilizer": "Add fuel stabilizer & top off the tank",
+      "batteryTender": "Battery on a tender, or disconnect it",
+      "tyrePressure": "Set tyre pressure, get it off the ground if you can",
+      "oilChange": "Change oil & filter",
+      "washWax": "Wash, wax & corrosion-spray",
+      "blockExhaust": "Block the exhaust against pests",
+      "cover": "Cover the bike",
+      "batteryInstall": "Refit & charge the battery",
+      "tyres": "Check tyres & pressure",
+      "brakes": "Check brakes & fluid",
+      "chain": "Clean, lube & tension the chain",
+      "lights": "Test all lights",
+      "fluids": "Check coolant & oil levels",
+      "bolts": "Check bolts are torqued",
+      "firstRide": "Take a gentle first ride"
+    },
+    "inspection": {
+      "title": "Inspection Tracker",
+      "requiredIn": "This country requires periodic MC inspection ({{term}}).",
+      "notRequired": "Motorcycles aren't subject to periodic inspection here.",
+      "unverified": "Inspection rules aren't verified yet — dates and reminders are turned off until the exact cadence is confirmed against the official source.",
+      "source": "Official source",
+      "setReminder": "Set inspection reminder",
+      "nextDue": "Estimated next deadline: {{date}}",
+      "estimateNote": "Estimated from the registration date — confirm against the official record.",
+      "enterDate": "Add your bike's first-registration date above to estimate the next inspection deadline.",
+      "notifTitle": "Inspection coming up",
+      "notifBody": "Your {{term}} is due around {{date}}. Time to book it in.",
+      "reminderSetTitle": "Reminder set",
+      "reminderSetBody": "We'll remind you on {{date}}.",
+      "reminderFailTitle": "Couldn't set reminder",
+      "reminderFailBody": "The deadline is too close or invalid to schedule a reminder.",
+      "permTitle": "Notifications are off",
+      "permBody": "Turn on notifications to get a reminder before your inspection is due.",
+      "updateReminder": "Update reminder",
+      "reminderSetLabel": "Reminder set for {{date}}",
+      "reminderSetLabelNoDate": "Reminder set",
+      "cancelReminder": "Cancel reminder",
+      "reminderStale": "Your bike's details changed — tap Update to reschedule the reminder."
+    }
+  },
   "sos": {
     "badge": "🆘 EMERGENCY",
     "title": "SOS",
@@ -370,7 +445,6 @@
     "rideLabel": "Ride {{n}}",
     "accuracy": "GPS accuracy {{value}} m",
     "points_one": "{{count}} GPS point",
-
     "points_other": "{{count}} GPS points",
     "tooShortTitle": "Ride Not Saved",
     "tooShortMsg": "Ride was under 10 m — not saved.",

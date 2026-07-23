@@ -2,14 +2,10 @@
 // set of keys as en.json (the source of truth). A missing/extra key fails CI.
 
 import en from "../lib/locales/en.json";
-import es from "../lib/locales/es.json";
-import de from "../lib/locales/de.json";
-import fr from "../lib/locales/fr.json";
 import is from "../lib/locales/is.json";
 import no from "../lib/locales/no.json";
 import sv from "../lib/locales/sv.json";
 import da from "../lib/locales/da.json";
-import nl from "../lib/locales/nl.json";
 
 type Json = Record<string, unknown>;
 
@@ -27,7 +23,7 @@ function flattenKeys(obj: Json, prefix = ""): string[] {
   return keys.sort();
 }
 
-const locales: Record<string, Json> = { es, de, fr, is, no, sv, da, nl };
+const locales: Record<string, Json> = { is, no, sv, da };
 const enKeys = flattenKeys(en as Json);
 
 describe("locale key parity with en.json", () => {

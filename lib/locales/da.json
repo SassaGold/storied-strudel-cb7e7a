@@ -46,14 +46,10 @@
   "language": {
     "label": "🌍 Sprog",
     "en": "🇬🇧 EN",
-    "es": "🇪🇸 ES",
-    "de": "🇩🇪 DE",
-    "fr": "🇫🇷 FR",
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA",
-    "nl": "🇳🇱 NL"
+    "da": "🇩🇰 DA"
   },
   "home": {
     "quickNav": "HURTIG NAVIGATION",
@@ -90,7 +86,6 @@
     "roadConditionsLoading": "Tjekker vejforhold…",
     "roadConditionsNone": "✅ Ingen vejarbejde inden for {{radius}}.",
     "roadConditionsCount_one": "{{count}} vejarbejde inden for {{radius}}",
-
     "roadConditionsCount_other": "{{count}} vejarbejder inden for {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKORT",
     "tapToOpenMaps": "Tryk for at åbne i Kort",
@@ -284,6 +279,86 @@
     "searchGoogleMaps": "🗺️ Søg på Google Maps",
     "freeParking": "Gratis parkering"
   },
+  "season": {
+    "badge": "🏍️ SÆSON",
+    "title": "MC-SÆSON",
+    "subtitle": "Vinteropbevar, forårsklargør og hold styr på synet.",
+    "entry": {
+      "title": "Sæson og syn",
+      "subtitle": "Vinteropbevaring, forårsklargøring og synspåmindelser"
+    },
+    "nudge": {
+      "winterize": "Efteråret er her – tid til at sætte motorcyklen væk til vinteren.",
+      "springPrep": "Foråret nærmer sig – gå klargøringslisten igennem.",
+      "riding": "Køresæson – nyd den. Tjeklisterne er her, når du får brug for dem.",
+      "offSeason": "Uden for sæson – motorcyklen sover. Vi minder dig om det til foråret."
+    },
+    "panels": {
+      "winter": "Vinter",
+      "spring": "Forår",
+      "inspection": "Syn"
+    },
+    "bike": {
+      "title": "Din motorcykel",
+      "namePlaceholder": "Mærke og model (f.eks. Yamaha MT-07)",
+      "country": "Land",
+      "firstRegistration": "Første registrering"
+    },
+    "country": {
+      "SE": "Sverige",
+      "NO": "Norge",
+      "DK": "Danmark",
+      "IS": "Island"
+    },
+    "checklist": {
+      "winterTitle": "Vinteropbevaring",
+      "winterDesc": "Sæt motorcyklen rigtigt væk, så den vågner sund til foråret.",
+      "springTitle": "Forårsklargøring",
+      "springDesc": "Væk motorcyklen og tjek den før første tur.",
+      "completedOn": "Udført {{date}}"
+    },
+    "items": {
+      "fuelStabilizer": "Tilsæt brændstofstabilisator og fyld tanken",
+      "batteryTender": "Batteri på vedligeholdelseslader, eller afmontér det",
+      "tyrePressure": "Indstil dæktryk, få motorcyklen op fra jorden hvis muligt",
+      "oilChange": "Skift olie og filter",
+      "washWax": "Vask, voks og korrosionsspray",
+      "blockExhaust": "Bloker udstødningen mod skadedyr",
+      "cover": "Dæk motorcyklen til",
+      "batteryInstall": "Montér og oplad batteriet",
+      "tyres": "Tjek dæk og tryk",
+      "brakes": "Tjek bremser og væske",
+      "chain": "Rens, smør og stram kæden",
+      "lights": "Test alle lygter",
+      "fluids": "Tjek kølervæske- og olieniveau",
+      "bolts": "Tjek at bolte er spændt",
+      "firstRide": "Tag en rolig første tur"
+    },
+    "inspection": {
+      "title": "Synsoversigt",
+      "requiredIn": "Dette land kræver periodisk MC-syn ({{term}}).",
+      "notRequired": "Motorcykler er ikke underlagt periodisk syn her.",
+      "unverified": "Synsreglerne er ikke verificeret endnu – datoer og påmindelser er slået fra, indtil det nøjagtige interval er bekræftet mod den officielle kilde.",
+      "source": "Officiel kilde",
+      "setReminder": "Indstil synspåmindelse",
+      "nextDue": "Anslået næste frist: {{date}}",
+      "estimateNote": "Anslået ud fra registreringsdatoen – bekræft mod det officielle register.",
+      "enterDate": "Tilføj motorcyklens første registrering ovenfor for at anslå næste synsfrist.",
+      "notifTitle": "Syn nærmer sig",
+      "notifBody": "{{term}} forfalder omkring {{date}}. Tid til at booke tid.",
+      "reminderSetTitle": "Påmindelse indstillet",
+      "reminderSetBody": "Vi minder dig den {{date}}.",
+      "reminderFailTitle": "Kunne ikke indstille påmindelse",
+      "reminderFailBody": "Fristen er for tæt på eller ugyldig til at planlægge en påmindelse.",
+      "permTitle": "Notifikationer er slået fra",
+      "permBody": "Slå notifikationer til for at få en påmindelse, før dit syn forfalder.",
+      "updateReminder": "Opdater påmindelse",
+      "reminderSetLabel": "Påmindelse indstillet til {{date}}",
+      "reminderSetLabelNoDate": "Påmindelse indstillet",
+      "cancelReminder": "Annuller påmindelse",
+      "reminderStale": "Motorcyklens oplysninger er ændret – tryk Opdater for at planlægge påmindelsen igen."
+    }
+  },
   "sos": {
     "badge": "🆘 NØDSITUATION",
     "title": "SOS",
@@ -370,7 +445,6 @@
     "rideLabel": "Tur {{n}}",
     "accuracy": "GPS-nøjagtighed {{value}} m",
     "points_one": "{{count}} GPS-punkt",
-
     "points_other": "{{count}} GPS-punkter",
     "tooShortTitle": "Tur ikke gemt",
     "tooShortMsg": "Turen var under 10 m — ikke gemt.",
