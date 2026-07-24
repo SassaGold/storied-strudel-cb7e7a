@@ -24,7 +24,7 @@ Demonstrate that:
 5. Wait until the Trip Logger UI shows that recording is active.
 6. Pull down the Android notification shade.
 7. Keep the notification visible long enough to read:
-   - `Where Am I Trip Logger`
+   - `Vegvísir Trip Logger`
    - `Recording your ride in the background.`
 8. Return to the app and briefly show that ride stats are updating.
 9. Press the power button to lock the phone, or press Home to background the app.

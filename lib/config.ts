@@ -1,5 +1,5 @@
 // ── lib/config.ts ─────────────────────────────────────────────────────────────
-// Central configuration constants for the Where Am I app.
+// Central configuration constants for the Vegvísir app.
 // All magic numbers, API base URLs, timeouts and cache parameters live here.
 // Import from this file instead of hardcoding values in feature modules.
 

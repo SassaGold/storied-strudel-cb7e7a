@@ -1,4 +1,4 @@
-# Play Store Submission Checklist — Where Am I
+# Play Store Submission Checklist — Vegvísir
 
 Use this checklist before submitting to Google Play.
 
@@ -101,7 +101,7 @@ Expected rating: **Everyone (3+)** — no violence, no adult content, no user in
 In Play Console → App Content, declare:
 - **Ads:** No ads
 - **Data Safety:**
-  - Location: used on-device and anonymised coordinates sent to third-party open APIs (Nominatim, Overpass, Open-Meteo). Not shared with Where Am I servers.
+  - Location: used on-device and anonymised coordinates sent to third-party open APIs (Nominatim, Overpass, Open-Meteo). Not shared with Vegvísir servers.
   - Trip data: stored only on-device, never uploaded.
 - **Target Audience:** All ages (no children-targeted content)
 - **Background Location:** Used only while a trip is actively being recorded in the Trip Logger. Not used at any other time.
@@ -123,7 +123,7 @@ For this app, the correct declaration is:
 - **User-facing feature:** Trip Logger records the ride route, distance, and speed while the phone is locked.
 - **Why foreground service is needed:** Android requires an ongoing foreground service notification while continuous background GPS is active. Without it, trip recording stops or becomes unreliable when the app is backgrounded.
 - **User trigger:** The service starts only after the user explicitly taps Start in Trip Logger and stops when the user ends the recording.
-- **Notification shown to the user:** `Where Am I Trip Logger` / `Recording your ride in the background.`
+- **Notification shown to the user:** `Vegvísir Trip Logger` / `Recording your ride in the background.`
 
 Recommended evidence for Play review:
 - Short video showing the user starting Trip Logger, locking the screen, and the persistent notification remaining visible while the ride is recorded.

@@ -1,0 +1,72 @@
+Vegvísir — Motorcyklistens följeslagare 🏍️
+
+Allt du behöver på vägen, i en ren och snygg app. Vegvísir är byggd för motorcyklister som vill ha lokal information i realtid, smart turloggning och trygghet i nödsituationer — utan konto, utan reklam och utan datainsamling.
+
+(Nytt namn, samma app — Vegvísir hette tidigare Where Am I.)
+
+━━━━━━━━━━━━━━━━━━━━
+🧭 RIDER HQ
+━━━━━━━━━━━━━━━━━━━━
+Din live-instrumentpanel under turen. Se din aktuella adress, vädret just nu med tim- och 3-dygnsprognoser, ett åkbarhetsbetyg med praktiska rekommendationer, soluppgångs- och solnedgångstider samt varningar om vägförhållanden — allt utifrån din aktuella GPS-position.
+
+━━━━━━━━━━━━━━━━━━━━
+🍽️ MATSTOPP
+━━━━━━━━━━━━━━━━━━━━
+Hitta restauranger, kaféer, barer, bagerier och snabbmat i närheten, sorterat efter avstånd. Tryck på ett resultat för vägbeskrivning, kontaktuppgifter eller deras webbplats.
+
+━━━━━━━━━━━━━━━━━━━━
+🛏️ ÖVERNATTNING
+━━━━━━━━━━━━━━━━━━━━
+Hitta hotell, vandrarhem, campingplatser och andra ställen att sova på nära din position — perfekt när dagens tur drar ut på tiden.
+
+━━━━━━━━━━━━━━━━━━━━
+🏁 STOPP LÄNGS VÄGEN
+━━━━━━━━━━━━━━━━━━━━
+Upptäck utsiktspunkter, museer, sevärdheter och andra stopp värda att svänga in för längs din rutt.
+
+━━━━━━━━━━━━━━━━━━━━
+🔧 GARAGET
+━━━━━━━━━━━━━━━━━━━━
+Allt som håller dig rullande:
+• MC-handlare, verkstäder & reservdelsbutiker
+• Bensinstationer (med info om bränsletyp)
+• Parkering — allmän och MC-specifik
+• MC-klubbar & racingbanor
+• Bankomater & banker
+
+━━━━━━━━━━━━━━━━━━━━
+🗓️ MC-SÄSONG & BESIKTNING
+━━━━━━━━━━━━━━━━━━━━
+Byggd för den nordiska åksäsongen. Checklistor för vinterförvaring och vårförberedelser guidar dig genom att ställa av och väcka hojen, och en besiktningskoll per land håller dig före deadline — med en påminnelse ungefär en månad innan det är dags. Lägg till flera hojar och följ var och en. Besiktningsregler verifierade för Sverige, Norge, Danmark och Island.
+
+━━━━━━━━━━━━━━━━━━━━
+📏 TURLOGGER
+━━━━━━━━━━━━━━━━━━━━
+Spela in dina turer med live hastighetsmätare, distans- och tidräknare i realtid och GPS-spårning som fortsätter även med låst skärm. Hela din turhistorik sparas på din enhet — och laddas aldrig upp.
+
+━━━━━━━━━━━━━━━━━━━━
+🆘 SOS / NÖDLÄGE
+━━━━━━━━━━━━━━━━━━━━
+En dedikerad nödskärm, ett tryck bort:
+• Ring det lokala nödnumret med ett tryck
+• Universella nödnummer (112, 911, 999, 000, 111)
+• Närmaste sjukhus, polis, brandstationer & apotek
+• Dela din position via SMS eller WhatsApp
+• Ficklampa / blinkande skärm för signalering
+• Första hjälpen steg för steg vid MC-olyckor
+
+━━━━━━━━━━━━━━━━━━━━
+🌍 5 SPRÅK
+━━━━━━━━━━━━━━━━━━━━
+Fullständigt gränssnitt på svenska, danska, norska, engelska och isländska — byt direkt, sparas för alltid.
+
+━━━━━━━━━━━━━━━━━━━━
+🔒 INTEGRITET — INGA DATA SAMLAS IN
+━━━━━━━━━━━━━━━━━━━━
+• Inget konto krävs
+• Ingen reklam, analys eller spårning
+• Din position används endast på enheten
+• Turloggar stannar på din enhet
+• Öppna data: OpenStreetMap, Open-Meteo, Wikipedia
+
+Redo att åka smartare? Ladda ner Vegvísir, ge dig ut på vägen och vet alltid vad som väntar bakom nästa kurva. Frågor eller idéer? Vi svarar på allt: support@sassagold.com

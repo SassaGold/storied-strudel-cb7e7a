@@ -184,7 +184,7 @@ export default function Index() {
             </Pressable>
           </View>
         </View>
-        <Text style={styles.logoSubtitle}>Where Am I – Explore. Ride. Discover</Text>
+        <Text style={styles.logoSubtitle}>Vegvísir – Explore. Ride. Discover</Text>
       </View>
 
       {/* ── Language picker modal ─────────────────────────────────── */}
