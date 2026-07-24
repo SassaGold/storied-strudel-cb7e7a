@@ -196,7 +196,7 @@
     "badge": "🏕️ OVERNATTINGSSTEDER",
     "title": "SOV GODT",
     "subtitle": "Hoteller, campingplasser og hvilesteder langs ruten.",
-    "findButton": "FINN ET OVERNATTING",
+    "findButton": "FINN OVERNATTING",
     "searching": "Søker etter overnattingssteder i nærheten…",
     "locationError": "Plasseringstillatelse er nødvendig for å finne overnattingssteder.",
     "loadError": "Kan ikke laste inn overnattingssteder. Prøv igjen.",
