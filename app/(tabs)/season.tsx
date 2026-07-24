@@ -260,7 +260,7 @@ export default function SeasonScreen() {
               style={styles.input}
               value={selected.bike.firstRegistration ?? ""}
               onChangeText={(v) => patchBike({ firstRegistration: v || undefined })}
-              placeholder="YYYY-MM-DD"
+              placeholder="DD-MM-YYYY"
               placeholderTextColor="#555555"
               keyboardType="numbers-and-punctuation"
               autoCapitalize="none"

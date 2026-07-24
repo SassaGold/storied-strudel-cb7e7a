@@ -133,6 +133,29 @@ export function inspectionRule(country: Country): InspectionRule {
 }
 
 /**
+ * Parse a registration date the rider entered. Accepts dd-mm-yyyy (the display
+ * format used throughout the app) and legacy yyyy-mm-dd. Returns a local-time
+ * Date, or null when the string is missing or not a real calendar date.
+ */
+export function parseRegistrationDate(s: string | undefined): Date | null {
+  if (!s) return null;
+  const str = s.trim();
+  let yyyy: number, mm: number, dd: number;
+  let m = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(str); // dd-mm-yyyy
+  if (m) {
+    dd = +m[1]; mm = +m[2]; yyyy = +m[3];
+  } else if ((m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(str))) { // yyyy-mm-dd (legacy)
+    yyyy = +m[1]; mm = +m[2]; dd = +m[3];
+  } else {
+    return null;
+  }
+  const d = new Date(yyyy, mm - 1, dd);
+  // Reject impossible dates (e.g. 31-02-2020 rolling over into March).
+  if (d.getFullYear() !== yyyy || d.getMonth() !== mm - 1 || d.getDate() !== dd) return null;
+  return d;
+}
+
+/**
  * Compute the next inspection due date (YYYY-MM-DD) from a first-registration
  * date, or null when no date can honestly be given.
  *
@@ -147,14 +170,13 @@ export function inspectionRule(country: Country): InspectionRule {
  */
 export function computeNextDue(
   rule: InspectionRule,
-  firstRegistrationISO: string | undefined,
+  firstRegistration: string | undefined,
   now: Date = new Date()
 ): string | null {
   if (!rule.verified || !rule.required || rule.cadence.kind === "none") return null;
-  if (!firstRegistrationISO) return null;
 
-  const first = new Date(firstRegistrationISO);
-  if (isNaN(first.getTime())) return null;
+  const first = parseRegistrationDate(firstRegistration);
+  if (!first) return null;
 
   if (rule.cadence.kind === "months") {
     const { firstMonths, recurringMonths } = rule.cadence;

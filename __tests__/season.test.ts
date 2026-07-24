@@ -127,7 +127,8 @@ describe("parseSeasonState migration", () => {
     expect(s.bikes).toHaveLength(1);
     const e = s.bikes[0];
     expect(s.selectedBikeId).toBe(e.id);
-    expect(e.bike).toEqual({ name: "Old Bike", country: "SE", firstRegistration: "2020-06-15" });
+    // Registration is normalized to the dd-mm-yyyy the UI uses everywhere.
+    expect(e.bike).toEqual({ name: "Old Bike", country: "SE", firstRegistration: "15-06-2020" });
     expect(e.checklists.winter.cover.done).toBe(true);
     expect(e.inspection.reminderId).toBe("keep-me");
   });

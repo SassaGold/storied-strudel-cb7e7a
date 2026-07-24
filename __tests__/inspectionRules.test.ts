@@ -2,7 +2,12 @@
 // no date (it would fire a false reminder), so the compute logic is pinned here
 // against the verified per-country cadences (see lib/inspectionRules.ts).
 
-import { INSPECTION_RULES, computeNextDue, inspectionRule } from "../lib/inspectionRules";
+import {
+  INSPECTION_RULES,
+  computeNextDue,
+  inspectionRule,
+  parseRegistrationDate,
+} from "../lib/inspectionRules";
 
 const NOW = new Date("2026-07-23T12:00:00Z");
 
@@ -26,6 +31,12 @@ describe("computeNextDue", () => {
     it("older bike: rolls forward by 24 months past today", () => {
       // Registered 2020-06-15 → 2024-06, 2026-06 (both past NOW) → 2028-06-15.
       expect(computeNextDue(se, "2020-06-15", NOW)).toBe("2028-06-15");
+    });
+
+    it("accepts dd-mm-yyyy input (the app's display format)", () => {
+      // Same dates as above, entered dd-mm-yyyy.
+      expect(computeNextDue(se, "10-03-2025", NOW)).toBe("2029-03-10");
+      expect(computeNextDue(se, "15-06-2020", NOW)).toBe("2028-06-15");
     });
   });
 
@@ -67,5 +78,25 @@ describe("computeNextDue", () => {
         expect(rule.required).toBe(rule.cadence.kind !== "none");
       }
     });
+  });
+});
+
+describe("parseRegistrationDate", () => {
+  const ymd = (d: Date | null) =>
+    d ? `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}` : null;
+
+  it("parses dd-mm-yyyy", () => {
+    expect(ymd(parseRegistrationDate("15-06-2020"))).toBe("2020-6-15");
+    expect(ymd(parseRegistrationDate("1-2-2020"))).toBe("2020-2-1");
+  });
+  it("still parses legacy yyyy-mm-dd", () => {
+    expect(ymd(parseRegistrationDate("2020-06-15"))).toBe("2020-6-15");
+  });
+  it("rejects missing, malformed, and impossible dates", () => {
+    expect(parseRegistrationDate(undefined)).toBeNull();
+    expect(parseRegistrationDate("")).toBeNull();
+    expect(parseRegistrationDate("not-a-date")).toBeNull();
+    expect(parseRegistrationDate("31-02-2020")).toBeNull(); // no 31 Feb
+    expect(parseRegistrationDate("15-13-2020")).toBeNull(); // no month 13
   });
 });

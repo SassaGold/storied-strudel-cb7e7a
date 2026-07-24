@@ -282,11 +282,21 @@ export function checklistProgress(
 
 // ── Persistence ────────────────────────────────────────────────────────────────
 
+/** Convert a stored ISO (yyyy-mm-dd) registration date to the dd-mm-yyyy the UI
+ *  uses everywhere; pass anything else through unchanged. */
+function toDisplayReg(s: string | undefined): string | undefined {
+  if (!s) return s;
+  const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.trim());
+  return iso ? `${iso[3]}-${iso[2]}-${iso[1]}` : s;
+}
+
 function sanitizeEntry(raw: unknown): BikeEntry {
   const e = (raw ?? {}) as Partial<BikeEntry> & { bike?: Partial<Bike> };
+  const bike: Bike = { name: "", country: "NO", ...e.bike };
+  bike.firstRegistration = toDisplayReg(bike.firstRegistration);
   return {
     id: typeof e.id === "string" ? e.id : makeBikeId(),
-    bike: { name: "", country: "NO", ...e.bike },
+    bike,
     checklists: {
       winter: { ...e.checklists?.winter },
       spring: { ...e.checklists?.spring },
