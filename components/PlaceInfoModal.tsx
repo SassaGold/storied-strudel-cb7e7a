@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   modalNoInfo: {
-    color: "#555555",
+    color: "#5B6478",
     fontSize: 13,
     fontStyle: "italic",
   },
@@ -314,12 +314,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalActionButton: {
-    backgroundColor: "rgba(255,102,0,0.12)",
+    backgroundColor: "rgba(47,212,196,0.12)",
     borderRadius: 10,
     paddingVertical: 10,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
   },
   modalActionButtonWiki: {
     backgroundColor: "rgba(250,204,21,0.1)",

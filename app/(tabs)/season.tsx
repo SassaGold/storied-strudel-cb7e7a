@@ -251,7 +251,7 @@ export default function SeasonScreen() {
               value={selected.bike.name}
               onChangeText={(name) => patchBike({ name })}
               placeholder={t("season.bike.namePlaceholder")}
-              placeholderTextColor="#555555"
+              placeholderTextColor="#5B6478"
               returnKeyType="done"
               accessibilityLabel={t("season.bike.namePlaceholder")}
             />
@@ -261,7 +261,7 @@ export default function SeasonScreen() {
               value={selected.bike.firstRegistration ?? ""}
               onChangeText={(v) => patchBike({ firstRegistration: v || undefined })}
               placeholder="DD-MM-YYYY"
-              placeholderTextColor="#555555"
+              placeholderTextColor="#5B6478"
               keyboardType="numbers-and-punctuation"
               autoCapitalize="none"
               autoCorrect={false}
@@ -580,13 +580,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
     overflow: "hidden",
-    backgroundColor: "#1a0900",
+    backgroundColor: "#0E1A2E",
   },
   headerBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,102,0,0.18)",
+    backgroundColor: "rgba(47,212,196,0.18)",
     color: COLORS.brand,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -596,7 +596,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     letterSpacing: 0.6,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.5)",
+    borderColor: "rgba(47,212,196,0.5)",
   },
   title: { color: COLORS.white, fontSize: 30, fontFamily: FONTS.display, letterSpacing: 1.5 },
   subtitle: { color: COLORS.body, marginTop: 6, fontSize: 15 },
@@ -609,11 +609,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "rgba(255,102,0,0.15)",
+    backgroundColor: "rgba(47,212,196,0.15)",
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
   },
-  backBtnPressed: { backgroundColor: "rgba(255,102,0,0.35)" },
+  backBtnPressed: { backgroundColor: "rgba(47,212,196,0.35)" },
   backBtnLabel: { color: COLORS.brand, fontSize: 13, fontWeight: "600", letterSpacing: 0.5 },
   nudge: {
     flexDirection: "row",
@@ -622,9 +622,9 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 16,
     borderRadius: 12,
-    backgroundColor: "rgba(255,102,0,0.08)",
+    backgroundColor: "rgba(47,212,196,0.08)",
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.25)",
+    borderColor: "rgba(47,212,196,0.25)",
   },
   nudgeWeather: {
     backgroundColor: "rgba(125,211,252,0.08)",
@@ -649,7 +649,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
     backgroundColor: COLORS.card,
   },
-  bikeChipActive: { borderColor: COLORS.brand, backgroundColor: "rgba(255,102,0,0.10)" },
+  bikeChipActive: { borderColor: COLORS.brand, backgroundColor: "rgba(47,212,196,0.10)" },
   bikeChipText: { color: COLORS.muted, fontSize: 13, fontWeight: "700", flexShrink: 1 },
   bikeChipTextActive: { color: COLORS.brand },
   bikeAddChip: {
@@ -661,8 +661,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderStyle: "dashed",
-    borderColor: "rgba(255,102,0,0.5)",
-    backgroundColor: "rgba(255,102,0,0.06)",
+    borderColor: "rgba(47,212,196,0.5)",
+    backgroundColor: "rgba(47,212,196,0.06)",
   },
   bikeAddText: { color: COLORS.brand, fontSize: 13, fontWeight: "700" },
   card: {
@@ -676,10 +676,10 @@ const styles = StyleSheet.create({
   cardTitle: { color: COLORS.white, fontSize: 16, fontWeight: "800", letterSpacing: 0.5 },
   cardDescription: { color: COLORS.muted, fontSize: 13, marginTop: 4, marginBottom: 14, lineHeight: 18 },
   input: {
-    backgroundColor: "#1e1e1e",
+    backgroundColor: "#1B2438",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.35)",
+    borderColor: "rgba(47,212,196,0.35)",
     color: COLORS.white,
     fontSize: 14,
     paddingHorizontal: 12,
@@ -706,12 +706,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.35)",
-    backgroundColor: "rgba(255,102,0,0.08)",
+    borderColor: "rgba(47,212,196,0.35)",
+    backgroundColor: "rgba(47,212,196,0.08)",
   },
   chipActive: { backgroundColor: COLORS.brand, borderColor: COLORS.brand },
   chipFlag: { fontSize: 15 },
-  chipText: { color: "#dddddd", fontSize: 13, fontWeight: "600" },
+  chipText: { color: "#C4CCDC", fontSize: 13, fontWeight: "600" },
   chipTextActive: { color: COLORS.white },
   segmentRow: { flexDirection: "row", gap: 10, marginBottom: 16 },
   segmentTile: {
@@ -724,7 +724,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: COLORS.border,
   },
-  segmentTileActive: { borderColor: COLORS.brand, backgroundColor: "rgba(255,102,0,0.10)" },
+  segmentTileActive: { borderColor: COLORS.brand, backgroundColor: "rgba(47,212,196,0.10)" },
   segmentText: { color: COLORS.muted, fontSize: 13, fontWeight: "700" },
   segmentTextActive: { color: COLORS.brand },
   progressRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
@@ -760,9 +760,9 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginBottom: 14,
-    backgroundColor: "rgba(255,102,0,0.10)",
+    backgroundColor: "rgba(47,212,196,0.10)",
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.30)",
+    borderColor: "rgba(47,212,196,0.30)",
   },
   dueText: { color: COLORS.white, fontSize: 15, fontWeight: "700" },
   dueEstimate: { color: COLORS.muted, fontSize: 12, marginTop: 2, lineHeight: 16 },

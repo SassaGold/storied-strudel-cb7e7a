@@ -8,14 +8,18 @@
 import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
+// Two crossing diagonal washes make a soft aurora: the "main" colour glows in
+// from the top-right, the "depth" colour answers from the bottom-left.
 const TINTS = {
   brand: {
+    // Aurora teal from the top-right.
     main: [
-      "rgba(255,102,0,0.50)",
-      "rgba(255,102,0,0.12)",
-      "rgba(255,102,0,0)",
+      "rgba(47,212,196,0.42)",
+      "rgba(79,184,224,0.10)",
+      "rgba(47,212,196,0)",
     ],
-    depth: ["rgba(180,60,0,0)", "rgba(180,60,0,0.30)"],
+    // Aurora violet answering from the bottom-left.
+    depth: ["rgba(142,134,245,0)", "rgba(142,134,245,0.36)"],
   },
   danger: {
     main: [

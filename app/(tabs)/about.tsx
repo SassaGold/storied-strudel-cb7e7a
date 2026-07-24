@@ -184,9 +184,9 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
     overflow: "hidden",
-    backgroundColor: "#1a0900",
+    backgroundColor: "#0E1A2E",
   },
   backBtn: {
     alignSelf: "flex-end",
@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "rgba(255,102,0,0.15)",
+    backgroundColor: "rgba(47,212,196,0.15)",
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
   },
   backBtnPressed: {
-    backgroundColor: "rgba(255,102,0,0.35)",
+    backgroundColor: "rgba(47,212,196,0.35)",
   },
   backBtnLabel: {
     color: COLORS.brand,
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   badge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,102,0,0.18)",
+    backgroundColor: "rgba(47,212,196,0.18)",
     color: COLORS.brand,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#141C2E",
     borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 4,
     borderTopWidth: 1,
-    borderTopColor: "#1a1a1a",
+    borderTopColor: "#141C2E",
   },
   versionLabel: {
     color: "#555",
