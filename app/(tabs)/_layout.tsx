@@ -118,6 +118,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="season"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
         name="about"
         options={{ href: null }}
       />

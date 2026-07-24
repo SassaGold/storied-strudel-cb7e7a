@@ -1117,7 +1117,7 @@ const SpeedGauge = memo(function SpeedGauge({
   // Color: green → yellow → orange → red
   const gaugeColor =
     pct > 0.85 ? COLORS.danger :
-    pct > 0.6  ? "#f97316" :
+    pct > 0.6  ? "#2FD4C4" :
     pct > 0.3  ? "#fbbf24" : COLORS.success;
 
   return (
@@ -1150,7 +1150,7 @@ const SpeedGauge = memo(function SpeedGauge({
                 width: isMajor ? 4 : 2.5,
                 height: isMajor ? 14 : 9,
                 borderRadius: 2,
-                backgroundColor: isActive ? gaugeColor : "#252525",
+                backgroundColor: isActive ? gaugeColor : "#232E44",
                 marginTop: 4,
               }}
             />
@@ -1311,7 +1311,7 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
 
   return (
     <View
-      style={{ height: MAP_HEIGHT, backgroundColor: "#0d0d0d", borderRadius: 10, overflow: "hidden" }}
+      style={{ height: MAP_HEIGHT, backgroundColor: "#0C1120", borderRadius: 10, overflow: "hidden" }}
       onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
     >
       {/* OSM map tiles */}
@@ -1393,13 +1393,13 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
     overflow: "hidden",
-    backgroundColor: "#1a0900",
+    backgroundColor: "#0E1A2E",
   },
   badge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,102,0,0.18)",
+    backgroundColor: "rgba(47,212,196,0.18)",
     color: COLORS.brand,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -1425,7 +1425,7 @@ const styles = StyleSheet.create({
 
   // Stats card
   card: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#141C2E",
     borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -1589,7 +1589,7 @@ const styles = StyleSheet.create({
 
   // Ride cards — vertical card layout
   rideCard: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#141C2E",
     borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -1661,7 +1661,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   deleteBtn: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#141C2E",
     borderWidth: 1,
     borderColor: "#333",
     flex: 0,
@@ -1677,16 +1677,16 @@ const styles = StyleSheet.create({
   },
   mapBtn: {
     flex: 1,
-    backgroundColor: "rgba(255,102,0,0.08)",
+    backgroundColor: "rgba(47,212,196,0.08)",
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.35)",
+    borderColor: "rgba(47,212,196,0.35)",
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
     alignItems: "center",
   },
   mapBtnActive: {
-    backgroundColor: "rgba(255,102,0,0.18)",
+    backgroundColor: "rgba(47,212,196,0.18)",
     borderColor: COLORS.brand,
   },
   mapBtnText: {
@@ -1791,7 +1791,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "rgba(255,102,0,0.15)",
+    backgroundColor: "rgba(47,212,196,0.15)",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1816,7 +1816,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   renameCard: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#141C2E",
     borderRadius: 14,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -1829,7 +1829,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#111",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.35)",
+    borderColor: "rgba(47,212,196,0.35)",
     color: COLORS.white,
     fontSize: 15,
     paddingHorizontal: 12,

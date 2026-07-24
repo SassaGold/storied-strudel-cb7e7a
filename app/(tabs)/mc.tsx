@@ -1,4 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useRef, useState, type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
@@ -72,26 +73,26 @@ const CATEGORY_COLORS: Record<Category, string> = {
   parking:  "#3b82f6",
   clubs_tracks: COLORS.danger,
   atm_bank: "#a855f7",
-  fitness:  "#14b8a6",
+  fitness:  "#f59e0b",
 };
 
 // Pre-computed inactive border and active background colours (27% / 10% opacity)
 const CATEGORY_BORDER_INACTIVE: Record<Category, string> = {
-  services:     "rgba(255,102,0,0.27)",
+  services:     "rgba(47,212,196,0.27)",
   fuel:         "rgba(34,197,94,0.27)",
   parking:      "rgba(59,130,246,0.27)",
   clubs_tracks: "rgba(239,68,68,0.27)",
   atm_bank:     "rgba(168,85,247,0.27)",
-  fitness:      "rgba(20,184,166,0.27)",
+  fitness:      "rgba(245,158,11,0.27)",
 };
 
 const CATEGORY_BG_ACTIVE: Record<Category, string> = {
-  services:     "rgba(255,102,0,0.10)",
+  services:     "rgba(47,212,196,0.10)",
   fuel:         "rgba(34,197,94,0.10)",
   parking:      "rgba(59,130,246,0.10)",
   clubs_tracks: "rgba(239,68,68,0.10)",
   atm_bank:     "rgba(168,85,247,0.10)",
-  fitness:      "rgba(20,184,166,0.10)",
+  fitness:      "rgba(245,158,11,0.10)",
 };
 
 const CATEGORY_ICONS: Record<Category, ComponentProps<typeof MaterialCommunityIcons>["name"]> = {
@@ -228,6 +229,7 @@ export default function McScreen() {
   const { t } = useTranslation();
   const { settings, setSetting } = useSettings();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [selected, setSelected] = useState<Category>("services");
   const [nameSearch, setNameSearch] = useState("");
   // Flips true when the mount restore has finished (state twin of initDoneRef,
@@ -400,6 +402,21 @@ export default function McScreen() {
         </Text>
       </View>
 
+      {/* Season entry — links to the winterize / spring-prep / inspection screen */}
+      <Pressable
+        style={styles.seasonEntry}
+        onPress={() => { hapticLight(); router.push("/season"); }}
+        accessibilityRole="button"
+        accessibilityLabel={t("season.entry.title")}
+      >
+        <MaterialCommunityIcons name="calendar-sync" size={26} color={COLORS.brand} />
+        <View style={styles.seasonEntryBody}>
+          <Text style={styles.seasonEntryTitle}>{t("season.entry.title")}</Text>
+          <Text style={styles.seasonEntrySubtitle}>{t("season.entry.subtitle")}</Text>
+        </View>
+        <MaterialCommunityIcons name="chevron-right" size={24} color={COLORS.muted} />
+      </Pressable>
+
       {/* Category selector — 2×3 icon tile grid */}
       <View style={styles.segmentRow}>
         {CATEGORY_KEYS.map((key) => {
@@ -492,7 +509,7 @@ export default function McScreen() {
               value={nameSearch}
               onChangeText={setNameSearch}
               placeholder={t("garage.searchPlaceholder")}
-              placeholderTextColor="#555555"
+              placeholderTextColor="#5B6478"
               clearButtonMode="while-editing"
               returnKeyType="search"
               accessibilityLabel={t("garage.searchPlaceholder")}
@@ -613,13 +630,13 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
     overflow: "hidden",
-    backgroundColor: "#1a0900",
+    backgroundColor: "#0E1A2E",
   },
   headerBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(255,102,0,0.18)",
+    backgroundColor: "rgba(47,212,196,0.18)",
     color: COLORS.brand,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -629,7 +646,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     letterSpacing: 0.6,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.5)",
+    borderColor: "rgba(47,212,196,0.5)",
   },
   title: {
     color: COLORS.white,
@@ -641,6 +658,31 @@ const styles = StyleSheet.create({
     color: COLORS.body,
     marginTop: 6,
     fontSize: 15,
+  },
+  seasonEntry: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: "rgba(47,212,196,0.35)",
+  },
+  seasonEntryBody: {
+    flex: 1,
+  },
+  seasonEntryTitle: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  seasonEntrySubtitle: {
+    color: COLORS.muted,
+    fontSize: 13,
+    marginTop: 2,
   },
   primaryButton: {
     backgroundColor: COLORS.brand,
@@ -728,10 +770,10 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   searchInput: {
-    backgroundColor: "#1e1e1e",
+    backgroundColor: "#1B2438",
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.35)",
+    borderColor: "rgba(47,212,196,0.35)",
     color: COLORS.white,
     fontSize: 14,
     paddingHorizontal: 12,
@@ -822,7 +864,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.25)",
+    borderColor: "rgba(47,212,196,0.25)",
   },
   viewToggleBtnActive: {
     backgroundColor: COLORS.brand,

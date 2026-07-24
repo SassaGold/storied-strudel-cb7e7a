@@ -46,14 +46,10 @@
   "language": {
     "label": "🌍 Tungumál",
     "en": "🇬🇧 EN",
-    "es": "🇪🇸 ES",
-    "de": "🇩🇪 DE",
-    "fr": "🇫🇷 FR",
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA",
-    "nl": "🇳🇱 NL"
+    "da": "🇩🇰 DA"
   },
   "home": {
     "quickNav": "FLJÓTLEGAR LEIÐIR",
@@ -90,7 +86,6 @@
     "roadConditionsLoading": "Athuga vegaskilyrði…",
     "roadConditionsNone": "✅ Engar vegaframkvæmdir greindar í {{radius}}.",
     "roadConditionsCount_one": "{{count}} vegaframkvæmd greind í {{radius}}",
-
     "roadConditionsCount_other": "{{count}} vegaframkvæmdir greindar í {{radius}}",
     "openTrafficMap": "UMFERÐARKORT",
     "tapToOpenMaps": "Ýttu til að opna í kortum",
@@ -284,6 +279,100 @@
     "searchGoogleMaps": "🗺️ Leita á Google Maps",
     "freeParking": "Ókeypis bílastæði"
   },
+  "season": {
+    "badge": "🏍️ TÍMABIL",
+    "title": "MÓTORHJÓLATÍMABIL",
+    "subtitle": "Vetrargeymsla, vorundirbúningur og skoðun.",
+    "entry": {
+      "title": "Tímabil og skoðun",
+      "subtitle": "Vetrargeymsla, vorundirbúningur og áminningar um skoðun"
+    },
+    "nudge": {
+      "winterize": "Haustið er komið – kominn tími til að leggja hjólinu fyrir veturinn.",
+      "springPrep": "Vorið er á næsta leiti – farðu yfir gátlistann fyrir vorið.",
+      "riding": "Aksturstímabil – njóttu þess. Gátlistarnir eru hér þegar þú þarft.",
+      "offSeason": "Utan tímabils – hjólið sefur. Við minnum þig á það í vor."
+    },
+    "panels": {
+      "winter": "Vetur",
+      "spring": "Vor",
+      "inspection": "Skoðun"
+    },
+    "bike": {
+      "title": "Hjólið þitt",
+      "namePlaceholder": "Tegund og gerð (t.d. Yamaha MT-07)",
+      "country": "Land",
+      "firstRegistration": "Fyrsta skráning"
+    },
+    "country": {
+      "SE": "Svíþjóð",
+      "NO": "Noregur",
+      "DK": "Danmörk",
+      "IS": "Ísland"
+    },
+    "checklist": {
+      "winterTitle": "Vetrargeymsla",
+      "winterDesc": "Gakktu rétt frá hjólinu svo það vakni heilbrigt í vor.",
+      "springTitle": "Vorundirbúningur",
+      "springDesc": "Vektu hjólið og farðu yfir það fyrir fyrsta túrinn.",
+      "completedOn": "Lokið {{date}}"
+    },
+    "items": {
+      "fuelStabilizer": "Bættu við eldsneytisstöðgara og fylltu tankinn",
+      "batteryTender": "Rafgeymir í viðhaldshleðslu, eða aftengdu hann",
+      "tyrePressure": "Stilltu dekkþrýsting, lyftu hjólinu frá jörðu ef hægt er",
+      "oilChange": "Skiptu um olíu og síu",
+      "washWax": "Þvoðu, bónaðu og ryðvarðu",
+      "blockExhaust": "Lokaðu púströrinu fyrir meindýr",
+      "cover": "Hyldu hjólið",
+      "batteryInstall": "Settu í og hladdu rafgeyminn",
+      "tyres": "Athugaðu dekk og þrýsting",
+      "brakes": "Athugaðu bremsur og vökva",
+      "chain": "Hreinsaðu, smyrðu og stilltu keðjuna",
+      "lights": "Prófaðu öll ljós",
+      "fluids": "Athugaðu kæli- og olíustöðu",
+      "bolts": "Athugaðu að boltar séu hertir",
+      "firstRide": "Farðu rólegan fyrsta túr"
+    },
+    "inspection": {
+      "title": "Skoðunaryfirlit",
+      "requiredIn": "Þetta land krefst reglubundinnar skoðunar á mótorhjólum ({{term}}).",
+      "notRequired": "Mótorhjól þurfa ekki reglubundna skoðun hér.",
+      "unverified": "Skoðunarreglur eru ekki staðfestar enn – dagsetningar og áminningar eru óvirkar þar til nákvæmt millibil er staðfest við opinbera heimild.",
+      "source": "Opinber heimild",
+      "setReminder": "Setja áminningu um skoðun",
+      "nextDue": "Áætluð næsta skiladagsetning: {{date}}",
+      "estimateNote": "Áætlað út frá skráningardegi – staðfestu við opinbera skrá.",
+      "enterDate": "Bættu við fyrstu skráningu hjólsins hér að ofan til að áætla næstu skoðunardagsetningu.",
+      "notifTitle": "Skoðun framundan",
+      "notifBody": "{{term}} er á gjalddaga um {{date}}. Tími til að bóka.",
+      "reminderSetTitle": "Áminning stillt",
+      "reminderSetBody": "Við minnum þig {{date}}.",
+      "reminderFailTitle": "Ekki tókst að stilla áminningu",
+      "reminderFailBody": "Skiladagsetningin er of nálæg eða ógild til að tímasetja áminningu.",
+      "permTitle": "Tilkynningar eru óvirkar",
+      "permBody": "Kveiktu á tilkynningum til að fá áminningu áður en skoðun er á gjalddaga.",
+      "updateReminder": "Uppfæra áminningu",
+      "reminderSetLabel": "Áminning stillt á {{date}}",
+      "reminderSetLabelNoDate": "Áminning stillt",
+      "cancelReminder": "Hætta við áminningu",
+      "reminderStale": "Upplýsingar hjólsins hafa breyst – ýttu á Uppfæra til að endurstilla áminninguna."
+    },
+    "bikes": {
+      "add": "Bæta við hjóli",
+      "defaultName": "Hjól {{n}}",
+      "remove": "Fjarlægja hjól",
+      "removeTitle": "Fjarlægja hjól?",
+      "removeBody": "Fjarlægja „{{name}}“ með gátlistum og áminningu?",
+      "removeCancel": "Hætta við",
+      "removeConfirm": "Fjarlægja",
+      "empty": "Bættu við hjóli til að fylgjast með tímabili og skoðun."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost í vændum (niður í {{temp}}°C) – kominn tími á vetrargeymslu.",
+      "springWarming": "Mild veðurspá ({{temp}}°C) – góður tími fyrir vorundirbúning."
+    }
+  },
   "sos": {
     "badge": "🆘 NEYÐARMÁL",
     "title": "SOS",
@@ -370,7 +459,6 @@
     "rideLabel": "Ferð {{n}}",
     "accuracy": "GPS nákvæmni {{value}} m",
     "points_one": "{{count}} GPS-punktur",
-
     "points_other": "{{count}} GPS-punktar",
     "tooShortTitle": "Ferð Ekki Vistuð",
     "tooShortMsg": "Ferðin var undir 10 m — ekki vistuð.",

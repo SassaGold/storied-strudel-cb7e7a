@@ -109,7 +109,7 @@ export default function POIMap<T extends Marker>({
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    backgroundColor: "#0d0d0d",
+    backgroundColor: "#0C1120",
     borderRadius: 10,
     overflow: "hidden",
     marginBottom: 12,

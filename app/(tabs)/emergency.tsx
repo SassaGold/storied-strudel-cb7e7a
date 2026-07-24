@@ -594,7 +594,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   sosRegion: {
-    color: "#888888",
+    color: "#8A93A8",
     fontSize: 11,
     fontWeight: "600",
     textAlign: "center",
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   bodyText: {
-    color: "#888888",
+    color: "#8A93A8",
     fontSize: 14,
     fontStyle: "italic",
   },
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   cardDescription: {
-    color: "#555555",
+    color: "#5B6478",
     fontSize: 12,
     marginBottom: 14,
   },
@@ -719,7 +719,7 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   placeName: {
-    color: "#f0f0f0",
+    color: "#F4F7FC",
     fontSize: 14,
     fontWeight: "700",
   },
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   distanceText: {
-    color: "#888888",
+    color: "#8A93A8",
     fontSize: 12,
     fontWeight: "600",
   },

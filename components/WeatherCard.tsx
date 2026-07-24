@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     borderWidth: 1,
     borderColor: COLORS.brand,
-    backgroundColor: "rgba(255,102,0,0.08)",
+    backgroundColor: "rgba(47,212,196,0.08)",
     paddingVertical: 8,
     borderRadius: 10,
     alignItems: "center",
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     lineHeight: 46,
   },
   weatherConditionText: { color: COLORS.body, fontSize: 16, marginTop: 2 },
-  weatherFeelsLike: { color: "#888888", fontSize: 13, marginTop: 2 },
+  weatherFeelsLike: { color: "#8A93A8", fontSize: 13, marginTop: 2 },
   weatherStatsGrid: {
     backgroundColor: COLORS.bg,
     borderRadius: 10,
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 4,
   },
-  hourlyCardRain: { color: "#888888", fontSize: 11 },
+  hourlyCardRain: { color: "#8A93A8", fontSize: 11 },
   forecastCardsRow: { flexDirection: "row", gap: 8, marginTop: 8 },
   forecastCard: {
     flex: 1,
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   forecastCardRainRow: {
-    backgroundColor: "rgba(255,102,0,0.12)",
+    backgroundColor: "rgba(47,212,196,0.12)",
     borderRadius: 999,
     paddingHorizontal: 8,
     paddingVertical: 2,

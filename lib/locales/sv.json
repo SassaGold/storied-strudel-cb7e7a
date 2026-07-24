@@ -46,14 +46,10 @@
   "language": {
     "label": "🌍 Språk",
     "en": "🇬🇧 EN",
-    "es": "🇪🇸 ES",
-    "de": "🇩🇪 DE",
-    "fr": "🇫🇷 FR",
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA",
-    "nl": "🇳🇱 NL"
+    "da": "🇩🇰 DA"
   },
   "home": {
     "quickNav": "SNABBNAVIGERING",
@@ -90,7 +86,6 @@
     "roadConditionsLoading": "Kontrollerar vägförhållanden…",
     "roadConditionsNone": "✅ Inga vägarbeten inom {{radius}}.",
     "roadConditionsCount_one": "{{count}} vägarbete inom {{radius}}",
-
     "roadConditionsCount_other": "{{count}} vägarbeten inom {{radius}}",
     "openTrafficMap": "LIVE TRAFIIKKARTA",
     "tapToOpenMaps": "Tryck för att öppna i Kartor",
@@ -284,6 +279,100 @@
     "searchGoogleMaps": "🗺️ Sök på Google Maps",
     "freeParking": "Gratis parkering"
   },
+  "season": {
+    "badge": "🏍️ SÄSONG",
+    "title": "MC-SÄSONG",
+    "subtitle": "Vinterförvara, vårrusta och håll koll på besiktningen.",
+    "entry": {
+      "title": "Säsong och besiktning",
+      "subtitle": "Vinterförvaring, vårrustning och besiktningspåminnelser"
+    },
+    "nudge": {
+      "winterize": "Hösten är här – dags att ställa in hojen för vintern.",
+      "springPrep": "Våren är på väg – gå igenom vårrustningslistan.",
+      "riding": "Körsäsong – njut. Checklistorna finns här när du behöver dem.",
+      "offSeason": "Utanför säsong – hojen sover. Vi hör av oss till våren."
+    },
+    "panels": {
+      "winter": "Vinter",
+      "spring": "Vår",
+      "inspection": "Besiktning"
+    },
+    "bike": {
+      "title": "Din hoj",
+      "namePlaceholder": "Märke och modell (t.ex. Yamaha MT-07)",
+      "country": "Land",
+      "firstRegistration": "Första registrering"
+    },
+    "country": {
+      "SE": "Sverige",
+      "NO": "Norge",
+      "DK": "Danmark",
+      "IS": "Island"
+    },
+    "checklist": {
+      "winterTitle": "Vinterförvaring",
+      "winterDesc": "Ställ in hojen rätt så den vaknar frisk till våren.",
+      "springTitle": "Vårrustning",
+      "springDesc": "Väck hojen och gå igenom den innan första turen.",
+      "completedOn": "Klart {{date}}"
+    },
+    "items": {
+      "fuelStabilizer": "Tillsätt bränslestabilisator och fyll tanken",
+      "batteryTender": "Batteri på underhållsladdare, eller koppla ur det",
+      "tyrePressure": "Ställ däcktryck, få upp hojen från marken om möjligt",
+      "oilChange": "Byt olja och filter",
+      "washWax": "Tvätta, vaxa och rostskyddsspreja",
+      "blockExhaust": "Plugga avgasröret mot skadedjur",
+      "cover": "Täck över hojen",
+      "batteryInstall": "Sätt i och ladda batteriet",
+      "tyres": "Kontrollera däck och tryck",
+      "brakes": "Kontrollera bromsar och vätska",
+      "chain": "Rengör, smörj och spänn kedjan",
+      "lights": "Testa alla lampor",
+      "fluids": "Kontrollera kyl- och oljenivå",
+      "bolts": "Kontrollera att bultar är åtdragna",
+      "firstRide": "Ta en lugn första tur"
+    },
+    "inspection": {
+      "title": "Besiktningsöversikt",
+      "requiredIn": "Det här landet kräver periodisk MC-besiktning ({{term}}).",
+      "notRequired": "Motorcyklar omfattas inte av periodisk besiktning här.",
+      "unverified": "Besiktningsreglerna är inte verifierade ännu – datum och påminnelser är avstängda tills exakt intervall bekräftats mot officiell källa.",
+      "source": "Officiell källa",
+      "setReminder": "Ställ in besiktningspåminnelse",
+      "nextDue": "Uppskattad nästa deadline: {{date}}",
+      "estimateNote": "Uppskattat utifrån registreringsdatumet – bekräfta mot officiellt register.",
+      "enterDate": "Lägg till hojens första registrering ovan för att uppskatta nästa besiktningsdeadline.",
+      "notifTitle": "Besiktning närmar sig",
+      "notifBody": "{{term}} förfaller runt {{date}}. Dags att boka tid.",
+      "reminderSetTitle": "Påminnelse inställd",
+      "reminderSetBody": "Vi påminner dig den {{date}}.",
+      "reminderFailTitle": "Kunde inte ställa in påminnelse",
+      "reminderFailBody": "Deadline är för nära eller ogiltig för att schemalägga en påminnelse.",
+      "permTitle": "Aviseringar är av",
+      "permBody": "Slå på aviseringar för att få en påminnelse innan besiktningen förfaller.",
+      "updateReminder": "Uppdatera påminnelse",
+      "reminderSetLabel": "Påminnelse inställd till {{date}}",
+      "reminderSetLabelNoDate": "Påminnelse inställd",
+      "cancelReminder": "Avbryt påminnelse",
+      "reminderStale": "Hojens uppgifter har ändrats – tryck Uppdatera för att boka om påminnelsen."
+    },
+    "bikes": {
+      "add": "Lägg till hoj",
+      "defaultName": "Hoj {{n}}",
+      "remove": "Ta bort hoj",
+      "removeTitle": "Ta bort hoj?",
+      "removeBody": "Ta bort ”{{name}}” med checklistor och påminnelse?",
+      "removeCancel": "Avbryt",
+      "removeConfirm": "Ta bort",
+      "empty": "Lägg till en hoj för att följa säsong och besiktning."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost väntas (ner mot {{temp}}°C) – dags att vinterförvara.",
+      "springWarming": "Milt väder på väg ({{temp}}°C) – bra tid för vårrustning."
+    }
+  },
   "sos": {
     "badge": "🆘 NÖDSITUATION",
     "title": "SOS",
@@ -370,7 +459,6 @@
     "rideLabel": "Tur {{n}}",
     "accuracy": "GPS-noggrannhet {{value}} m",
     "points_one": "{{count}} GPS-punkt",
-
     "points_other": "{{count}} GPS-punkter",
     "tooShortTitle": "Tur inte sparad",
     "tooShortMsg": "Turen var under 10 m — inte sparad.",

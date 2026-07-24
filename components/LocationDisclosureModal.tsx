@@ -71,10 +71,10 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   card: {
-    backgroundColor: "#1a1a1a",
+    backgroundColor: "#141C2E",
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "rgba(255,102,0,0.4)",
+    borderColor: "rgba(47,212,196,0.4)",
     padding: 20,
     width: "100%",
     maxWidth: 420,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
-  allowBtnPressed: { backgroundColor: "#e05500" },
+  allowBtnPressed: { backgroundColor: "#17B9AC" },
   allowBtnText: {
     color: "#000000",
     fontSize: 16,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   denyBtnPressed: { backgroundColor: "rgba(255,255,255,0.08)" },
   denyBtnText: {
-    color: "#888888",
+    color: "#8A93A8",
     fontSize: 15,
     fontWeight: "600",
   },

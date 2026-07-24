@@ -46,14 +46,10 @@
   "language": {
     "label": "🌍 Språk",
     "en": "🇬🇧 EN",
-    "es": "🇪🇸 ES",
-    "de": "🇩🇪 DE",
-    "fr": "🇫🇷 FR",
     "is": "🇮🇸 IS",
     "no": "🇳🇴 NO",
     "sv": "🇸🇪 SV",
-    "da": "🇩🇰 DA",
-    "nl": "🇳🇱 NL"
+    "da": "🇩🇰 DA"
   },
   "home": {
     "quickNav": "HURTIGNAVIGASJON",
@@ -90,7 +86,6 @@
     "roadConditionsLoading": "Sjekker veiforhold…",
     "roadConditionsNone": "✅ Ingen veiarbeid oppdaget innen {{radius}}.",
     "roadConditionsCount_one": "{{count}} veiarbeid oppdaget innen {{radius}}",
-
     "roadConditionsCount_other": "{{count}} veiarbeider oppdaget innen {{radius}}",
     "openTrafficMap": "LIVE TRAFIKKART",
     "tapToOpenMaps": "Trykk for å åpne i Kart",
@@ -284,6 +279,100 @@
     "searchGoogleMaps": "🗺️ Søk på Google Maps",
     "freeParking": "Gratis parkering"
   },
+  "season": {
+    "badge": "🏍️ SESONG",
+    "title": "MC-SESONG",
+    "subtitle": "Vinterlagre, klargjør til våren og hold styr på kontrollen.",
+    "entry": {
+      "title": "Sesong og kontroll",
+      "subtitle": "Vinterlagring, vårklargjøring og kontrollpåminnelser"
+    },
+    "nudge": {
+      "winterize": "Høsten er her – på tide å legge sykkelen inn for vinteren.",
+      "springPrep": "Våren nærmer seg – gå gjennom klargjøringslista.",
+      "riding": "Kjøresesong – nyt den. Sjekklistene er her når du trenger dem.",
+      "offSeason": "Utenom sesong – sykkelen sover. Vi minner deg på det til våren."
+    },
+    "panels": {
+      "winter": "Vinter",
+      "spring": "Vår",
+      "inspection": "Kontroll"
+    },
+    "bike": {
+      "title": "Sykkelen din",
+      "namePlaceholder": "Merke og modell (f.eks. Yamaha MT-07)",
+      "country": "Land",
+      "firstRegistration": "Førstegangsregistrert"
+    },
+    "country": {
+      "SE": "Sverige",
+      "NO": "Norge",
+      "DK": "Danmark",
+      "IS": "Island"
+    },
+    "checklist": {
+      "winterTitle": "Vinterlagring",
+      "winterDesc": "Legg sykkelen riktig inn så den våkner sunn til våren.",
+      "springTitle": "Vårklargjøring",
+      "springDesc": "Vekk sykkelen og sjekk den før første tur.",
+      "completedOn": "Utført {{date}}"
+    },
+    "items": {
+      "fuelStabilizer": "Tilsett drivstoffstabilisator og fyll tanken",
+      "batteryTender": "Batteri på vedlikeholdslader, eller koble det fra",
+      "tyrePressure": "Still dekktrykk, få sykkelen opp fra bakken om mulig",
+      "oilChange": "Skift olje og filter",
+      "washWax": "Vask, voks og korrosjonsspray",
+      "blockExhaust": "Tett eksosen mot skadedyr",
+      "cover": "Dekk til sykkelen",
+      "batteryInstall": "Sett inn og lad batteriet",
+      "tyres": "Sjekk dekk og trykk",
+      "brakes": "Sjekk bremser og væske",
+      "chain": "Rengjør, smør og stram kjedet",
+      "lights": "Test alle lys",
+      "fluids": "Sjekk kjøle- og oljenivå",
+      "bolts": "Sjekk at bolter er tiltrukket",
+      "firstRide": "Ta en rolig første tur"
+    },
+    "inspection": {
+      "title": "Kontrolloversikt",
+      "requiredIn": "Dette landet krever periodisk MC-kontroll ({{term}}).",
+      "notRequired": "Motorsykler er ikke underlagt periodisk kontroll her.",
+      "unverified": "Kontrollreglene er ikke verifisert ennå – datoer og påminnelser er slått av til nøyaktig intervall er bekreftet mot offisiell kilde.",
+      "source": "Offisiell kilde",
+      "setReminder": "Sett kontrollpåminnelse",
+      "nextDue": "Estimert neste frist: {{date}}",
+      "estimateNote": "Estimert ut fra registreringsdatoen – bekreft mot offisielt register.",
+      "enterDate": "Legg inn sykkelens førstegangsregistrering over for å estimere neste kontrollfrist.",
+      "notifTitle": "Kontroll nærmer seg",
+      "notifBody": "{{term}} forfaller rundt {{date}}. På tide å bestille time.",
+      "reminderSetTitle": "Påminnelse satt",
+      "reminderSetBody": "Vi minner deg på {{date}}.",
+      "reminderFailTitle": "Kunne ikke sette påminnelse",
+      "reminderFailBody": "Fristen er for nær eller ugyldig til å planlegge en påminnelse.",
+      "permTitle": "Varsler er av",
+      "permBody": "Slå på varsler for å få en påminnelse før kontrollen forfaller.",
+      "updateReminder": "Oppdater påminnelse",
+      "reminderSetLabel": "Påminnelse satt til {{date}}",
+      "reminderSetLabelNoDate": "Påminnelse satt",
+      "cancelReminder": "Avbryt påminnelse",
+      "reminderStale": "Sykkelens opplysninger er endret – trykk Oppdater for å planlegge påminnelsen på nytt."
+    },
+    "bikes": {
+      "add": "Legg til sykkel",
+      "defaultName": "Sykkel {{n}}",
+      "remove": "Fjern sykkel",
+      "removeTitle": "Fjerne sykkel?",
+      "removeBody": "Fjerne «{{name}}» med sjekklister og påminnelse?",
+      "removeCancel": "Avbryt",
+      "removeConfirm": "Fjern",
+      "empty": "Legg til en sykkel for å følge sesong og kontroll."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost meldt (ned mot {{temp}}°C) – på tide å vinterlagre.",
+      "springWarming": "Mildt vær i vente ({{temp}}°C) – fin tid for vårklargjøring."
+    }
+  },
   "sos": {
     "badge": "🆘 NØDSITUASJON",
     "title": "SOS",
@@ -370,7 +459,6 @@
     "rideLabel": "Tur {{n}}",
     "accuracy": "GPS-nøyaktighet {{value}} m",
     "points_one": "{{count}} GPS-punkt",
-
     "points_other": "{{count}} GPS-punkter",
     "tooShortTitle": "Tur ikke lagret",
     "tooShortMsg": "Turen var under 10 m — ikke lagret.",
