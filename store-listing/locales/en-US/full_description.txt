@@ -33,6 +33,11 @@ Everything to keep you riding:
 • ATMs & banks
 
 ━━━━━━━━━━━━━━━━━━━━
+🗓️ MC SEASON & INSPECTION
+━━━━━━━━━━━━━━━━━━━━
+Built for the Nordic riding calendar. Winterize and spring-prep checklists walk you through storing and waking your bike, and a per-country inspection tracker keeps you ahead of the deadline — with a reminder that fires about a month before you're due. Add several bikes and track each one. Inspection rules verified for Sweden, Norway, Denmark and Iceland.
+
+━━━━━━━━━━━━━━━━━━━━
 📏 TRIP LOGGER
 ━━━━━━━━━━━━━━━━━━━━
 Record your rides with a live speed gauge, real-time distance and duration counters, and GPS route tracking that keeps working with the screen locked. Your full ride history is saved on your device — never uploaded anywhere.
@@ -49,9 +54,9 @@ A dedicated emergency screen, one tap away:
 • Step-by-step first aid for motorcycle accidents
 
 ━━━━━━━━━━━━━━━━━━━━
-🌍 9 LANGUAGES
+🌍 5 LANGUAGES
 ━━━━━━━━━━━━━━━━━━━━
-Full interface in English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish and Dutch — switch instantly, remembered forever.
+Full interface in English, Norwegian, Swedish, Danish and Icelandic — switch instantly, remembered forever.
 
 ━━━━━━━━━━━━━━━━━━━━
 🔒 PRIVACY — NO DATA COLLECTED

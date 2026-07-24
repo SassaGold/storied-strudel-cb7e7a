@@ -1,0 +1,6 @@
+🏍️ Nytt i 1.3.0:
+• Nytt Nordic Aurora-utseende — renere og mørkere, med friskere farger på hver skjerm
+• NYTT MC-sesong og kontroll: sjekklister for vinterlagring og vårklargjøring, kontrolloversikt per land som minner deg på før fristen, og støtte for flere sykler
+• Kontrollregler verifisert for Sverige, Norge, Danmark og Island
+
+Takk for at du kjører med oss! Tilbakemelding → support@sassagold.com

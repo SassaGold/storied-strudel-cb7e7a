@@ -33,6 +33,11 @@ Alt for å holde deg på veien:
 • Minibanker og banker
 
 ━━━━━━━━━━━━━━━━━━━━
+🗓️ MC-SESONG OG KONTROLL
+━━━━━━━━━━━━━━━━━━━━
+Laget for den nordiske kjøresesongen. Sjekklister for vinterlagring og vårklargjøring tar deg steg for steg gjennom å legge sykkelen bort og vekke den igjen, og en kontrolloversikt per land holder deg i forkant av fristen — med en påminnelse omtrent én måned før. Legg til flere sykler og følg med på hver enkelt. Kontrollregler verifisert for Sverige, Norge, Danmark og Island.
+
+━━━━━━━━━━━━━━━━━━━━
 📏 REISEDAGBOK
 ━━━━━━━━━━━━━━━━━━━━
 Loggfør turene dine med fartsmåler i sanntid, distanse- og tidstellere og GPS-sporing som fortsetter med låst skjerm. Hele kjørehistorikken lagres på enheten din — aldri lastet opp noe sted.
@@ -49,9 +54,9 @@ En egen nødskjerm, ett trykk unna:
 • Førstehjelp steg for steg ved MC-ulykker
 
 ━━━━━━━━━━━━━━━━━━━━
-🌍 9 SPRÅK
+🌍 5 SPRÅK
 ━━━━━━━━━━━━━━━━━━━━
-Fullt grensesnitt på norsk, engelsk, spansk, tysk, fransk, islandsk, svensk, dansk og nederlandsk — bytt umiddelbart, huskes for alltid.
+Fullt grensesnitt på norsk, engelsk, svensk, dansk og islandsk — bytt umiddelbart, huskes for alltid.
 
 ━━━━━━━━━━━━━━━━━━━━
 🔒 PERSONVERN — INGEN DATA SAMLES INN
