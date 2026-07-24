@@ -1,0 +1,72 @@
+Vegvísir — Motorcyklistens makker 🏍️
+
+Alt hvad du har brug for på vejen, i én ryddelig app. Vegvísir er bygget til motorcyklister, der vil have lokal information i realtid, smart turlogning og tryghed i nødsituationer — uden konto, uden reklamer og uden dataindsamling.
+
+(Nyt navn, samme app — Vegvísir hed tidligere Where Am I.)
+
+━━━━━━━━━━━━━━━━━━━━
+🧭 RIDER HQ
+━━━━━━━━━━━━━━━━━━━━
+Dit live-dashboard på turen. Se din aktuelle adresse, vejret lige nu med time- og 3-dages prognoser, en kørevenlighedsscore med praktiske anbefalinger, solopgangs- og solnedgangstider samt varsler om vejforhold — alt sammen ud fra din aktuelle GPS-position.
+
+━━━━━━━━━━━━━━━━━━━━
+🍽️ MADSTOP
+━━━━━━━━━━━━━━━━━━━━
+Find restauranter, caféer, barer, bagerier og fastfood i nærheden, sorteret efter afstand. Tryk på et resultat for rutevejledning, kontaktinfo eller deres hjemmeside.
+
+━━━━━━━━━━━━━━━━━━━━
+🛏️ OVERNATNING
+━━━━━━━━━━━━━━━━━━━━
+Find hoteller, vandrerhjem, campingpladser og andre overnatningssteder nær din aktuelle position — perfekt når dagens tur trækker ud.
+
+━━━━━━━━━━━━━━━━━━━━
+🏁 STOP LANGS VEJEN
+━━━━━━━━━━━━━━━━━━━━
+Opdag udsigtspunkter, museer, seværdigheder og andre stop, der er værd at holde ind for undervejs.
+
+━━━━━━━━━━━━━━━━━━━━
+🔧 GARAGEN
+━━━━━━━━━━━━━━━━━━━━
+Alt der holder dig kørende:
+• Motorcykelforhandlere, værksteder & reservedelsbutikker
+• Tankstationer (med info om brændstoftype)
+• Parkering — almindelig og MC-specifik
+• MC-klubber & racerbaner
+• Hæveautomater & banker
+
+━━━━━━━━━━━━━━━━━━━━
+🗓️ MC-SÆSON & SYN
+━━━━━━━━━━━━━━━━━━━━
+Bygget til den nordiske køresæson. Tjeklister til vinteropbevaring og forårsklargøring guider dig gennem at stille cyklen væk og vække den igen, og en synsoversigt pr. land holder dig foran fristen — med en påmindelse cirka en måned før. Tilføj flere cykler og følg hver enkelt. Synsregler bekræftet for Sverige, Norge, Danmark og Island.
+
+━━━━━━━━━━━━━━━━━━━━
+📏 TURLOGGER
+━━━━━━━━━━━━━━━━━━━━
+Optag dine ture med live hastighedsmåler, distance- og tidstællere i realtid og GPS-rutesporing, der fortsætter med låst skærm. Hele din turhistorik gemmes på din enhed — og uploades aldrig.
+
+━━━━━━━━━━━━━━━━━━━━
+🆘 SOS / NØDSITUATION
+━━━━━━━━━━━━━━━━━━━━
+En dedikeret nødskærm, ét tryk væk:
+• Ring til det lokale alarmnummer med ét tryk
+• Universelle alarmnumre (112, 911, 999, 000, 111)
+• Nærmeste hospitaler, politi, brandstationer & apoteker
+• Del din position via SMS eller WhatsApp
+• Lommelygte / blinkende skærm til signalering
+• Førstehjælp trin for trin ved motorcykeluheld
+
+━━━━━━━━━━━━━━━━━━━━
+🌍 5 SPROG
+━━━━━━━━━━━━━━━━━━━━
+Fuld brugerflade på dansk, svensk, norsk, engelsk og islandsk — skift med det samme, huskes for altid.
+
+━━━━━━━━━━━━━━━━━━━━
+🔒 PRIVATLIV — INGEN DATA INDSAMLES
+━━━━━━━━━━━━━━━━━━━━
+• Ingen konto nødvendig
+• Ingen reklamer, analyse eller sporing
+• Din position bruges kun på enheden
+• Turlogs bliver på din enhed
+• Åbne data: OpenStreetMap, Open-Meteo, Wikipedia
+
+Klar til at køre klogere? Hent Vegvísir, kør ud, og vid altid hvad der venter bag næste sving. Spørgsmål eller idéer? Vi svarer på alt: support@sassagold.com
