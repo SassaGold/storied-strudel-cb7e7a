@@ -1,6 +1,8 @@
-Where Am I — motorsyklistens kompis 🏍️
+Vegvísir — motorsyklistens kompis 🏍️
 
-Alt du trenger på veien, i én ryddig app. Where Am I er laget for motorsyklister som vil ha lokal informasjon i sanntid, smart turlogging og trygghet i nødsituasjoner — uten konto, uten reklame og uten datainnsamling.
+Alt du trenger på veien, i én ryddig app. Vegvísir er laget for motorsyklister som vil ha lokal informasjon i sanntid, smart turlogging og trygghet i nødsituasjoner — uten konto, uten reklame og uten datainnsamling.
+
+(Nytt navn, samme app — Vegvísir het tidligere Where Am I.)
 
 ━━━━━━━━━━━━━━━━━━━━
 🧭 RIDER HQ
@@ -67,4 +69,4 @@ Fullt grensesnitt på norsk, engelsk, svensk, dansk og islandsk — bytt umiddel
 • Turlogger blir på enheten din
 • Åpne data: OpenStreetMap, Open-Meteo, Wikipedia
 
-Klar for smartere turer? Last ned Where Am I, kjør ut, og vit alltid hva som venter rundt neste sving. Spørsmål eller idéer? Vi svarer på alt: support@sassagold.com
+Klar for smartere turer? Last ned Vegvísir, kjør ut, og vit alltid hva som venter rundt neste sving. Spørsmål eller idéer? Vi svarer på alt: support@sassagold.com

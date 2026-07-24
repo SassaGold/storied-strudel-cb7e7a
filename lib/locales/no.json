@@ -467,7 +467,7 @@
     "startErrorMsg": "Kunne ikke starte turregistrering. Kontroller at posisjonstillatelse er aktivert, og prøv igjen.",
     "stopErrorTitle": "Feil ved lagring av tur",
     "stopErrorMsg": "Turen din ble kanskje ikke lagret riktig. Prøv igjen.",
-    "notifTitle": "Where Am I · Turlogger",
+    "notifTitle": "Vegvísir · Turlogger",
     "notifBody": "Tar opp turen din i bakgrunnen.",
     "viewRoute": "🗺️ Vis rute",
     "hideRoute": "▲ Skjul rute",
@@ -538,7 +538,7 @@
   },
   "locationDisclosure": {
     "title": "Posisjonstillatelse",
-    "body": "Where Am I bruker nøyaktig plassering fra enheten din for å:\n\n• Vise din nåværende posisjon og adresse på kartet\n• Finne nærliggende mat, overnatting, bensinstasjoner og tjenester\n• Vise lokalt vær og veiforhold\n• Registrere turer selv når appen er lukket eller ikke i bruk (turloggen)\n• Aktivere SOS-varsler og nødlokalisering\n\nPosisjonen din brukes i bakgrunnen — selv når appen er lukket eller ikke i bruk — kun mens turloggen er aktiv.\n\nPosisjonskoordinater sendes til kart- og værtjenester (OpenStreetMap, Open-Meteo) utelukkende for å levere disse funksjonene. Dataene dine selges ikke og deles aldri til reklamemål.\n\nTrykk på «Tillat og fortsett» for å gå videre til plasseringsforespørselen.",
+    "body": "Vegvísir bruker nøyaktig plassering fra enheten din for å:\n\n• Vise din nåværende posisjon og adresse på kartet\n• Finne nærliggende mat, overnatting, bensinstasjoner og tjenester\n• Vise lokalt vær og veiforhold\n• Registrere turer selv når appen er lukket eller ikke i bruk (turloggen)\n• Aktivere SOS-varsler og nødlokalisering\n\nPosisjonen din brukes i bakgrunnen — selv når appen er lukket eller ikke i bruk — kun mens turloggen er aktiv.\n\nPosisjonskoordinater sendes til kart- og værtjenester (OpenStreetMap, Open-Meteo) utelukkende for å levere disse funksjonene. Dataene dine selges ikke og deles aldri til reklamemål.\n\nTrykk på «Tillat og fortsett» for å gå videre til plasseringsforespørselen.",
     "privacyPolicy": "📄 Personvernregler",
     "allow": "Tillat og fortsett",
     "deny": "Nei takk"

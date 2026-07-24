@@ -1,14 +1,14 @@
-# Privacy Policy — Where Am I
+# Privacy Policy — Vegvísir (formerly Vegvísir)
 
 **Last updated: 2026-03-18**
 
-Where Am I ("the app", "we", "our") is a free motorcycle companion app. This policy explains what data the app accesses, how it is used, and how your privacy is protected.
+Vegvísir ("the app", "we", "our") is a free motorcycle companion app. This policy explains what data the app accesses, how it is used, and how your privacy is protected.
 
 ---
 
 ## 1. Data We Do NOT Collect
 
-Where Am I does **not** collect, store, transmit, or share any personal data. Specifically:
+Vegvísir does **not** collect, store, transmit, or share any personal data. Specifically:
 
 - ❌ No user accounts or registration
 - ❌ No analytics or usage tracking
@@ -29,7 +29,7 @@ The app requests access to your device's GPS location for the following purposes
 | SOS / Emergency tab | Finding nearest emergency services; sharing your coordinates via your device's share sheet |
 | Trip Logger tab | Recording GPS route and calculating distance while riding |
 
-**Your location is never sent to any server operated by Where Am I.**
+**Your location is never sent to any server operated by Vegvísir.**
 
 When location is used for POI searches, anonymised coordinates are sent to these **third-party open APIs**:
 
@@ -82,7 +82,7 @@ The app uses the following third-party services. No personal data is sent to any
 
 ## 7. Children's Privacy
 
-Where Am I does not knowingly collect any data from children under the age of 13. The app contains no features targeting children.
+Vegvísir does not knowingly collect any data from children under the age of 13. The app contains no features targeting children.
 
 ---
 

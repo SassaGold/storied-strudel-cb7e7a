@@ -467,7 +467,7 @@
     "startErrorMsg": "Kunne ikke starte turregistrering. Kontrollér, at placeringstilladelse er aktiveret, og prøv igen.",
     "stopErrorTitle": "Fejl ved lagring af tur",
     "stopErrorMsg": "Din tur blev muligvis ikke gemt korrekt. Prøv igen.",
-    "notifTitle": "Where Am I · Turlogger",
+    "notifTitle": "Vegvísir · Turlogger",
     "notifBody": "Optager din tur i baggrunden.",
     "viewRoute": "🗺️ Vis rute",
     "hideRoute": "▲ Skjul rute",
@@ -538,7 +538,7 @@
   },
   "locationDisclosure": {
     "title": "Placeringstilladelse",
-    "body": "Where Am I bruger din enheds præcise placering til at:\n\n• Vise din aktuelle position og adresse på kortet\n• Finde nærliggende mad, overnatning, tankstationer og tjenester\n• Vise lokalt vejr og vejforhold\n• Registrere ture, selv når appen er lukket eller ikke bruges (turudskriften)\n• Aktivere SOS-advarsler og nødplacering\n\nDin placering tilgås i baggrunden — selv når appen er lukket eller ikke bruges — kun mens turudskriften er aktiv.\n\nPlaceringskoordinater sendes til kortlægnings- og vejrtjenester (OpenStreetMap, Open-Meteo) udelukkende for at levere disse funktioner. Dine data sælges ikke og deles aldrig til reklamemæssige formål.\n\nTryk på „Tillad og fortsæt“ for at fortsætte til placeringstilladelsesanmodningen.",
+    "body": "Vegvísir bruger din enheds præcise placering til at:\n\n• Vise din aktuelle position og adresse på kortet\n• Finde nærliggende mad, overnatning, tankstationer og tjenester\n• Vise lokalt vejr og vejforhold\n• Registrere ture, selv når appen er lukket eller ikke bruges (turudskriften)\n• Aktivere SOS-advarsler og nødplacering\n\nDin placering tilgås i baggrunden — selv når appen er lukket eller ikke bruges — kun mens turudskriften er aktiv.\n\nPlaceringskoordinater sendes til kortlægnings- og vejrtjenester (OpenStreetMap, Open-Meteo) udelukkende for at levere disse funktioner. Dine data sælges ikke og deles aldrig til reklamemæssige formål.\n\nTryk på „Tillad og fortsæt“ for at fortsætte til placeringstilladelsesanmodningen.",
     "privacyPolicy": "📄 Privatlivspolitik",
     "allow": "Tillad og fortsæt",
     "deny": "Nej tak"

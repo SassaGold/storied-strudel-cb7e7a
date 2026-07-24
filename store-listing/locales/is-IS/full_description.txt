@@ -1,6 +1,8 @@
-Where Am I — félagi mótorhjólafólksins 🏍️
+Vegvísir — félagi mótorhjólafólksins 🏍️
 
-Allt sem þú þarft á veginum, í einu snyrtilegu appi. Where Am I er smíðað fyrir mótorhjólafólk sem vill staðbundnar upplýsingar í rauntíma, snjalla ferðaskráningu og öryggi í neyðartilvikum — án aðgangs, án auglýsinga og án gagnasöfnunar.
+Allt sem þú þarft á veginum, í einu snyrtilegu appi. Vegvísir er smíðað fyrir mótorhjólafólk sem vill staðbundnar upplýsingar í rauntíma, snjalla ferðaskráningu og öryggi í neyðartilvikum — án aðgangs, án auglýsinga og án gagnasöfnunar.
+
+(Nýtt nafn, sama app — Vegvísir hét áður Where Am I.)
 
 ━━━━━━━━━━━━━━━━━━━━
 🧭 RIDER HQ
@@ -67,4 +69,4 @@ Allt viðmótið á íslensku, ensku, norsku, sænsku og dönsku — skiptu sams
 • Ferðaskrár verða eftir í tækinu þínu
 • Opin gögn: OpenStreetMap, Open-Meteo, Wikipedia
 
-Tilbúin(n) að ferðast snjallar? Sæktu Where Am I, farðu af stað og vittu alltaf hvað bíður handan næstu beygju. Spurningar eða hugmyndir? Við svörum öllu: support@sassagold.com
+Tilbúin(n) að ferðast snjallar? Sæktu Vegvísir, farðu af stað og vittu alltaf hvað bíður handan næstu beygju. Spurningar eða hugmyndir? Við svörum öllu: support@sassagold.com

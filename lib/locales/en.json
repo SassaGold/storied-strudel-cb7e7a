@@ -54,7 +54,7 @@
   "home": {
     "quickNav": "QUICK NAVIGATE",
     "badge": "🏍️ RIDER HQ",
-    "title": "Where Am I – Explore. Ride. Discover",
+    "title": "Vegvísir – Explore. Ride. Discover",
     "subtitle": "Your location & riding conditions.",
     "updateLocation": "UPDATE LOCATION",
     "fetchingData": "Fetching local data…",
@@ -467,7 +467,7 @@
     "startErrorMsg": "Failed to start ride tracking. Please check that location permission is enabled and try again.",
     "stopErrorTitle": "Ride Save Error",
     "stopErrorMsg": "Your ride may not have saved correctly. Please try again.",
-    "notifTitle": "Where Am I · Trip Logger",
+    "notifTitle": "Vegvísir · Trip Logger",
     "notifBody": "Recording your ride in the background.",
     "viewRoute": "🗺️ View Route",
     "hideRoute": "▲ Hide Route",
@@ -538,7 +538,7 @@
   },
   "locationDisclosure": {
     "title": "Location Permission",
-    "body": "Where Am I uses your device's precise location to:\n\n• Show your current position and address on the map\n• Find nearby food, accommodation, fuel stations & services\n• Display local weather and road conditions\n• Record rides even when the app is closed or not in use (Trip Logger)\n• Enable SOS alerts and emergency location sharing\n\nYour location is accessed in the background — even when the app is closed or not in use — only while Trip Logger is active.\n\nLocation coordinates are sent to mapping and weather services (OpenStreetMap, Open-Meteo) solely to power these features. Your data is never sold and is never shared for advertising purposes.\n\nTap “Allow & Continue” to proceed to the permission request.",
+    "body": "Vegvísir uses your device's precise location to:\n\n• Show your current position and address on the map\n• Find nearby food, accommodation, fuel stations & services\n• Display local weather and road conditions\n• Record rides even when the app is closed or not in use (Trip Logger)\n• Enable SOS alerts and emergency location sharing\n\nYour location is accessed in the background — even when the app is closed or not in use — only while Trip Logger is active.\n\nLocation coordinates are sent to mapping and weather services (OpenStreetMap, Open-Meteo) solely to power these features. Your data is never sold and is never shared for advertising purposes.\n\nTap “Allow & Continue” to proceed to the permission request.",
     "privacyPolicy": "📄 Privacy Policy",
     "allow": "Allow & Continue",
     "deny": "No thanks"

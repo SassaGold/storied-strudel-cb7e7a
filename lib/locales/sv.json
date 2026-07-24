@@ -467,7 +467,7 @@
     "startErrorMsg": "Det gick inte att starta turregistreringen. Kontrollera att platsbehörighet är aktiverad och försök igen.",
     "stopErrorTitle": "Fel vid sparande av tur",
     "stopErrorMsg": "Din tur kanske inte sparades korrekt. Försök igen.",
-    "notifTitle": "Where Am I · Turlogg",
+    "notifTitle": "Vegvísir · Turlogg",
     "notifBody": "Spelar in din tur i bakgrunden.",
     "viewRoute": "🗺️ Visa rutt",
     "hideRoute": "▲ Dölj rutt",
@@ -538,7 +538,7 @@
   },
   "locationDisclosure": {
     "title": "Platsbehörighet",
-    "body": "Where Am I använder din enhets exakta plats för att:\n\n• Visa din nuvarande position och adress på kartan\n• Hitta närliggande mat, boende, bensinstationer och tjänster\n• Visa lokalt väder och vägförhållanden\n• Registrera turer även när appen är stängd eller inte används (reseloggen)\n• Aktivera SOS-larm och nödplatsdelning\n\nDin plats används i bakgrunden — även när appen är stängd eller inte används — endast medan reseloggen är aktiv.\n\nPlatskoordinater skickas till kart- och vädertjänster (OpenStreetMap, Open-Meteo) enbart för att tillhandahålla dessa funktioner. Dina data säljs inte och delas aldrig i marknadsföringssyfte.\n\nTryck på “Tillåt och fortsätt” för att gå vidare till platsbehörighetsförfrågan.",
+    "body": "Vegvísir använder din enhets exakta plats för att:\n\n• Visa din nuvarande position och adress på kartan\n• Hitta närliggande mat, boende, bensinstationer och tjänster\n• Visa lokalt väder och vägförhållanden\n• Registrera turer även när appen är stängd eller inte används (reseloggen)\n• Aktivera SOS-larm och nödplatsdelning\n\nDin plats används i bakgrunden — även när appen är stängd eller inte används — endast medan reseloggen är aktiv.\n\nPlatskoordinater skickas till kart- och vädertjänster (OpenStreetMap, Open-Meteo) enbart för att tillhandahålla dessa funktioner. Dina data säljs inte och delas aldrig i marknadsföringssyfte.\n\nTryck på “Tillåt och fortsätt” för att gå vidare till platsbehörighetsförfrågan.",
     "privacyPolicy": "📄 Integritetspolicy",
     "allow": "Tillåt och fortsätt",
     "deny": "Nej tack"

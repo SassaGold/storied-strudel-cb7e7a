@@ -1,4 +1,4 @@
-# Where Am I — Biker Companion App 🏍️
+# Vegvísir — Biker Companion App 🏍️
 
 A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, parking, clubs & tracks, ATMs), log your rides with GPS, and get riding weather, road conditions and emergency tools. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, and Dutch.
 

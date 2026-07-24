@@ -29,7 +29,7 @@ export function buildGpx(route: GpsPoint[], name: string, startedAt?: number): s
     )
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Where Am I" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Vegvísir" xmlns="http://www.topografix.com/GPX/1/1">
   <metadata>
     <name>${safeName}</name>
     <time>${metaTime}</time>
