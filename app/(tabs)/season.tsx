@@ -26,16 +26,26 @@ import {
   CHECKLIST_ITEMS,
   COUNTRIES,
   COUNTRY_FLAG,
+  addBike,
   checklistProgress,
   currentSeasonPhase,
   defaultSeasonState,
+  loadCachedForecast,
   loadSeasonState,
+  removeBike,
   saveSeasonState,
+  selectBike,
+  selectedBike,
   toggleChecklistItem,
+  updateBike,
+  updateInspection,
+  weatherSeasonNudge,
+  type BikeEntry,
   type ChecklistType,
-  type Country,
+  type InspectionState,
   type SeasonState,
 } from "../../lib/season";
+import type { ForecastDay } from "../../lib/weather";
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const Haptics: typeof import("expo-haptics") | null = (() => { try { return require("expo-haptics"); } catch { return null; } })();
@@ -65,14 +75,16 @@ export default function SeasonScreen() {
   const insets = useSafeAreaInsets();
 
   const [state, setState] = useState<SeasonState>(defaultSeasonState);
+  const [forecast, setForecast] = useState<ForecastDay[] | null>(null);
   const [panel, setPanel] = useState<Panel>(() =>
     currentSeasonPhase() === "springPrep" ? "spring" : "winter"
   );
 
-  // Hydrate persisted state on mount.
+  // Hydrate persisted state + the cached forecast (for the weather nudge) on mount.
   useEffect(() => {
     let alive = true;
     loadSeasonState().then((s) => { if (alive) setState(s); });
+    loadCachedForecast().then((f) => { if (alive) setForecast(f); });
     return () => { alive = false; };
   }, []);
 
@@ -85,22 +97,61 @@ export default function SeasonScreen() {
     saveSeasonState(next);
   }, []);
 
+  const selected = selectedBike(state);
+
   const onToggle = useCallback((type: ChecklistType, itemId: string) => {
     hapticLight();
     setState((prev) => {
-      const next = toggleChecklistItem(prev, type, itemId);
+      const sel = selectedBike(prev);
+      if (!sel) return prev;
+      const next = toggleChecklistItem(prev, sel.id, type, itemId);
       saveSeasonState(next);
       return next;
     });
   }, []);
 
-  const setCountry = (country: Country) => {
+  const onUpdateInspection = useCallback((id: string, partial: Partial<InspectionState>) => {
+    setState((prev) => {
+      const next = updateInspection(prev, id, partial);
+      saveSeasonState(next);
+      return next;
+    });
+  }, []);
+
+  const patchBike = (partial: Partial<BikeEntry["bike"]>) => {
+    if (selected) update(updateBike(state, selected.id, partial));
+  };
+
+  const onAddBike = () => { hapticLight(); update(addBike(state)); };
+  const onSelectBike = (id: string) => { hapticLight(); update(selectBike(state, id)); };
+
+  const bikeLabel = (entry: BikeEntry, index: number) =>
+    entry.bike.name.trim() || t("season.bikes.defaultName", { n: index + 1 });
+
+  const onRemoveBike = () => {
+    if (!selected) return;
+    const idx = state.bikes.findIndex((b) => b.id === selected.id);
     hapticLight();
-    update({ ...state, bike: { ...state.bike, country } });
+    Alert.alert(
+      t("season.bikes.removeTitle"),
+      t("season.bikes.removeBody", { name: bikeLabel(selected, idx) }),
+      [
+        { text: t("season.bikes.removeCancel"), style: "cancel" },
+        {
+          text: t("season.bikes.removeConfirm"),
+          style: "destructive",
+          onPress: () => {
+            cancelInspectionReminder(selected.inspection.reminderId);
+            update(removeBike(state, selected.id));
+          },
+        },
+      ]
+    );
   };
 
   const phase = currentSeasonPhase();
-  const rule = inspectionRule(state.bike.country);
+  const wNudge = weatherSeasonNudge(phase, forecast);
+  const rule = selected ? inspectionRule(selected.bike.country) : null;
 
   return (
     <ScrollView
@@ -125,95 +176,156 @@ export default function SeasonScreen() {
         </Pressable>
       </View>
 
-      {/* ── Season nudge ── */}
-      <View style={styles.nudge}>
-        <MaterialCommunityIcons name="calendar-clock" size={20} color={COLORS.brand} />
-        <Text style={styles.nudgeText}>{t(`season.nudge.${phase}`)}</Text>
+      {/* ── Season nudge (weather-aware when a fresh forecast is cached) ── */}
+      <View style={[styles.nudge, wNudge && styles.nudgeWeather]}>
+        <MaterialCommunityIcons
+          name={wNudge ? (wNudge.key === "frostSoon" ? "snowflake" : "weather-sunny") : "calendar-clock"}
+          size={20}
+          color={wNudge?.key === "frostSoon" ? "#7dd3fc" : COLORS.brand}
+        />
+        <Text style={styles.nudgeText}>
+          {wNudge
+            ? t(`season.weatherNudge.${wNudge.key}`, { temp: wNudge.tempC })
+            : t(`season.nudge.${phase}`)}
+        </Text>
       </View>
 
-      {/* ── Bike / country ── */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>{t("season.bike.title")}</Text>
-        <TextInput
-          style={styles.input}
-          value={state.bike.name}
-          onChangeText={(name) => update({ ...state, bike: { ...state.bike, name } })}
-          placeholder={t("season.bike.namePlaceholder")}
-          placeholderTextColor="#555555"
-          returnKeyType="done"
-          accessibilityLabel={t("season.bike.namePlaceholder")}
-        />
-        <Text style={styles.fieldLabel}>{t("season.bike.firstRegistration")}</Text>
-        <TextInput
-          style={styles.input}
-          value={state.bike.firstRegistration ?? ""}
-          onChangeText={(v) =>
-            update({ ...state, bike: { ...state.bike, firstRegistration: v || undefined } })
-          }
-          placeholder="YYYY-MM-DD"
-          placeholderTextColor="#555555"
-          keyboardType="numbers-and-punctuation"
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="done"
-          accessibilityLabel={t("season.bike.firstRegistration")}
-        />
-        <Text style={styles.fieldLabel}>{t("season.bike.country")}</Text>
-        <View style={styles.chipRow}>
-          {COUNTRIES.map((c) => {
-            const active = state.bike.country === c;
-            return (
-              <Pressable
-                key={c}
-                style={[styles.chip, active && styles.chipActive]}
-                onPress={() => setCountry(c)}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                accessibilityLabel={t(`season.country.${c}`)}
-              >
-                <Text style={styles.chipFlag}>{COUNTRY_FLAG[c]}</Text>
-                <Text
-                  style={[styles.chipText, active && styles.chipTextActive]}
-                  numberOfLines={1}
-                >
-                  {t(`season.country.${c}`)}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* ── Panel selector ── */}
-      <View style={styles.segmentRow}>
-        {PANELS.map(({ key, icon }) => {
-          const active = panel === key;
+      {/* ── Bike selector (garage) ── */}
+      <View style={styles.bikeBar}>
+        {state.bikes.map((b, i) => {
+          const active = b.id === selected?.id;
           return (
             <Pressable
-              key={key}
-              style={[styles.segmentTile, active && styles.segmentTileActive]}
-              onPress={() => { hapticLight(); setPanel(key); }}
+              key={b.id}
+              style={[styles.bikeChip, active && styles.bikeChipActive]}
+              onPress={() => onSelectBike(b.id)}
               accessibilityRole="button"
               accessibilityState={{ selected: active }}
-              accessibilityLabel={t(`season.panels.${key}`)}
+              accessibilityLabel={bikeLabel(b, i)}
             >
               <MaterialCommunityIcons
-                name={icon}
-                size={24}
+                name="motorbike"
+                size={16}
                 color={active ? COLORS.brand : COLORS.muted}
               />
-              <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
-                {t(`season.panels.${key}`)}
+              <Text style={[styles.bikeChipText, active && styles.bikeChipTextActive]} numberOfLines={1}>
+                {bikeLabel(b, i)}
               </Text>
             </Pressable>
           );
         })}
+        <Pressable
+          style={styles.bikeAddChip}
+          onPress={onAddBike}
+          accessibilityRole="button"
+          accessibilityLabel={t("season.bikes.add")}
+        >
+          <MaterialCommunityIcons name="plus" size={18} color={COLORS.brand} />
+          <Text style={styles.bikeAddText}>{t("season.bikes.add")}</Text>
+        </Pressable>
       </View>
 
-      {panel === "inspection" ? (
-        <InspectionPanel rule={rule} state={state} update={update} />
+      {!selected ? (
+        <View style={styles.card}>
+          <Text style={styles.cardDescription}>{t("season.bikes.empty")}</Text>
+        </View>
       ) : (
-        <ChecklistPanel state={state} type={panel} onToggle={onToggle} />
+        <>
+          {/* ── Bike / country ── */}
+          <View style={styles.card}>
+            <View style={styles.progressRow}>
+              <Text style={styles.cardTitle}>{t("season.bike.title")}</Text>
+              {state.bikes.length > 1 && (
+                <Pressable
+                  onPress={onRemoveBike}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("season.bikes.remove")}
+                >
+                  <MaterialCommunityIcons name="trash-can-outline" size={20} color={COLORS.muted} />
+                </Pressable>
+              )}
+            </View>
+            <TextInput
+              style={styles.input}
+              value={selected.bike.name}
+              onChangeText={(name) => patchBike({ name })}
+              placeholder={t("season.bike.namePlaceholder")}
+              placeholderTextColor="#555555"
+              returnKeyType="done"
+              accessibilityLabel={t("season.bike.namePlaceholder")}
+            />
+            <Text style={styles.fieldLabel}>{t("season.bike.firstRegistration")}</Text>
+            <TextInput
+              style={styles.input}
+              value={selected.bike.firstRegistration ?? ""}
+              onChangeText={(v) => patchBike({ firstRegistration: v || undefined })}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor="#555555"
+              keyboardType="numbers-and-punctuation"
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="done"
+              accessibilityLabel={t("season.bike.firstRegistration")}
+            />
+            <Text style={styles.fieldLabel}>{t("season.bike.country")}</Text>
+            <View style={styles.chipRow}>
+              {COUNTRIES.map((c) => {
+                const active = selected.bike.country === c;
+                return (
+                  <Pressable
+                    key={c}
+                    style={[styles.chip, active && styles.chipActive]}
+                    onPress={() => { hapticLight(); patchBike({ country: c }); }}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}
+                    accessibilityLabel={t(`season.country.${c}`)}
+                  >
+                    <Text style={styles.chipFlag}>{COUNTRY_FLAG[c]}</Text>
+                    <Text
+                      style={[styles.chipText, active && styles.chipTextActive]}
+                      numberOfLines={1}
+                    >
+                      {t(`season.country.${c}`)}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* ── Panel selector ── */}
+          <View style={styles.segmentRow}>
+            {PANELS.map(({ key, icon }) => {
+              const active = panel === key;
+              return (
+                <Pressable
+                  key={key}
+                  style={[styles.segmentTile, active && styles.segmentTileActive]}
+                  onPress={() => { hapticLight(); setPanel(key); }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
+                  accessibilityLabel={t(`season.panels.${key}`)}
+                >
+                  <MaterialCommunityIcons
+                    name={icon}
+                    size={24}
+                    color={active ? COLORS.brand : COLORS.muted}
+                  />
+                  <Text style={[styles.segmentText, active && styles.segmentTextActive]}>
+                    {t(`season.panels.${key}`)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {panel === "inspection" && rule ? (
+            <InspectionPanel rule={rule} entry={selected} onUpdateInspection={onUpdateInspection} />
+          ) : panel !== "inspection" ? (
+            <ChecklistPanel entry={selected} type={panel} onToggle={onToggle} />
+          ) : null}
+        </>
       )}
     </ScrollView>
   );
@@ -222,17 +334,17 @@ export default function SeasonScreen() {
 // ── Checklist panel ───────────────────────────────────────────────────────────
 
 function ChecklistPanel({
-  state,
+  entry,
   type,
   onToggle,
 }: {
-  state: SeasonState;
+  entry: BikeEntry;
   type: ChecklistType;
   onToggle: (type: ChecklistType, itemId: string) => void;
 }) {
   const { t } = useTranslation();
   const items = CHECKLIST_ITEMS[type];
-  const { done, total } = checklistProgress(state, type);
+  const { done, total } = checklistProgress(entry, type);
 
   return (
     <View style={styles.card}>
@@ -243,7 +355,7 @@ function ChecklistPanel({
       <Text style={styles.cardDescription}>{t(`season.checklist.${type}Desc`)}</Text>
 
       {items.map((item) => {
-        const st = state.checklists[type][item.id];
+        const st = entry.checklists[type][item.id];
         const checked = !!st?.done;
         return (
           <Pressable
@@ -280,22 +392,22 @@ function ChecklistPanel({
 
 function InspectionPanel({
   rule,
-  state,
-  update,
+  entry,
+  onUpdateInspection,
 }: {
   rule: ReturnType<typeof inspectionRule>;
-  state: SeasonState;
-  update: (next: SeasonState) => void;
+  entry: BikeEntry;
+  onUpdateInspection: (id: string, partial: Partial<InspectionState>) => void;
 }) {
   const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
-  const nextDue = rule.required ? computeNextDue(rule, state.bike.firstRegistration) : null;
-  const reminderId = state.inspection.reminderId;
+  const nextDue = rule.required ? computeNextDue(rule, entry.bike.firstRegistration) : null;
+  const reminderId = entry.inspection.reminderId;
   // What the currently-scheduled reminder was actually set for (persisted at
   // schedule time) — NOT recomputed from the live deadline, so the label always
   // reflects the real notification even after the bike's country/date change.
-  const scheduledFire = state.inspection.reminderFireDate;
-  const scheduledFor = state.inspection.nextDueDate;
+  const scheduledFire = entry.inspection.reminderFireDate;
+  const scheduledFor = entry.inspection.nextDueDate;
   // The scheduled reminder no longer matches the current computed deadline.
   const isStale = !!reminderId && !!scheduledFor && scheduledFor !== nextDue;
 
@@ -326,14 +438,10 @@ function InspectionPanel({
         existingId: reminderId,
       });
       if (id) {
-        update({
-          ...state,
-          inspection: {
-            ...state.inspection,
-            reminderId: id,
-            nextDueDate: nextDue,
-            reminderFireDate: fire ? fire.toISOString() : undefined,
-          },
+        onUpdateInspection(entry.id, {
+          reminderId: id,
+          nextDueDate: nextDue,
+          reminderFireDate: fire ? fire.toISOString() : undefined,
         });
         Alert.alert(
           t("season.inspection.reminderSetTitle"),
@@ -353,14 +461,10 @@ function InspectionPanel({
   const onCancelReminder = async () => {
     hapticLight();
     await cancelInspectionReminder(reminderId);
-    update({
-      ...state,
-      inspection: {
-        ...state.inspection,
-        reminderId: undefined,
-        nextDueDate: undefined,
-        reminderFireDate: undefined,
-      },
+    onUpdateInspection(entry.id, {
+      reminderId: undefined,
+      nextDueDate: undefined,
+      reminderFireDate: undefined,
     });
   };
 
@@ -522,7 +626,45 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,102,0,0.25)",
   },
+  nudgeWeather: {
+    backgroundColor: "rgba(125,211,252,0.08)",
+    borderColor: "rgba(125,211,252,0.30)",
+  },
   nudgeText: { color: COLORS.body, fontSize: 14, flex: 1 },
+  bikeBar: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 16,
+  },
+  bikeChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    maxWidth: "100%",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.card,
+  },
+  bikeChipActive: { borderColor: COLORS.brand, backgroundColor: "rgba(255,102,0,0.10)" },
+  bikeChipText: { color: COLORS.muted, fontSize: 13, fontWeight: "700", flexShrink: 1 },
+  bikeChipTextActive: { color: COLORS.brand },
+  bikeAddChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: "rgba(255,102,0,0.5)",
+    backgroundColor: "rgba(255,102,0,0.06)",
+  },
+  bikeAddText: { color: COLORS.brand, fontSize: 13, fontWeight: "700" },
   card: {
     backgroundColor: COLORS.card,
     padding: 16,

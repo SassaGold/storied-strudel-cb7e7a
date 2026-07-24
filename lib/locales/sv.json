@@ -357,6 +357,20 @@
       "reminderSetLabelNoDate": "Påminnelse inställd",
       "cancelReminder": "Avbryt påminnelse",
       "reminderStale": "Hojens uppgifter har ändrats – tryck Uppdatera för att boka om påminnelsen."
+    },
+    "bikes": {
+      "add": "Lägg till hoj",
+      "defaultName": "Hoj {{n}}",
+      "remove": "Ta bort hoj",
+      "removeTitle": "Ta bort hoj?",
+      "removeBody": "Ta bort ”{{name}}” med checklistor och påminnelse?",
+      "removeCancel": "Avbryt",
+      "removeConfirm": "Ta bort",
+      "empty": "Lägg till en hoj för att följa säsong och besiktning."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost väntas (ner mot {{temp}}°C) – dags att vinterförvara.",
+      "springWarming": "Milt väder på väg ({{temp}}°C) – bra tid för vårrustning."
     }
   },
   "sos": {

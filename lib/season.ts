@@ -3,12 +3,13 @@
 // rhythm of a bike: winterize in autumn, wake it up in spring, stay on top of
 // the country-mandated inspection.
 //
-// Scaffold scope: a SINGLE bike is modelled for now. The store is intentionally
-// shaped so a `bikes: Bike[]` list can be layered on later without a data
-// migration — everything hangs off the one `SeasonState` object today.
+// The store holds a LIST of bikes (a garage), each with its own checklists and
+// inspection reminder; `selectedBikeId` tracks which one the screen is showing.
+// loadSeasonState() migrates the original single-bike shape forward.
 // See launch/mc-season-spec.md (in the ReceiptVault repo) for the full spec.
 
 import { storage } from "./storage";
+import type { ForecastDay } from "./weather";
 
 export const SEASON_STORAGE_KEY = "season_state_v1";
 
@@ -59,10 +60,17 @@ export interface InspectionState {
   reminderId?: string;
 }
 
-export interface SeasonState {
+/** One bike in the garage, with its own checklists and inspection. */
+export interface BikeEntry {
+  id: string;
   bike: Bike;
   checklists: Record<ChecklistType, Record<string, ChecklistItemState>>;
   inspection: InspectionState;
+}
+
+export interface SeasonState {
+  bikes: BikeEntry[];
+  selectedBikeId: string | null;
 }
 
 // ── Checklist definitions ─────────────────────────────────────────────────────
@@ -123,35 +131,205 @@ export function currentSeasonPhase(): SeasonPhase {
   return seasonPhase(new Date().getMonth());
 }
 
-// ── Defaults & persistence ────────────────────────────────────────────────────
+// ── Weather-aware nudge ───────────────────────────────────────────────────────
+// The base nudge comes from the calendar phase. When recent forecast data is
+// available (from the RIDER HQ weather cache), we can surface a timelier one:
+// frost incoming while the bike is still out, or a warm spell during spring prep.
+// Pure + testable; returns null when there's no strong signal (caller falls back
+// to the phase nudge).
 
-const emptyChecklist = (): Record<string, ChecklistItemState> => ({});
+/** Temp (°C) at/below which we warn about frost while the bike is still out. */
+export const FROST_THRESHOLD_C = 1;
+/** Temp (°C) at/above which a spring day counts as good prep weather. */
+export const SPRING_WARM_C = 12;
 
-export function defaultSeasonState(): SeasonState {
+export type WeatherSeasonNudge =
+  | { key: "frostSoon"; tempC: number }
+  | { key: "springWarming"; tempC: number }
+  | null;
+
+export function weatherSeasonNudge(
+  phase: SeasonPhase,
+  forecast: { minTempC: number; maxTempC: number }[] | null | undefined
+): WeatherSeasonNudge {
+  if (!forecast || forecast.length === 0) return null;
+  const minLow = Math.min(...forecast.map((d) => d.minTempC));
+  const maxHigh = Math.max(...forecast.map((d) => d.maxTempC));
+  // Frost warning only while the bike is plausibly still out (riding / put-away).
+  if ((phase === "riding" || phase === "winterize") && minLow <= FROST_THRESHOLD_C) {
+    return { key: "frostSoon", tempC: Math.round(minLow) };
+  }
+  // A warm spell during spring prep is a good push to get the bike ready.
+  if (phase === "springPrep" && maxHigh >= SPRING_WARM_C) {
+    return { key: "springWarming", tempC: Math.round(maxHigh) };
+  }
+  return null;
+}
+
+/** RIDER HQ caches its last weather snapshot here; we borrow the forecast. */
+const RIDERHQ_CACHE_KEY = "cache_riderhq_v1";
+const FORECAST_MAX_AGE_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+/**
+ * Read the cached RIDER HQ forecast (if reasonably fresh) for the weather-aware
+ * nudge. Returns null when absent, stale, or malformed — the nudge then falls
+ * back to the calendar phase. Never throws.
+ */
+export async function loadCachedForecast(now: number = Date.now()): Promise<ForecastDay[] | null> {
+  try {
+    const raw = await storage.getItem(RIDERHQ_CACHE_KEY);
+    if (!raw) return null;
+    const snap = JSON.parse(raw);
+    if (typeof snap?.ts !== "number" || now - snap.ts > FORECAST_MAX_AGE_MS) return null;
+    const f = snap?.weather?.forecast;
+    return Array.isArray(f) && f.length > 0 ? (f as ForecastDay[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+// ── Bikes / garage ────────────────────────────────────────────────────────────
+
+function makeBikeId(): string {
+  return `bike_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+export function emptyBikeEntry(): BikeEntry {
   return {
+    id: makeBikeId(),
     bike: { name: "", country: "NO" },
-    checklists: { winter: emptyChecklist(), spring: emptyChecklist() },
+    checklists: { winter: {}, spring: {} },
     inspection: { source: "entered" },
   };
 }
 
-/** Load persisted season state, or a fresh default when absent/corrupt. */
+export function defaultSeasonState(): SeasonState {
+  const entry = emptyBikeEntry();
+  return { bikes: [entry], selectedBikeId: entry.id };
+}
+
+/** The currently-selected bike, or the first one, or null when the garage is empty. */
+export function selectedBike(state: SeasonState): BikeEntry | null {
+  return state.bikes.find((b) => b.id === state.selectedBikeId) ?? state.bikes[0] ?? null;
+}
+
+export function addBike(state: SeasonState): SeasonState {
+  const entry = emptyBikeEntry();
+  return { bikes: [...state.bikes, entry], selectedBikeId: entry.id };
+}
+
+export function selectBike(state: SeasonState, id: string): SeasonState {
+  return { ...state, selectedBikeId: id };
+}
+
+/** Remove a bike; reselect a remaining one (or null) if it was selected. */
+export function removeBike(state: SeasonState, id: string): SeasonState {
+  const bikes = state.bikes.filter((b) => b.id !== id);
+  const selectedBikeId =
+    state.selectedBikeId === id ? (bikes[0]?.id ?? null) : state.selectedBikeId;
+  return { bikes, selectedBikeId };
+}
+
+function mapBike(state: SeasonState, id: string, fn: (b: BikeEntry) => BikeEntry): SeasonState {
+  return { ...state, bikes: state.bikes.map((b) => (b.id === id ? fn(b) : b)) };
+}
+
+export function updateBike(state: SeasonState, id: string, partial: Partial<Bike>): SeasonState {
+  return mapBike(state, id, (b) => ({ ...b, bike: { ...b.bike, ...partial } }));
+}
+
+export function updateInspection(
+  state: SeasonState,
+  id: string,
+  partial: Partial<InspectionState>
+): SeasonState {
+  return mapBike(state, id, (b) => ({ ...b, inspection: { ...b.inspection, ...partial } }));
+}
+
+/** Toggle a checklist item on a bike, stamping/removing completedAt. Pure. */
+export function toggleChecklistItem(
+  state: SeasonState,
+  bikeId: string,
+  type: ChecklistType,
+  itemId: string
+): SeasonState {
+  return mapBike(state, bikeId, (b) => {
+    const nowDone = !b.checklists[type][itemId]?.done;
+    return {
+      ...b,
+      checklists: {
+        ...b.checklists,
+        [type]: {
+          ...b.checklists[type],
+          [itemId]: nowDone
+            ? { done: true, completedAt: new Date().toISOString() }
+            : { done: false },
+        },
+      },
+    };
+  });
+}
+
+/** Count of completed items in a bike's checklist, for the progress indicator. */
+export function checklistProgress(
+  entry: BikeEntry,
+  type: ChecklistType
+): { done: number; total: number } {
+  const items = CHECKLIST_ITEMS[type];
+  const done = items.filter((i) => entry.checklists[type][i.id]?.done).length;
+  return { done, total: items.length };
+}
+
+// ── Persistence ────────────────────────────────────────────────────────────────
+
+function sanitizeEntry(raw: unknown): BikeEntry {
+  const e = (raw ?? {}) as Partial<BikeEntry> & { bike?: Partial<Bike> };
+  return {
+    id: typeof e.id === "string" ? e.id : makeBikeId(),
+    bike: { name: "", country: "NO", ...e.bike },
+    checklists: {
+      winter: { ...e.checklists?.winter },
+      spring: { ...e.checklists?.spring },
+    },
+    inspection: { source: "entered", ...e.inspection },
+  };
+}
+
+/**
+ * Parse (and migrate) a stored payload into a valid SeasonState. Pure — split
+ * out from loadSeasonState so migration is unit-testable without storage.
+ */
+export function parseSeasonState(raw: string | null): SeasonState {
+  if (!raw) return defaultSeasonState();
+  try {
+    const parsed = JSON.parse(raw);
+
+    // Legacy single-bike shape: { bike, checklists, inspection }.
+    if (parsed && parsed.bike && !parsed.bikes) {
+      const entry = sanitizeEntry(parsed);
+      return { bikes: [entry], selectedBikeId: entry.id };
+    }
+
+    // Current shape: { bikes, selectedBikeId }.
+    if (parsed && Array.isArray(parsed.bikes)) {
+      const bikes = parsed.bikes.map(sanitizeEntry);
+      if (bikes.length === 0) return defaultSeasonState();
+      const selectedBikeId = bikes.some((b: BikeEntry) => b.id === parsed.selectedBikeId)
+        ? parsed.selectedBikeId
+        : bikes[0].id;
+      return { bikes, selectedBikeId };
+    }
+
+    return defaultSeasonState();
+  } catch {
+    return defaultSeasonState();
+  }
+}
+
+/** Load persisted season state, migrating the old single-bike shape forward. */
 export async function loadSeasonState(): Promise<SeasonState> {
   try {
-    const raw = await storage.getItem(SEASON_STORAGE_KEY);
-    if (!raw) return defaultSeasonState();
-    const parsed = JSON.parse(raw) as Partial<SeasonState>;
-    // Shallow-merge onto defaults so older/partial payloads stay valid as the
-    // shape grows.
-    const base = defaultSeasonState();
-    return {
-      bike: { ...base.bike, ...parsed.bike },
-      checklists: {
-        winter: { ...base.checklists.winter, ...parsed.checklists?.winter },
-        spring: { ...base.checklists.spring, ...parsed.checklists?.spring },
-      },
-      inspection: { ...base.inspection, ...parsed.inspection },
-    };
+    return parseSeasonState(await storage.getItem(SEASON_STORAGE_KEY));
   } catch {
     return defaultSeasonState();
   }
@@ -162,36 +340,4 @@ export async function saveSeasonState(state: SeasonState): Promise<void> {
   try {
     await storage.setItem(SEASON_STORAGE_KEY, JSON.stringify(state));
   } catch {}
-}
-
-/** Toggle a checklist item, stamping/removing completedAt. Pure — returns a new state. */
-export function toggleChecklistItem(
-  state: SeasonState,
-  type: ChecklistType,
-  itemId: string
-): SeasonState {
-  const current = state.checklists[type][itemId];
-  const nowDone = !current?.done;
-  return {
-    ...state,
-    checklists: {
-      ...state.checklists,
-      [type]: {
-        ...state.checklists[type],
-        [itemId]: nowDone
-          ? { done: true, completedAt: new Date().toISOString() }
-          : { done: false },
-      },
-    },
-  };
-}
-
-/** Count of completed items in a checklist, for the progress indicator. */
-export function checklistProgress(
-  state: SeasonState,
-  type: ChecklistType
-): { done: number; total: number } {
-  const items = CHECKLIST_ITEMS[type];
-  const done = items.filter((i) => state.checklists[type][i.id]?.done).length;
-  return { done, total: items.length };
 }

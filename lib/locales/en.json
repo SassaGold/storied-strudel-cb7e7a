@@ -357,6 +357,20 @@
       "reminderSetLabelNoDate": "Reminder set",
       "cancelReminder": "Cancel reminder",
       "reminderStale": "Your bike's details changed — tap Update to reschedule the reminder."
+    },
+    "bikes": {
+      "add": "Add bike",
+      "defaultName": "Bike {{n}}",
+      "remove": "Remove bike",
+      "removeTitle": "Remove bike?",
+      "removeBody": "Remove “{{name}}” and its checklists & reminder?",
+      "removeCancel": "Cancel",
+      "removeConfirm": "Remove",
+      "empty": "Add a bike to start tracking its season and inspection."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost forecast (down to {{temp}}°C) — time to winterize.",
+      "springWarming": "Mild weather ahead ({{temp}}°C) — great for spring prep."
     }
   },
   "sos": {

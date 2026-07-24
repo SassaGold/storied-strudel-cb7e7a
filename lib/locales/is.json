@@ -357,6 +357,20 @@
       "reminderSetLabelNoDate": "Áminning stillt",
       "cancelReminder": "Hætta við áminningu",
       "reminderStale": "Upplýsingar hjólsins hafa breyst – ýttu á Uppfæra til að endurstilla áminninguna."
+    },
+    "bikes": {
+      "add": "Bæta við hjóli",
+      "defaultName": "Hjól {{n}}",
+      "remove": "Fjarlægja hjól",
+      "removeTitle": "Fjarlægja hjól?",
+      "removeBody": "Fjarlægja „{{name}}“ með gátlistum og áminningu?",
+      "removeCancel": "Hætta við",
+      "removeConfirm": "Fjarlægja",
+      "empty": "Bættu við hjóli til að fylgjast með tímabili og skoðun."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost í vændum (niður í {{temp}}°C) – kominn tími á vetrargeymslu.",
+      "springWarming": "Mild veðurspá ({{temp}}°C) – góður tími fyrir vorundirbúning."
     }
   },
   "sos": {

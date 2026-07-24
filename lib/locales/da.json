@@ -357,6 +357,20 @@
       "reminderSetLabelNoDate": "Påmindelse indstillet",
       "cancelReminder": "Annuller påmindelse",
       "reminderStale": "Motorcyklens oplysninger er ændret – tryk Opdater for at planlægge påmindelsen igen."
+    },
+    "bikes": {
+      "add": "Tilføj motorcykel",
+      "defaultName": "Motorcykel {{n}}",
+      "remove": "Fjern motorcykel",
+      "removeTitle": "Fjern motorcykel?",
+      "removeBody": "Fjern “{{name}}” med tjeklister og påmindelse?",
+      "removeCancel": "Annuller",
+      "removeConfirm": "Fjern",
+      "empty": "Tilføj en motorcykel for at følge sæson og syn."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost i vente (ned mod {{temp}}°C) – tid til vinteropbevaring.",
+      "springWarming": "Mildt vejr på vej ({{temp}}°C) – god tid til forårsklargøring."
     }
   },
   "sos": {

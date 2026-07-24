@@ -357,6 +357,20 @@
       "reminderSetLabelNoDate": "Påminnelse satt",
       "cancelReminder": "Avbryt påminnelse",
       "reminderStale": "Sykkelens opplysninger er endret – trykk Oppdater for å planlegge påminnelsen på nytt."
+    },
+    "bikes": {
+      "add": "Legg til sykkel",
+      "defaultName": "Sykkel {{n}}",
+      "remove": "Fjern sykkel",
+      "removeTitle": "Fjerne sykkel?",
+      "removeBody": "Fjerne «{{name}}» med sjekklister og påminnelse?",
+      "removeCancel": "Avbryt",
+      "removeConfirm": "Fjern",
+      "empty": "Legg til en sykkel for å følge sesong og kontroll."
+    },
+    "weatherNudge": {
+      "frostSoon": "Frost meldt (ned mot {{temp}}°C) – på tide å vinterlagre.",
+      "springWarming": "Mildt vær i vente ({{temp}}°C) – fin tid for vårklargjøring."
     }
   },
   "sos": {
