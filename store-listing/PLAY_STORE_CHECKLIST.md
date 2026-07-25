@@ -33,7 +33,10 @@ Use this checklist before submitting to Google Play.
 - [x] Privacy statement in About screen (links to privacy policy)
 - [x] `store-listing/privacy_policy.md` created (covers background location, Trip Logger data, third-party APIs)
 - [x] Listing copy in `store-listing/locales/{en-US,no-NO,sv-SE,da-DK,is-IS}/` — all five, Vegvísir-branded (title ≤30, short ≤80, full ≤4000 — all verified) ✓
-- [x] Branded screenshots + feature graphics in `store-listing/graphics/` (rerun via `node scripts/render-store-assets.js`) ✓
+- [x] Branded screenshots + feature graphics in `store-listing/graphics/` ✓
+  — ⚠️ **not** regenerable with `scripts/render-store-assets.js`; that script is
+  superseded and now refuses to run without `--force`. See "Regenerating store
+  graphics" below.
 - [x] All map tiles served from OpenStreetMap (no Google Maps API key required)
 - [x] `edgeToEdgeEnabled: true` in `app.json` for Android 15+
 
@@ -98,8 +101,25 @@ Source of the assets, for regenerating or for the next release:
 | Email | support@sassagold.com |
 | Privacy policy URL | Hosted URL from step 1 above |
 
-Regenerate graphics with `node scripts/render-store-assets.js` (raw captures in
-`store-listing/raw/`). Push text and release notes with
+### Regenerating store graphics (read before trying)
+
+**`scripts/render-store-assets.js` does not reproduce the committed assets.** It
+renders a phone-mockup feature graphic titled "Where Am I" and wraps screenshots
+in a marketing panel; the committed assets are a Vegvísir stave-and-wordmark
+graphic and raw unframed captures. It writes to the same paths, so running it
+destroys them. It now refuses to run without `--force`.
+
+- **Feature graphics — not currently reproducible.** The generator was never
+  committed (`dda7b26` added the PNGs and the uploader, no renderer) and the
+  background photo is not in the repo. Treat the committed PNGs as the source of
+  truth. The stave survives at `store-listing/brand/vegvisir-gold-ring.png`.
+- **Screenshots — reproducible.** They are raw 1080×1920 device captures. Take
+  them with `adb exec-out screencap -p` against a build of the version being
+  shipped, one set per locale, matching the existing 8-shot order.
+- ⚠️ **The 40 screenshots now in review show "Where Am I" in the app header** —
+  they were captured from a 1.3.0-era build. Re-capture them for 1.4.1.
+
+Push text and release notes with
 `node scripts/push-play-listing.js --key <sa.json> --notes-version <x.y.z>`
 (`--dry-run` first to see the length report). For future release notes follow
 `whats-new-template.txt` — lead with rider benefits, not internal labels like
