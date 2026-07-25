@@ -26,7 +26,7 @@ import { LOCATION_TASK_NAME, clearBgPoints, isLocationTaskDefined, readBgPoints 
 import { useLocationPermission } from "../../lib/locationPermission";
 import { OSM_USER_AGENT, TRIP_MAX_GPS_ACCURACY_M } from "../../lib/config";
 import { boundsOf, buildTiles, computeTileLayout, padBounds, projectToScreen } from "../../lib/osmTiles";
-import { mapMatchRouteCached, downsampleCoords } from "../../lib/mapMatch";
+import { downsampleCoords } from "../../lib/coords";
 import { storage } from "../../lib/storage";
 import {
   buildRide,
@@ -1233,31 +1233,17 @@ const RideMapPreview = memo(function RideMapPreview({ route, fullscreen = false 
   /** Extra space around the route so map context is visible (fraction of extent). */
   const ROUTE_PAD = 0.3;
 
-  // Use map-matched (road-snapped) route for display. The cached variant makes
-  // collapse/re-expand and the fullscreen modal reuse one OSRM response.
-  const [matchedRoute, setMatchedRoute] = useState<{ latitude: number; longitude: number }[] | null>(null);
   /** Number of map tiles that failed to load (offline / tile server down). */
   const [tileErrors, setTileErrors] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    mapMatchRouteCached(route).then((matched) => {
-      if (!cancelled) setMatchedRoute(matched);
-    });
-    return () => { cancelled = true; };
-  }, [route]);
-
-  // Use matched route for rendering if available, otherwise fall back to raw GPS points.
-  const pts = useMemo(
-    () =>
-      matchedRoute
-        ? downsampleCoords(matchedRoute.map((p, i) => ({
-            ...p,
-            timestamp: route[Math.min(i, route.length - 1)]?.timestamp ?? 0,
-          })), 500)
-        : downsampleCoords(route, 200),
-    [matchedRoute, route],
-  );
+  // Routes render straight from the recorded GPS points. Road-snapping via the
+  // public OSRM demo server was removed on 2026-07-25 — it uploaded the whole
+  // trip trace to a third party on every render for a cosmetic gain, and it
+  // already fell back to exactly this whenever OSRM was slow or unavailable.
+  // Points are captured every 5 m / 3 s at BestForNavigation, so the raw trace
+  // is dense enough to read as the route ridden; 500 is the same cap the
+  // snapped geometry used, kept so the line kept its smoothness.
+  const pts = useMemo(() => downsampleCoords(route, 500), [route]);
 
   // Find the padded bounding box that contains the whole route.
   const paddedBounds = useMemo(() => {

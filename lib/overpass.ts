@@ -88,8 +88,8 @@ export async function fetchOverpass(
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          // OSM usage etiquette: identify the app (also sent to Nominatim,
-          // OSRM and the tile servers). Reduces the risk of being throttled.
+          // OSM usage etiquette: identify the app (also sent to Nominatim and
+          // the tile servers). Reduces the risk of being throttled.
           "User-Agent": OSM_USER_AGENT,
           Accept: "application/json",
         },
@@ -121,7 +121,7 @@ export async function fetchOverpass(
 /**
  * fetch() with an AbortController timeout — a stalled socket otherwise hangs
  * forever (React Native fetch has no default timeout). Used for all non-Overpass
- * HTTP calls (Nominatim, Open-Meteo, OSRM, Wikipedia); fetchOverpass has its own
+ * HTTP calls (Nominatim, Open-Meteo, Wikipedia); fetchOverpass has its own
  * per-mirror timeout handling above.
  */
 export async function fetchWithTimeout(

@@ -37,7 +37,7 @@ export const OVERPASS_DEFAULT_TIMEOUT_MS = 40_000;
 /** Overpass timeout for road-condition queries (faster, smaller result set). */
 export const OVERPASS_ROAD_TIMEOUT_MS = 15_000;
 
-/** Timeout for plain HTTP fetches (Nominatim, Open-Meteo, OSRM, Wikipedia). */
+/** Timeout for plain HTTP fetches (Nominatim, Open-Meteo, Wikipedia). */
 export const HTTP_FETCH_TIMEOUT_MS = 15_000;
 
 /** Search radius for emergency POIs (metres). */
@@ -172,18 +172,16 @@ export const TRIP_LOCATION_INTERVAL_MS = 1_500;
  *  trip distance. A typical good fix is < 10 m; > 40 m is unreliable. */
 export const TRIP_MAX_GPS_ACCURACY_M = 40;
 
-// ── OSRM map matching ─────────────────────────────────────────────────────────
-
-/** OSRM public demo "match" service base URL (snaps GPS traces to roads). No API key. */
-export const OSRM_MATCH_BASE_URL = "https://router.project-osrm.org/match/v1/driving/";
-
-/** Maximum number of coordinates OSRM accepts per match request. */
-export const OSRM_MAX_COORDS_PER_REQUEST = 100;
-
-/** Allowed per-point GPS deviation (metres) when matching a trace to roads. */
-export const OSRM_MATCH_RADIUS_M = 50;
-
 // ── Privacy ───────────────────────────────────────────────────────────────────
+//
+// Removed 2026-07-25: OSRM_MATCH_BASE_URL / OSRM_MAX_COORDS_PER_REQUEST /
+// OSRM_MATCH_RADIUS_M, which pointed at the public OSRM demo server
+// (router.project-osrm.org) and snapped recorded rides to the road network.
+// That uploaded the whole trip trace — coordinates and timestamps — to a third
+// party automatically whenever a route was displayed. Routes now draw from the
+// raw GPS points (lib/coords.ts). Do not reintroduce a route-shape upload
+// without an explicit user opt-in and a privacy-policy update; it is the only
+// thing that ever put trip data off-device.
 
 /** Publicly hosted privacy policy URL shown in the location-disclosure modal. */
 export const PRIVACY_POLICY_URL = "https://sassagold.com/privacy";

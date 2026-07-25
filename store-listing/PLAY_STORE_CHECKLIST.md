@@ -16,6 +16,8 @@ Use this checklist before submitting to Google Play.
   - `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION` — POI search, weather, map
   - `ACCESS_BACKGROUND_LOCATION` — Trip Logger background GPS recording
   - `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_LOCATION` — Android foreground service notification during trip recording
+  - `POST_NOTIFICATIONS` — required on Android 13+ for the foreground-service
+    notification to be visible (requested in `app/(tabs)/triplogger.tsx`)
 - [x] `expo-location` plugin configured in `app.json` with background location enabled
 - [x] `expo-task-manager` plugin configured in `app.json`
 - [x] Background location task implemented (`lib/locationTask.ts`) — writes GPS points to AsyncStorage while screen is locked
@@ -103,18 +105,67 @@ Regenerate graphics with `node scripts/render-store-assets.js` (raw captures in
 `whats-new-template.txt` — lead with rider benefits, not internal labels like
 "Visual Overhaul Release".
 
+> **Steps 5–8 audited against the source on 2026-07-25.** Every claim below was
+> checked against the actual code, not carried forward from an earlier draft.
+> What follows is *what the app really does* — the Console state itself has
+> **not** been read, so treat these as the values to enter/verify, not as
+> confirmation that the Console already says this.
+
 ### 5. Content Rating
 Complete the content rating questionnaire in Play Console.
 Expected rating: **Everyone (3+)** — no violence, no adult content, no user interaction.
 
+✅ **Verified.** No user-generated content, messaging, social or sharing-to-other-users
+surface exists in the app. GPX export (`lib/gpx.ts`) hands a file to the Android
+share sheet on explicit user action — that is the user exporting their own data,
+not in-app user interaction, and does not change the rating.
+
 ### 6. App Content Declaration
 In Play Console → App Content, declare:
-- **Ads:** No ads
+- **Ads:** No ads ✅ verified — no ad SDK in `package.json`
 - **Data Safety:**
-  - Location: used on-device and anonymised coordinates sent to third-party open APIs (Nominatim, Overpass, Open-Meteo). Not shared with Vegvísir servers.
-  - Trip data: stored only on-device, never uploaded.
+  - **Location — collected AND transferred off-device.** Precise coordinates are
+    sent to third-party map and weather APIs (full list below). Not sent to any
+    SassaGold server — there is no SassaGold backend.
+  - **Trip data — on-device only.** Recorded routes, distances and statistics
+    live in on-device AsyncStorage and are not transmitted. True as of the OSRM
+    removal below; it was **not** true in 1.4.0 and earlier.
 - **Target Audience:** All ages (no children-targeted content)
-- **Background Location:** Used only while a trip is actively being recorded in the Trip Logger. Not used at any other time.
+- **Background Location:** Used only while a trip is actively being recorded in the Trip Logger. Not used at any other time. ✅ verified — see step 7.
+
+#### Trip routes used to be sent off-device — removed 2026-07-25
+
+The 1.4.0 and earlier builds sent each recorded ride's GPS trace — coordinates
+**and** per-point timestamps — to the public OSRM demo server
+`router.project-osrm.org`, to snap the route to roads for display. It fired
+automatically from a `useEffect` whenever a trip route was rendered, with no
+user opt-in, so under Play's Data safety definitions it was *collection and
+transfer* of precise location to a third party.
+
+It was removed rather than declared: the feature was cosmetic, the demo server
+carries no uptime or privacy guarantee, and the code already fell back to raw
+GPS points whenever OSRM was slow or failed to match. Routes now render from the
+recorded points directly (`lib/coords.ts`). Trip statistics never used OSRM and
+are unchanged. **If a route-shape upload is ever reintroduced, it needs an
+explicit user opt-in, a privacy-policy update, and a Data-safety change** — it
+was the only thing that ever put trip data off-device.
+
+#### Complete list of hosts the app contacts (audited 2026-07-25, `lib/config.ts`)
+
+| Host | Purpose | What leaves the device | Declared in privacy policy? |
+|---|---|---|---|
+| `nominatim.openstreetmap.org` | reverse geocoding | current coordinates | ✅ yes |
+| `overpass-api.de` | POI queries | current coordinates | ✅ yes |
+| `overpass.kumi.systems` | Overpass mirror/fallback | current coordinates | ✅ added 2026-07-25 |
+| `maps.mail.ru` | Overpass mirror/fallback | current coordinates | ✅ added 2026-07-25 |
+| `api.open-meteo.com` | weather | current coordinates | ✅ yes |
+| `tile.openstreetmap.de` | map tiles | coordinates, via tile path per pan/zoom | ✅ added 2026-07-25 |
+| `*.wikipedia.org` | place descriptions | place title (not coordinates) | ✅ yes |
+| `www.yr.no` | outbound link to forecast page | nothing until the user taps | n/a |
+
+`maps.mail.ru` is a Russian-operated host taking rider coordinates as an Overpass
+fallback. It is now disclosed in all five locales, but whether to keep it at all
+is still an open product decision.
 
 ### 7. Background Location Permission Declaration
 Google Play will request a **Prominent Disclosure** for `ACCESS_BACKGROUND_LOCATION`.
@@ -123,6 +174,19 @@ In Play Console → App Content → Sensitive app permissions, provide:
 - **Core functionality:** Trip Logger records GPS route and distance even when the screen is locked.
 - **Why background access is needed:** Without background location, GPS tracking stops when the screen locks during a ride, resulting in incomplete route data.
 - The foreground service notification ("Recording your ride in the background") is shown to users while background tracking is active.
+
+✅ **Verified against the source.** `ACCESS_BACKGROUND_LOCATION` is declared in
+`app.json:15` and `isAndroidBackgroundLocationEnabled: true` is set on the
+`expo-location` plugin. `Location.startLocationUpdatesAsync` is called in exactly
+one place (`app/(tabs)/triplogger.tsx:429`), inside the user's Start action, and
+only after `getBackgroundPermissionsAsync()` returns `granted` — so the app never
+attempts background tracking on a refusal, it silently degrades to
+foreground-only `watchPositionAsync`. It is stopped on Stop
+(`triplogger.tsx:297`) and on unmount (`triplogger.tsx:585`). The background task
+(`lib/locationTask.ts`) writes `{latitude, longitude, timestamp}` to on-device
+AsyncStorage only and performs **no** network I/O — the off-device transfer in
+step 6 happens later, at render time, not in the background service.
+`showsBackgroundLocationIndicator: true` is set.
 
 ### 8. Foreground Service Permission Declaration
 Google Play will also ask whether the app uses any foreground service permissions.
@@ -133,7 +197,22 @@ For this app, the correct declaration is:
 - **User-facing feature:** Trip Logger records the ride route, distance, and speed while the phone is locked.
 - **Why foreground service is needed:** Android requires an ongoing foreground service notification while continuous background GPS is active. Without it, trip recording stops or becomes unreliable when the app is backgrounded.
 - **User trigger:** The service starts only after the user explicitly taps Start in Trip Logger and stops when the user ends the recording.
-- **Notification shown to the user:** `Vegvísir Trip Logger` / `Recording your ride in the background.`
+- **Notification shown to the user:** `Vegvísir · Trip Logger` / `Recording your ride in the background.`
+
+✅ **Verified.** `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_LOCATION` are declared
+(`app.json:16-17`) and `location` is the correct and only service type — the
+`foregroundService` block at `triplogger.tsx:434` is attached to a location
+update request and nothing else. The notification strings above are
+`triplog.notifTitle` / `triplog.notifBody`, quoted verbatim from
+`lib/locales/en.json`; the title uses a **middle dot** (`Vegvísir · Trip Logger`),
+which this checklist previously mis-transcribed as a plain space. The strings are
+localised, so a reviewer on a no/sv/da/is device sees that locale's wording.
+
+⚠️ **`POST_NOTIFICATIONS` is declared (`app.json:18`) but was missing from the
+"Already Done" permission list above.** It is genuinely used — `expo-notifications`
+is requested at `triplogger.tsx:373` — and Android 13+ requires it for the
+foreground-service notification to be visible at all. Include it if the Console
+asks for a per-permission justification.
 
 Recommended evidence for Play review:
 - Short video showing the user starting Trip Logger, locking the screen, and the persistent notification remaining visible while the ride is recorded.
