@@ -1,5 +1,26 @@
 <!doctype html>
-<html><body style="margin:0;background:#111">
+<!--
+  Generates the SassaGold Studios Play developer page assets:
+  header 4096x2304 and developer icon 512x512.
+
+  HOW TO RUN — from the parent workspace (the directory containing
+  storied-strudel-cb7e7a/ and sassagold-landing/):
+
+      node tools/render.js storied-strudel-cb7e7a/store-listing/brand/studio-brand-generator.html \
+        --only=header,logo --jpeg=header --flatten=logo --quality=90
+
+  --flatten on the logo is REQUIRED: canvas.toDataURL always emits RGBA, and
+  Play demands "JPEG or 24-bit PNG (not transparent)" for both fields. Play
+  also caps each at 1 MB, which is why the header ships as JPEG — the lossless
+  PNG master is ~2.7 MB and would be rejected.
+
+  The p96/p48/proof canvases are legibility checks, not deliverables: Play
+  renders the developer icon at roughly those sizes, and an earlier draft with
+  thin spikes disappeared entirely at 48px.
+
+  The starfield uses a seeded PRNG so re-renders are byte-identical.
+-->
+<html><head><meta charset="utf-8"></head><body style="margin:0;background:#111">
 <canvas id="header" width="4096" height="2304"></canvas>
 <canvas id="logo" width="512" height="512"></canvas>
 <!-- legibility proofs: the sizes Play actually renders the logo at -->
