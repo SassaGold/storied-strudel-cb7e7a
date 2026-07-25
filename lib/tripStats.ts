@@ -2,7 +2,7 @@
 // Route distance/stats math and display helpers, extracted from
 // app/(tabs)/triplogger.tsx so they can be unit-tested without the component.
 
-import { downsampleCoords } from "./mapMatch";
+import { downsampleCoords } from "./coords";
 import { haversineMeters } from "./overpass";
 
 export type GpsPoint = { latitude: number; longitude: number; timestamp: number };
