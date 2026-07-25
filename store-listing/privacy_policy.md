@@ -68,9 +68,12 @@ directly from them; nothing about a recorded ride is sent anywhere. This data:
 Only if *you* choose to export a ride as a GPX file does it leave the device, via
 your own device's share sheet, to wherever you send it.
 
-> Until version 1.4.0 the app sent recorded routes to a third-party service
-> (`router.project-osrm.org`) to snap them to the road network for display. That
-> was removed on 2026-07-25; trip routes are no longer transmitted anywhere.
+> **Version note.** Versions 1.1.7 through 1.4.0 sent recorded routes to a
+> third-party service (`router.project-osrm.org`) to snap them to the road
+> network for display. That was removed on 2026-07-25 and takes effect in the
+> **first release after 1.4.0** — section 3 describes the app from that release
+> onward. If you are running 1.4.0 or earlier, your recorded routes are still
+> sent when a trip's route map is displayed.
 
 ---
 
