@@ -2,7 +2,7 @@
 
 A React Native / Expo app for motorcyclists. Find nearby restaurants, hotels, attractions, and motorcycle-specific POIs (fuel, repair, parking, clubs & tracks, ATMs), log your rides with GPS, and get riding weather, road conditions and emergency tools. Supports English, Spanish, German, French, Icelandic, Norwegian, Swedish, Danish, and Dutch.
 
-> **Current version: 1.4.3** (see [CHANGELOG.md](CHANGELOG.md)) — distributed as an Android app via Google Play, built in the cloud with [EAS Build](https://docs.expo.dev/build/introduction/).
+> **Current version: 1.4.1** (see [CHANGELOG.md](CHANGELOG.md)) — distributed as an Android app via Google Play, built in the cloud with [EAS Build](https://docs.expo.dev/build/introduction/).
 
 ---
 
