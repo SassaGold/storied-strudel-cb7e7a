@@ -52,9 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "QUICK NAVIGATE",
-    "badge": "🏍️ RIDER HQ",
-    "title": "Vegvísir – Explore. Ride. Discover",
+    "quickNav": "QUICK NAVIGATE",    "tagline": "Vegvísir – Explore. Ride. Discover",
     "slogan": "You will not lose your way.",
     "subtitle": "Your location & riding conditions.",
     "updateLocation": "UPDATE LOCATION",
