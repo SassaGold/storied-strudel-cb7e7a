@@ -7,7 +7,8 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.whereami`
-- [x] App version: kept in sync in `app.json` + `package.json` + `README.md` by `npm run version:patch` (currently **1.4.0**; **live on Play: 1.3.0**)
+- [x] App version: **1.4.0** in `app.json` (the source of truth `scripts/version-bump.js` reads), submitted to Play and awaiting review; **live on Play: 1.3.0** until review clears
+  - ⚠️ 1.4.0 was hand-edited into `app.json` rather than set with `npm run version:patch`, so `package.json` and `README.md` were left at 1.2.6 and had to be corrected by hand on 2026-07-25. Use `npm run version:*` for future bumps so all three stay in sync.
 - [x] Android `versionCode`: auto-incremented by EAS on each production build via `autoIncrement: true` in `eas.json`
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
@@ -47,61 +48,60 @@ The About screen links to this URL (`PRIVACY_POLICY_URL` in `lib/config.ts`); th
 source document lives at `docs/privacy-policy.html`.
 Paste the URL into Google Play Console → App Content → Privacy Policy.
 
-### 2. Screenshots (Required) — ✅ GENERATED, ready to upload
-Branded 1080×1920 panels live in `store-listing/graphics/<locale>/screenshots/`
-(8 per locale: Rider HQ, SOS, Garage, Trip, Food, Sleep, Explore, Language).
-Regenerate any time with `node scripts/render-store-assets.js` (raw captures in
-`store-listing/raw/`).
+### 2–4c. Store listing, graphics and translations — ✅ SUBMITTED, IN REVIEW
 
-Upload: Play Console → **Grow users → Store presence → Main store listing** →
-scroll to **Phone screenshots** → delete the old bare captures → upload all 8
-from `graphics/en-US/screenshots/` in numbered order.
+> **Verified directly in Play Console on 2026-07-25.** The publishing overview
+> reports *"Your changes are now in review"*; managed publishing is **off**, so
+> everything below goes live automatically as soon as Google's review clears.
+> **Do not edit these fields while the review is pending** — that stacks a second
+> set of changes on top of the ones under review.
 
-### 3. Feature Graphic (Required) — ✅ GENERATED, ready to upload
-`store-listing/graphics/<locale>/feature-graphic.png` (1024×500). Upload in the
-same Main store listing page under **Feature graphic**. This banner is what
-Play shows in search and promo placements — the listing currently has none.
+Submitted and awaiting review:
 
-### 4. Store Listing Entry
-In Google Play Console → **Grow users → Store presence → Main store listing**:
+| Item | Change in review |
+|------|------------------|
+| Production release | **1.4.0** — start full rollout |
+| en-US | app name → `Vegvísir – Nordic Ride Compass`, full description, phone screenshots, feature graphic |
+| no-NO | app name → `Vegvísir – Nordisk MC-kompass`, full description, phone screenshots, feature graphic |
+| is-IS | app name → `Vegvísir – áttaviti hjólafólks`, full description, phone screenshots, feature graphic |
+| da-DK | **added as a new language** (`Vegvísir – Nordisk MC-kompas`) + all required information |
+| sv-SE | **added as a new language** (`Vegvísir – Nordisk MC-kompass`) + all required information |
 
-| Field | Value |
-|-------|-------|
-| App name | `store-listing/locales/en-US/title.txt` (27 chars) |
-| Short description | `store-listing/locales/en-US/short_description.txt` |
-| Full description | `store-listing/locales/en-US/full_description.txt` |
-| App icon | Keep current (or `assets/images/icon.png`, 1024×1024) |
-| Feature graphic | `store-listing/graphics/en-US/feature-graphic.png` |
-| Phone screenshots | `store-listing/graphics/en-US/screenshots/01..08` |
+The submitted en-US copy was diffed against this repo and matches: app name is
+`title.txt` verbatim (30/30 characters — at the limit, no slack), and the full
+description is content-identical to `full_description.txt`. The short
+description already matched `short_description.txt` exactly, which is why Play
+lists no change for it — it is not an omission.
+
+**This clears the previous 🔴 warning.** The live listing was both stale
+("Where Am I — Ride Companion" at 1.3.0) and overstating functionality —
+promising "offline maps", "save routes" and "share highlights", features the app
+does not have, which is a Play policy problem and not merely untidy. Neither
+phrase appears in the submitted description. Until review clears, the *public*
+page still shows the old copy; that is review lag, not an unpushed change.
+
+Source of the assets, for regenerating or for the next release:
+
+| Field | Source |
+|-------|--------|
+| App name | `store-listing/locales/<locale>/title.txt` (≤30 chars) |
+| Short description | `store-listing/locales/<locale>/short_description.txt` (≤80) |
+| Full description | `store-listing/locales/<locale>/full_description.txt` (≤4000) |
+| App icon | Taken automatically from the uploaded AAB |
+| Feature graphic | `store-listing/graphics/<locale>/feature-graphic.png` (1024×500) |
+| Phone screenshots | `store-listing/graphics/<locale>/screenshots/01..08` (1080×1920) |
+| Release notes | `store-listing/locales/<locale>/whats-new-1.4.0.txt` (≤500) |
 | Category | **Travel & Local** |
 | Tags | motorcycle, biker, navigation, trip logger, POI |
 | Email | support@sassagold.com |
 | Privacy policy URL | Hosted URL from step 1 above |
 
-> ### 🔴 The live listing is stale in two ways — verified 2026-07-25
->
-> 1. **Still branded "Where Am I — Ride Companion" at 1.3.0.** The entire
->    Vegvísir rename (1.4.0) is prepared in this repo and has never been
->    published. The live page contains no mention of Vegvísir at all.
-> 2. **The live description promises features the app does not have** —
->    "offline maps", "save routes", "share highlights". That is the more urgent
->    of the two: a listing that overstates functionality is a Play policy
->    problem, not just a tidiness one, and it is the first thing a reviewer or
->    a disappointed user would point at.
->
-> Both are fixed by pushing the text in `locales/` — either by hand in Play
-> Console or with `node scripts/push-play-listing.js --key <sa.json>`.
-
-### 4b. Localized listings (all four additional locales)
-On the Main store listing page, top-right language selector → **Manage
-translations → Add translations** → add **Norwegian (no-NO)**, **Swedish
-(sv-SE)**, **Danish (da-DK)** and **Icelandic (is-IS)**. For each, paste the three text files from
-`store-listing/locales/<locale>/` and upload the 8 screenshots + feature
-graphic from `store-listing/graphics/<locale>/`.
-
-### 4c. "What's new" release notes
-Use `store-listing/locales/en-US/whats-new-template.txt` as the pattern —
-lead with rider benefits, not internal notes like "Visual Overhaul Release".
+Regenerate graphics with `node scripts/render-store-assets.js` (raw captures in
+`store-listing/raw/`). Push text and release notes with
+`node scripts/push-play-listing.js --key <sa.json> --notes-version <x.y.z>`
+(`--dry-run` first to see the length report). For future release notes follow
+`whats-new-template.txt` — lead with rider benefits, not internal labels like
+"Visual Overhaul Release".
 
 ### 5. Content Rating
 Complete the content rating questionnaire in Play Console.

@@ -4,7 +4,7 @@
 
 **Where Am I is now Vegvísir**, named after the Icelandic wayfinding stave. An in-place rename, not a new app: the package stays `com.sassagold.whereami`, so rides, garage and settings survive the update with nothing to reinstall. Ships a new gold stave icon set, splash screen and wordmark, a localized slogan in all five languages, and refreshed store listings (title, short and full description, 1.4.0 release notes) for **all five Play locales** — en-US, no-NO, sv-SE, da-DK, is-IS — plus localized store graphics and a marketing kit (wallpapers, promo banner, generators). Also adds `scripts/push-play-listing.js`, which pushes listing text and release notes to Play through the Publishing API with a service-account key.
 
-> ⚠️ **Not yet on Play.** The live listing is still "Where Am I — Ride Companion" at 1.3.0. Everything in this release is prepared in-repo and unpublished.
+> ⏳ **Submitted to Play, in review** (verified in Play Console 2026-07-25). The 1.4.0 production release and the store listings for all five locales — including da-DK and sv-SE as brand-new languages — are in Google's review queue. Managed publishing is off, so they go live as soon as review clears. Until then the public Play page still shows "Where Am I — Ride Companion" at 1.3.0; that is review lag, not an unpushed change.
 
 ## v1.3.0 — MC Season & Nordic Aurora (2026-07-24)
 
