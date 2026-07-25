@@ -7,7 +7,7 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.whereami`
-- [x] App version: kept in sync in `app.json` + `package.json` + `README.md` by `npm run version:patch` (currently 1.2.4)
+- [x] App version: kept in sync in `app.json` + `package.json` + `README.md` by `npm run version:patch` (currently **1.4.0**; **live on Play: 1.3.0**)
 - [x] Android `versionCode`: auto-incremented by EAS on each production build via `autoIncrement: true` in `eas.json`
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
@@ -26,10 +26,10 @@ Use this checklist before submitting to Google Play.
 - [x] Error boundaries wrapping the full app tree
 - [x] No hardcoded API keys or secrets in source code
 - [x] No analytics, no crash reporters, no ad SDKs
-- [x] 9-language i18n (EN / ES / DE / FR / IS / NO / SV / DA / NL)
+- [x] 5-language i18n (EN / NO / SV / DA / IS) — trimmed from nine in 1.3.0; ES, DE, FR and NL were dropped
 - [x] Privacy statement in About screen (links to privacy policy)
 - [x] `store-listing/privacy_policy.md` created (covers background location, Trip Logger data, third-party APIs)
-- [x] Listing copy in `store-listing/locales/{en-US,no-NO,is-IS}/` (title ≤30, short ≤80, full ≤4000 — all verified) ✓
+- [x] Listing copy in `store-listing/locales/{en-US,no-NO,sv-SE,da-DK,is-IS}/` — all five, Vegvísir-branded (title ≤30, short ≤80, full ≤4000 — all verified) ✓
 - [x] Branded screenshots + feature graphics in `store-listing/graphics/` (rerun via `node scripts/render-store-assets.js`) ✓
 - [x] All map tiles served from OpenStreetMap (no Google Maps API key required)
 - [x] `edgeToEdgeEnabled: true` in `app.json` for Android 15+
@@ -78,14 +78,24 @@ In Google Play Console → **Grow users → Store presence → Main store listin
 | Email | support@sassagold.com |
 | Privacy policy URL | Hosted URL from step 1 above |
 
-> ⚠️ The description currently LIVE on Play does not match this repo — it
-> promises "offline maps", "save routes" and "share highlights", which the app
-> does not have. Replace it with the text above to avoid review complaints.
+> ### 🔴 The live listing is stale in two ways — verified 2026-07-25
+>
+> 1. **Still branded "Where Am I — Ride Companion" at 1.3.0.** The entire
+>    Vegvísir rename (1.4.0) is prepared in this repo and has never been
+>    published. The live page contains no mention of Vegvísir at all.
+> 2. **The live description promises features the app does not have** —
+>    "offline maps", "save routes", "share highlights". That is the more urgent
+>    of the two: a listing that overstates functionality is a Play policy
+>    problem, not just a tidiness one, and it is the first thing a reviewer or
+>    a disappointed user would point at.
+>
+> Both are fixed by pushing the text in `locales/` — either by hand in Play
+> Console or with `node scripts/push-play-listing.js --key <sa.json>`.
 
-### 4b. Localized listings (Norwegian & Icelandic)
+### 4b. Localized listings (all four additional locales)
 On the Main store listing page, top-right language selector → **Manage
-translations → Add translations** → add **Norwegian (no-NO)** and
-**Icelandic (is-IS)**. For each, paste the three text files from
+translations → Add translations** → add **Norwegian (no-NO)**, **Swedish
+(sv-SE)**, **Danish (da-DK)** and **Icelandic (is-IS)**. For each, paste the three text files from
 `store-listing/locales/<locale>/` and upload the 8 screenshots + feature
 graphic from `store-listing/graphics/<locale>/`.
 
