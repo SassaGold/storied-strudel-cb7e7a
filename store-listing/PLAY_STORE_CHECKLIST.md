@@ -109,10 +109,33 @@ in a marketing panel; the committed assets are a Vegvísir stave-and-wordmark
 graphic and raw unframed captures. It writes to the same paths, so running it
 destroys them. It now refuses to run without `--force`.
 
-- **Feature graphics — not currently reproducible.** The generator was never
-  committed (`dda7b26` added the PNGs and the uploader, no renderer) and the
-  background photo is not in the repo. Treat the committed PNGs as the source of
-  truth. The stave survives at `store-listing/brand/vegvisir-gold-ring.png`.
+- **Feature graphics — reconstructed generator, 2026-07-25.**
+  `store-listing/brand/feature-graphic-generator.html` renders all five:
+
+  ```bash
+  node tools/render.js storied-strudel-cb7e7a/store-listing/brand/feature-graphic-generator.html \
+    --only=feat-en-US,feat-no-NO,feat-sv-SE,feat-da-DK,feat-is-IS \
+    --flatten=feat-en-US,feat-no-NO,feat-sv-SE,feat-da-DK,feat-is-IS
+  ```
+
+  The original generator was never committed (`dda7b26` added the PNGs and the
+  uploader, no renderer). This rebuilds the design from parts that do exist: the
+  stave drawn as vector, lifted from `scripts/render-brand.js`, and the photo
+  `sassagold-landing/assets/herofinal.jpg`. The stave is **drawn**, not pasted
+  from `brand/vegvisir-gold-ring.png` — that PNG has an opaque background and
+  would show as a square patch.
+
+  ⚠️ **A faithful reconstruction, not a byte-exact reproducer.** Mean
+  per-channel difference against the committed graphics is ~24/255, almost all
+  of it in the blurred photo. Use it for *new* output — a new locale, a changed
+  slogan. **The committed PNGs remain the source of truth for what was
+  submitted** and are deliberately left untouched.
+
+  ⚠️ **`herofinal.jpg` has "Where Am I – Explore. Ride. Discover" burned into
+  it**, and it lands in frame. A targeted radial darkening hides it. Any change
+  to the crop or the gradients can make it read back through as ghost text —
+  this happened once during development. **Check the render visually, not just
+  numerically.**
 - **Screenshots — reproducible.** They are raw 1080×1920 device captures. Take
   them with `adb exec-out screencap -p` against a build of the version being
   shipped, one set per locale, matching the existing 8-shot order.

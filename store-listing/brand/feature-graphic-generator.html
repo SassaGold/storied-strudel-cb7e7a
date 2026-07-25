@@ -1,0 +1,196 @@
+<!--
+  Play feature graphic (1024x500), one canvas per locale.
+
+    node tools/render.js storied-strudel-cb7e7a/store-listing/brand/feature-graphic-generator.html \
+      --only=feat-en-US,feat-no-NO,feat-sv-SE,feat-da-DK,feat-is-IS \
+      --flatten=feat-en-US,feat-no-NO,feat-sv-SE,feat-da-DK,feat-is-IS
+
+  Then copy tools/out/feat-<locale>.png over
+  store-listing/graphics/<locale>/feature-graphic.png.
+
+  Reconstructed 2026-07-25. The original generator was never committed (dda7b26
+  added the PNGs and the uploader but no renderer), so the committed graphics
+  were the only source of truth. This reproduces them from parts that do exist:
+
+    - the stave is drawn as vector, lifted from scripts/render-brand.js, NOT
+      pasted from brand/vegvisir-gold-ring.png -- that PNG has an opaque
+      background and would show as a square patch.
+    - the background photo is sassagold-landing/assets/herofinal.jpg, the same
+      sunset shot used on the landing hero. It has "Where Am I -- Explore. Ride.
+      Discover." burned into the middle-right, which is why it is blurred and
+      buried under a heavy gradient here. If that text ever becomes visible
+      through the overlay, the overlay is wrong, not the photo.
+
+  Flatten is required: Play wants "JPEG or 24-bit PNG (not transparent)" and
+  canvas.toDataURL always emits RGBA.
+
+  The charset declaration below is load-bearing: without it Chrome decodes as
+  latin-1 and "Vegvisir" renders as mojibake.
+-->
+<!doctype html>
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family:'InterLocal'; font-weight:800;
+  src:url('/sassagold-landing/assets/fonts/inter-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family:'InterLocal'; font-weight:600;
+  src:url('/sassagold-landing/assets/fonts/inter-latin-600-normal.woff2') format('woff2'); }
+body { margin:0; background:#11151c; }
+canvas { display:block; margin:12px; }
+</style></head><body>
+
+<canvas id="feat-en-US" width="1024" height="500"></canvas>
+<canvas id="feat-no-NO" width="1024" height="500"></canvas>
+<canvas id="feat-sv-SE" width="1024" height="500"></canvas>
+<canvas id="feat-da-DK" width="1024" height="500"></canvas>
+<canvas id="feat-is-IS" width="1024" height="500"></canvas>
+
+<script>
+/* Slogans are lib/locales/<lang>.json -> home.slogan, verbatim. */
+const LOCALES = {
+  'feat-en-US': 'You will not lose your way.',
+  'feat-no-NO': 'Du går deg aldri vill.',
+  'feat-sv-SE': 'Du går aldrig vilse.',
+  'feat-da-DK': 'Du farer aldrig vild.',
+  'feat-is-IS': 'Þú villist aldrei.',
+};
+
+const W = 1024, H = 500;
+
+/* ── stave, lifted verbatim from scripts/render-brand.js ─────────────────── */
+function arm(X, i, R, r0, t) {
+  X.save();
+  X.rotate(i * Math.PI / 4);
+  const L = (x1,y1,x2,y2)=>{X.beginPath();X.moveTo(x1,y1);X.lineTo(x2,y2);X.stroke();};
+  const circ = (x,y,r,fill)=>{X.beginPath();X.arc(x,y,r,0,7);fill?X.fill():X.stroke();};
+  L(0, -r0, 0, -R);
+  switch (i) {
+    case 0: L(0,-R,-t,-R-t); L(0,-R,t,-R-t); L(0,-R,0,-R-t*1.25); break;
+    case 1: L(-t*.8,-R+t*.15,t*.8,-R+t*.15); L(-t*.6,-R+t*.8,t*.6,-R+t*.8); break;
+    case 2: L(-t*.8,-R,t*.8,-R); L(-t*.8,-R,-t*.8,-R+t*.6); L(t*.8,-R,t*.8,-R+t*.6); break;
+    case 3: circ(0,-R-t*.5,t*.5,false); break;
+    case 4: X.beginPath(); X.arc(0,-R-t*.1,t*.55,Math.PI,2*Math.PI); X.stroke();
+            L(-t*.7,-R+t*.7,t*.7,-R+t*.7); break;
+    case 5: L(0,-R,-t*.8,-R+t*.8); L(0,-R,t*.8,-R+t*.8);
+            L(0,-R+t*.9,-t*.6,-R+t*1.6); L(0,-R+t*.9,t*.6,-R+t*1.6); break;
+    case 6: L(-t*.7,-R+t*.5,t*.7,-R+t*.5); circ(0,-R-t*.35,t*.22,true); break;
+    case 7: L(-t*.7,-R-t*.2,0,-R-t*.8); L(0,-R-t*.8,t*.7,-R-t*.2); break;
+  }
+  X.restore();
+}
+
+function stave(X, cx, cy, scale) {
+  const R = 300, r0 = 46, t = 52;
+  X.save();
+  X.translate(cx, cy);
+  X.scale(scale, scale);
+  X.lineWidth = 30; X.lineCap = 'round'; X.lineJoin = 'round';
+  const g = X.createLinearGradient(0, -300, 0, 330);
+  g.addColorStop(0, '#EFCC5A'); g.addColorStop(1, '#B8900A');
+  X.strokeStyle = g; X.fillStyle = g;
+  X.shadowColor = 'rgba(196,154,0,.45)';
+  X.shadowBlur = 42;
+  for (let i = 0; i < 8; i++) arm(X, i, R, r0, t);
+  X.beginPath(); X.arc(0, 0, r0 * .62, 0, 7); X.stroke();
+  X.beginPath(); X.arc(0, 0, 9, 0, 7); X.fill();
+  X.shadowBlur = 0; X.lineWidth = 8; X.globalAlpha = .55;
+  X.beginPath(); X.arc(0, 0, 436, 0, 7); X.stroke();
+  for (let i = 0; i < 8; i++) {
+    X.save(); X.rotate(i * Math.PI / 4 + Math.PI / 8);
+    X.beginPath(); X.moveTo(0, -420); X.lineTo(0, -452); X.stroke(); X.restore();
+  }
+  X.globalAlpha = 1;
+  X.restore();
+}
+
+/* ── background: photo, blurred, then buried under a dark gradient ───────── */
+function background(X, photo) {
+  X.save();
+  X.filter = 'blur(9px) saturate(0.9)';
+  // Zoomed past a plain cover so the sunset falls around x~700 and the burned-in
+  // "Where Am I" text in the photo sits under the darkest part of the gradient.
+  const s = Math.max(W / photo.width, H / photo.height) * 1.35;
+  const dw = photo.width * s, dh = photo.height * s;
+  X.drawImage(photo, 25, (H - dh) / 2 + 30, dw, dh);
+  X.restore();
+
+  // left-to-right darkening: near-solid on the wordmark side, letting the bike
+  // and the sunset glow survive on the right
+  const g = X.createLinearGradient(0, 0, W, 0);
+  g.addColorStop(0.00, 'rgba(8,12,20,0.925)');
+  g.addColorStop(0.42, 'rgba(8,12,20,0.825)');
+  g.addColorStop(0.68, 'rgba(8,12,20,0.575)');
+  g.addColorStop(0.85, 'rgba(8,12,20,0.635)');
+  g.addColorStop(1.00, 'rgba(8,12,20,0.80)');
+  X.fillStyle = g; X.fillRect(0, 0, W, H);
+
+  // Targeted kill for the burned-in "Where Am I -- Explore. Ride. Discover."
+  // wordmark in the photo, which lands around x 750-1024, y 285-415 at this
+  // crop. Without this it reads straight through the gradient as ghost text.
+  // Verify visually after ANY change to the crop or the gradient above.
+  // Filled across the whole canvas, not a sub-rect: a clipped fill leaves a
+  // visible seam where the rectangle ends. The radial fades to transparent on
+  // its own well before the edges.
+  const k = X.createRadialGradient(905, 350, 20, 905, 350, 330);
+  k.addColorStop(0.00, 'rgba(8,12,20,0.93)');
+  k.addColorStop(0.55, 'rgba(8,12,20,0.70)');
+  k.addColorStop(1.00, 'rgba(8,12,20,0)');
+  X.fillStyle = k; X.fillRect(0, 0, W, H);
+
+  // vertical vignette
+  const v = X.createLinearGradient(0, 0, 0, H);
+  v.addColorStop(0, 'rgba(4,7,12,0.42)');
+  v.addColorStop(0.5, 'rgba(4,7,12,0.06)');
+  v.addColorStop(1, 'rgba(4,7,12,0.48)');
+  X.fillStyle = v; X.fillRect(0, 0, W, H);
+}
+
+function draw(id, slogan, photo) {
+  const C = document.getElementById(id);
+  const X = C.getContext('2d');
+  X.clearRect(0, 0, W, H);
+  background(X, photo);
+
+  stave(X, 165, 250, 0.275);
+
+  const left = 325;
+  X.textAlign = 'left';
+  X.textBaseline = 'alphabetic';
+
+  X.fillStyle = '#FFFFFF';
+  X.font = '800 76px InterLocal, system-ui, sans-serif';
+  X.fillText('VEGVÍSIR', left, 228);
+
+  // hairline rule under the wordmark
+  X.strokeStyle = 'rgba(214,178,74,0.75)';
+  X.lineWidth = 1.5;
+  X.beginPath(); X.moveTo(left, 272.5); X.lineTo(900, 272.5); X.stroke();
+
+  X.fillStyle = '#E8B93E';
+  X.font = 'italic 800 30px InterLocal, system-ui, sans-serif';
+  X.fillText(slogan, left, 333);
+
+  X.fillStyle = 'rgba(176,184,196,0.95)';
+  X.font = '600 19px InterLocal, system-ui, sans-serif';
+  const studio = 'S A S S A G O L D   S T U D I O S';
+  X.fillText(studio, left, 388);
+}
+
+function load(src) {
+  return new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = () => rej(new Error('failed to load ' + src));
+    i.src = src;
+  });
+}
+
+(async () => {
+  await document.fonts.load('800 76px InterLocal');
+  await document.fonts.load('600 19px InterLocal');
+  await document.fonts.load('italic 800 30px InterLocal');
+  await document.fonts.ready;
+  const photo = await load('/sassagold-landing/assets/herofinal.jpg');
+  for (const [id, slogan] of Object.entries(LOCALES)) draw(id, slogan, photo);
+  window.__done = true;
+})();
+</script>
+</body></html>
