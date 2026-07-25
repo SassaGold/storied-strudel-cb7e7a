@@ -1,0 +1,7 @@
+🔒 A privacy release.
+
+• Recorded rides now stay entirely on your phone. Route maps are drawn from your own GPS points — nothing about a trip is sent anywhere.
+• Fewer third-party servers see your searches: the map-matching service is gone, and one of the map-data mirrors has been retired.
+• The header tagline now speaks your language.
+
+No ads, no tracking — you will not lose your way.

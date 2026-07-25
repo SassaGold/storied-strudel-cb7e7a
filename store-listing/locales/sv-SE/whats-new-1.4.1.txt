@@ -1,0 +1,7 @@
+🔒 En integritetsuppdatering.
+
+• Resor du spelar in stannar nu helt på din telefon. Ruttkartan ritas från dina egna GPS-punkter — ingenting om en resa skickas någonstans.
+• Färre tredjepartsservrar ser dina sökningar: kartmatchningstjänsten är borta, och en av spegelservrarna för kartdata har tagits ur bruk.
+• Underrubriken högst upp talar nu ditt språk.
+
+Inga annonser, ingen spårning — du går aldrig vilse.

@@ -1,5 +1,30 @@
 # Changelog
 
+## v1.4.1 — Privacy (2026-07-26)
+
+**Recorded trip routes no longer leave the device.** Every build from 1.1.7
+through 1.4.0 uploaded each ride's coordinates *and* timestamps to the public
+OSRM demo server to snap the line to roads — automatically, on every route
+render, with no opt-in. That is removed. Route maps now draw straight from the
+recorded GPS points, which was already the fallback whenever OSRM was slow or
+could not match, so no new code path was introduced. Trip statistics never used
+it and are unchanged. Visible cost: GPS jitter shows in the drawn line, and
+signal gaps such as tunnels draw as a straight chord rather than following the
+road.
+
+**The Russian-operated Overpass mirror (`maps.mail.ru`) is gone.** Requests
+round-robin across the mirrors rather than failing over in order, so it was
+taking roughly a third of all POI searches rather than acting as the rare last
+resort the docs claimed. Two mirrors remain.
+
+**The RIDER HQ tagline is localised.** It was a hardcoded English string, so
+Norwegian, Swedish, Danish and Icelandic riders all saw English. Two dead locale
+keys went with it, one of which still held the old app name translated per
+locale.
+
+Store assets: all 40 screenshots re-captured from this build, and the privacy
+policy corrected in every copy and every locale.
+
 ## v1.4.0 — Vegvísir (2026-07-24)
 
 **Where Am I is now Vegvísir**, named after the Icelandic wayfinding stave. An in-place rename, not a new app: the package stays `com.sassagold.whereami`, so rides, garage and settings survive the update with nothing to reinstall. Ships a new gold stave icon set, splash screen and wordmark, a localized slogan in all five languages, and refreshed store listings (title, short and full description, 1.4.0 release notes) for **all five Play locales** — en-US, no-NO, sv-SE, da-DK, is-IS — plus localized store graphics and a marketing kit (wallpapers, promo banner, generators). Also adds `scripts/push-play-listing.js`, which pushes listing text and release notes to Play through the Publishing API with a service-account key.

@@ -1,0 +1,7 @@
+🔒 En personvernoppdatering.
+
+• Turer du tar opp blir nå værende på telefonen din. Rutekartet tegnes fra dine egne GPS-punkter — ingenting om en tur sendes noe sted.
+• Færre tredjepartsservere ser søkene dine: karttilpasningstjenesten er fjernet, og en av speilserverne for kartdata er tatt ut av bruk.
+• Undertittelen i toppen snakker nå ditt språk.
+
+Ingen reklame, ingen sporing — du går deg aldri vill.
