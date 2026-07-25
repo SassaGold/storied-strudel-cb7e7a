@@ -1,0 +1,212 @@
+<!doctype html>
+<!--
+  Generates the sassagold.com brand assets: og-image.png (1200x630),
+  apple-touch-icon.png (180x180) and assets/logo.png (512x512, transparent).
+
+  HOW TO RUN — paths below are absolute and span BOTH repos, so this must be
+  served from the parent directory that contains storied-strudel-cb7e7a/ and
+  sassagold-landing/ side by side:
+
+      node store-listing/brand/brand-render-server.js     # from that parent, on :8099
+      open http://127.0.0.1:8099/site-brand-generator.html
+
+  The nav/footer logo must keep its alpha channel, so it is saved by POSTing
+  the canvas blob to /save — a browser element screenshot composites against
+  the page background and silently bakes in an opaque tile.
+
+  The charset declaration above is load-bearing: without it Chrome decodes
+  this file as latin-1 and "Vegvísir" renders as "VegvÃ­sir" on the card.
+-->
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family:'InterLocal'; font-weight:800;
+  src:url('/sassagold-landing/assets/fonts/inter-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family:'InterLocal'; font-weight:600;
+  src:url('/sassagold-landing/assets/fonts/inter-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family:'InterLocal'; font-weight:400;
+  src:url('/sassagold-landing/assets/fonts/inter-latin-400-normal.woff2') format('woff2'); }
+</style></head>
+<body style="margin:0;background:#111">
+<canvas id="touch" width="180" height="180"></canvas>
+<canvas id="og" width="1200" height="630"></canvas>
+<!-- nav/footer logo: transparent, deeper gold so it reads on the light theme too -->
+<canvas id="navlogo" width="512" height="512"></canvas>
+<!-- proofs: the mark on both site themes at real nav size -->
+<canvas id="themeproof" width="760" height="200"></canvas>
+<script>
+const GOLD_HI='#F7DC7A', GOLD='#E8C34A', GOLD_LO='#C2941A', SNOW='#EDF4F2';
+
+function lcg(seed){let s=seed>>>0;return()=>((s=(s*1664525+1013904223)>>>0)/4294967296);}
+
+function goldGrad(X,y0,y1){
+  const g=X.createLinearGradient(0,y0,0,y1);
+  g.addColorStop(0,GOLD_HI); g.addColorStop(.55,GOLD); g.addColorStop(1,GOLD_LO);
+  return g;
+}
+
+/* same compass geometry as the Play assets and logo.svg */
+function compass(X,cx,cy,size){
+  const R=size/2;
+  X.save(); X.translate(cx,cy);
+  X.fillStyle=goldGrad(X,-R,R); X.strokeStyle=goldGrad(X,-R,R);
+  const spike=(len,half)=>{X.beginPath();X.moveTo(0,-len);X.lineTo(half,0);
+    X.lineTo(0,len*.18);X.lineTo(-half,0);X.closePath();X.fill();};
+  X.globalAlpha=.55; X.lineWidth=R*.055;
+  X.beginPath(); X.arc(0,0,R*.70,0,Math.PI*2); X.stroke();
+  X.globalAlpha=1;
+  for(let i=0;i<4;i++){X.save();X.rotate(Math.PI/4+i*Math.PI/2);spike(R*.60,R*.082);X.restore();}
+  for(let i=0;i<4;i++){X.save();X.rotate(i*Math.PI/2);spike(R*.99,R*.130);X.restore();}
+  X.beginPath(); X.arc(0,0,R*.105,0,Math.PI*2); X.fill();
+  X.restore();
+}
+
+/* same geometry, deeper gradient — for use on light backgrounds */
+function compassDeep(X,cx,cy,size){
+  const R=size/2;
+  const g=X.createLinearGradient(0,cy-R,0,cy+R);
+  g.addColorStop(0,'#F2D169'); g.addColorStop(.55,'#D9A92B'); g.addColorStop(1,'#A97C0C');
+  X.save(); X.translate(cx,cy);
+  X.fillStyle=g; X.strokeStyle=g;
+  const spike=(len,half)=>{X.beginPath();X.moveTo(0,-len);X.lineTo(half,0);
+    X.lineTo(0,len*.18);X.lineTo(-half,0);X.closePath();X.fill();};
+  X.globalAlpha=.6; X.lineWidth=R*.055;
+  X.beginPath(); X.arc(0,0,R*.70,0,Math.PI*2); X.stroke();
+  X.globalAlpha=1;
+  for(let i=0;i<4;i++){X.save();X.rotate(Math.PI/4+i*Math.PI/2);spike(R*.60,R*.082);X.restore();}
+  for(let i=0;i<4;i++){X.save();X.rotate(i*Math.PI/2);spike(R*.99,R*.130);X.restore();}
+  X.beginPath(); X.arc(0,0,R*.105,0,Math.PI*2); X.fill();
+  X.restore();
+}
+
+function nightSky(X,W,H,o){
+  const base=X.createLinearGradient(0,0,W*.55,H);
+  base.addColorStop(0,'#0B1524'); base.addColorStop(1,'#04070D');
+  X.fillStyle=base; X.fillRect(0,0,W,H);
+  const a1=X.createRadialGradient(W*.72,-H*.10,10,W*.72,-H*.10,H*1.05);
+  a1.addColorStop(0,'rgba(72,232,168,0.24)');
+  a1.addColorStop(.42,'rgba(52,180,150,0.10)');
+  a1.addColorStop(1,'rgba(0,0,0,0)');
+  X.fillStyle=a1; X.fillRect(0,0,W,H);
+  const a2=X.createRadialGradient(W*1.0,H*.30,10,W*1.0,H*.30,H*.80);
+  a2.addColorStop(0,'rgba(78,175,225,0.15)'); a2.addColorStop(1,'rgba(0,0,0,0)');
+  X.fillStyle=a2; X.fillRect(0,0,W,H);
+  const rnd=lcg(20260725);
+  for(let i=0;i<o.stars;i++){
+    const x=rnd()*W,y=rnd()*H*.86,r=(.6+rnd()*1.7)*o.starScale;
+    X.globalAlpha=.10+rnd()*.45; X.fillStyle='#fff';
+    X.beginPath(); X.arc(x,y,r,0,Math.PI*2); X.fill();
+  }
+  X.globalAlpha=1;
+  const v=X.createRadialGradient(W*.42,H*.5,H*.24,W*.42,H*.5,H*1.05);
+  v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(2,4,8,0.55)');
+  X.fillStyle=v; X.fillRect(0,0,W,H);
+}
+
+function roundedImg(X,img,x,y,s,r){
+  X.save(); X.beginPath(); X.roundRect(x,y,s,s,r); X.clip();
+  X.drawImage(img,x,y,s,s); X.restore();
+  X.strokeStyle='rgba(237,244,242,0.14)'; X.lineWidth=2;
+  X.beginPath(); X.roundRect(x,y,s,s,r); X.stroke();
+}
+
+function load(src){return new Promise((res,rej)=>{const i=new Image();
+  i.onload=()=>res(i); i.onerror=()=>rej(new Error('load fail '+src)); i.src=src;});}
+
+(async () => {
+  await document.fonts.load('800 40px InterLocal');
+  await document.fonts.load('600 40px InterLocal');
+  await document.fonts.load('400 40px InterLocal');
+  await document.fonts.ready;
+
+  /* ── apple-touch-icon 180x180 ── */
+  {
+    const C=document.getElementById('touch'), X=C.getContext('2d');
+    nightSky(X,180,180,{stars:14,starScale:.30});
+    compass(X,90,90,118);
+  }
+
+  /* ── og-image 1200x630 ── */
+  {
+    const C=document.getElementById('og'), X=C.getContext('2d');
+    const W=1200,H=630;
+    nightSky(X,W,H,{stars:90,starScale:.85});
+
+    // hairline frame, echoing the previous card
+    X.strokeStyle='rgba(232,195,74,0.22)'; X.lineWidth=2;
+    X.beginPath(); X.roundRect(18,18,W-36,H-36,16); X.stroke();
+
+    const LX=64;
+
+    // studio lockup
+    compass(X,LX+34,80,68);
+    X.textAlign='left'; X.textBaseline='alphabetic';
+    X.fillStyle=goldGrad(X,52,102);
+    X.font='800 34px InterLocal, system-ui, sans-serif';
+    X.fillText('SASSAGOLD', LX+82, 78);
+    X.fillStyle='rgba(237,244,242,0.72)';
+    X.font='600 15px InterLocal, system-ui, sans-serif';
+    let sx=LX+84;
+    for(const ch of 'STUDIOS'){ X.fillText(ch,sx,102); sx+=X.measureText(ch).width+6.5; }
+
+    // slogan — the headline
+    X.fillStyle=SNOW;
+    X.font='800 76px InterLocal, system-ui, sans-serif';
+    X.fillText('No ads.', LX, 250);
+    X.fillText('No tracking.', LX, 336);
+    X.fillStyle=goldGrad(X,360,430);
+    X.fillText('No clutter.', LX, 422);
+
+    X.fillStyle='rgba(237,244,242,0.80)';
+    X.font='400 25px InterLocal, system-ui, sans-serif';
+    X.fillText('Clean Android apps. Free on Google Play.', LX, 476);
+
+    X.fillStyle=GOLD;
+    X.font='800 20px InterLocal, system-ui, sans-serif';
+    let dx=LX;
+    for(const ch of 'SASSAGOLD.COM'){ X.fillText(ch,dx,556); dx+=X.measureText(ch).width+1.6; }
+
+    // the three apps, by their real icons
+    const apps=[
+      ['/storied-strudel-cb7e7a/assets/images/icon.png','Vegvísir'],
+      ['/sassagold-landing/assets/excuses/icon.png','1001 Excuses'],
+      ['/sassagold-landing/assets/receiptvault/icon.png','ReceiptVault'],
+    ];
+    const S=116, GAP=34, RX=W-64-S;
+    let y=118;
+    for (const [src,name] of apps) {
+      const img=await load(src);
+      roundedImg(X,img,RX,y,S,26);
+      X.textAlign='right';
+      X.fillStyle=SNOW;
+      X.font='600 26px InterLocal, system-ui, sans-serif';
+      X.fillText(name, RX-24, y+S/2+9);
+      X.textAlign='left';
+      y+=S+GAP;
+    }
+  }
+
+  /* ── nav/footer logo: transparent bg, deeper gold ── */
+  {
+    const C=document.getElementById('navlogo'), X=C.getContext('2d');
+    compassDeep(X,256,256,470);
+  }
+
+  /* ── proof: nav-size mark on light and dark site themes ── */
+  {
+    const P=document.getElementById('themeproof'), X=P.getContext('2d');
+    const nav=document.getElementById('navlogo');
+    X.fillStyle='#FFFFFF'; X.fillRect(0,0,380,200);        // light theme
+    X.fillStyle='#0E0E10'; X.fillRect(380,0,380,200);      // dark theme
+    for (const [ox,txt] of [[0,'#141414'],[380,'#F2F2F2']]) {
+      X.drawImage(nav, ox+28, 60, 46, 46);                 // real nav size
+      X.drawImage(nav, ox+100, 52, 64, 64);                // real footer size
+      X.fillStyle=txt;
+      X.font='800 17px InterLocal, system-ui, sans-serif';
+      X.fillText('SassaGold Studios', ox+180, 90);
+      X.font='400 12px InterLocal, system-ui, sans-serif';
+      X.fillText('46px nav · 64px footer', ox+180, 110);
+    }
+  }
+
+  window.__done=true;
+})().catch(e=>{ window.__err=e.message; });
+</script></body></html>
