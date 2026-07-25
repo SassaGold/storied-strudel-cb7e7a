@@ -1,0 +1,241 @@
+<!doctype html>
+<html><body style="margin:0;background:#111">
+<canvas id="header" width="4096" height="2304"></canvas>
+<canvas id="logo" width="512" height="512"></canvas>
+<!-- legibility proofs: the sizes Play actually renders the logo at -->
+<canvas id="p96" width="96" height="96"></canvas>
+<canvas id="p48" width="48" height="48"></canvas>
+<canvas id="proof" width="920" height="560"></canvas>
+<script>
+const GOLD_HI = '#F7DC7A', GOLD = '#E8C34A', GOLD_LO = '#C2941A';
+
+/* deterministic PRNG so re-renders are byte-identical */
+function lcg(seed) {
+  let s = seed >>> 0;
+  return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+}
+
+function goldGrad(X, y0, y1) {
+  const g = X.createLinearGradient(0, y0, 0, y1);
+  g.addColorStop(0, GOLD_HI);
+  g.addColorStop(0.55, GOLD);
+  g.addColorStop(1, GOLD_LO);
+  return g;
+}
+
+/* Flat geometric compass rose. Weights are tuned so the mark still reads
+ * as a compass at 48px, where hairlines vanish. No bevel, no gloss. */
+function compass(X, cx, cy, size) {
+  const R = size / 2;
+  X.save();
+  X.translate(cx, cy);
+  X.fillStyle = goldGrad(X, -R, R);
+  X.strokeStyle = goldGrad(X, -R, R);
+
+  const spike = (len, half) => {
+    X.beginPath();
+    X.moveTo(0, -len);
+    X.lineTo(half, 0);
+    X.lineTo(0, len * 0.18);
+    X.lineTo(-half, 0);
+    X.closePath();
+    X.fill();
+  };
+
+  // orbit ring first, so the spikes read as sitting on top of it
+  X.globalAlpha = 0.55;
+  X.lineWidth = R * 0.055;
+  X.beginPath();
+  X.arc(0, 0, R * 0.70, 0, Math.PI * 2);
+  X.stroke();
+  X.globalAlpha = 1;
+
+  for (let i = 0; i < 4; i++) {      // diagonals
+    X.save();
+    X.rotate(Math.PI / 4 + i * Math.PI / 2);
+    spike(R * 0.60, R * 0.082);
+    X.restore();
+  }
+  for (let i = 0; i < 4; i++) {      // cardinals
+    X.save();
+    X.rotate(i * Math.PI / 2);
+    spike(R * 0.99, R * 0.130);
+    X.restore();
+  }
+
+  X.beginPath();                     // hub
+  X.arc(0, 0, R * 0.105, 0, Math.PI * 2);
+  X.fill();
+  X.restore();
+}
+
+/* Aurora ribbon: a soft vertical-falloff band along a curve */
+function ribbon(X, W, H, cfg) {
+  const g = X.createLinearGradient(0, cfg.y - cfg.spread, 0, cfg.y + cfg.spread);
+  g.addColorStop(0, 'rgba(0,0,0,0)');
+  g.addColorStop(0.5, cfg.color);
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  X.save();
+  X.filter = 'blur(' + cfg.blur + 'px)';
+  X.fillStyle = g;
+  X.beginPath();
+  X.moveTo(cfg.x0, cfg.y);
+  X.bezierCurveTo(cfg.x0 + (cfg.x1 - cfg.x0) * 0.35, cfg.y - cfg.lift,
+                  cfg.x0 + (cfg.x1 - cfg.x0) * 0.65, cfg.y + cfg.lift,
+                  cfg.x1, cfg.y - cfg.lift * 0.4);
+  X.lineTo(cfg.x1, cfg.y - cfg.lift * 0.4 + cfg.thick);
+  X.bezierCurveTo(cfg.x0 + (cfg.x1 - cfg.x0) * 0.65, cfg.y + cfg.lift + cfg.thick,
+                  cfg.x0 + (cfg.x1 - cfg.x0) * 0.35, cfg.y - cfg.lift + cfg.thick,
+                  cfg.x0, cfg.y + cfg.thick);
+  X.closePath();
+  X.fill();
+  X.restore();
+}
+
+/* Shared night-sky ground */
+function nightSky(X, W, H, o) {
+  const base = X.createLinearGradient(0, 0, W * 0.55, H);
+  base.addColorStop(0, '#0B1524');
+  base.addColorStop(1, '#04070D');
+  X.fillStyle = base;
+  X.fillRect(0, 0, W, H);
+
+  // aurora glow masses
+  const a1 = X.createRadialGradient(W * 0.72, -H * 0.10, 10, W * 0.72, -H * 0.10, H * 1.05);
+  a1.addColorStop(0, 'rgba(72,232,168,0.26)');
+  a1.addColorStop(0.42, 'rgba(52,180,150,0.10)');
+  a1.addColorStop(1, 'rgba(0,0,0,0)');
+  X.fillStyle = a1;
+  X.fillRect(0, 0, W, H);
+
+  const a2 = X.createRadialGradient(W * 1.00, H * 0.30, 10, W * 1.00, H * 0.30, H * 0.80);
+  a2.addColorStop(0, 'rgba(78,175,225,0.16)');
+  a2.addColorStop(1, 'rgba(0,0,0,0)');
+  X.fillStyle = a2;
+  X.fillRect(0, 0, W, H);
+
+  if (o.ribbons) {
+    ribbon(X, W, H, { x0: W * 0.34, x1: W * 1.04, y: H * 0.30, lift: H * 0.11,
+      thick: H * 0.030, spread: H * 0.16, blur: 90, color: 'rgba(96,240,180,0.30)' });
+    ribbon(X, W, H, { x0: W * 0.46, x1: W * 1.06, y: H * 0.47, lift: H * 0.08,
+      thick: H * 0.020, spread: H * 0.13, blur: 110, color: 'rgba(120,220,255,0.16)' });
+    ribbon(X, W, H, { x0: W * 0.58, x1: W * 1.02, y: H * 0.17, lift: H * 0.06,
+      thick: H * 0.014, spread: H * 0.10, blur: 80, color: 'rgba(150,255,210,0.18)' });
+  }
+
+  // stars
+  const rnd = lcg(20260725);
+  for (let i = 0; i < o.stars; i++) {
+    const x = rnd() * W, y = rnd() * H * 0.86;
+    const r = (0.6 + rnd() * 1.7) * o.starScale;
+    X.globalAlpha = 0.10 + rnd() * 0.45;
+    X.fillStyle = '#FFFFFF';
+    X.beginPath();
+    X.arc(x, y, r, 0, Math.PI * 2);
+    X.fill();
+  }
+  X.globalAlpha = 1;
+
+  // Nordic horizon: layered ridges, near-black so overlaid text stays legible
+  if (o.horizon) {
+    const ridge = (yBase, amp, seed, fill) => {
+      const r2 = lcg(seed);
+      X.fillStyle = fill;
+      X.beginPath();
+      X.moveTo(0, H);
+      X.lineTo(0, yBase);
+      let x = 0;
+      while (x < W) {
+        const step = W * (0.06 + r2() * 0.07);
+        const peak = yBase - amp * (0.35 + r2() * 0.65);
+        X.lineTo(x + step * 0.5, peak);
+        X.lineTo(x + step, yBase - amp * 0.10 * r2());
+        x += step;
+      }
+      X.lineTo(W, H);
+      X.closePath();
+      X.fill();
+    };
+    ridge(H * 0.955, H * 0.115, 7717, 'rgba(6,12,22,0.85)');
+    ridge(H * 1.000, H * 0.085, 3391, 'rgba(2,5,10,0.97)');
+  }
+
+  // vignette so cropped edges fall away
+  const v = X.createRadialGradient(W * 0.42, H * 0.5, H * 0.24, W * 0.42, H * 0.5, H * 1.05);
+  v.addColorStop(0, 'rgba(0,0,0,0)');
+  v.addColorStop(1, 'rgba(2,4,8,0.55)');
+  X.fillStyle = v;
+  X.fillRect(0, 0, W, H);
+}
+
+/* ── HEADER 4096x2304 ───────────────────────────────────────────── */
+(() => {
+  const C = document.getElementById('header'), X = C.getContext('2d');
+  const W = 4096, H = 2304;
+  nightSky(X, W, H, { stars: 220, starScale: 1.9, ribbons: true, horizon: false });
+
+  const LX = 470;
+  const CY = H * 0.48;
+
+  compass(X, LX + 195, CY - 40, 400);
+
+  X.textAlign = 'left';
+  X.textBaseline = 'alphabetic';
+  X.fillStyle = goldGrad(X, CY - 220, CY + 60);
+  X.font = '700 300px "Arial Narrow", "Liberation Sans Narrow", Impact, sans-serif';
+  const wx = LX + 450;
+  X.shadowColor = 'rgba(2,6,14,0.55)';
+  X.shadowBlur = 42;
+  X.fillText('SASSAGOLD', wx, CY + 40);
+  X.shadowBlur = 0;
+  const ww = X.measureText('SASSAGOLD').width;
+
+  X.strokeStyle = 'rgba(232,195,74,0.45)';
+  X.lineWidth = 4;
+  X.beginPath();
+  X.moveTo(wx + 6, CY + 116);
+  X.lineTo(wx + ww, CY + 116);
+  X.stroke();
+
+  X.fillStyle = 'rgba(237,244,242,0.84)';
+  X.font = '600 96px system-ui, "Segoe UI", sans-serif';
+  let sx = wx + 8;
+  for (const ch of 'STUDIOS') {
+    X.fillText(ch, sx, CY + 236);
+    sx += X.measureText(ch).width + 44;
+  }
+
+  window.__header = true;
+})();
+
+/* ── LOGO 512x512 (survives Play's circular crop) ───────────────── */
+(() => {
+  const C = document.getElementById('logo'), X = C.getContext('2d');
+  nightSky(X, 512, 512, { stars: 30, starScale: 0.42, ribbons: false, horizon: false });
+  compass(X, 256, 256, 330);
+  window.__logo = true;
+
+  // downscale proofs at the sizes Play actually shows
+  for (const id of ['p96', 'p48']) {
+    const p = document.getElementById(id), px = p.getContext('2d');
+    px.imageSmoothingQuality = 'high';
+    px.drawImage(C, 0, 0, p.width, p.height);
+  }
+
+  // magnify those downscales (nearest-neighbour) to judge what survives
+  const pr = document.getElementById('proof'), q = pr.getContext('2d');
+  q.fillStyle = '#242424';
+  q.fillRect(0, 0, pr.width, pr.height);
+  q.imageSmoothingEnabled = false;
+  q.drawImage(document.getElementById('p96'), 40, 60, 384, 384);
+  q.drawImage(document.getElementById('p48'), 480, 60, 384, 384);
+  q.imageSmoothingEnabled = true;
+  q.fillStyle = '#EDF4F2';
+  q.font = '600 30px system-ui, sans-serif';
+  q.fillText('96px (magnified 4x)', 40, 40);
+  q.fillText('48px (magnified 8x)', 480, 40);
+  q.fillText('actual size:', 40, 500);
+  q.drawImage(document.getElementById('p96'), 220, 470);
+  q.drawImage(document.getElementById('p48'), 340, 490);
+})();
+</script></body></html>
