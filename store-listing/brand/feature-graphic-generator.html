@@ -16,10 +16,10 @@
       pasted from brand/vegvisir-gold-ring.png -- that PNG has an opaque
       background and would show as a square patch.
     - the background photo is sassagold-landing/assets/herofinal.jpg, the same
-      sunset shot used on the landing hero. It has "Where Am I -- Explore. Ride.
-      Discover." burned into the middle-right, which is why it is blurred and
-      buried under a heavy gradient here. If that text ever becomes visible
-      through the overlay, the overlay is wrong, not the photo.
+      sunset shot used on the landing hero. It used to have "Where Am I --
+      Explore. Ride. Discover." burned into it, which forced a radial darkening
+      over the lower right to hide it; the photo was cleaned in the landing repo
+      (fix/hero-photo-old-branding) and that workaround has been removed.
 
   Flatten is required: Play wants "JPEG or 24-bit PNG (not transparent)" and
   canvas.toDataURL always emits RGBA.
@@ -105,8 +105,8 @@ function stave(X, cx, cy, scale) {
 function background(X, photo) {
   X.save();
   X.filter = 'blur(9px) saturate(0.9)';
-  // Zoomed past a plain cover so the sunset falls around x~700 and the burned-in
-  // "Where Am I" text in the photo sits under the darkest part of the gradient.
+  // Zoomed past a plain cover so the sunset falls around x~700, matching where
+  // the committed graphics put their warm peak.
   const s = Math.max(W / photo.width, H / photo.height) * 1.35;
   const dw = photo.width * s, dh = photo.height * s;
   X.drawImage(photo, 25, (H - dh) / 2 + 30, dw, dh);
@@ -122,18 +122,11 @@ function background(X, photo) {
   g.addColorStop(1.00, 'rgba(8,12,20,0.80)');
   X.fillStyle = g; X.fillRect(0, 0, W, H);
 
-  // Targeted kill for the burned-in "Where Am I -- Explore. Ride. Discover."
-  // wordmark in the photo, which lands around x 750-1024, y 285-415 at this
-  // crop. Without this it reads straight through the gradient as ghost text.
-  // Verify visually after ANY change to the crop or the gradient above.
-  // Filled across the whole canvas, not a sub-rect: a clipped fill leaves a
-  // visible seam where the rectangle ends. The radial fades to transparent on
-  // its own well before the edges.
-  const k = X.createRadialGradient(905, 350, 20, 905, 350, 330);
-  k.addColorStop(0.00, 'rgba(8,12,20,0.93)');
-  k.addColorStop(0.55, 'rgba(8,12,20,0.70)');
-  k.addColorStop(1.00, 'rgba(8,12,20,0)');
-  X.fillStyle = k; X.fillRect(0, 0, W, H);
+  // A targeted radial darkening used to sit here, hiding the "Where Am I --
+  // Explore. Ride. Discover." wordmark burned into the photo. The photo was
+  // cleaned in sassagold-landing (fix/hero-photo-old-branding), so the
+  // workaround is gone and the right side is no longer artificially dark.
+  // If ghost text ever reappears, the photo has been reverted, not the crop.
 
   // vertical vignette
   const v = X.createLinearGradient(0, 0, 0, H);

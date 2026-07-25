@@ -131,11 +131,11 @@ destroys them. It now refuses to run without `--force`.
   slogan. **The committed PNGs remain the source of truth for what was
   submitted** and are deliberately left untouched.
 
-  ⚠️ **`herofinal.jpg` has "Where Am I – Explore. Ride. Discover" burned into
-  it**, and it lands in frame. A targeted radial darkening hides it. Any change
-  to the crop or the gradients can make it read back through as ghost text —
-  this happened once during development. **Check the render visually, not just
-  numerically.**
+  `herofinal.jpg` used to have "Where Am I – Explore. Ride. Discover" burned
+  into it, which forced a radial darkening over the lower right to hide it —
+  and it ghosted back through once when a gradient was tweaked. The photo was
+  cleaned in `sassagold-landing` (PR #44) and the workaround is gone. **If ghost
+  text ever reappears, the photo has been reverted, not the crop.**
 - **Screenshots — reproducible.** They are raw 1080×1920 device captures. Take
   them with `adb exec-out screencap -p` against a build of the version being
   shipped, one set per locale, matching the existing 8-shot order.
