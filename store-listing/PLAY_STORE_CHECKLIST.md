@@ -49,9 +49,18 @@ Google Play requires a **publicly accessible URL** for your privacy policy.
 
 **✅ Using custom domain:** `https://sassagold.com/privacy`
 
-The About screen links to this URL (`PRIVACY_POLICY_URL` in `lib/config.ts`); the
-source document lives at `docs/privacy-policy.html`.
+The About screen links to this URL (`PRIVACY_POLICY_URL` in `lib/config.ts`).
 Paste the URL into Google Play Console → App Content → Privacy Policy.
+
+**Two copies, not three.** `store-listing/privacy_policy.md` is the working
+source; the pages served at `sassagold.com/privacy` (English plus `no/ se/ dk/
+is/`, in the `sassagold-landing` repo) are what users actually read, and are the
+version Play reviews. A third copy at `docs/privacy-policy.html` was deleted on
+2026-07-26 — it was never published (the repo has no GitHub Pages site), nothing
+but this checklist referenced it, and it had silently drifted twice, at one point
+still claiming the app *"does not collect, store, transmit, or share any personal
+data"* long after that was corrected everywhere else. **Keep the md and the
+hosted pages in step; do not reintroduce a third.**
 
 ### 2–4c. Store listing, graphics and translations — ✅ SUBMITTED, IN REVIEW
 
