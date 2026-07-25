@@ -1,6 +1,6 @@
-# Privacy Policy — Vegvísir (formerly Vegvísir)
+# Privacy Policy — Vegvísir (formerly Where Am I — Ride Companion)
 
-**Last updated: 2026-03-18**
+**Last updated: 2026-07-25**
 
 Vegvísir ("the app", "we", "our") is a free motorcycle companion app. This policy explains what data the app accesses, how it is used, and how your privacy is protected.
 
@@ -8,13 +8,19 @@ Vegvísir ("the app", "we", "our") is a free motorcycle companion app. This poli
 
 ## 1. Data We Do NOT Collect
 
-Vegvísir does **not** collect, store, transmit, or share any personal data. Specifically:
+Vegvísir has **no servers of its own**. We operate no backend, and no data of any
+kind is sent to, stored on, or processed by infrastructure we control.
+Specifically:
 
 - ❌ No user accounts or registration
 - ❌ No analytics or usage tracking
 - ❌ No crash reporting sent to external servers
 - ❌ No advertising SDKs or third-party trackers
 - ❌ No data is ever sent to servers operated by this app
+
+To work, the app does send your coordinates to independent public map and
+weather services — no account, identifier or profile is attached, but the
+requests do leave your device. Section 2 lists every one of them.
 
 ---
 
@@ -29,25 +35,42 @@ The app requests access to your device's GPS location for the following purposes
 | SOS / Emergency tab | Finding nearest emergency services; sharing your coordinates via your device's share sheet |
 | Trip Logger tab | Recording GPS route and calculating distance while riding |
 
-**Your location is never sent to any server operated by Vegvísir.**
+**Your location is never sent to any server operated by Vegvísir** — we have none.
 
-When location is used for POI searches, anonymised coordinates are sent to these **third-party open APIs**:
+Coordinates are sent to these **third-party open APIs**, all keyless and
+anonymous. They receive coordinates but no user identifier:
 
-- **Nominatim (OpenStreetMap)** — reverse geocoding: `https://nominatim.openstreetmap.org` — [Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy)
-- **Overpass API** — POI queries: `https://overpass-api.de` — [Privacy Policy](https://wiki.openstreetmap.org/wiki/Overpass_API)
-- **Open-Meteo** — weather data: `https://open-meteo.com` — [Privacy Policy](https://open-meteo.com/en/terms)
+| Service | What it receives | Terms |
+|---------|------------------|-------|
+| **Nominatim (OpenStreetMap)** `nominatim.openstreetmap.org` | your current coordinates, for reverse geocoding | [Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy) |
+| **Overpass API** `overpass-api.de`, and the fallback mirrors `overpass.kumi.systems` and `maps.mail.ru` | your current coordinates, for POI queries | [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
+| **Open-Meteo** `api.open-meteo.com` | your current coordinates, for weather | [Terms](https://open-meteo.com/en/terms) |
+| **OSM tile server** `tile.openstreetmap.de` | the map tiles you view, which indicate the area you are looking at | [Tile policy](https://operations.osmfoundation.org/policies/tiles/) |
+| **Wikipedia REST API** `*.wikipedia.org` | a place name only — **not** your coordinates | [Privacy Policy](https://foundation.wikimedia.org/wiki/Privacy_policy) |
 
-These are anonymous, keyless public APIs. They receive coordinates but no user identifiers.
+If an Overpass request fails, the app retries against the mirrors listed above.
+`maps.mail.ru` is operated in Russia; if that matters to you, avoid the
+POI-search tabs, which are the only feature that uses Overpass.
 
 ---
 
 ## 3. Trip Logger Data
 
-GPS coordinates recorded by the Trip Logger are stored **only on your device** using local storage (AsyncStorage). This data:
+GPS coordinates recorded by the Trip Logger are stored **only on your device**
+using local storage (AsyncStorage). Distances, speeds and ride statistics are
+calculated on-device from those points. Recorded routes are drawn on the map
+directly from them; nothing about a recorded ride is sent anywhere. This data:
 
 - Is never uploaded or transmitted anywhere
 - Can be deleted at any time from within the app (Settings → Clear Cache, or per-ride delete)
 - Is lost if you uninstall the app
+
+Only if *you* choose to export a ride as a GPX file does it leave the device, via
+your own device's share sheet, to wherever you send it.
+
+> Until version 1.4.0 the app sent recorded routes to a third-party service
+> (`router.project-osrm.org`) to snap them to the road network for display. That
+> was removed on 2026-07-25; trip routes are no longer transmitted anywhere.
 
 ---
 
@@ -63,19 +86,22 @@ POI search results (restaurants, hotels, etc.) are cached **locally on your devi
 
 ## 5. Background Location
 
-The app uses background location access **only when a trip is actively being recorded** in the Trip Logger. Background location is used solely to track GPS points while the screen is locked. The app does not access location in the background at any other time.
+The app uses background location access **only when a trip is actively being recorded** in the Trip Logger. Background location is used solely to track GPS points while the screen is locked, writing them to on-device storage; the background service itself makes no network requests. The app does not access location in the background at any other time.
+
+While background recording is active, Android shows an ongoing notification ("Recording your ride in the background") for as long as it continues.
 
 ---
 
 ## 6. Third-Party Services
 
-The app uses the following third-party services. No personal data is sent to any of them beyond what is listed above.
+The app uses the following third-party services. No personal data is sent to any of them beyond what is described in sections 2 and 3.
 
 | Service | Purpose | Privacy Policy |
 |---------|---------|----------------|
 | OpenStreetMap / Nominatim | Address lookup & POI data | [osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy) |
-| Overpass API | POI queries | [wiki.openstreetmap.org/wiki/Overpass_API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
+| Overpass API (+ kumi.systems, maps.mail.ru mirrors) | POI queries | [wiki.openstreetmap.org/wiki/Overpass_API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
 | Open-Meteo | Weather forecasts | [open-meteo.com/en/terms](https://open-meteo.com/en/terms) |
+| OpenStreetMap tile server (tile.openstreetmap.de) | Map imagery | [operations.osmfoundation.org/policies/tiles](https://operations.osmfoundation.org/policies/tiles/) |
 | Wikipedia REST API | Place descriptions | [wikimedia.org/wiki/Privacy_policy](https://foundation.wikimedia.org/wiki/Privacy_policy) |
 
 ---
