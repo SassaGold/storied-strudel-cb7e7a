@@ -4,15 +4,27 @@
   apple-touch-icon.png (180x180) and assets/logo.png (512x512, transparent).
 
   HOW TO RUN — paths below are absolute and span BOTH repos, so this must be
-  served from the parent directory that contains storied-strudel-cb7e7a/ and
-  sassagold-landing/ side by side:
+  served from the parent workspace that contains storied-strudel-cb7e7a/ and
+  sassagold-landing/ side by side. From that workspace:
 
-      node store-listing/brand/brand-render-server.js     # from that parent, on :8099
-      open http://127.0.0.1:8099/site-brand-generator.html
+      node tools/render.js storied-strudel-cb7e7a/store-listing/brand/site-brand-generator.html \
+        --only=og,touch,navlogo --flatten=og,touch
 
-  The nav/footer logo must keep its alpha channel, so it is saved by POSTing
-  the canvas blob to /save — a browser element screenshot composites against
-  the page background and silently bakes in an opaque tile.
+  og and touch are full-bleed opaque designs, so they are flattened: it drops a
+  useless alpha channel (og goes ~914KB -> ~380KB) and avoids the odd
+  compositing iOS can apply to a transparent apple-touch-icon. navlogo is the
+  one that MUST keep its alpha.
+
+  render.js starts its own server and writes each canvas to tools/out/. To
+  poke at the page by hand instead: `node tools/serve.js` then open
+  http://127.0.0.1:8099/storied-strudel-cb7e7a/store-listing/brand/site-brand-generator.html
+
+  The nav/footer logo must keep its alpha channel. render.js exports via
+  canvas.toDataURL, which preserves it; do NOT use a browser element
+  screenshot, which composites against the page background and silently bakes
+  in an opaque tile. Conversely, anything bound for Google Play must be
+  flattened (`--flatten=`), because Play requires "24-bit PNG (not
+  transparent)" and toDataURL always emits RGBA.
 
   The charset declaration above is load-bearing: without it Chrome decodes
   this file as latin-1 and "Vegvísir" renders as "VegvÃ­sir" on the card.
