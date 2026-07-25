@@ -7,8 +7,9 @@ Use this checklist before submitting to Google Play.
 ## ✅ Already Done (in-code)
 
 - [x] Android package name: `com.sassagold.whereami`
-- [x] App version: **1.4.0** in `app.json` (the source of truth `scripts/version-bump.js` reads), submitted to Play and awaiting review; **live on Play: 1.3.0** until review clears
-  - ⚠️ 1.4.0 was hand-edited into `app.json` rather than set with `npm run version:patch`, so `package.json` and `README.md` were left at 1.2.6 and had to be corrected by hand on 2026-07-25. Use `npm run version:*` for future bumps so all three stay in sync.
+- [x] App version: **1.4.1** in `app.json` (the source of truth `scripts/version-bump.js` reads), bumped with `npm run version:patch` so `package.json` and `README.md` stayed in sync
+  - ⚠️ **1.4.0 is still in Play review and 1.3.0 is live.** Do not submit 1.4.1 — build, listing text or assets — until 1.4.0 clears, or the change sets stack.
+  - For context: 1.4.0 was hand-edited into `app.json` rather than set with `npm run version:patch`, leaving `package.json` and `README.md` at 1.2.6 until they were corrected by hand on 2026-07-25. Use `npm run version:*` and this does not happen.
 - [x] Android `versionCode`: auto-incremented by EAS on each production build via `autoIncrement: true` in `eas.json`
 - [x] Adaptive icon: foreground + background + monochrome (`assets/images/android-icon-*.png`)
 - [x] Splash screen configured (white/dark background, branded icon)
@@ -95,7 +96,7 @@ Source of the assets, for regenerating or for the next release:
 | App icon | Taken automatically from the uploaded AAB |
 | Feature graphic | `store-listing/graphics/<locale>/feature-graphic.png` (1024×500) |
 | Phone screenshots | `store-listing/graphics/<locale>/screenshots/01..08` (1080×1920) |
-| Release notes | `store-listing/locales/<locale>/whats-new-1.4.0.txt` (≤500) |
+| Release notes | `store-listing/locales/<locale>/whats-new-<version>.txt` (≤500) — 1.4.1 written, all five locales, longest 424/500 |
 | Category | **Travel & Local** |
 | Tags | motorcycle, biker, navigation, trip logger, POI |
 | Email | support@sassagold.com |

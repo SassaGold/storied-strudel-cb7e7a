@@ -1,0 +1,7 @@
+🔒 En privatlivsopdatering.
+
+• Ture, du optager, bliver nu helt på din telefon. Rutekortet tegnes ud fra dine egne GPS-punkter — intet om en tur sendes nogen steder.
+• Færre tredjepartsservere ser dine søgninger: kortmatchningstjenesten er fjernet, og en af spejlserverne til kortdata er taget ud af brug.
+• Underteksten øverst taler nu dit sprog.
+
+Ingen annoncer, ingen sporing — du farer aldrig vild.
