@@ -33,8 +33,7 @@ Audited against the source on 2026-07-25. Every endpoint is in `lib/config.ts`.
 | `nominatim.openstreetmap.org` | Rider HQ load / Update location | precise coordinates |
 | `api.open-meteo.com` | Rider HQ load / Update location | precise coordinates |
 | `overpass-api.de` | opening a POI tab (auto-searches) | precise coordinates |
-| `overpass.kumi.systems` | fallback when the above fails | precise coordinates |
-| `maps.mail.ru` | fallback, **operated in Russia** | precise coordinates |
+| `overpass.kumi.systems` | opening a POI tab (round-robin with the above) | precise coordinates |
 | `tile.openstreetmap.de` | any map view | the tile area being viewed |
 | `*.wikipedia.org` | opening a place description | a place name, **not** coordinates |
 

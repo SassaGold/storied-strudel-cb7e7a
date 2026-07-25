@@ -24,11 +24,14 @@ export const WIKIPEDIA_SUMMARY_URL = (lang: string, title: string) =>
 
 // ── Overpass API ──────────────────────────────────────────────────────────────
 
-/** Overpass API mirrors — free OpenStreetMap data, no API key required. */
+/** Overpass API mirrors — free OpenStreetMap data, no API key required.
+ *  Requests round-robin across these (see fetchOverpass), so every entry here
+ *  receives a share of rider coordinates — they are not ordered fallbacks.
+ *  maps.mail.ru was dropped on 2026-07-25 for that reason: it is operated in
+ *  Russia and was taking roughly a third of all POI queries. */
 export const OVERPASS_ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
-  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
 ];
 
 /** Default per-request timeout for Overpass queries (ms). */

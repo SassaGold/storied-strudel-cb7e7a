@@ -199,16 +199,17 @@ was the only thing that ever put trip data off-device.
 |---|---|---|---|
 | `nominatim.openstreetmap.org` | reverse geocoding | current coordinates | ✅ yes |
 | `overpass-api.de` | POI queries | current coordinates | ✅ yes |
-| `overpass.kumi.systems` | Overpass mirror/fallback | current coordinates | ✅ added 2026-07-25 |
-| `maps.mail.ru` | Overpass mirror/fallback | current coordinates | ✅ added 2026-07-25 |
+| `overpass.kumi.systems` | Overpass mirror (round-robin, **not** fallback) | current coordinates | ✅ added 2026-07-25 |
 | `api.open-meteo.com` | weather | current coordinates | ✅ yes |
 | `tile.openstreetmap.de` | map tiles | coordinates, via tile path per pan/zoom | ✅ added 2026-07-25 |
 | `*.wikipedia.org` | place descriptions | place title (not coordinates) | ✅ yes |
 | `www.yr.no` | outbound link to forecast page | nothing until the user taps | n/a |
 
-`maps.mail.ru` is a Russian-operated host taking rider coordinates as an Overpass
-fallback. It is now disclosed in all five locales, but whether to keep it at all
-is still an open product decision.
+`fetchOverpass` **round-robins** across the endpoints rather than failing over in
+order, so every mirror in the list receives a share of the queries. A third
+mirror, `maps.mail.ru`, was operated in Russia and was therefore taking roughly a
+third of all POI searches — not the rare last resort the docs previously implied.
+It was removed on 2026-07-25.
 
 ### 7. Background Location Permission Declaration
 Google Play will request a **Prominent Disclosure** for `ACCESS_BACKGROUND_LOCATION`.
