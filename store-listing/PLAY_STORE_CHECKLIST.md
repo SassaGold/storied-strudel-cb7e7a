@@ -33,7 +33,10 @@ Use this checklist before submitting to Google Play.
 - [x] Privacy statement in About screen (links to privacy policy)
 - [x] `store-listing/privacy_policy.md` created (covers background location, Trip Logger data, third-party APIs)
 - [x] Listing copy in `store-listing/locales/{en-US,no-NO,sv-SE,da-DK,is-IS}/` — all five, Vegvísir-branded (title ≤30, short ≤80, full ≤4000 — all verified) ✓
-- [x] Branded screenshots + feature graphics in `store-listing/graphics/` (rerun via `node scripts/render-store-assets.js`) ✓
+- [x] Branded screenshots + feature graphics in `store-listing/graphics/` ✓
+  — ⚠️ **not** regenerable with `scripts/render-store-assets.js`; that script is
+  superseded and now refuses to run without `--force`. See "Regenerating store
+  graphics" below.
 - [x] All map tiles served from OpenStreetMap (no Google Maps API key required)
 - [x] `edgeToEdgeEnabled: true` in `app.json` for Android 15+
 
@@ -98,8 +101,48 @@ Source of the assets, for regenerating or for the next release:
 | Email | support@sassagold.com |
 | Privacy policy URL | Hosted URL from step 1 above |
 
-Regenerate graphics with `node scripts/render-store-assets.js` (raw captures in
-`store-listing/raw/`). Push text and release notes with
+### Regenerating store graphics (read before trying)
+
+**`scripts/render-store-assets.js` does not reproduce the committed assets.** It
+renders a phone-mockup feature graphic titled "Where Am I" and wraps screenshots
+in a marketing panel; the committed assets are a Vegvísir stave-and-wordmark
+graphic and raw unframed captures. It writes to the same paths, so running it
+destroys them. It now refuses to run without `--force`.
+
+- **Feature graphics — reconstructed generator, 2026-07-25.**
+  `store-listing/brand/feature-graphic-generator.html` renders all five:
+
+  ```bash
+  node tools/render.js storied-strudel-cb7e7a/store-listing/brand/feature-graphic-generator.html \
+    --only=feat-en-US,feat-no-NO,feat-sv-SE,feat-da-DK,feat-is-IS \
+    --flatten=feat-en-US,feat-no-NO,feat-sv-SE,feat-da-DK,feat-is-IS
+  ```
+
+  The original generator was never committed (`dda7b26` added the PNGs and the
+  uploader, no renderer). This rebuilds the design from parts that do exist: the
+  stave drawn as vector, lifted from `scripts/render-brand.js`, and the photo
+  `sassagold-landing/assets/herofinal.jpg`. The stave is **drawn**, not pasted
+  from `brand/vegvisir-gold-ring.png` — that PNG has an opaque background and
+  would show as a square patch.
+
+  ⚠️ **A faithful reconstruction, not a byte-exact reproducer.** Mean
+  per-channel difference against the committed graphics is ~24/255, almost all
+  of it in the blurred photo. Use it for *new* output — a new locale, a changed
+  slogan. **The committed PNGs remain the source of truth for what was
+  submitted** and are deliberately left untouched.
+
+  `herofinal.jpg` used to have "Where Am I – Explore. Ride. Discover" burned
+  into it, which forced a radial darkening over the lower right to hide it —
+  and it ghosted back through once when a gradient was tweaked. The photo was
+  cleaned in `sassagold-landing` (PR #44) and the workaround is gone. **If ghost
+  text ever reappears, the photo has been reverted, not the crop.**
+- **Screenshots — reproducible.** They are raw 1080×1920 device captures. Take
+  them with `adb exec-out screencap -p` against a build of the version being
+  shipped, one set per locale, matching the existing 8-shot order.
+- ⚠️ **The 40 screenshots now in review show "Where Am I" in the app header** —
+  they were captured from a 1.3.0-era build. Re-capture them for 1.4.1.
+
+Push text and release notes with
 `node scripts/push-play-listing.js --key <sa.json> --notes-version <x.y.z>`
 (`--dry-run` first to see the length report). For future release notes follow
 `whats-new-template.txt` — lead with rider benefits, not internal labels like

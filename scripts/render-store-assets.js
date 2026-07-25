@@ -142,6 +142,38 @@ function featureHtml(shotB64, logoB64, tagline) {
   </body></html>`;
 }
 
+// ── SUPERSEDED — do not run without reading this ─────────────────────────────
+//
+// This script does NOT produce the store assets currently committed under
+// store-listing/graphics/, and running it overwrites them in place.
+//
+// What it produces vs what shipped:
+//   - feature graphics: this renders a phone-mockup layout titled "Where Am I"
+//     (see featureHtml below). The committed ones are a Vegvísir-branded
+//     stave + wordmark over a photo, with no phone.
+//   - screenshots: this wraps each capture in a marketing panel. The committed
+//     ones are raw 1080x1920 app captures with no frame.
+//
+// The generator that made the current assets was never committed (dda7b26 added
+// the PNGs and push-play-graphics.js, but no renderer), and its background photo
+// is not in the repo either, so the feature graphics cannot currently be
+// reproduced. The committed PNGs are the source of truth. The stave artwork does
+// survive at store-listing/brand/vegvisir-gold-ring.png.
+//
+// Screenshots ARE reproducible: capture them from a device at 1080x1920
+// (adb exec-out screencap) against a build of the version being shipped.
+//
+// Guarded on 2026-07-25 after this was found still being recommended by
+// PLAY_STORE_CHECKLIST.md while 40 screenshots sat in Play review.
+if (!process.argv.includes('--force')) {
+  console.error(
+    'render-store-assets.js is SUPERSEDED and would overwrite the committed\n' +
+    'store assets with old-branded ones. Read the comment at the top of this\n' +
+    'file. Pass --force only if you have decided that is what you want.'
+  );
+  process.exit(1);
+}
+
 (async () => {
   const browser = await chromium.launch({ channel: 'msedge' });
   const logoB64 = b64('logo.png');
