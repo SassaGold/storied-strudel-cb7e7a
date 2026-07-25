@@ -52,9 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "HURTIGNAVIGASJON",
-    "badge": "🏍️ RIDER HQ",
-    "title": "HVOR ER JEG?",
+    "quickNav": "HURTIGNAVIGASJON",    "tagline": "Vegvísir – Utforsk. Kjør. Oppdag",
     "slogan": "Du går deg aldri vill.",
     "subtitle": "Din plassering og kjøreforhold.",
     "updateLocation": "OPPDATER PLASSERING",

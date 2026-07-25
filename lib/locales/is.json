@@ -52,9 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "FLJÓTLEGAR LEIÐIR",
-    "badge": "🏍️ RIDER HQ",
-    "title": "HVAR ER ÉG?",
+    "quickNav": "FLJÓTLEGAR LEIÐIR",    "tagline": "Vegvísir – Kannaðu. Keyrðu. Uppgötvaðu",
     "slogan": "Þú villist aldrei.",
     "subtitle": "Staðsetning þín og akstursskilyrði.",
     "updateLocation": "UPPFÆRA STAÐSETNINGU",
