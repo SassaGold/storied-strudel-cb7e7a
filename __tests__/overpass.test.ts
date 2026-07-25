@@ -191,12 +191,7 @@ describe("fetchOverpass", () => {
         status: 500,
         headers: headersWithRetryAfter(null),
       })
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        headers: headersWithRetryAfter(null),
-      })
-      // would be call 5 if cooled endpoint were incorrectly retried
+      // would be a further call if the cooled endpoint were incorrectly retried
       .mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -208,9 +203,11 @@ describe("fetchOverpass", () => {
     await fetchOverpass("[out:json];node(1);out;", 1_000);
     await expect(fetchOverpass("[out:json];node(2);out;", 1_000)).rejects.toThrow("Overpass error 500");
 
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    // Two mirrors: call 1 burns both (403 then 200), call 2 has only the
+    // non-cooling one left to try, so three fetches in total rather than four.
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     const secondCallEndpoints = fetchMock.mock.calls.slice(2).map((args) => args[0]);
-    expect(secondCallEndpoints).toEqual([OVERPASS_ENDPOINTS[1], OVERPASS_ENDPOINTS[2]]);
+    expect(secondCallEndpoints).toEqual([OVERPASS_ENDPOINTS[1]]);
     expect(secondCallEndpoints).not.toContain(OVERPASS_ENDPOINTS[0]);
   });
 });

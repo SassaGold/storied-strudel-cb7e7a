@@ -43,14 +43,14 @@ anonymous. They receive coordinates but no user identifier:
 | Service | What it receives | Terms |
 |---------|------------------|-------|
 | **Nominatim (OpenStreetMap)** `nominatim.openstreetmap.org` | your current coordinates, for reverse geocoding | [Privacy Policy](https://osmfoundation.org/wiki/Privacy_Policy) |
-| **Overpass API** `overpass-api.de`, and the fallback mirrors `overpass.kumi.systems` and `maps.mail.ru` | your current coordinates, for POI queries | [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
+| **Overpass API** `overpass-api.de` and the mirror `overpass.kumi.systems` | your current coordinates, for POI queries | [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
 | **Open-Meteo** `api.open-meteo.com` | your current coordinates, for weather | [Terms](https://open-meteo.com/en/terms) |
 | **OSM tile server** `tile.openstreetmap.de` | the map tiles you view, which indicate the area you are looking at | [Tile policy](https://operations.osmfoundation.org/policies/tiles/) |
 | **Wikipedia REST API** `*.wikipedia.org` | a place name only — **not** your coordinates | [Privacy Policy](https://foundation.wikimedia.org/wiki/Privacy_policy) |
 
-If an Overpass request fails, the app retries against the mirrors listed above.
-`maps.mail.ru` is operated in Russia; if that matters to you, avoid the
-POI-search tabs, which are the only feature that uses Overpass.
+POI searches are spread across both Overpass servers in rotation, so each of
+them sees a share of the queries. A third mirror operated in Russia
+(maps.mail.ru) was removed on 2026-07-25.
 
 ---
 
@@ -102,7 +102,7 @@ The app uses the following third-party services. No personal data is sent to any
 | Service | Purpose | Privacy Policy |
 |---------|---------|----------------|
 | OpenStreetMap / Nominatim | Address lookup & POI data | [osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy) |
-| Overpass API (+ kumi.systems, maps.mail.ru mirrors) | POI queries | [wiki.openstreetmap.org/wiki/Overpass_API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
+| Overpass API (+ the kumi.systems mirror) | POI queries | [wiki.openstreetmap.org/wiki/Overpass_API](https://wiki.openstreetmap.org/wiki/Overpass_API) |
 | Open-Meteo | Weather forecasts | [open-meteo.com/en/terms](https://open-meteo.com/en/terms) |
 | OpenStreetMap tile server (tile.openstreetmap.de) | Map imagery | [operations.osmfoundation.org/policies/tiles](https://operations.osmfoundation.org/policies/tiles/) |
 | Wikipedia REST API | Place descriptions | [wikimedia.org/wiki/Privacy_policy](https://foundation.wikimedia.org/wiki/Privacy_policy) |
