@@ -1,6 +1,6 @@
 Vegvísir — Motorcyklistens följeslagare 🏍️
 
-Allt du behöver på vägen, i en ren och snygg app. Vegvísir är byggd för motorcyklister som vill ha lokal information i realtid, smart turloggning och trygghet i nödsituationer — utan konto, utan reklam och utan datainsamling.
+Allt du behöver på vägen, i en ren och snygg app. Vegvísir är byggd för motorcyklister som vill ha lokal information i realtid, smart turloggning och trygghet i nödsituationer — utan konto, utan reklam och utan spårning.
 
 (Nytt namn, samma app — Vegvísir hette tidigare Where Am I.)
 
@@ -61,11 +61,11 @@ En dedikerad nödskärm, ett tryck bort:
 Fullständigt gränssnitt på svenska, danska, norska, engelska och isländska — byt direkt, sparas för alltid.
 
 ━━━━━━━━━━━━━━━━━━━━
-🔒 INTEGRITET — INGA DATA SAMLAS IN
+🔒 INTEGRITET — INGEN REKLAM, INGEN SPÅRNING, INGET KONTO
 ━━━━━━━━━━━━━━━━━━━━
 • Inget konto krävs
 • Ingen reklam, analys eller spårning
-• Din position används endast på enheten
+• Din position skickas till OpenStreetMap och Open-Meteo för att hitta platser och väder i närheten — aldrig till oss, och vi har ingen server
 • Turloggar stannar på din enhet
 • Öppna data: OpenStreetMap, Open-Meteo, Wikipedia
 
