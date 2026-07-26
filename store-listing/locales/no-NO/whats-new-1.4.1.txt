@@ -1,6 +1,6 @@
 🔧 Posisjonen fungerer igjen.
 
-• Retter en feil som hindret appen fra å finne posisjonen din — Rider HQ, søk i nærheten, turopptak og SOS var alle rammet. Fant ikke appen deg? Denne oppdateringen løser det.
+• Retter en feil som hindret appen fra å finne posisjonen din — Rider HQ, søk i nærheten, turlogging og SOS var alle rammet. Fant ikke appen deg? Denne oppdateringen løser det.
 • Turer du tar opp blir nå værende på telefonen din. Rutekartet tegnes fra dine egne GPS-punkter — ingenting om en tur sendes noe sted.
 • Færre tredjepartsservere ser søkene dine.
 • Undertittelen i toppen snakker nå ditt språk.

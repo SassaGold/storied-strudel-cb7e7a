@@ -1,6 +1,6 @@
 🔧 Location is working again.
 
-• Fixes a bug that stopped the app finding your position — Rider HQ, nearby searches, ride recording and SOS were all affected. If the app could not locate you, this update fixes it.
+• Fixes a bug that stopped the app finding your position — Rider HQ, nearby searches, trip logging and SOS were all affected. If the app could not locate you, this update fixes it.
 • Recorded rides now stay entirely on your phone. Route maps are drawn from your own GPS points — nothing about a trip is sent anywhere.
 • Fewer third-party servers see your searches.
 • The header tagline now speaks your language.
