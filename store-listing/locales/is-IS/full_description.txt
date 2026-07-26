@@ -1,6 +1,6 @@
 Vegvísir — félagi mótorhjólafólksins 🏍️
 
-Allt sem þú þarft á veginum, í einu snyrtilegu appi. Vegvísir er smíðað fyrir mótorhjólafólk sem vill staðbundnar upplýsingar í rauntíma, snjalla ferðaskráningu og öryggi í neyðartilvikum — án aðgangs, án auglýsinga og án gagnasöfnunar.
+Allt sem þú þarft á veginum, í einu snyrtilegu appi. Vegvísir er smíðað fyrir mótorhjólafólk sem vill staðbundnar upplýsingar í rauntíma, snjalla ferðaskráningu og öryggi í neyðartilvikum — án aðgangs, án auglýsinga og án rakningar.
 
 (Nýtt nafn, sama app — Vegvísir hét áður Where Am I.)
 
@@ -61,11 +61,11 @@ Sérstakur neyðarskjár, í einni snertingu:
 Allt viðmótið á íslensku, ensku, norsku, sænsku og dönsku — skiptu samstundis, munað að eilífu.
 
 ━━━━━━━━━━━━━━━━━━━━
-🔒 PERSÓNUVERND — ENGIN GAGNASÖFNUN
+🔒 PERSÓNUVERND — ENGAR AUGLÝSINGAR, ENGIN RAKNING, ENGINN AÐGANGUR
 ━━━━━━━━━━━━━━━━━━━━
 • Enginn aðgangur nauðsynlegur
 • Engar auglýsingar, greining eða rakning
-• Staðsetningin þín er aðeins notuð í tækinu
+• Staðsetningin þín er send til OpenStreetMap og Open-Meteo til að finna staði og veður í nágrenninu — aldrei til okkar, og við höfum engan netþjón
 • Ferðaskrár verða eftir í tækinu þínu
 • Opin gögn: OpenStreetMap, Open-Meteo, Wikipedia
 
