@@ -71,7 +71,6 @@
       ],
       "./plugins/withAndroidEdgeToEdge",
       "./plugins/withMaterialVersion",
-      "./plugins/withProguardOptimize",
       "./plugins/withMlkitOrientationFix",
       "expo-font",
       "expo-localization"
