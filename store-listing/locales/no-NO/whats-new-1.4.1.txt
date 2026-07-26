@@ -1,7 +1,6 @@
-🔒 En personvernoppdatering.
+🔧 Posisjonen fungerer igjen.
 
+• Retter en feil som hindret appen fra å finne posisjonen din — Rider HQ, søk i nærheten, turlogging og SOS var alle rammet. Fant ikke appen deg? Denne oppdateringen løser det.
 • Turer du tar opp blir nå værende på telefonen din. Rutekartet tegnes fra dine egne GPS-punkter — ingenting om en tur sendes noe sted.
-• Færre tredjepartsservere ser søkene dine: karttilpasningstjenesten er fjernet, og en av speilserverne for kartdata er tatt ut av bruk.
+• Færre tredjepartsservere ser søkene dine.
 • Undertittelen i toppen snakker nå ditt språk.
-
-Ingen reklame, ingen sporing — du går deg aldri vill.

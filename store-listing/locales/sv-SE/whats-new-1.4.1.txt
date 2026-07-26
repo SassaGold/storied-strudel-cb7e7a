@@ -1,7 +1,6 @@
-🔒 En integritetsuppdatering.
+🔧 Positionen fungerar igen.
 
+• Rättar ett fel som hindrade appen från att hitta din position — Rider HQ, sökningar i närheten, turloggning och SOS var alla drabbade. Hittade appen dig inte? Det är löst nu.
 • Resor du spelar in stannar nu helt på din telefon. Ruttkartan ritas från dina egna GPS-punkter — ingenting om en resa skickas någonstans.
-• Färre tredjepartsservrar ser dina sökningar: kartmatchningstjänsten är borta, och en av spegelservrarna för kartdata har tagits ur bruk.
+• Färre tredjepartsservrar ser dina sökningar.
 • Underrubriken högst upp talar nu ditt språk.
-
-Inga annonser, ingen spårning — du går aldrig vilse.
