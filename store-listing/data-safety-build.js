@@ -13,6 +13,11 @@
  *
  * Answers and the reasoning behind them: DATA_SAFETY.md in this directory.
  */
+/* global __dirname */
+// The flat eslint config applies eslint-config-expo everywhere and declares no
+// Node globals, so plain CommonJS scripts trip no-undef. Declared locally rather
+// than by adding an override to eslint.config.js, which would also change how
+// the eight pre-existing scripts/*.js files lint.
 const fs = require('fs');
 const path = require('path');
 const { parseCsv, serialiseCsv } = require('./data-safety-csv');

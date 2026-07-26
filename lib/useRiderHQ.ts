@@ -337,8 +337,12 @@ export function useRiderHQ(): RiderHQState {
         roadAlerts: finalRoads,
       };
       storage.setItem(RIDERHQ_CACHE_KEY, JSON.stringify(snapshot)).catch(() => {});
-    } catch {
+    } catch (err) {
       if (activeCallRef.current !== callId) return;
+      // Log before swallowing. This catch used to discard the error entirely,
+      // which made the 1.3.0/1.4.0 release-only expo-location failure invisible
+      // here — the equivalent line in usePOIFetch is what actually identified it.
+      console.error("[useRiderHQ] loadData failed:", err);
       // Offline/GPS failure: keep showing cached data rather than an error.
       if (!cached) setError(t("home.dataError"));
     } finally {
