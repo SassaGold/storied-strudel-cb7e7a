@@ -1,6 +1,6 @@
 🔧 Positionen fungerar igen.
 
-• Rättar ett fel som hindrade appen från att hitta din position — Rider HQ, sökningar i närheten, Trip Logger och SOS var alla drabbade. Hittade appen dig inte? Det är löst nu.
+• Rättar ett fel som hindrade appen från att hitta din position — Rider HQ, sökningar i närheten, turinspelning och SOS var alla drabbade. Hittade appen dig inte? Det är löst nu.
 • Resor du spelar in stannar nu helt på din telefon. Ruttkartan ritas från dina egna GPS-punkter — ingenting om en resa skickas någonstans.
 • Färre tredjepartsservrar ser dina sökningar.
 • Underrubriken högst upp talar nu ditt språk.

@@ -1,6 +1,6 @@
 🔧 Staðsetning virkar aftur.
 
-• Lagfærir villu sem kom í veg fyrir að appið fyndi staðsetninguna þína — Rider HQ, leit í nágrenninu, Trip Logger og SOS urðu öll fyrir þessu. Fann appið þig ekki? Það er leyst núna.
+• Lagfærir villu sem kom í veg fyrir að appið fyndi staðsetninguna þína — Rider HQ, leit í nágrenninu, ferðaskráning og SOS urðu öll fyrir þessu. Fann appið þig ekki? Það er leyst núna.
 • Ferðir sem þú tekur upp haldast nú alfarið í símanum þínum. Leiðakortið er teiknað úr þínum eigin GPS-punktum — ekkert um ferð er sent neitt.
 • Færri þjónustur þriðja aðila sjá leitirnar þínar.
 • Undirtitillinn efst talar nú þitt tungumál.
