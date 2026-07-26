@@ -1,6 +1,19 @@
 # Data safety declaration — Vegvísir
 
-**Draft for the Play Console questionnaire. Not yet submitted.**
+**Entered in the Play Console on 2026-07-26 and saved.** It is staged in
+Publishing overview as *"Complete Data safety questionnaire"* and has **not yet
+been sent for review** — press *Submit changes for review* to do that. Nothing
+reaches the public listing until then.
+
+Entered by CSV import, not by clicking: the questionnaire has **Export to CSV /
+Import from CSV** buttons, which is far faster and auditable. The exact file that
+was imported is `data-safety.csv` in this directory, and `data-safety-build.js`
+regenerates it from a fresh export. Re-export before reusing — the schema is
+Google's and can change.
+
+> ⚠️ **One answer differs from the original draft: `Processed ephemerally` is
+> now `No`, not `Yes`.** See "Two judgment calls" below for why the answer was
+> reversed. The tables in this file reflect what was actually submitted.
 
 ## Why this exists
 
@@ -36,8 +49,16 @@ Audited against the source on 2026-07-25. Every endpoint is in `lib/config.ts`.
 | `overpass.kumi.systems` | opening a POI tab (round-robin with the above) | precise coordinates |
 | `tile.openstreetmap.de` | any map view | the tile area being viewed |
 | `*.wikipedia.org` | opening a place description | a place name, **not** coordinates |
+| `www.yr.no` | **tapping** the weather card | precise coordinates at 4 dp (~11 m), in the URL path |
 
 Nothing goes to a SassaGold server, because there is none.
+
+`yr.no` is the one genuinely user-initiated transfer, and the only entry here that
+is not an in-app `fetch`: `WeatherCard` calls `Linking.openURL(weatherUrl)`
+(`components/WeatherCard.tsx:122`), handing a URL built in `lib/useRiderHQ.ts:369`
+to the external browser. Play's user-initiated carve-out does apply, so it does
+not change any answer below — it is listed because this table claims to be a
+complete account of what leaves the device.
 
 Most of these fire **automatically** on screen load, not on an explicit user
 action — Rider HQ geocodes and fetches weather when it opens, and the POI tabs
@@ -75,7 +96,7 @@ browsing, app info and performance, device or other IDs — is **not collected**
 |---|---|---|
 | Collected | **Yes** | **Yes** |
 | Shared | **Yes** | **Yes** |
-| Processed ephemerally | **Yes** | **Yes** |
+| Processed ephemerally | **No** | **No** |
 | Required or optional | **Optional** — the app runs without granting location | same |
 | Purpose | **App functionality** only | same |
 
@@ -83,11 +104,47 @@ Approximate location is included because the app declares
 `ACCESS_COARSE_LOCATION` alongside `ACCESS_FINE_LOCATION` (`app.json`), so a
 coarse fix can be what gets sent.
 
-"Processed ephemerally" is accurate: coordinates are used to service a single
-request and are not retained by us — we operate no server. It does **not**
-remove the duty to declare; it only keeps the entry off the public listing card.
+Two further answers the questionnaire demands once collection is `Yes`, both
+accurate and both entered: account creation → *"My app does not allow users to
+create an account"*, and *"Can users login with accounts created outside of the
+app?"* → **No**. The app has no auth of any kind. The export marks the second
+`OPTIONAL`, but the form blocks on it, so it must be in the CSV.
+
+**Resulting public store-listing card**, read from the Step 5 preview:
+
+| Section | Shows |
+|---|---|
+| Data shared | Location — Approximate, Precise |
+| Data collected | Location — Approximate, Precise |
+| Data deletion | Developer hasn't provided a way to request data deletion |
+| Security practices | Data is encrypted in transit |
+| Privacy policy | `https://sassagold.com/privacy` |
 
 ---
+
+## Three judgment calls, flagged rather than buried
+
+**0. "Processed ephemerally" — reversed to No on 2026-07-26.**
+The original draft answered `Yes`, reasoning that coordinates service a single
+request and are not retained *by us*, since we run no server. That reasoning is
+sound about our own infrastructure and wrong about the question. Play's
+definition — *"only stored in memory, and is retained for no longer than
+necessary to service the specific request in real-time"* — describes what happens
+to the data **after it leaves the device**, which here means what Nominatim,
+Overpass, Open-Meteo and the OSM tile servers do with it. They are independent
+public services that log requests; we cannot assert in-memory-only retention on
+their behalf.
+
+It also mattered publicly. With `ephemeral: Yes` the Step 5 preview still read
+*"No data collection declared — The developer says this app doesn't collect user
+data"*, because ephemeral collection is disclosed to Google but hidden from the
+listing card. That is the exact sentence this whole correction exists to remove.
+Answering `No` surfaces Location under **Data collected** as well as **Data
+shared**.
+
+The risk is asymmetric: over-declaring collection costs nothing, while
+over-claiming ephemerality is a misdeclaration of the same species as the one
+being fixed.
 
 ## Two judgment calls, flagged rather than buried
 
@@ -113,7 +170,18 @@ per-ride delete, or uninstalling.
 - Only step 1 of the 5-step wizard has been read. **Verify the wording and the
   exact fields against the live form** — this draft is the intended answers, not
   a transcript.
-- Re-check the host table above against `lib/config.ts` if any release has
-  shipped since 2026-07-25.
+- ✅ **Host table re-audited against `lib/config.ts` on 2026-07-26.** Endpoints
+  are unchanged apart from the two removals landing in 1.4.1, both verified gone
+  from source (only explanatory comments remain): `router.project-osrm.org` and
+  the `maps.mail.ru` Overpass mirror. Every remaining endpoint is `https://` —
+  the only `http://` in the codebase is the GPX XML namespace in `lib/gpx.ts:32`,
+  which is an identifier, not a request. The re-audit added the `yr.no` row above,
+  which the 2026-07-25 pass had missed. **No proposed answer changes.**
 - The **privacy policy** at `sassagold.com/privacy` already lists every host in
-  this table, in all five locales, so the two are consistent.
+  this table, in all five locales, so the two are consistent. Note it does not
+  mention `yr.no`; harmless, since that transfer is user-initiated and goes to the
+  browser, but worth adding for symmetry the next time those pages are touched.
+- The blocking gate is **lifted**: the 1.4.0 listing change set cleared review on
+  or before 2026-07-26 (confirmed from the public listing — the Vegvísir rename is
+  live, including the brand-new da-DK and is-IS titles). Confirm no *other* change
+  is pending in Publishing overview before opening the questionnaire.
