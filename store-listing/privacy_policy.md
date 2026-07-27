@@ -70,9 +70,8 @@ your own device's share sheet, to wherever you send it.
 
 > **Version note.** Versions 1.1.7 through 1.4.0 sent recorded routes to a
 > third-party service (`router.project-osrm.org`) to snap them to the road
-> network for display. That was removed on 2026-07-25 and takes effect in the
-> **first release after 1.4.0** — section 3 describes the app from that release
-> onward. If you are running 1.4.0 or earlier, your recorded routes are still
+> network for display. That was removed in **1.4.1**, released 2026-07-27 —
+> section 3 describes the app from that release onward. If you are running 1.4.0 or earlier, your recorded routes are still
 > sent when a trip's route map is displayed.
 
 ---
