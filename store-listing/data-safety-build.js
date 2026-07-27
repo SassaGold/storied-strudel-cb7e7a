@@ -40,9 +40,24 @@ SET.set('PSL_HAS_OUTSIDE_APP_ACCOUNTS', 'false');
 // Nothing is held off-device, so there is no deletion request flow.
 SET.set('PSL_SUPPORT_DATA_DELETION_BY_USER|DATA_DELETION_NO', 'true');
 
-// -- Step 3: data types — Location only --------------------------------------
+// -- Step 3: data types — Location, and Device or other IDs ------------------
 SET.set('PSL_DATA_TYPES_LOCATION|PSL_APPROX_LOCATION', 'true');
 SET.set('PSL_DATA_TYPES_LOCATION|PSL_PRECISE_LOCATION', 'true');
+
+// Device or other IDs. Added 2026-07-27 after Google rejected the form for
+// "user data transmitted off devices that you have not disclosed" against
+// version code 57.
+//
+// Cause: expo-notifications links com.google.firebase:firebase-messaging on
+// Android whether or not the app sends push. FCM registers the device with
+// Google at startup and that registration carries a Firebase Instance ID — a
+// device identifier. Confirmed inside the shipped AAB, which contains
+// firebase-iid-interop and play-services-cloud-messaging. The app only ever
+// schedules LOCAL notifications, so this buys no functionality; the intent is
+// to strip FCM in a later release and then remove this declaration.
+//
+// There is no advertising ID: the manifest declares no AD_ID permission.
+SET.set('PSL_DATA_TYPES_IDENTIFIERS|PSL_DEVICE_ID', 'true');
 
 // -- Step 4: usage and handling, identical for both location granularities ----
 for (const t of ['PSL_APPROX_LOCATION', 'PSL_PRECISE_LOCATION']) {
@@ -60,6 +75,22 @@ for (const t of ['PSL_APPROX_LOCATION', 'PSL_PRECISE_LOCATION']) {
   SET.set(`${p}:DATA_USAGE_USER_CONTROL|PSL_DATA_USAGE_USER_CONTROL_OPTIONAL`, 'true');
   SET.set(`${p}:DATA_USAGE_COLLECTION_PURPOSE|PSL_APP_FUNCTIONALITY`, 'true');
   SET.set(`${p}:DATA_USAGE_SHARING_PURPOSE|PSL_APP_FUNCTIONALITY`, 'true');
+}
+
+// -- Step 4: usage and handling for Device or other IDs ----------------------
+{
+  const p = 'PSL_DATA_USAGE_RESPONSES:PSL_DEVICE_ID';
+  // Collected, not shared. Unlike the OSM and weather endpoints — independent
+  // public services, hence Shared: Yes — Firebase is Google acting as a service
+  // provider for the app, which is the transfer Play's "shared" definition
+  // explicitly excludes.
+  SET.set(`${p}:PSL_DATA_USAGE_COLLECTION_AND_SHARING|PSL_DATA_USAGE_ONLY_COLLECTED`, 'true');
+  // Not ephemeral: an FCM registration persists, it is not held for one request.
+  SET.set(`${p}:PSL_DATA_USAGE_EPHEMERAL`, 'false');
+  // Required, not optional: FCM registers at startup and the user cannot turn
+  // it off from inside the app.
+  SET.set(`${p}:DATA_USAGE_USER_CONTROL|PSL_DATA_USAGE_USER_CONTROL_REQUIRED`, 'true');
+  SET.set(`${p}:DATA_USAGE_COLLECTION_PURPOSE|PSL_APP_FUNCTIONALITY`, 'true');
 }
 
 const rows = parseCsv(fs.readFileSync(SRC, 'utf8'));
