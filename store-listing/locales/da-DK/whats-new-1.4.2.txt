@@ -1,0 +1,6 @@
+🧹 Mindre, og hurtigere at åbne.
+
+• Fjernet en komponent appen aldrig brugte. Appen er mindre, og der er mindre at gøre, hver gang den starter.
+• Turlog-fanen viste et norsk ord. Det er rettet.
+
+Intet er ændret i, hvordan appen finder din position, optager en tur eller håndterer dine data.

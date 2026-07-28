@@ -1,0 +1,6 @@
+🧹 Mindre, och snabbare att öppna.
+
+• Tog bort en komponent appen aldrig använde. Appen är mindre, och det är mindre att göra varje gång den startar.
+• Språkrättelser på danska och isländska.
+
+Ingenting är ändrat i hur appen hittar din position, spelar in en tur eller hanterar dina data.
