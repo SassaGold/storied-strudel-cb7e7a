@@ -212,7 +212,7 @@
   "explore": {
     "badge": "🗺️ VEGARSTOPP",
     "title": "VEGARSTOPP",
-    "subtitle": "Áhugaverðir staðir og skoðunarverðir leikir á leið þinni.",
+    "subtitle": "Áhugaverðir staðir og kennileiti á leiðinni.",
     "findButton": "FINNA NÁLÆGA STOPPISTÖÐ",
     "searching": "Leitar að nálægum kennileitum…",
     "locationError": "Staðsetningarleyfi er nauðsynlegt til að finna kennileiti.",
