@@ -1,5 +1,55 @@
 # Changelog
 
+## v1.4.2 — Housekeeping (2026-07-28)
+
+**A barcode scanner that nothing uses no longer ships to users.**
+`expo-dev-launcher` declares `play-services-code-scanner` and
+`mlkit:barcode-scanning` as `implementation` rather than `debugImplementation`,
+so they compiled into every variant. The app has no barcode or QR feature. Eight
+artifacts leave the release classpath — the two declared plus six transitive —
+and with them go `mlkitinitprovider`, a ContentProvider registered under our own
+package that ran at **every launch**, `GmsBarcodeScanningDelegateActivity`, and
+the Firebase `BarcodeRegistrar` / `VisionCommonRegistrar`. Smaller download, less
+work at startup, and one fewer Firebase-linked surface in an app that declares no
+analytics.
+
+The exclude is **release-only** and must stay that way: `expo-dev-launcher` uses
+that scanner to read the Metro QR code, so a blanket exclude would break the
+development workflow instead. Implemented as `plugins/withMlkitReleaseExclude.js`
+because `android/` is generated and gitignored — an edit there would work locally
+and vanish from every EAS build.
+
+This replaces `plugins/withMlkitOrientationFix.js`, which existed only to strip
+`android:screenOrientation` from the scanner activity so Play would stop flagging
+an orientation restriction. With the library gone from the Play artifact that
+advisory has no source, and keeping the plugin would have been worse than
+useless: it wrote the activity into the app's own variant-agnostic
+`AndroidManifest.xml`, so with nothing contributing it in release the node would
+have shipped a declaration pointing at a class no longer in the APK.
+
+**No Data safety change.** "Device or other IDs" is declared because
+`expo-notifications` links `firebase-messaging`, which is untouched here.
+
+### Two locale fixes
+
+- **Danish** showed a Norwegian word: the trip-log badge read `TURLOGG`, where
+  Danish is `TURLOG`. Only the badge — Danish doubles a consonant before a
+  vowel-initial suffix (`blog` → `bloggen`), so `Turlogger` and `Turloggen` were
+  already correct and are untouched.
+- **Icelandic** Explore said *games*: `skoðunarverðir leikir` where every other
+  locale says *sights*. Now `kennileiti`, which the same section already used in
+  its other three strings.
+
+### Verified on a device before release
+
+Release build on a physical phone: `ProviderRequest[HIGH_ACCURACY]` reached the
+OS provider, a real fix rendered with reverse geocode and weather, the
+foreground-service notification posted, and trip recording collected GPS points
+and released cleanly. The R8 mapping contains **zero** MLKit classes while
+`expo.modules.location` is intact. This category of change broke location in
+1.3.0 and 1.4.0, and a debug build cannot detect it — R8 does not run there, and
+the exclude deliberately does not apply.
+
 ## v1.4.1 — Privacy (2026-07-26)
 
 **Recorded trip routes no longer leave the device.** Every build from 1.1.7

@@ -1,0 +1,6 @@
+🧹 Smaller, and quicker to open.
+
+• Removed a component the app never used. The download is smaller and there is less to do every time the app starts.
+• Wording fixes in Danish and Icelandic.
+
+Nothing changed in how the app finds your position, records a ride, or handles your data.

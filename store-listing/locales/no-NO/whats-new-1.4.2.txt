@@ -1,0 +1,6 @@
+🧹 Mindre, og raskere å åpne.
+
+• Fjernet en komponent appen aldri brukte. Appen er mindre, og det er mindre å gjøre hver gang den starter.
+• Språkrettelser på dansk og islandsk.
+
+Ingenting er endret i hvordan appen finner posisjonen din, tar opp en tur eller håndterer dataene dine.
