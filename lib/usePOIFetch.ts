@@ -213,6 +213,30 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       if (activeCallRef.current !== callId) return;
       console.error("[usePOIFetch] loadPlaces failed:", err);
       setError(loadErrorMsg);
+
+      // Fall back to expired cache rather than showing the rider nothing.
+      //
+      // A fresh hit (< CACHE_TTL_MS) is already on screen from the read at the
+      // top of this function, so this only fires once the cache has aged out.
+      // Overpass 504s under load — measured ~9 s per search, failing
+      // intermittently — and on a roadside "here is what was nearby earlier"
+      // beats an empty screen. Results are marked as cached with their real
+      // timestamp, so the age is visible rather than implied.
+      //
+      // Only when nothing is displayed: never replace live results with older
+      // ones, and never overwrite a fresher cache hit with a staler read.
+      if (places.length === 0) {
+        try {
+          const stale = await readTimedCache<Place>(cacheKey, Number.POSITIVE_INFINITY);
+          if (stale && stale.data.length > 0 && activeCallRef.current === callId) {
+            setPlaces(stale.data);
+            setFromCache(true);
+            setCacheTs(stale.ts);
+          }
+        } catch {
+          // Cache unreadable too — the error message already stands.
+        }
+      }
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }

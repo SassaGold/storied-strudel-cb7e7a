@@ -276,3 +276,43 @@ describe("sparse-area escalation", () => {
     expect(mockedFetchOsmPlaces).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("stale cache fallback on failure", () => {
+  it("shows expired cached places rather than an empty screen when the search fails", async () => {
+    // Fresh read (CACHE_TTL_MS) misses — the cache has aged out. The fallback
+    // read, with an infinite TTL, still has yesterday's results.
+    mockedReadCache
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ data: [{ id: "old", name: "Yesterday's cafe" }], ts: 1_000 });
+    mockedFetchOsmPlaces.mockRejectedValue(new Error("Overpass error 504"));
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    // The rider sees something useful AND is told it is old and that the search failed.
+    expect(result.current.places.map((p) => p.id)).toEqual(["old"]);
+    expect(result.current.fromCache).toBe(true);
+    expect(result.current.cacheTs).toBe(1_000);
+    expect(result.current.error).toBeTruthy();
+    consoleSpy.mockRestore();
+  });
+
+  it("does not overwrite live results with stale ones", async () => {
+    // A fresh hit is already on screen; a later failure must not replace it.
+    mockedReadCache.mockResolvedValue({ data: [{ id: "fresh", name: "Open now" }], ts: 9_000 });
+    mockedFetchOsmPlaces.mockRejectedValue(new Error("Overpass error 504"));
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    expect(result.current.places.map((p) => p.id)).toEqual(["fresh"]);
+    expect(result.current.cacheTs).toBe(9_000);
+    consoleSpy.mockRestore();
+  });
+});
