@@ -4,7 +4,7 @@
     "food": "MATUR",
     "sleep": "SVEFN",
     "explore": "KANNA",
-    "garage": "BÍLSKÚR",
+    "garage": "SKÚR",
     "sos": "SOS",
     "trip": "FERÐ",
     "about": "UM"
@@ -236,7 +236,7 @@
   },
   "garage": {
     "badge": "🔧 BÚAST UNDIR",
-    "title": "BÍLSKÚRINN",
+    "title": "SKÚRINN",
     "subtitle": "Finna mótorhjólaþjónustu, bensínstöð, bílastæði og klúbba nálægt.",
     "findButton": "Finna {{title}}",
     "locationError": "Staðsetningarleyfi er nauðsynlegt til að finna nálæga staði.",
@@ -524,7 +524,7 @@
     "unit_metric": "🌍 Metrakerfi  (km · °C)",
     "unit_imperial": "🇺🇸 Enskar einingar (mi · °F)",
     "searchRadius": "LEITARRADÍUS",
-    "searchRadiusDesc": "Radíus til að leita að mat, gistingu og aðdráttarstöðum. Bílskúr- og neyðarflipar nota sinn eigin fastan radíus.",
+    "searchRadiusDesc": "Radíus til að leita að mat, gistingu og aðdráttarstöðum. Skúr- og neyðarflipar nota sinn eigin fastan radíus.",
     "defaultTab": "SJÁLFGEFINN FLIPI",
     "defaultTabDesc": "Hvaða flipi opnast sjálfkrafa þegar forritið ræsist.",
     "language": "TUNGUMÁL",
