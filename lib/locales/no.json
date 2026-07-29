@@ -431,7 +431,7 @@
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
-    "title": "ODOMETER",
+    "title": "KILOMETERTELLER",
     "subtitle": "Ta opp turen din — avstand, rute og varighet.",
     "start": "START TUR",
     "stop": "STOPP TUR",

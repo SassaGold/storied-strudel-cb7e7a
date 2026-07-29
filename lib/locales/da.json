@@ -431,7 +431,7 @@
   },
   "triplog": {
     "badge": "🏍️ TURLOG",
-    "title": "ODOMETER",
+    "title": "KILOMETERTÆLLER",
     "subtitle": "Optag din tur — afstand, rute og varighed.",
     "start": "START TUR",
     "stop": "STOP TUR",
@@ -479,11 +479,11 @@
     "exportFailedMsg": "GPX-filen kunne ikke oprettes eller deles på denne enhed.",
     "maxSpeed": "Maks",
     "totalRides": "Ture",
-    "totalDistance": "Samlet distance",
+    "totalDistance": "Samlet afstand",
     "totalTime": "Samlet tid",
     "pause": "PAUSE",
     "resume": "FORTSÆT",
-    "pausedHint": "Sat på pause — tid og distance er standset",
+    "pausedHint": "Sat på pause — tid og afstand er standset",
     "stopShort": "STOP"
   },
   "about": {
