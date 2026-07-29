@@ -144,7 +144,10 @@ export default function Index() {
 
           <View style={styles.logoWrapper}>
             <Text style={styles.logoMoto}>🏍️</Text>
-            <Text style={styles.logoTitle}>RIDER HQ</Text>
+            {/* Same key as the tab label, so the header and the tab bar can
+                never drift apart — the mismatch that had to be fixed on the
+                site in landing PR #56. */}
+            <Text style={styles.logoTitle}>{t("tabs.home")}</Text>
           </View>
 
           <View style={styles.headerTopRowRight}>

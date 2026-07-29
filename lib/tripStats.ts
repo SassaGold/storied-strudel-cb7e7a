@@ -87,6 +87,43 @@ export const routeDistanceKm = (
   return km;
 };
 
+/**
+ * Merge background-recorded points into the foreground route.
+ *
+ * `earliestValidTs` is the crucial argument. The background buffer can still
+ * hold points written moments after the *previous* ride stopped, and merging
+ * those makes the saved route open with a leg from wherever the rider was last
+ * seen to where this ride actually started. That leg is never real distance —
+ * it inflates distanceKm, and because durationMs is unaffected, avgSpeedKmh
+ * with it.
+ *
+ * Seen in the wild as a saved 9.37 km against a live 5.65 km, the 3.72 km
+ * difference being exactly the distance between the two locations, and an
+ * average of 72 km/h against a true 43 km/h.
+ *
+ * Callers must pass a bound that cannot move: the ride's wall-clock start, or
+ * its earliest recorded point. NOT a pause-adjusted start time, which shifts
+ * forward on every resume and would discard genuine pre-pause points.
+ */
+export const mergeBackgroundPoints = (
+  foreground: GpsPoint[],
+  background: GpsPoint[],
+  earliestValidTs: number,
+  pausedIntervals: PausedInterval[] = []
+): GpsPoint[] => {
+  if (background.length === 0) return [...foreground];
+  const fgTs = new Set(foreground.map((p) => p.timestamp));
+  const inPaused = (ts: number) =>
+    pausedIntervals.some(([s, e]) => ts >= s && ts <= e);
+  const extra = background.filter(
+    (p) =>
+      p.timestamp >= earliestValidTs &&
+      !fgTs.has(p.timestamp) &&
+      !inPaused(p.timestamp)
+  );
+  return [...foreground, ...extra].sort((a, b) => a.timestamp - b.timestamp);
+};
+
 /** Build a SavedRide from a route + timing, or null if it's too short (< ~10 m). */
 export const buildRide = (
   route: GpsPoint[],

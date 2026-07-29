@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "RIDER HQ",
+    "home": "VEGVÍSIR",
     "food": "MAD",
     "sleep": "SØVN",
     "explore": "UDFORSK",
@@ -52,7 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "HURTIG NAVIGATION",    "tagline": "Vegvísir – Udforsk. Kør. Opdag",
+    "quickNav": "HURTIG NAVIGATION",    "tagline": "Udforsk. Kør. Opdag",
     "slogan": "Du farer aldrig vild.",
     "subtitle": "Din placering og køreforhold.",
     "updateLocation": "OPDATER PLACERING",
@@ -86,7 +86,7 @@
     "roadConditionsNone": "✅ Ingen vejarbejde inden for {{radius}}.",
     "roadConditionsCount_one": "{{count}} vejarbejde inden for {{radius}}",
     "roadConditionsCount_other": "{{count}} vejarbejder inden for {{radius}}",
-    "openTrafficMap": "LIVE TRAFIIKKORT",
+    "openTrafficMap": "LIVE TRAFIKKORT",
     "tapToOpenMaps": "Tryk for at åbne i Kort",
     "showAllAlerts": "Vis alle {{count}}",
     "showFewerAlerts": "Vis færre",
@@ -96,7 +96,7 @@
       "primary": "Primærvej",
       "secondary": "Sekundærvej",
       "tertiary": "Tertiærvej",
-      "unclassified": "Uklassificeret Vej",
+      "unclassified": "Uklassificeret vej",
       "trunk": "Motortrafikvej",
       "motorway": "Motorvej",
       "road": "Vej",
@@ -255,7 +255,7 @@
       "parking": "Parkering",
       "clubs_tracks": "Klubber og baner",
       "atm_bank": "Hæveautomater og banker",
-      "fitness": "Sport & Fitness"
+      "fitness": "Sport og fitness"
     },
     "descriptions": {
       "services": "Søger inden for 30 km efter motorcykelforhandlere, reparationsværksteder, dele og tilbehørsbutikker samt udlejningsbutikker. Skriv et navn for at søge direkte i Google Maps.",
@@ -431,7 +431,7 @@
   },
   "triplog": {
     "badge": "🏍️ TURLOG",
-    "title": "ODOMETER",
+    "title": "KILOMETERTÆLLER",
     "subtitle": "Optag din tur — afstand, rute og varighed.",
     "start": "START TUR",
     "stop": "STOP TUR",
@@ -479,11 +479,11 @@
     "exportFailedMsg": "GPX-filen kunne ikke oprettes eller deles på denne enhed.",
     "maxSpeed": "Maks",
     "totalRides": "Ture",
-    "totalDistance": "Samlet distance",
+    "totalDistance": "Samlet afstand",
     "totalTime": "Samlet tid",
     "pause": "PAUSE",
     "resume": "FORTSÆT",
-    "pausedHint": "Sat på pause — tid og distance er standset",
+    "pausedHint": "Sat på pause — tid og afstand er standset",
     "stopShort": "STOP"
   },
   "about": {
@@ -501,10 +501,10 @@
     "wikiLicense": "© Wikipedia-bidragsydere · CC BY-SA",
     "privacy": "PRIVATLIV",
     "privacyTitle": "Dit privatliv",
-    "privacyP1": "Denne app indsamler, overfører eller deler ikke personlige data. Der er ingen analyse, ingen crash-reportere og ingen reklameprogrammer.",
-    "privacyP2": "Din placering bruges kun på enheden til at hente nærliggende POI'er, vejr og vejforhold. Den sendes aldrig til nogen server drevet af denne app.",
+    "privacyP1": "Vegvísir har ingen konto, ingen reklamer og ingen sporing. Der er ingen analyse, ingen crash-reportere og ingen reklameprogrammer.",
+    "privacyP2": "Din position sendes til OpenStreetMap og Open-Meteo for at besvare hver forespørgsel — steder i nærheden, vejr og vejforhold. Aldrig til os, og aldrig til annoncører.",
     "privacyP3": "Turdata registreret af Turloggen (afstande, GPS-ruter) gemmes kun på din enhed ved hjælp af lokal lagring og uploades aldrig.",
-    "privacyP4": "POI-søgeresultater cachelagres lokalt på din enhed for at reducere gentagne netværksanmodninger. Cachen kan ryddes når som helst via Indstillinger → Ryd cachelagrede data.",
+    "privacyP4": "Søgeresultater cachelagres lokalt på din enhed for at reducere gentagne netværksanmodninger. Cachen kan ryddes når som helst via Indstillinger → Ryd cachelagrede data.",
     "credits": "ÅBEN KILDEKODE",
     "creditsBody": "Bygget med Expo, React Native, expo-location, @react-native-async-storage/async-storage, i18next og react-i18next. Alle biblioteker brugt under deres respektive open source-licenser.",
     "version": "App-version",

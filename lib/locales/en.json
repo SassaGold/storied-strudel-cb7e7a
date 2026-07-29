@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "RIDER HQ",
+    "home": "VEGVÍSIR",
     "food": "FOOD",
     "sleep": "SLEEP",
     "explore": "EXPLORE",
@@ -52,7 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "QUICK NAVIGATE",    "tagline": "Vegvísir – Explore. Ride. Discover",
+    "quickNav": "QUICK NAVIGATE",    "tagline": "Explore. Ride. Discover",
     "slogan": "You will not lose your way.",
     "subtitle": "Your location & riding conditions.",
     "updateLocation": "UPDATE LOCATION",
@@ -501,10 +501,10 @@
     "wikiLicense": "© Wikipedia contributors · CC BY-SA",
     "privacy": "PRIVACY",
     "privacyTitle": "Your Privacy",
-    "privacyP1": "This app does not collect, transmit, or share any personal data. There are no analytics, no crash reporters, and no advertising SDKs.",
-    "privacyP2": "Your location is used only on-device to fetch nearby POIs, weather, and road conditions. It is never sent to any server operated by this app.",
+    "privacyP1": "Vegvísir has no accounts, no ads and no tracking. There are no analytics, no crash reporters, and no advertising SDKs.",
+    "privacyP2": "Your coordinates are sent to OpenStreetMap and Open-Meteo to answer each request — nearby places, weather and road conditions. Never to us, and never to advertisers.",
     "privacyP3": "Ride data recorded by the Trip Logger (distances, GPS routes) is stored only on your device using local storage and is never uploaded.",
-    "privacyP4": "POI search results are cached locally on your device to reduce repeated network requests. The cache can be cleared at any time via Settings → Clear Cached Data.",
+    "privacyP4": "Search results are cached locally on your device to reduce repeated network requests. The cache can be cleared at any time via Settings → Clear Cached Data.",
     "credits": "OPEN-SOURCE CREDITS",
     "creditsBody": "Built with Expo, React Native, expo-location, @react-native-async-storage/async-storage, i18next, and react-i18next. All libraries used under their respective open-source licenses.",
     "version": "App Version",

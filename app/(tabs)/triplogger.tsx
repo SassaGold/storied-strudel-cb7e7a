@@ -33,6 +33,7 @@ import {
   formatDate,
   formatDuration,
   MAX_SAVED_ROUTE_POINTS,
+  mergeBackgroundPoints,
   nextRideSeq,
   rideTotals,
   type GpsPoint,
@@ -123,6 +124,13 @@ export default function TripLoggerScreen() {
   const routeRef = useRef<GpsPoint[]>([]);
   const distRef = useRef(0);
   const startTimeRef = useRef<number | null>(null);
+  /**
+   * Wall-clock moment recording began. Unlike startTimeRef — which is shifted
+   * forward on every resume so that endTime - startTime yields *active*
+   * duration — this never moves, so it is a safe lower bound for deciding
+   * which background points belong to this ride.
+   */
+  const rideStartedAtRef = useRef<number | null>(null);
   const recordingRef = useRef(false);
   /** Highest reliable speed observed during the current recording (km/h). */
   const maxSpeedRef = useRef(0);
@@ -267,11 +275,13 @@ export default function TripLoggerScreen() {
       try {
         const bg = await readBgPoints();
         if (bg.length > 0) {
-          const fgTs = new Set(route.map((p) => p.timestamp));
-          // Same filtering as a normal stop: drop background points captured
-          // while the ride was paused.
-          route = [...route, ...bg.filter((p) => !fgTs.has(p.timestamp) && !inPausedInterval(p.timestamp))]
-            .sort((a, b) => a.timestamp - b.timestamp);
+          // The lower bound is the recovered route's own first point, NOT
+          // cp.startTime: the checkpoint stores the pause-shifted start, so
+          // using that would discard genuine points recorded before the first
+          // pause. Nothing older than the ride's earliest recorded point can
+          // belong to it.
+          const firstTs = route.length > 0 ? route[0].timestamp : cp.startTime;
+          route = mergeBackgroundPoints(route, bg, firstTs, pausedIntervals);
         }
         await clearBgPoints();
       } catch {}
@@ -407,6 +417,7 @@ export default function TripLoggerScreen() {
       setPaused(false);
       const now = Date.now();
       startTimeRef.current = now;
+      rideStartedAtRef.current = now;
       setPointCount(0);
       setDistanceKm(0);
       setElapsedMs(0);
@@ -604,22 +615,19 @@ export default function TripLoggerScreen() {
         setPaused(false);
       }
       const pausedIntervals = pausedIntervalsRef.current;
-      const inPausedInterval = (ts: number) =>
-        pausedIntervals.some(([s, e]) => ts >= s && ts <= e);
 
       // Merge foreground + background points, deduplicate by timestamp, recalculate distance.
       let mergedRoute = [...routeRef.current];
       try {
         const bgPoints = await readBgPoints();
-        if (bgPoints.length > 0) {
-          const fgTsSet = new Set(routeRef.current.map((p) => p.timestamp));
-          // Drop background points captured while the ride was paused — the
-          // foreground watcher already skipped that stretch.
-          const uniqueBg = bgPoints.filter(
-            (p) => !fgTsSet.has(p.timestamp) && !inPausedInterval(p.timestamp)
-          );
-          mergedRoute = [...routeRef.current, ...uniqueBg].sort((a, b) => a.timestamp - b.timestamp);
-        }
+        // rideStartedAtRef is the wall-clock start and never shifts, so it is
+        // the correct bound — see mergeBackgroundPoints.
+        mergedRoute = mergeBackgroundPoints(
+          routeRef.current,
+          bgPoints,
+          rideStartedAtRef.current ?? 0,
+          pausedIntervals
+        );
         await clearBgPoints();
       } catch {
         // Keep foreground-only route if background data cannot be read.

@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "RIDER HQ",
+    "home": "VEGVÍSIR",
     "food": "MAT",
     "sleep": "SØVN",
     "explore": "UTFORSK",
@@ -52,7 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "HURTIGNAVIGASJON",    "tagline": "Vegvísir – Utforsk. Kjør. Oppdag",
+    "quickNav": "HURTIGNAVIGASJON",    "tagline": "Utforsk. Kjør. Oppdag",
     "slogan": "Du går deg aldri vill.",
     "subtitle": "Din plassering og kjøreforhold.",
     "updateLocation": "OPPDATER PLASSERING",
@@ -65,7 +65,7 @@
     "localWeather": "Lokalt vær",
     "wind": "Vind",
     "precip": "Nedbør",
-    "rainChance": "Sjanseregn",
+    "rainChance": "Sjanse for regn",
     "humidity": "Luftfuktighet",
     "feelsLike": "Føles som",
     "hourlyForecast": "Neste 6 timer",
@@ -287,10 +287,10 @@
       "subtitle": "Vinterlagring, vårklargjøring og kontrollpåminnelser"
     },
     "nudge": {
-      "winterize": "Høsten er her – på tide å legge sykkelen inn for vinteren.",
+      "winterize": "Høsten er her – på tide å legge motorsykkelen inn for vinteren.",
       "springPrep": "Våren nærmer seg – gå gjennom klargjøringslista.",
       "riding": "Kjøresesong – nyt den. Sjekklistene er her når du trenger dem.",
-      "offSeason": "Utenom sesong – sykkelen sover. Vi minner deg på det til våren."
+      "offSeason": "Utenom sesong – motorsykkelen sover. Vi minner deg på det til våren."
     },
     "panels": {
       "winter": "Vinter",
@@ -298,7 +298,7 @@
       "inspection": "Kontroll"
     },
     "bike": {
-      "title": "Sykkelen din",
+      "title": "Motorsykkelen din",
       "namePlaceholder": "Merke og modell (f.eks. Yamaha MT-07)",
       "country": "Land",
       "firstRegistration": "Førstegangsregistrert"
@@ -311,19 +311,19 @@
     },
     "checklist": {
       "winterTitle": "Vinterlagring",
-      "winterDesc": "Legg sykkelen riktig inn så den våkner sunn til våren.",
+      "winterDesc": "Legg motorsykkelen riktig inn så den våkner sunn til våren.",
       "springTitle": "Vårklargjøring",
-      "springDesc": "Vekk sykkelen og sjekk den før første tur.",
+      "springDesc": "Vekk motorsykkelen og sjekk den før første tur.",
       "completedOn": "Utført {{date}}"
     },
     "items": {
       "fuelStabilizer": "Tilsett drivstoffstabilisator og fyll tanken",
       "batteryTender": "Batteri på vedlikeholdslader, eller koble det fra",
-      "tyrePressure": "Still dekktrykk, få sykkelen opp fra bakken om mulig",
+      "tyrePressure": "Still dekktrykk, få motorsykkelen opp fra bakken om mulig",
       "oilChange": "Skift olje og filter",
       "washWax": "Vask, voks og korrosjonsspray",
       "blockExhaust": "Tett eksosen mot skadedyr",
-      "cover": "Dekk til sykkelen",
+      "cover": "Dekk til motorsykkelen",
       "batteryInstall": "Sett inn og lad batteriet",
       "tyres": "Sjekk dekk og trykk",
       "brakes": "Sjekk bremser og væske",
@@ -342,7 +342,7 @@
       "setReminder": "Sett kontrollpåminnelse",
       "nextDue": "Estimert neste frist: {{date}}",
       "estimateNote": "Estimert ut fra registreringsdatoen – bekreft mot offisielt register.",
-      "enterDate": "Legg inn sykkelens førstegangsregistrering over for å estimere neste kontrollfrist.",
+      "enterDate": "Legg inn motorsykkelens førstegangsregistrering over for å estimere neste kontrollfrist.",
       "notifTitle": "Kontroll nærmer seg",
       "notifBody": "{{term}} forfaller rundt {{date}}. På tide å bestille time.",
       "reminderSetTitle": "Påminnelse satt",
@@ -355,17 +355,17 @@
       "reminderSetLabel": "Påminnelse satt til {{date}}",
       "reminderSetLabelNoDate": "Påminnelse satt",
       "cancelReminder": "Avbryt påminnelse",
-      "reminderStale": "Sykkelens opplysninger er endret – trykk Oppdater for å planlegge påminnelsen på nytt."
+      "reminderStale": "Motorsykkelens opplysninger er endret – trykk Oppdater for å planlegge påminnelsen på nytt."
     },
     "bikes": {
-      "add": "Legg til sykkel",
-      "defaultName": "Sykkel {{n}}",
-      "remove": "Fjern sykkel",
-      "removeTitle": "Fjerne sykkel?",
+      "add": "Legg til motorsykkel",
+      "defaultName": "Motorsykkel {{n}}",
+      "remove": "Fjern motorsykkel",
+      "removeTitle": "Fjerne motorsykkel?",
       "removeBody": "Fjerne «{{name}}» med sjekklister og påminnelse?",
       "removeCancel": "Avbryt",
       "removeConfirm": "Fjern",
-      "empty": "Legg til en sykkel for å følge sesong og kontroll."
+      "empty": "Legg til en motorsykkel for å følge sesong og kontroll."
     },
     "weatherNudge": {
       "frostSoon": "Frost meldt (ned mot {{temp}}°C) – på tide å vinterlagre.",
@@ -431,7 +431,7 @@
   },
   "triplog": {
     "badge": "🏍️ TURLOGG",
-    "title": "ODOMETER",
+    "title": "KILOMETERTELLER",
     "subtitle": "Ta opp turen din — avstand, rute og varighet.",
     "start": "START TUR",
     "stop": "STOPP TUR",
@@ -501,10 +501,10 @@
     "wikiLicense": "© Wikipedia-bidragsytere · CC BY-SA",
     "privacy": "PERSONVERN",
     "privacyTitle": "Ditt personvern",
-    "privacyP1": "Denne appen samler ikke inn, overfører eller deler personlige data. Det er ingen analyse, ingen krasjrapportere og ingen reklameprogramvare.",
-    "privacyP2": "Plasseringen din brukes kun på enheten for å hente nærliggende POIer, vær og veiforhold. Den sendes aldri til noen server drevet av denne appen.",
+    "privacyP1": "Vegvísir har ingen konto, ingen reklame og ingen sporing. Det er ingen analyse, ingen krasjrapportere og ingen reklameprogramvare.",
+    "privacyP2": "Posisjonen din sendes til OpenStreetMap og Open-Meteo for å besvare hver forespørsel — steder i nærheten, vær og veiforhold. Aldri til oss, og aldri til annonsører.",
     "privacyP3": "Turdata registrert av Turloggen (avstander, GPS-ruter) lagres kun på enheten din ved hjelp av lokal lagring og lastes aldri opp.",
-    "privacyP4": "POI-søkeresultater bufres lokalt på enheten din for å redusere gjentatte nettverksforespørsler. Bufferen kan tømmes når som helst via Innstillinger → Tøm bufrede data.",
+    "privacyP4": "Søkeresultater bufres lokalt på enheten din for å redusere gjentatte nettverksforespørsler. Bufferen kan tømmes når som helst via Innstillinger → Tøm bufrede data.",
     "credits": "ÅPEN KILDEKODE",
     "creditsBody": "Bygget med Expo, React Native, expo-location, @react-native-async-storage/async-storage, i18next og react-i18next. Alle biblioteker brukt under sine respektive åpen kildekode-lisenser.",
     "version": "App-versjon",
