@@ -5,7 +5,7 @@
 
 import { renderHook, act, waitFor } from "@testing-library/react-native";
 import * as Location from "expo-location";
-import { usePOIFetch, type Place } from "../lib/usePOIFetch";
+import { poiRadiusLadder, usePOIFetch, type Place } from "../lib/usePOIFetch";
 import { getCurrentPositionWithTimeout } from "../lib/location";
 import { fetchOsmPlaces } from "../lib/osmPlaces";
 import { readTimedCache, writeTimedCache } from "../lib/storage";
@@ -221,5 +221,58 @@ describe("usePOIFetch", () => {
     expect(result.current.userLocation).toBeNull();
     expect(result.current.loading).toBe(false);
     expect(mockedFetchOsmPlaces).not.toHaveBeenCalled();
+  });
+});
+
+describe("poiRadiusLadder", () => {
+  it("ascends and never exceeds the cap", () => {
+    for (const km of [1, 2, 5, 10, 25, 50, 100, 500]) {
+      const ladder = poiRadiusLadder(km * 1000);
+      expect(ladder).toEqual([...ladder].sort((a, b) => a - b));
+      expect(new Set(ladder).size).toBe(ladder.length);
+      expect(Math.max(...ladder)).toBeLessThanOrEqual(100_000);
+    }
+  });
+
+  it("reaches the 100 km cap from the default 5 km setting", () => {
+    // The regression this exists for: a single 4x expansion capped reach at
+    // 20 km, so POI_MAX_RADIUS_M was unreachable unless the user had manually
+    // set 25 km or more. Rural riders hit that ceiling constantly.
+    expect(poiRadiusLadder(5_000)).toContain(100_000);
+    expect(poiRadiusLadder(5_000)[0]).toBe(5_000);
+  });
+
+  it("collapses to a single step when the user already searches at the cap", () => {
+    expect(poiRadiusLadder(100_000)).toEqual([100_000]);
+    expect(poiRadiusLadder(200_000)).toEqual([100_000]);
+  });
+});
+
+describe("sparse-area escalation", () => {
+  it("keeps widening past 20 km when nothing is found, then stops on the first hit", async () => {
+    mockedFetchOsmPlaces
+      .mockResolvedValueOnce([])                          // 5 km
+      .mockResolvedValueOnce([])                          // 20 km — where it used to give up
+      .mockResolvedValueOnce([osmItem("far", 40000)]);    // 50 km
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    expect(mockedFetchOsmPlaces).toHaveBeenCalledTimes(3);
+    expect(mockedFetchOsmPlaces.mock.calls.map((c) => c[3])).toEqual([5_000, 20_000, 50_000]);
+    expect(result.current.places.map((p) => p.id)).toEqual(["far"]);
+  });
+
+  it("does not keep querying once results are found", async () => {
+    mockedFetchOsmPlaces.mockResolvedValueOnce([osmItem("near", 1000)]);
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    expect(mockedFetchOsmPlaces).toHaveBeenCalledTimes(1);
   });
 });

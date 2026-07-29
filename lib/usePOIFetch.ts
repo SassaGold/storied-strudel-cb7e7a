@@ -41,6 +41,30 @@ export type Place = {
  * The coordinates and radius are provided but buildSearchQuery can ignore them for static queries. */
 export type BuildSearchQuery = (lat: number, lon: number, radiusM: number) => string;
 
+/**
+ * Search radii to try, in order, stopping at the first that returns anything.
+ *
+ * Replaces a single 4x expansion, which capped reach at 4x the user's setting —
+ * so the default 5 km could never look past 20 km, and POI_MAX_RADIUS_M was
+ * unreachable below a 25 km setting. Rural riders hit that ceiling constantly.
+ *
+ * Ascending and de-duplicated, so a user who has already set a wide radius does
+ * not re-query the same circle twice, and nothing ever exceeds the cap.
+ */
+export const poiRadiusLadder = (baseRadiusM: number): number[] => {
+  const ladder: number[] = [];
+  for (const candidate of [
+    baseRadiusM,
+    baseRadiusM * POI_EXPANDED_RADIUS_FACTOR,
+    baseRadiusM * POI_EXPANDED_RADIUS_FACTOR * 2.5,
+    POI_MAX_RADIUS_M,
+  ]) {
+    const r = Math.round(Math.min(candidate, POI_MAX_RADIUS_M));
+    if (r > (ladder[ladder.length - 1] ?? 0)) ladder.push(r);
+  }
+  return ladder;
+};
+
 /** Maps a single Overpass place item to a Place, or returns null to discard it. */
 export type MapPlaceItem = (item: OsmPlaceItem, userLat: number, userLon: number) => Place | null;
 
@@ -160,15 +184,21 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
           .filter(Boolean) as Place[];
       };
 
-      const baseRadiusM = searchRadiusKm * 1000;
-      let mapped = await fetchWithinRadius(baseRadiusM);
-      if (activeCallRef.current !== callId) return;
-
-      // Nothing nearby — widen the search so rural users still get results.
-      const expandedRadiusM = Math.min(baseRadiusM * POI_EXPANDED_RADIUS_FACTOR, POI_MAX_RADIUS_M);
-      if (mapped.length === 0 && expandedRadiusM > baseRadiusM) {
-        mapped = await fetchWithinRadius(expandedRadiusM);
+      // Widen in steps until something turns up, rather than one 4x jump.
+      // A single expansion capped at 4x the user's radius meant the default 5 km
+      // setting could never look past 20 km, leaving POI_MAX_RADIUS_M (100 km)
+      // unreachable unless someone had manually set 25 km or more. In sparse
+      // country that is the difference between results and an empty screen:
+      // measured at 58.92/14.44 in rural Sweden, a food search returns 0 places
+      // at 5 km, 17 at 20 km and over a thousand at 100 km.
+      //
+      // Costs nothing in the common case — the loop stops at the first radius
+      // that returns anything, which near a town is the first one.
+      let mapped: Place[] = [];
+      for (const radiusM of poiRadiusLadder(searchRadiusKm * 1000)) {
+        mapped = await fetchWithinRadius(radiusM);
         if (activeCallRef.current !== callId) return;
+        if (mapped.length > 0) break;
       }
 
       const sorted = mapped
