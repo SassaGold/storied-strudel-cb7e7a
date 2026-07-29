@@ -1,0 +1,6 @@
+📏 Afstandene på dine ture passer igen.
+
+• Nogle gemte ture var længere end den tur du faktisk kørte, med gennemsnitshastigheden pustet op tilsvarende. Rettet.
+• Skærmen du kendte som Rider HQ hedder nu Vegvísir.
+• Privatlivsteksten under Om beskriver nu præcis hvor din position sendes hen.
+• Sprogrettelser på alle fem sprog.

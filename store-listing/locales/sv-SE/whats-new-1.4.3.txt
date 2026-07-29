@@ -1,0 +1,6 @@
+📏 Avstånden på dina turer stämmer igen.
+
+• Vissa sparade turer var längre än turen du faktiskt körde, med medelhastigheten uppblåst därefter. Rättat.
+• Skärmen du kände som Rider HQ heter nu Vegvísir.
+• Integritetstexten under Om beskriver nu exakt vart din position skickas.
+• Språkrättelser på alla fem språk.

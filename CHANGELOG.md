@@ -1,5 +1,97 @@
 # Changelog
 
+## v1.4.3 — Accuracy (2026-07-29)
+
+**Saved rides could be longer than the ride.** On stop, background-recorded
+points are merged into the foreground route. That merge filtered for duplicate
+timestamps and paused intervals, but never checked whether a point belonged to
+*this* ride — and the background buffer can still hold points written moments
+after the previous ride stopped. So a saved route could open with a leg from
+wherever the rider was last seen to where they actually set off. That leg is
+never real distance: it inflated `distanceKm`, and because `durationMs` is
+unaffected, `avgSpeedKmh` with it.
+
+It needed no unusual conditions. Ride to a meeting point with the app closed,
+start recording, and if the first background fix delivered is the cached one from
+where you set off, that whole leg joined your ride.
+
+Observed as a saved 9.37 km against a live 5.65 km — the 3.72 km difference being
+exactly the gap between the two locations — at 72 km/h average against a true 43.
+
+The filter moved to `lib/tripStats.ts` as `mergeBackgroundPoints`, with six tests
+including the regression. Both call sites are verified on a device: the stop path
+saves 0.59 km where the bug gave 4.44, and crash recovery saves 0.80 km where a
+stale leak would give 4.64.
+
+> Choosing the bound is the subtle part. `startTimeRef` shifts forward on every
+> resume so that `endTime - startTime` yields *active* duration, so it is not
+> safe — using it would silently discard genuine points recorded before the first
+> pause. Stop passes a new wall-clock `rideStartedAtRef` that never moves; crash
+> recovery passes the recovered route's own first point, because its checkpoint
+> only stores the shifted value.
+
+### The home screen is now called Vegvísir
+
+`RIDER HQ` was the only untranslated English left in an otherwise fully localised
+UI, and `HQ` is an English abbreviation that does not travel. Per-locale
+translation was not viable: every Nordic word for headquarters busts the tab
+budget — `HOVEDKVARTER` 12, `HÖGKVARTER` 10, `HÖFUÐSTÖÐVAR` 12, against a maximum
+of 8 across all locales.
+
+`VEGVÍSIR` is already the product name in all five locales, is exactly 8
+characters so nothing truncates, and is Icelandic in origin. The tagline loses
+its now-redundant prefix, since it repeated the app name directly underneath.
+
+The header was a hardcoded `<Text>RIDER HQ</Text>`; it now renders
+`t("tabs.home")`, the same key as the tab label, so the two cannot drift apart.
+
+### The in-app privacy text now describes what actually happens
+
+The About screen said the app *"does not collect, transmit, or share any personal
+data"* and that location is *"used only on-device"*. It sends precise coordinates
+to `nominatim.openstreetmap.org`, `overpass-api.de`, `overpass.kumi.systems`,
+`api.open-meteo.com` and `tile.openstreetmap.de`, and **Location: collected +
+shared** was filed with Google on 2026-07-27.
+
+The site and the store listing were both corrected for this claim; the in-app
+strings were in neither fix, so the app had been contradicting its own store
+card. The replacement wording is taken from sassagold.com, where it is already
+reviewed and live.
+
+`privacyP3` is untouched — *"trip data stays on the device"* is true, and has been
+since 1.4.1 removed the OSRM upload.
+
+### Locale corrections
+
+Every one of the 468 strings was read against its English source, in all five
+locales. Two classes came out of it.
+
+Mechanical slips a script catches: `TRAFIIKKARTA` and `TRAFIIKKORT` (doubled `I`),
+`Dagsbirt` (missing its `-a`), `mótorhjala` (wrong stem), stray capitals in
+`Oklassificerad Väg` / `Uklassificeret Vej`, English Title Case in `Ferð Ekki
+Vistuð`, and a `garage.locationError` that had lost its purpose clause while its
+five siblings kept theirs.
+
+Wrong-word choices only reading catches:
+
+- **A bicycle for a motorcycle**, 28 times. `sykkel` is a pedal bike and `hjól` is
+  a wheel; both files already contained `motorsykkel-` and `mótorhjól-` compounds.
+- **A map scale for the metric system** and **"folk" units for imperial** —
+  Icelandic offered a choice between `Mælikvarðakerfi` and `Þjóðrænt`.
+- **A payment falling due** for a vehicle inspection — `á gjalddaga`, alongside
+  `skiladagsetning`, a *submission* date. Both replaced by `skoðun`, which the
+  file already used nine times.
+- **`ODOMETER` left in English** in Norwegian, Swedish and Danish, where Icelandic
+  had translated it.
+- **Icelandic Explore said "games"** — `skoðunarverðir leikir` where every other
+  locale says *sights*, and where its own three sibling strings already said
+  `kennileiti`.
+
+> `{{term}}` in the inspection strings is the **country's** native term, not the
+> UI language — `Kontrollbesiktning`, `Aðalskoðun`, `EU-kontroll (PKK)`,
+> `Periodisk syn` — so an Icelandic UI can render "Periodisk syn …". Any gendered
+> adjective around it is unsafe. Worth remembering before editing those strings.
+
 ## v1.4.2 — Housekeeping (2026-07-28)
 
 **A barcode scanner that nothing uses no longer ships to users.**

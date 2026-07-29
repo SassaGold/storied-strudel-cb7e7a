@@ -1,0 +1,6 @@
+📏 Ride distances are accurate again.
+
+• Some saved rides were longer than the ride you actually took, with average speed inflated to match. Fixed.
+• The screen you knew as Rider HQ is now called Vegvísir.
+• The privacy text under About now describes exactly where your coordinates go.
+• Wording corrections throughout, in all five languages.
