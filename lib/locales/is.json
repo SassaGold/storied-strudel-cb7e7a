@@ -287,10 +287,10 @@
       "subtitle": "Vetrargeymsla, vorundirbúningur og áminningar um skoðun"
     },
     "nudge": {
-      "winterize": "Haustið er komið – kominn tími til að leggja hjólinu fyrir veturinn.",
+      "winterize": "Haustið er komið – kominn tími til að leggja mótorhjólinu fyrir veturinn.",
       "springPrep": "Vorið er á næsta leiti – farðu yfir gátlistann fyrir vorið.",
       "riding": "Aksturstímabil – njóttu þess. Gátlistarnir eru hér þegar þú þarft.",
-      "offSeason": "Utan tímabils – hjólið sefur. Við minnum þig á það í vor."
+      "offSeason": "Utan tímabils – mótorhjólið sefur. Við minnum þig á það í vor."
     },
     "panels": {
       "winter": "Vetur",
@@ -298,7 +298,7 @@
       "inspection": "Skoðun"
     },
     "bike": {
-      "title": "Hjólið þitt",
+      "title": "Mótorhjólið þitt",
       "namePlaceholder": "Tegund og gerð (t.d. Yamaha MT-07)",
       "country": "Land",
       "firstRegistration": "Fyrsta skráning"
@@ -311,19 +311,19 @@
     },
     "checklist": {
       "winterTitle": "Vetrargeymsla",
-      "winterDesc": "Gakktu rétt frá hjólinu svo það vakni heilbrigt í vor.",
+      "winterDesc": "Gakktu rétt frá mótorhjólinu svo það vakni heilbrigt í vor.",
       "springTitle": "Vorundirbúningur",
-      "springDesc": "Vektu hjólið og farðu yfir það fyrir fyrsta túrinn.",
+      "springDesc": "Vektu mótorhjólið og farðu yfir það fyrir fyrsta túrinn.",
       "completedOn": "Lokið {{date}}"
     },
     "items": {
       "fuelStabilizer": "Bættu við eldsneytisstöðgara og fylltu tankinn",
       "batteryTender": "Rafgeymir í viðhaldshleðslu, eða aftengdu hann",
-      "tyrePressure": "Stilltu dekkþrýsting, lyftu hjólinu frá jörðu ef hægt er",
+      "tyrePressure": "Stilltu dekkþrýsting, lyftu mótorhjólinu frá jörðu ef hægt er",
       "oilChange": "Skiptu um olíu og síu",
       "washWax": "Þvoðu, bónaðu og ryðvarðu",
       "blockExhaust": "Lokaðu púströrinu fyrir meindýr",
-      "cover": "Hyldu hjólið",
+      "cover": "Hyldu mótorhjólið",
       "batteryInstall": "Settu í og hladdu rafgeyminn",
       "tyres": "Athugaðu dekk og þrýsting",
       "brakes": "Athugaðu bremsur og vökva",
@@ -342,7 +342,7 @@
       "setReminder": "Setja áminningu um skoðun",
       "nextDue": "Áætluð næsta skiladagsetning: {{date}}",
       "estimateNote": "Áætlað út frá skráningardegi – staðfestu við opinbera skrá.",
-      "enterDate": "Bættu við fyrstu skráningu hjólsins hér að ofan til að áætla næstu skoðunardagsetningu.",
+      "enterDate": "Bættu við fyrstu skráningu mótorhjólsins hér að ofan til að áætla næstu skoðunardagsetningu.",
       "notifTitle": "Skoðun framundan",
       "notifBody": "{{term}} er á gjalddaga um {{date}}. Tími til að bóka.",
       "reminderSetTitle": "Áminning stillt",
@@ -355,17 +355,17 @@
       "reminderSetLabel": "Áminning stillt á {{date}}",
       "reminderSetLabelNoDate": "Áminning stillt",
       "cancelReminder": "Hætta við áminningu",
-      "reminderStale": "Upplýsingar hjólsins hafa breyst – ýttu á Uppfæra til að endurstilla áminninguna."
+      "reminderStale": "Upplýsingar mótorhjólsins hafa breyst – ýttu á Uppfæra til að endurstilla áminninguna."
     },
     "bikes": {
-      "add": "Bæta við hjóli",
-      "defaultName": "Hjól {{n}}",
-      "remove": "Fjarlægja hjól",
-      "removeTitle": "Fjarlægja hjól?",
+      "add": "Bæta við mótorhjóli",
+      "defaultName": "Mótorhjól {{n}}",
+      "remove": "Fjarlægja mótorhjól",
+      "removeTitle": "Fjarlægja mótorhjól?",
       "removeBody": "Fjarlægja „{{name}}“ með gátlistum og áminningu?",
       "removeCancel": "Hætta við",
       "removeConfirm": "Fjarlægja",
-      "empty": "Bættu við hjóli til að fylgjast með tímabili og skoðun."
+      "empty": "Bættu við mótorhjóli til að fylgjast með tímabili og skoðun."
     },
     "weatherNudge": {
       "frostSoon": "Frost í vændum (niður í {{temp}}°C) – kominn tími á vetrargeymslu.",
