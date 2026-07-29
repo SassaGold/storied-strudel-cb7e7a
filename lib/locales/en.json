@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "RIDER HQ",
+    "home": "VEGVÍSIR",
     "food": "FOOD",
     "sleep": "SLEEP",
     "explore": "EXPLORE",
@@ -52,7 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "QUICK NAVIGATE",    "tagline": "Vegvísir – Explore. Ride. Discover",
+    "quickNav": "QUICK NAVIGATE",    "tagline": "Explore. Ride. Discover",
     "slogan": "You will not lose your way.",
     "subtitle": "Your location & riding conditions.",
     "updateLocation": "UPDATE LOCATION",

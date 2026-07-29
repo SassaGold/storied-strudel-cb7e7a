@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "RIDER HQ",
+    "home": "VEGVÍSIR",
     "food": "MAT",
     "sleep": "SÖMN",
     "explore": "UTFORSKA",
@@ -52,7 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "SNABBNAVIGERING",    "tagline": "Vegvísir – Utforska. Kör. Upptäck",
+    "quickNav": "SNABBNAVIGERING",    "tagline": "Utforska. Kör. Upptäck",
     "slogan": "Du går aldrig vilse.",
     "subtitle": "Din plats och körförhållanden.",
     "updateLocation": "UPPDATERA PLATS",

@@ -1,6 +1,6 @@
 {
   "tabs": {
-    "home": "RIDER HQ",
+    "home": "VEGVÍSIR",
     "food": "MATUR",
     "sleep": "SVEFN",
     "explore": "KANNA",
@@ -52,7 +52,7 @@
     "da": "🇩🇰 DA"
   },
   "home": {
-    "quickNav": "FLJÓTLEGAR LEIÐIR",    "tagline": "Vegvísir – Kannaðu. Keyrðu. Uppgötvaðu",
+    "quickNav": "FLJÓTLEGAR LEIÐIR",    "tagline": "Kannaðu. Keyrðu. Uppgötvaðu",
     "slogan": "Þú villist aldrei.",
     "subtitle": "Staðsetning þín og akstursskilyrði.",
     "updateLocation": "UPPFÆRA STAÐSETNINGU",
