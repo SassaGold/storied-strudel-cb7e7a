@@ -239,7 +239,7 @@
     "title": "BÍLSKÚRINN",
     "subtitle": "Finna mótorhjólaþjónustu, bensínstöð, bílastæði og klúbba nálægt.",
     "findButton": "Finna {{title}}",
-    "locationError": "Staðsetningarleyfi er nauðsynlegt.",
+    "locationError": "Staðsetningarleyfi er nauðsynlegt til að finna nálæga staði.",
     "loadError": "Ekki tókst að hlaða gögnum. Reyndu aftur.",
     "searching": "Leitar að nálægum stöðum…",
     "categories": {
@@ -442,7 +442,7 @@
     "km": "km",
     "kmh": "km/klst",
     "noGps": "Bíð eftir GPS…",
-    "tracking": "MÆL",
+    "tracking": "REKUR",
     "locationPermRequired": "Staðsetningarleyfi þarf til að rekja ferðina.",
     "history": "FERÐASAGA",
     "noRides": "Engar ferðir skráðar enn. Ýttu á BYRJA FERÐ!",
