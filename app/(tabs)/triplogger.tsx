@@ -232,10 +232,28 @@ export default function TripLoggerScreen() {
     };
   }, []);
 
-  const saveRides = useCallback(async (updated: SavedRide[]) => {
+  /**
+   * Persist the ride list. Returns false if the write failed.
+   *
+   * This used to swallow the error entirely, which meant a failed write was
+   * invisible: the caller had already called setRides, so the rider saw their
+   * ride in the list, closed the app, and found it gone next launch with
+   * nothing having said so. Storage failures are rare, but "rare and silent" is
+   * the worst combination for the one thing a rider may actually want to keep.
+   *
+   * The result is returned rather than thrown because the two callers want
+   * different things: finishing a ride should tell the rider, but failing to
+   * persist a seq backfill on load should not interrupt them.
+   */
+  const saveRides = useCallback(async (updated: SavedRide[]): Promise<boolean> => {
     try {
       await storage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
+      return true;
+    } catch (err) {
+      // No crash reporter in this app — at least surface it in logcat.
+      console.error("[triplogger] failed to persist rides:", err);
+      return false;
+    }
   }, []);
 
   /** Throttled snapshot of the in-progress ride so a crash can be recovered. */
@@ -326,6 +344,9 @@ export default function TripLoggerScreen() {
     const recovered = await recoverCheckpointRide(nextRideSeq(existing));
     const all = (recovered ? [recovered, ...existing] : existing).slice(0, MAX_SAVED_RIDES);
     setRides(all);
+    // A failed write here is logged by saveRides but deliberately not surfaced:
+    // this is a seq backfill or a recovered ride being re-persisted on load, and
+    // interrupting the rider at startup would be worse than retrying next time.
     if (recovered || needsBackfill) await saveRides(all);
   }, [recoverCheckpointRide, saveRides]);
 
@@ -645,7 +666,11 @@ export default function TripLoggerScreen() {
         // Cap history so storage can't grow unbounded; keep the newest rides.
         const updated = [ride, ...rides].slice(0, MAX_SAVED_RIDES);
         setRides(updated);
-        await saveRides(updated);
+        // If the write failed the ride is only in memory — say so, rather than
+        // letting the rider close the app and lose it silently.
+        if (!(await saveRides(updated))) {
+          Alert.alert(t("triplog.stopErrorTitle"), t("triplog.stopErrorMsg"));
+        }
       } else {
         Alert.alert(t("triplog.tooShortTitle"), t("triplog.tooShortMsg"));
       }
