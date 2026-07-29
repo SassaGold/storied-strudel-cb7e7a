@@ -5,6 +5,7 @@ import {
   buildRide,
   formatDuration,
   MAX_SAVED_ROUTE_POINTS,
+  mergeBackgroundPoints,
   nextRideSeq,
   routeDistanceKm,
   type GpsPoint,
@@ -180,5 +181,68 @@ describe("formatDuration", () => {
     expect(formatDuration(3_600_000)).toBe("1:00:00");
     expect(formatDuration(3_661_000)).toBe("1:01:01");
     expect(formatDuration(36_000_000 + 754_000)).toBe("10:12:34");
+  });
+});
+
+describe("mergeBackgroundPoints", () => {
+  const at = (ts: number, lat = 59.9): GpsPoint => ({ latitude: lat, longitude: 10.75, timestamp: ts });
+
+  it("merges background points into the foreground route in timestamp order", () => {
+    const fg = [at(1000), at(3000)];
+    const bg = [at(2000), at(4000)];
+    expect(mergeBackgroundPoints(fg, bg, 0).map((p) => p.timestamp)).toEqual([
+      1000, 2000, 3000, 4000,
+    ]);
+  });
+
+  it("deduplicates points the foreground watcher already recorded", () => {
+    const fg = [at(1000), at(2000)];
+    const bg = [at(2000), at(3000)];
+    expect(mergeBackgroundPoints(fg, bg, 0).map((p) => p.timestamp)).toEqual([1000, 2000, 3000]);
+  });
+
+  it("drops background points captured while the ride was paused", () => {
+    const fg = [at(1000), at(5000)];
+    const bg = [at(2500), at(6000)];
+    const merged = mergeBackgroundPoints(fg, bg, 0, [[2000, 3000]]);
+    expect(merged.map((p) => p.timestamp)).toEqual([1000, 5000, 6000]);
+  });
+
+  // The regression this function exists for. The background buffer can still
+  // hold points written just after the PREVIOUS ride stopped; merging them made
+  // the saved route open with a leg from wherever the rider was last seen to
+  // where this ride actually began. Observed as a saved 9.37 km against a live
+  // 5.65 km — the 3.72 km difference being exactly that gap — and an average of
+  // 72 km/h against a true 43 km/h.
+  it("drops stale points from before the ride began", () => {
+    const staleFarAway = { latitude: 59.88, longitude: 10.82, timestamp: 500 };
+    const fg = [at(1000), at(2000)];
+    const merged = mergeBackgroundPoints(fg, [staleFarAway, at(3000)], 1000);
+    expect(merged.map((p) => p.timestamp)).toEqual([1000, 2000, 3000]);
+  });
+
+  it("does not inflate distance or average speed with a stale point", () => {
+    // ~1 km of real riding, plus a stale fix 3.7 km away recorded beforehand.
+    const fg = [pointNorthOf(59.9, 0, 1000), pointNorthOf(59.9, 1000, 61_000)];
+    const stale = { latitude: 59.9 - 3700 / 111_320, longitude: 10.75, timestamp: 500 };
+
+    const withBound = mergeBackgroundPoints(fg, [stale], 1000);
+    const withoutBound = mergeBackgroundPoints(fg, [stale], 0);
+
+    expect(routeDistanceKm(withBound)).toBeCloseTo(1, 1);
+    // Without the bound the stale leg is counted — the bug.
+    expect(routeDistanceKm(withoutBound)).toBeGreaterThan(4);
+
+    const good = buildRide(withBound, 1000, 61_000, 1);
+    const bad = buildRide(withoutBound, 1000, 61_000, 1);
+    expect(good?.avgSpeedKmh).toBeCloseTo(60, 0);
+    expect(bad!.avgSpeedKmh).toBeGreaterThan(good!.avgSpeedKmh * 4);
+  });
+
+  it("returns a copy of the foreground route when there are no background points", () => {
+    const fg = [at(1000)];
+    const merged = mergeBackgroundPoints(fg, [], 0);
+    expect(merged).toEqual(fg);
+    expect(merged).not.toBe(fg);
   });
 });
