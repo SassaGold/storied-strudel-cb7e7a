@@ -278,7 +278,13 @@ export default function POIScreen({
       renderItem={renderPlace}
       ListHeaderComponent={listHeader}
       ListEmptyComponent={
-        !loading && places.length === 0 ? (
+        // Only claim there is nothing nearby when the search actually
+        // succeeded. On an Overpass failure this used to say "no results" while
+        // a small red error line sat elsewhere on screen, so a failed search
+        // read as an empty area. Reported from a shopping-centre car park in
+        // Trollhättan where fuel and food both "found nothing" — there were 72
+        // food places within 5 km, and Overpass had returned 504.
+        !loading && !error && places.length === 0 ? (
           <Text style={styles.bodyText}>{t(`${i18nPrefix}.noResults`)}</Text>
         ) : null
       }
