@@ -11,6 +11,51 @@ const MIN_OVERPASS_TIMEOUT_SECONDS = 10;
  */
 const OSM_POI_SEARCH_KEYS = ["amenity", "tourism", "shop", "historic", "leisure"] as const;
 
+/**
+ * Which OSM keys can actually hold a given value.
+ *
+ * Every plain token used to be queried against all five keys × node/way/relation
+ * = 15 clauses, of which typically two could ever match: `tourism` is never
+ * "restaurant", `historic` is never "cafe". The other thirteen were full scans
+ * guaranteed to return nothing, and they are why a 5 km food search took ~9
+ * seconds and tipped into Overpass 504s under load. Measured at Överby
+ * köpcentrum, Trollhättan, where a rider got "no results" beside 72 real places.
+ *
+ * A token absent from this map falls back to all five keys — so an unmapped or
+ * newly-added value behaves exactly as before rather than silently finding
+ * nothing. Values that genuinely live under more than one key list all of them.
+ */
+const OSM_VALUE_KEYS: Record<string, readonly (typeof OSM_POI_SEARCH_KEYS)[number][]> = {
+  // Food & drink
+  restaurant: ["amenity"], cafe: ["amenity"], fast_food: ["amenity"],
+  bar: ["amenity"], pub: ["amenity"], food_court: ["amenity"],
+  bakery: ["shop"],
+  ice_cream: ["amenity", "shop"],        // amenity=ice_cream and shop=ice_cream both in use
+
+  // Accommodation — all tourism=*
+  hotel: ["tourism"], motel: ["tourism"], hostel: ["tourism"],
+  guest_house: ["tourism"], apartment: ["tourism"], chalet: ["tourism"],
+  camp_site: ["tourism"], caravan_site: ["tourism"], alpine_hut: ["tourism"],
+  wilderness_hut: ["tourism"],
+
+  // Sights
+  attraction: ["tourism"], museum: ["tourism"], viewpoint: ["tourism"],
+  artwork: ["tourism"], zoo: ["tourism"], theme_park: ["tourism"],
+  gallery: ["tourism"],
+  castle: ["historic"], monument: ["historic"], memorial: ["historic"],
+  ruins: ["historic"], fort: ["historic"],
+
+  // Garage / services
+  motorcycle: ["shop"], motorcycle_repair: ["shop"], car_repair: ["shop"],
+  car_parts: ["shop"], tyres: ["shop"], bicycle: ["shop"],
+  fuel: ["amenity"], parking: ["amenity"], atm: ["amenity"], bank: ["amenity"],
+
+  // Sport & fitness
+  fitness_centre: ["leisure"], sports_centre: ["leisure"], stadium: ["leisure"],
+  golf_course: ["leisure"], swimming_pool: ["leisure"], fitness_station: ["leisure"],
+  park: ["leisure"],
+};
+
 export type OsmPlace = {
   type: string; // "node", "way", or "relation"
   id: number;
@@ -95,8 +140,25 @@ export async function fetchOsmPlaces(
 
   const clauseList: string[] = [];
   if (plainValues.length > 0) {
-    const valueRe = plainValues.join("|");
-    for (const key of OSM_POI_SEARCH_KEYS) clauseList.push(...clauseFor(key, valueRe));
+    // Group values by the keys that can actually hold them, so each key is
+    // queried only for the values it might contain. A food search drops from
+    // five keys to two; the three that can never match are simply not asked.
+    // Unmapped values fall back to every key, preserving the old behaviour.
+    const valuesByKey = new Map<string, string[]>();
+    for (const value of plainValues) {
+      const keys = OSM_VALUE_KEYS[value] ?? OSM_POI_SEARCH_KEYS;
+      for (const key of keys) {
+        const list = valuesByKey.get(key);
+        if (list) list.push(value);
+        else valuesByKey.set(key, [value]);
+      }
+    }
+    // Iterate OSM_POI_SEARCH_KEYS rather than the Map so clause order stays
+    // stable regardless of token order — keeps queries cache-friendly upstream.
+    for (const key of OSM_POI_SEARCH_KEYS) {
+      const values = valuesByKey.get(key);
+      if (values && values.length > 0) clauseList.push(...clauseFor(key, values.join("|")));
+    }
   }
   for (const [key, values] of Object.entries(keyedValues)) {
     clauseList.push(...clauseFor(key, values.join("|")));

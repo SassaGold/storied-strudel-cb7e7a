@@ -183,9 +183,55 @@ describe("fetchOsmPlaces query syntax", () => {
     const capturedBody = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
     const query = decodeURIComponent(capturedBody.replace(/^data=/, ""));
 
-    for (const key of ["amenity", "tourism", "shop", "historic", "leisure"]) {
-      expect(query).toContain(`["${key}"~"^(car_repair)$"]`);
+    // car_repair only ever appears as shop=car_repair. Querying it against
+    // tourism/historic/leisure was pure waste — full scans that cannot match.
+    // That waste is why a 5 km food search took ~9 s and tipped into Overpass
+    // 504s, which the app then reported to riders as "no results".
+    expect(query).toContain(`["shop"~"^(car_repair)$"]`);
+    for (const key of ["amenity", "tourism", "historic", "leisure"]) {
+      expect(query).not.toContain(`["${key}"~"^(car_repair)$"]`);
     }
+  });
+
+  it("queries every key for a value it does not recognise", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({ elements: [] }),
+    }) as unknown as typeof fetch;
+
+    // The fallback matters: an unmapped or newly-added value must behave as it
+    // always did rather than silently matching nothing.
+    await fetchOsmPlaces("some_unmapped_value", 51.5, 0.0, 5000, 50, 10000);
+
+    const body = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
+    const q = decodeURIComponent(body.replace(/^data=/, ""));
+
+    for (const key of ["amenity", "tourism", "shop", "historic", "leisure"]) {
+      expect(q).toContain(`["${key}"~"^(some_unmapped_value)$"]`);
+    }
+  });
+
+  it("groups values by key so each key is asked only what it can hold", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => null },
+      json: async () => ({ elements: [] }),
+    }) as unknown as typeof fetch;
+
+    await fetchOsmPlaces("restaurant|cafe|bakery", 51.5, 0.0, 5000, 50, 10000);
+
+    const body = (global.fetch as jest.Mock).mock.calls[0][1].body as string;
+    const q = decodeURIComponent(body.replace(/^data=/, ""));
+
+    expect(q).toContain(`["amenity"~"^(restaurant|cafe)$"]`);
+    expect(q).toContain(`["shop"~"^(bakery)$"]`);
+    expect(q).not.toContain(`"historic"`);
+    expect(q).not.toContain(`"leisure"`);
+    // 2 keys x node/way/relation, down from 5 x 3.
+    expect((q.match(/around:/g) || []).length).toBe(6);
   });
 
   it("matches key=value tokens against that exact key only", async () => {
