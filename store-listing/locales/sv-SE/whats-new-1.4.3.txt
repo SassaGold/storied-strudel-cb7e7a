@@ -4,3 +4,4 @@
 • Skärmen du kände som Rider HQ heter nu Vegvísir.
 • Integritetstexten under Om beskriver nu exakt vart din position skickas.
 • Språkrättelser på alla fem språk.
+• Sökningen letar nu mycket längre ut när det är långt mellan ställena, och en misslyckad sökning säger till i stället för att visa en tom lista.

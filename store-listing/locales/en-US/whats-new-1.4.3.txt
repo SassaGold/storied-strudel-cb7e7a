@@ -4,3 +4,4 @@
 • The screen you knew as Rider HQ is now called Vegvísir.
 • The privacy text under About now describes exactly where your coordinates go.
 • Wording corrections throughout, in all five languages.
+• Searches now look much farther afield where places are sparse, and a failed search says so instead of showing an empty list.
