@@ -68,7 +68,9 @@ export function useEmergencyPlaces() {
   const { requestForegroundPermission } = useLocationPermission();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // What failed, not the message for it — translated at render below, so an
+  // error already on screen re-localizes when the user switches language.
+  const [errorKind, setErrorKind] = useState<"location" | "network" | "load" | null>(null);
   const [places, setPlaces] = useState<EmergencyPlace[]>([]);
   const [fromCache, setFromCache] = useState(false);
   /** Unix timestamp (ms) of the cache hit, or null if data is fresh. */
@@ -111,12 +113,12 @@ export function useEmergencyPlaces() {
 
     if (activeCallRef.current !== callId) return;
     setLoading(true);
-    setError(null);
+    setErrorKind(null);
     try {
       const perm = await requestForegroundPermission();
       if (activeCallRef.current !== callId) return;
       if (perm.status !== "granted") {
-        setError(t("sos.locationError"));
+        setErrorKind("location");
         return;
       }
 
@@ -125,7 +127,7 @@ export function useEmergencyPlaces() {
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (activeCallRef.current !== callId) return;
       if (!servicesEnabled) {
-        setError(t("sos.locationError"));
+        setErrorKind("location");
         return;
       }
 
@@ -224,12 +226,21 @@ export function useEmergencyPlaces() {
         const isNetwork =
           isOverpassNetworkError(err) ||
           (err instanceof TypeError && String(err).includes("fetch"));
-        setError(isNetwork ? t("sos.networkError") : t("sos.loadError"));
+        setErrorKind(isNetwork ? "network" : "load");
       }
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }
-  }, [t]);
+  }, []);
+
+  const error =
+    errorKind === "location"
+      ? t("sos.locationError")
+      : errorKind === "network"
+        ? t("sos.networkError")
+        : errorKind === "load"
+          ? t("sos.loadError")
+          : null;
 
   return { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch };
 }

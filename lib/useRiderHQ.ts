@@ -85,7 +85,9 @@ export function useRiderHQ(): RiderHQState {
   const { requestForegroundPermission } = useLocationPermission();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // What failed, not the message for it — translated at render below, so an
+  // error already on screen re-localizes when the user switches language.
+  const [errorKind, setErrorKind] = useState<"location" | "data" | null>(null);
   const [address, setAddress] = useState<GeoAddress | null>(null);
   const [weather, setWeather] = useState<WeatherInfo | null>(null);
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -104,7 +106,7 @@ export function useRiderHQ(): RiderHQState {
     const callId = (activeCallRef.current += 1);
 
     setLoading(true);
-    setError(null);
+    setErrorKind(null);
 
     // Serve the last-good snapshot immediately so the home screen isn't blank
     // on a cold start with poor/no signal. Fresh data replaces it below.
@@ -137,7 +139,7 @@ export function useRiderHQ(): RiderHQState {
       if (activeCallRef.current !== callId) return;
       // Only bail out on explicit denial; 'undetermined' triggers the browser dialog.
       if (permission.status === "denied") {
-        if (!cached) setError(t("home.locationError"));
+        if (!cached) setErrorKind("location");
         return;
       }
 
@@ -344,11 +346,11 @@ export function useRiderHQ(): RiderHQState {
       // here — the equivalent line in usePOIFetch is what actually identified it.
       console.error("[useRiderHQ] loadData failed:", err);
       // Offline/GPS failure: keep showing cached data rather than an error.
-      if (!cached) setError(t("home.dataError"));
+      if (!cached) setErrorKind("data");
     } finally {
       if (activeCallRef.current === callId) setLoading(false);
     }
-  }, [t, searchRadiusKm]);
+  }, [searchRadiusKm]);
 
   // ── Derived values ────────────────────────────────────────────────────────
 
@@ -375,6 +377,13 @@ export function useRiderHQ(): RiderHQState {
         `${location.coords.latitude.toFixed(4)},${location.coords.longitude.toFixed(4)}`
       )}`
     : YR_NO_FALLBACK_URL;
+
+  const error =
+    errorKind === "location"
+      ? t("home.locationError")
+      : errorKind === "data"
+        ? t("home.dataError")
+        : null;
 
   return {
     loading,

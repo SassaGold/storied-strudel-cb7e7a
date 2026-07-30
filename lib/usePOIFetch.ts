@@ -87,7 +87,11 @@ export interface UsePOIFetchOptions {
  */
 export function usePOIFetch(options: UsePOIFetchOptions) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // What failed, not the message for it. The message is derived at render from
+  // the current options, so an error already on screen re-localizes when the
+  // user switches language — storing the resolved string kept it in whatever
+  // language was active when the fetch failed.
+  const [errorKind, setErrorKind] = useState<"location" | "load" | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
   const [infoPlace, setInfoPlace] = useState<Place | null>(null);
   const [wikiExtract, setWikiExtract] = useState<string | null>(null);
@@ -124,8 +128,6 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       cacheKey,
       buildSearchQuery,
       mapPlaceItem,
-      locationErrorMsg,
-      loadErrorMsg,
       searchRadiusKm,
       fetchTimeoutMs = OVERPASS_DEFAULT_TIMEOUT_MS,
       fetchLimit = 120,
@@ -142,13 +144,13 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
 
     if (activeCallRef.current !== callId) return;
     setLoading(true);
-    setError(null);
+    setErrorKind(null);
 
     try {
       const permission = await requestForegroundPermission();
       if (activeCallRef.current !== callId) return;
       if (permission.status !== "granted") {
-        setError(locationErrorMsg);
+        setErrorKind("location");
         return;
       }
 
@@ -158,7 +160,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       const servicesEnabled = await Location.hasServicesEnabledAsync();
       if (activeCallRef.current !== callId) return;
       if (!servicesEnabled) {
-        setError(locationErrorMsg);
+        setErrorKind("location");
         return;
       }
 
@@ -212,7 +214,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     } catch (err) {
       if (activeCallRef.current !== callId) return;
       console.error("[usePOIFetch] loadPlaces failed:", err);
-      setError(loadErrorMsg);
+      setErrorKind("load");
 
       // Fall back to expired cache rather than showing the rider nothing.
       //
@@ -284,6 +286,17 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     setWikiLoading(false);
   }, []);
 
+  const clearError = useCallback(() => setErrorKind(null), []);
+
+  // Resolved from the options passed on *this* render, which the caller
+  // re-translates every render — see the errorKind comment above.
+  const error =
+    errorKind === "location"
+      ? options.locationErrorMsg
+      : errorKind === "load"
+        ? options.loadErrorMsg
+        : null;
+
   return {
     loading,
     error,
@@ -299,7 +312,7 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
     setPlaces,
     setFromCache,
     setCacheTs,
-    setError,
+    clearError,
     loadPlaces,
     cancelSearch,
     openInMaps,

@@ -196,6 +196,26 @@ describe("usePOIFetch", () => {
     consoleSpy.mockRestore();
   });
 
+  it("re-resolves an on-screen error when the messages change (language switch)", async () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    mockedFetchOsmPlaces.mockRejectedValue(new Error("Network error"));
+
+    const { result, rerender } = await renderHook((props) => usePOIFetch(props), {
+      initialProps: baseOptions,
+    });
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+    expect(result.current.error).toBe("LOAD_ERROR");
+
+    // A language switch re-renders callers with freshly translated options; the
+    // error already on screen must follow. It used to keep the language that
+    // was active when the fetch failed.
+    await rerender({ ...baseOptions, loadErrorMsg: "INDLÆS_FEJL" });
+    expect(result.current.error).toBe("INDLÆS_FEJL");
+    consoleSpy.mockRestore();
+  });
+
   it("discards results that arrive after cancelSearch", async () => {
     let resolvePosition!: (v: unknown) => void;
     mockedPosition.mockReturnValue(new Promise((res) => (resolvePosition = res)));

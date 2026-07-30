@@ -252,7 +252,7 @@ export default function McScreen() {
     setPlaces,
     setFromCache,
     setCacheTs,
-    setError,
+    clearError,
     loadPlaces,
     cancelSearch,
     openInMaps,
@@ -435,7 +435,7 @@ export default function McScreen() {
                 cancelSearch();
                 setSelected(key);
                 setPlaces([]);
-                setError(null);
+                clearError();
                 setNameSearch("");
                 // Hydrate the newly selected category from its cache (if fresh)
                 // so previously found results reappear without pressing "Find".
