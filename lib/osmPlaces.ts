@@ -193,7 +193,12 @@ export async function fetchOsmPlaces(
         }
 
         const tags = elem.tags || {};
-        const name = tags.name || tags.operator || "POI";
+        // No invented placeholder when the element is nameless: leave the
+        // title undefined so each screen's own fallback fires. The old literal
+        // "POI" leaked to riders as a place called "POI" — jargon deliberately
+        // scrubbed from all Nordic copy — because `item.title || fallback`
+        // never saw a falsy title.
+        const name = tags.name || tags.brand || tags.operator;
         const phone = tags.phone;
         const website = tags.website;
         const email = tags.email;
