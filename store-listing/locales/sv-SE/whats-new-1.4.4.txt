@@ -1,0 +1,4 @@
+🚀 Toppfarten är verklig nu.
+
+• Sparade turer missade farten som mättes med släckt skärm — en snabb tur kunde sparas med gångfart som toppfart. Rättat: nu räknas hela turen.
+• Platser utan namn i OpenStreetMap visas inte längre som 'POI'.

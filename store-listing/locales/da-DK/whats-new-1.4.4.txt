@@ -1,0 +1,4 @@
+🚀 Topfarten er ægte nu.
+
+• Gemte ture missede farten der blev målt med slukket skærm — en hurtig tur kunne gemmes med gangfart som topfart. Rettet: nu tæller hele turen.
+• Steder uden navn i OpenStreetMap vises ikke længere som 'POI'.
