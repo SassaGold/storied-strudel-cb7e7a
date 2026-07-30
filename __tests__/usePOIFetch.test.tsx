@@ -200,9 +200,10 @@ describe("usePOIFetch", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
     mockedFetchOsmPlaces.mockRejectedValue(new Error("Network error"));
 
-    const { result, rerender } = await renderHook((props) => usePOIFetch(props), {
-      initialProps: baseOptions,
-    });
+    const { result, rerender } = await renderHook(
+      (props: typeof baseOptions) => usePOIFetch(props),
+      { initialProps: baseOptions }
+    );
     await act(async () => {
       await result.current.loadPlaces();
     });

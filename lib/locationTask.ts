@@ -23,7 +23,18 @@ const BG_CHUNK_PREFIX = "triplogger_bg_chunk_v2:";
  *  write O(chunk) instead of re-serializing the whole ride every batch. */
 const BG_CHUNK_MAX_POINTS = 200;
 
-export type BgPoint = { latitude: number; longitude: number; timestamp: number };
+export type BgPoint = {
+  latitude: number;
+  longitude: number;
+  timestamp: number;
+  /** Native GPS speed in m/s, when the fix carried one. Without it, a ride
+   *  spent entirely in the background (screen off, phone pocketed — i.e. every
+   *  real ride) reports a max speed from the few foreground moments only. */
+  speed?: number;
+  /** Horizontal accuracy in metres, so stop/recovery can apply the same
+   *  reliability gate the foreground watcher uses before trusting the speed. */
+  accuracy?: number;
+};
 
 // Dynamically load expo-task-manager so a missing/broken native module does
 // not prevent this file from being imported (which would crash the app).
@@ -117,6 +128,10 @@ try {
             latitude: loc.coords.latitude,
             longitude: loc.coords.longitude,
             timestamp: loc.timestamp,
+            ...(loc.coords.speed != null && loc.coords.speed >= 0
+              ? { speed: loc.coords.speed }
+              : {}),
+            ...(loc.coords.accuracy != null ? { accuracy: loc.coords.accuracy } : {}),
           })),
         );
       } catch {

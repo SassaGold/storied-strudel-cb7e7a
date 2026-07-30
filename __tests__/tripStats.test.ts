@@ -5,6 +5,7 @@ import {
   buildRide,
   formatDuration,
   MAX_SAVED_ROUTE_POINTS,
+  maxSpeedKmhFromBgPoints,
   mergeBackgroundPoints,
   nextRideSeq,
   routeDistanceKm,
@@ -244,5 +245,42 @@ describe("mergeBackgroundPoints", () => {
     const merged = mergeBackgroundPoints(fg, [], 0);
     expect(merged).toEqual(fg);
     expect(merged).not.toBe(fg);
+  });
+});
+
+describe("maxSpeedKmhFromBgPoints", () => {
+  const bg = (ts: number, speed?: number, accuracy?: number) => ({
+    latitude: 59.9,
+    longitude: 10.75,
+    timestamp: ts,
+    ...(speed != null ? { speed } : {}),
+    ...(accuracy != null ? { accuracy } : {}),
+  });
+
+  it("returns the highest reliable speed in km/h", () => {
+    // 40 m/s = 144 km/h — the motorway stretch a pocketed phone records in
+    // the background while the foreground max only ever saw walking pace.
+    const points = [bg(1000, 10), bg(2000, 40), bg(3000, 25)];
+    expect(maxSpeedKmhFromBgPoints(points, 0)).toBeCloseTo(144, 5);
+  });
+
+  it("ignores points from before the ride started (stale buffer)", () => {
+    const points = [bg(500, 50), bg(2000, 20)];
+    expect(maxSpeedKmhFromBgPoints(points, 1000)).toBeCloseTo(72, 5);
+  });
+
+  it("ignores points inside paused intervals", () => {
+    const points = [bg(1000, 20), bg(2500, 50), bg(4000, 15)];
+    expect(maxSpeedKmhFromBgPoints(points, 0, [[2000, 3000]])).toBeCloseTo(72, 5);
+  });
+
+  it("applies the same accuracy gate as the foreground watcher", () => {
+    const points = [bg(1000, 20, 10), bg(2000, 60, 80)];
+    expect(maxSpeedKmhFromBgPoints(points, 0, [], 50)).toBeCloseTo(72, 5);
+  });
+
+  it("returns 0 when no point carries a usable speed", () => {
+    const points = [bg(1000), bg(2000, -1)];
+    expect(maxSpeedKmhFromBgPoints(points, 0)).toBe(0);
   });
 });

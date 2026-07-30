@@ -124,6 +124,37 @@ export const mergeBackgroundPoints = (
   return [...foreground, ...extra].sort((a, b) => a.timestamp - b.timestamp);
 };
 
+/**
+ * Highest reliable speed (km/h) among background-recorded points.
+ *
+ * The foreground watcher tracks maxSpeedRef, but it only receives fixes while
+ * the app is foregrounded — on a real ride the phone is pocketed and every
+ * fast stretch is recorded by the background task instead, so a 140 km/h ride
+ * saved with a walking-pace max. Fold this value in at stop/recovery.
+ *
+ * Same filters as mergeBackgroundPoints (stale points from before the ride and
+ * paused intervals contribute nothing) plus the foreground's reliability gate:
+ * a fix with accuracy worse than `maxAccuracyM` must not set the max.
+ */
+export const maxSpeedKmhFromBgPoints = (
+  points: Array<GpsPoint & { speed?: number; accuracy?: number }>,
+  earliestValidTs: number,
+  pausedIntervals: PausedInterval[] = [],
+  maxAccuracyM: number = Number.POSITIVE_INFINITY
+): number => {
+  const inPaused = (ts: number) =>
+    pausedIntervals.some(([s, e]) => ts >= s && ts <= e);
+  let max = 0;
+  for (const p of points) {
+    if (p.timestamp < earliestValidTs || inPaused(p.timestamp)) continue;
+    if (p.speed == null || p.speed < 0) continue;
+    if (p.accuracy != null && p.accuracy > maxAccuracyM) continue;
+    const kmh = p.speed * 3.6;
+    if (kmh > max) max = kmh;
+  }
+  return max;
+};
+
 /** Build a SavedRide from a route + timing, or null if it's too short (< ~10 m). */
 export const buildRide = (
   route: GpsPoint[],
