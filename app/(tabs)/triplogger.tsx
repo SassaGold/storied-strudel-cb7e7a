@@ -33,6 +33,7 @@ import {
   formatDate,
   formatDuration,
   MAX_SAVED_ROUTE_POINTS,
+  maxSpeedKmhFromBgPoints,
   mergeBackgroundPoints,
   nextRideSeq,
   rideTotals,
@@ -290,6 +291,7 @@ export default function TripLoggerScreen() {
       const pausedIntervals = Array.isArray(cp.pausedIntervals) ? cp.pausedIntervals : [];
       const inPausedInterval = (ts: number) =>
         pausedIntervals.some(([s, e]) => ts >= s && ts <= e);
+      let bgMaxSpeedKmh = 0;
       try {
         const bg = await readBgPoints();
         if (bg.length > 0) {
@@ -300,11 +302,19 @@ export default function TripLoggerScreen() {
           // belong to it.
           const firstTs = route.length > 0 ? route[0].timestamp : cp.startTime;
           route = mergeBackgroundPoints(route, bg, firstTs, pausedIntervals);
+          // The checkpoint's max only saw foreground fixes; the background
+          // points carry the speeds from the stretches ridden screen-off.
+          bgMaxSpeedKmh = maxSpeedKmhFromBgPoints(
+            bg,
+            firstTs,
+            pausedIntervals,
+            TRIP_MAX_GPS_ACCURACY_M
+          );
         }
         await clearBgPoints();
       } catch {}
       const lastTs = route.length > 0 ? route[route.length - 1].timestamp : cp.startTime;
-      return buildRide(route, cp.startTime, lastTs, seq, cp.maxSpeedKmh, pausedIntervals);
+      return buildRide(route, cp.startTime, lastTs, seq, Math.max(cp.maxSpeedKmh ?? 0, bgMaxSpeedKmh), pausedIntervals);
     } catch {
       return null;
     }
@@ -639,6 +649,7 @@ export default function TripLoggerScreen() {
 
       // Merge foreground + background points, deduplicate by timestamp, recalculate distance.
       let mergedRoute = [...routeRef.current];
+      let bgMaxSpeedKmh = 0;
       try {
         const bgPoints = await readBgPoints();
         // rideStartedAtRef is the wall-clock start and never shifts, so it is
@@ -649,6 +660,14 @@ export default function TripLoggerScreen() {
           rideStartedAtRef.current ?? 0,
           pausedIntervals
         );
+        // The fast stretches of a real ride happen with the app backgrounded,
+        // where maxSpeedRef never hears about them — fold their speeds in.
+        bgMaxSpeedKmh = maxSpeedKmhFromBgPoints(
+          bgPoints,
+          rideStartedAtRef.current ?? 0,
+          pausedIntervals,
+          TRIP_MAX_GPS_ACCURACY_M
+        );
         await clearBgPoints();
       } catch {
         // Keep foreground-only route if background data cannot be read.
@@ -657,7 +676,7 @@ export default function TripLoggerScreen() {
       // Recompute distance/stats from the merged route and persist the ride.
       // pausedIntervals also excludes the leg rolled while paused from the
       // recomputed distance, keeping it consistent with the live odometer.
-      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now(), nextRideSeq(rides), maxSpeedRef.current, pausedIntervals);
+      const ride = buildRide(mergedRoute, startTimeRef.current, Date.now(), nextRideSeq(rides), Math.max(maxSpeedRef.current, bgMaxSpeedKmh), pausedIntervals);
       // The ride is finalized — drop the crash-recovery checkpoint.
       clearCheckpoint();
 
