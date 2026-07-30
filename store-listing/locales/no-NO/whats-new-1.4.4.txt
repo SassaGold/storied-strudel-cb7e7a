@@ -1,0 +1,4 @@
+🚀 Toppfarten er ekte nå.
+
+• Lagrede turer fikk ikke med seg farten som ble målt med skjermen av — en rask tur kunne lagres med gangfart som toppfart. Rettet: nå teller hele turen.
+• Steder uten navn i OpenStreetMap vises ikke lenger som «POI».

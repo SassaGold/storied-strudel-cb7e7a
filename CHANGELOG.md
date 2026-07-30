@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.4.4 — The whole ride counts (2026-07-30)
+
+**Top speed missed everything recorded with the screen off.** `maxSpeedRef`
+only updates in the foreground GPS watcher, which receives nothing while the
+phone is pocketed — i.e. during every fast stretch of every real ride — and the
+background task stored no speed at all (`BgPoint` was lat/lon/timestamp).
+Found on a real ride: 130–150 km/h ridden, a fraction of that saved. Background
+points now carry the native speed and accuracy, and stop and crash recovery
+fold their highest reliable speed into the saved max, using the same
+stale-point bound and paused-interval exclusion as the route merge and the
+same accuracy gate as the foreground watcher. Rides recorded before this
+release cannot be repaired — the speeds were never stored. (PR #150)
+
+**Nameless OSM places showed up literally named "POI".** `osmPlaces` invented
+the literal for elements without a name tag, and only the Explore screen
+special-cased it. The title now stays undefined (name → brand → operator) so
+each screen's own fallback fires. (PR #151)
+
+1.4.3 cleared review the same day it was submitted (2026-07-30), so this
+release ships on its own rather than superseding it.
+
 ## v1.4.3 — Accuracy (2026-07-29)
 
 **Saved rides could be longer than the ride.** On stop, background-recorded

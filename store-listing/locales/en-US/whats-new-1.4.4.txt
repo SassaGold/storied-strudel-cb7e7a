@@ -1,0 +1,4 @@
+🚀 Top speed is real now.
+
+• Saved rides missed every speed measured while the screen was off — a fast ride could save with a walking-pace max. Fixed: the whole ride counts now.
+• Places with no name in OpenStreetMap no longer show up as 'POI'.

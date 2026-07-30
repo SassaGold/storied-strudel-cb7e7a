@@ -1,0 +1,4 @@
+🚀 Hámarkshraðinn er réttur núna.
+
+• Vistaðar ferðir misstu af hraðanum sem mældist með slökktum skjá — hröð ferð gat vistast með gönguhraða sem hámark. Lagfært: nú telst öll ferðin með.
+• Staðir án nafns í OpenStreetMap birtast ekki lengur sem 'POI'.
