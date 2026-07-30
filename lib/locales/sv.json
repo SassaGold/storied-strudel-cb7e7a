@@ -79,7 +79,7 @@
     "daylight": "Dagsljus",
     "polarDay": "☀️ Midnattssol — ljust dygnet runt",
     "polarNight": "🌙 Polarnatt — solen går inte upp idag",
-    "openWeather": "ÖPPNA YR VÄDER",
+    "openWeather": "ÖPPNA VÄDRET",
     "lastUpdated": "Senast uppdaterad {{time}}",
     "roadConditions": "🚧 Vägförhållanden",
     "roadConditionsLoading": "Kontrollerar vägförhållanden…",
