@@ -4,3 +4,4 @@
 • Skærmen du kendte som Rider HQ hedder nu Vegvísir.
 • Privatlivsteksten under Om beskriver nu præcis hvor din position sendes hen.
 • Sprogrettelser på alle fem sprog.
+• Søgningen leder nu meget længere ud, når der er langt mellem stederne, og en mislykket søgning siger til i stedet for at vise en tom liste.
