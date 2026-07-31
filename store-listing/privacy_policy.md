@@ -30,7 +30,7 @@ The app requests access to your device's GPS location for the following purposes
 
 | Feature | When location is used |
 |---------|----------------------|
-| Rider HQ (Home tab) | Reverse geocoding your current address; fetching nearby weather and road conditions |
+| Vegvísir (Home tab, formerly Rider HQ) | Reverse geocoding your current address; fetching nearby weather and road conditions |
 | Food / Hotels / Attractions / Garage tabs | Finding nearby points of interest |
 | SOS / Emergency tab | Finding nearest emergency services; sharing your coordinates via your device's share sheet |
 | Trip Logger tab | Recording GPS route and calculating distance while riding |
