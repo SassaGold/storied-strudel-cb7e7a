@@ -5,7 +5,7 @@ Everything you need on the road, in one clean app. Vegvísir is built for motorc
 (New name, same app — Vegvísir was formerly known as Where Am I.)
 
 ━━━━━━━━━━━━━━━━━━━━
-🧭 RIDER HQ
+🧭 VEGVÍSIR
 ━━━━━━━━━━━━━━━━━━━━
 Your live dashboard while riding. See your current address, live weather with hourly and 3-day forecasts, a riding-suitability score with practical recommendations, sunrise and sunset times, and road-condition alerts — all from your current GPS position.
 
@@ -58,7 +58,7 @@ A dedicated emergency screen, one tap away:
 ━━━━━━━━━━━━━━━━━━━━
 🌍 5 LANGUAGES
 ━━━━━━━━━━━━━━━━━━━━
-Full interface in English, Norwegian, Swedish, Danish and Icelandic — switch instantly, remembered forever.
+Full interface in English, Norwegian, Swedish, Danish and Icelandic. Switch instantly — the app remembers your choice.
 
 ━━━━━━━━━━━━━━━━━━━━
 🔒 PRIVACY — NO ADS, NO TRACKING, NO ACCOUNTS

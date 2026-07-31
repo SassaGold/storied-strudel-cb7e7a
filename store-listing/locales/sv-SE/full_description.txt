@@ -5,7 +5,7 @@ Allt du behöver på vägen, i en ren och snygg app. Vegvísir är byggd för mo
 (Nytt namn, samma app — Vegvísir hette tidigare Where Am I.)
 
 ━━━━━━━━━━━━━━━━━━━━
-🧭 RIDER HQ
+🧭 VEGVÍSIR
 ━━━━━━━━━━━━━━━━━━━━
 Din live-instrumentpanel under turen. Se din aktuella adress, vädret just nu med tim- och 3-dygnsprognoser, ett åkbarhetsbetyg med praktiska rekommendationer, soluppgångs- och solnedgångstider samt varningar om vägförhållanden — allt utifrån din aktuella GPS-position.
 
@@ -58,7 +58,7 @@ En dedikerad nödskärm, ett tryck bort:
 ━━━━━━━━━━━━━━━━━━━━
 🌍 5 SPRÅK
 ━━━━━━━━━━━━━━━━━━━━
-Fullständigt gränssnitt på svenska, danska, norska, engelska och isländska — byt direkt, sparas för alltid.
+Fullständigt gränssnitt på svenska, danska, norska, engelska och isländska. Byt direkt — appen kommer ihåg ditt val.
 
 ━━━━━━━━━━━━━━━━━━━━
 🔒 INTEGRITET — INGEN REKLAM, INGEN SPÅRNING, INGET KONTO

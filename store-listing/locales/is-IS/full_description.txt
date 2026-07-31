@@ -5,7 +5,7 @@ Allt sem þú þarft á veginum, í einu snyrtilegu appi. Vegvísir er smíðað
 (Nýtt nafn, sama app — Vegvísir hét áður Where Am I.)
 
 ━━━━━━━━━━━━━━━━━━━━
-🧭 RIDER HQ
+🧭 VEGVÍSIR
 ━━━━━━━━━━━━━━━━━━━━
 Mælaborðið þitt á ferðinni. Sjáðu núverandi heimilisfang, veður í rauntíma með klukkustunda- og 3 daga spá, aksturshæfniseinkunn með hagnýtum ráðleggingum, sólarupprás og sólsetur, og viðvaranir um vegaskilyrði — allt frá GPS-staðsetningu þinni.
 
@@ -58,7 +58,7 @@ Sérstakur neyðarskjár, í einni snertingu:
 ━━━━━━━━━━━━━━━━━━━━
 🌍 5 TUNGUMÁL
 ━━━━━━━━━━━━━━━━━━━━
-Allt viðmótið á íslensku, ensku, norsku, sænsku og dönsku — skiptu samstundis, munað að eilífu.
+Allt viðmótið á íslensku, ensku, norsku, sænsku og dönsku. Skiptu samstundis — appið man valið þitt.
 
 ━━━━━━━━━━━━━━━━━━━━
 🔒 PERSÓNUVERND — ENGAR AUGLÝSINGAR, ENGIN RAKNING, ENGINN AÐGANGUR

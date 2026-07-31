@@ -43,8 +43,8 @@ Audited against the source on 2026-07-25. Every endpoint is in `lib/config.ts`.
 
 | Host | Trigger | What is sent |
 |---|---|---|
-| `nominatim.openstreetmap.org` | Rider HQ load / Update location | precise coordinates |
-| `api.open-meteo.com` | Rider HQ load / Update location | precise coordinates |
+| `nominatim.openstreetmap.org` | Vegvísir screen load / Update location | precise coordinates |
+| `api.open-meteo.com` | Vegvísir screen load / Update location | precise coordinates |
 | `overpass-api.de` | opening a POI tab (auto-searches) | precise coordinates |
 | `overpass.kumi.systems` | opening a POI tab (round-robin with the above) | precise coordinates |
 | `tile.openstreetmap.de` | any map view | the tile area being viewed |
@@ -61,7 +61,8 @@ not change any answer below — it is listed because this table claims to be a
 complete account of what leaves the device.
 
 Most of these fire **automatically** on screen load, not on an explicit user
-action — Rider HQ geocodes and fetches weather when it opens, and the POI tabs
+action — the Vegvísir screen (formerly Rider HQ) geocodes and fetches weather
+when it opens, and the POI tabs
 search on open. That matters: it rules out leaning on Play's "user-initiated
 transfer" carve-out for most of the traffic.
 
