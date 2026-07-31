@@ -17,6 +17,7 @@ import {
   OVERPASS_RETRY_ATTEMPTS,
 } from "./config";
 import { useLocationPermission } from "./locationPermission";
+import { rescopeCachedPlaces } from "./usePOIFetch";
 import { readTimedCache, writeTimedCache } from "./storage";
 import { getCurrentPositionWithTimeout } from "./location";
 
@@ -95,6 +96,8 @@ export function useEmergencyPlaces() {
     // safety-critical SOS tab, a failed refresh can still show something.
     let staleData: EmergencyPlace[] | null = null;
     let staleTs = 0;
+    // Where the rider is, once known — the yardstick for any cached result.
+    let here: { latitude: number; longitude: number } | null = null;
 
     // Show cached results immediately while fetching fresh data.
     // Infinity TTL: even an expired entry is kept as the stale fallback;
@@ -104,12 +107,11 @@ export function useEmergencyPlaces() {
     if (hit) {
       staleData = hit.data;
       staleTs = hit.ts;
-      if (Date.now() - hit.ts < CACHE_TTL_MS) {
-        setPlaces(hit.data);
-        setFromCache(true);
-        setCacheTs(hit.ts);
-      }
     }
+    // Deliberately NOT painted here. Cached distances were measured wherever
+    // the last search ran, and on this screen "nearest hospital 200 m" for one
+    // 120 km behind is the worst possible lie. Shown below, re-measured, once
+    // the position is known.
 
     if (activeCallRef.current !== callId) return;
     setLoading(true);
@@ -137,6 +139,20 @@ export function useEmergencyPlaces() {
       if (activeCallRef.current !== callId) return;
       const { latitude, longitude } = pos.coords;
       setUserLocation({ latitude, longitude });
+      here = { latitude, longitude };
+
+      // Position known — a still-fresh cache can now be shown honestly, with
+      // distances re-measured from here and anything left behind dropped.
+      if (staleData && Date.now() - staleTs < CACHE_TTL_MS) {
+        const rescoped = rescopeCachedPlaces(
+          staleData, latitude, longitude, EMERGENCY_EXPANDED_SEARCH_RADIUS_M
+        );
+        if (rescoped.length > 0) {
+          setPlaces(rescoped);
+          setFromCache(true);
+          setCacheTs(staleTs);
+        }
+      }
 
       const mapEmergencyCategory = (item: OsmPlaceItem): string => {
         const categoryFields = (item.categories ?? [])
@@ -215,9 +231,16 @@ export function useEmergencyPlaces() {
     } catch (err) {
       if (activeCallRef.current !== callId) return;
       // Fall back to expired cache rather than leaving the SOS list empty when
-      // the network/GPS fails — outdated nearby hospitals still beat nothing.
-      if (staleData) {
-        setPlaces(staleData);
+      // the network fails — outdated nearby hospitals still beat nothing.
+      //
+      // Gated on `here`: an out-of-date hospital that is genuinely close by is
+      // useful, one 120 km away presented as "nearest" is dangerous. Without a
+      // position we cannot tell the two apart, so we show neither.
+      const rescopedStale = staleData && here
+        ? rescopeCachedPlaces(staleData, here.latitude, here.longitude, EMERGENCY_EXPANDED_SEARCH_RADIUS_M)
+        : [];
+      if (rescopedStale.length > 0) {
+        setPlaces(rescopedStale);
         setFromCache(true);
         setCacheTs(staleTs);
       } else {
