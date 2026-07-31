@@ -23,7 +23,34 @@ export type SavedRide = {
   name?: string;
   /** Highest speed observed during the ride (km/h). Absent on legacy rides. */
   maxSpeedKmh?: number;
+  /**
+   * Holes in the recorded track. Absent on legacy rides AND on clean ones —
+   * presence means `distanceKm` is partly inferred rather than measured, so
+   * the UI must not present it as an exact figure. See `trackGaps`.
+   */
+  gaps?: TrackGaps;
 };
+
+/**
+ * Longest believable spacing between consecutive fixes (ms).
+ *
+ * The recorder asks for a fix every 3 s or 5 m, so in a healthy track the
+ * spacing is seconds. A minute-wide hole means fixes stopped arriving and we
+ * simply do not know where the rider went in between.
+ */
+export const MAX_FIX_GAP_MS = 60_000;
+
+/** Holes in a recorded track. All zero/absent means the track is continuous. */
+export type TrackGaps = {
+  /** How many gaps longer than MAX_FIX_GAP_MS bridged real ground. */
+  count: number;
+  /** The longest such gap (ms). */
+  longestMs: number;
+  /** Straight-line km bridged by those gaps — the inferred part of the total. */
+  bridgedKm: number;
+};
+
+/** Holes in a recorded track; see `trackGaps` below for how they are found. */
 
 /** GPS jitter threshold: point-to-point moves below this are ignored (metres). */
 export const MIN_MOVE_M = 3;
@@ -85,6 +112,45 @@ export const routeDistanceKm = (
     if (d >= MIN_MOVE_M) km += d / 1000;
   }
   return km;
+};
+
+/**
+ * Find the holes in a track, i.e. the part of `routeDistanceKm` that is a
+ * straight-line guess rather than a measurement.
+ *
+ * Why this exists: with background location denied, Android delivers a fix as
+ * the ride starts and then throttles the app to nothing. A real 2026-07-31 ride
+ * saved **40.61 km from three points** — a single 40.54 km chord across a
+ * 1702-second gap. The rider was shown a clean, plausible, entirely inferred
+ * number, indistinguishable from a measured one. A chord can only *under*-state
+ * the road actually ridden, so the distance stays as a lower bound — but the UI
+ * has to say it is one.
+ *
+ * A long gap that bridges no ground (parked with the screen off) is not worth
+ * reporting, so `MIN_MOVE_M` gates it: only holes that swallowed real distance
+ * count. Paused stretches are excluded on the same terms as `routeDistanceKm`,
+ * since by design no points are recorded while paused.
+ */
+export const trackGaps = (
+  route: GpsPoint[],
+  pausedIntervals: PausedInterval[] = []
+): TrackGaps => {
+  let count = 0;
+  let longestMs = 0;
+  let bridgedKm = 0;
+  for (let i = 1; i < route.length; i++) {
+    const a = route[i - 1];
+    const b = route[i];
+    if (pausedIntervals.some(([s, e]) => a.timestamp <= e && b.timestamp >= s)) continue;
+    const dt = b.timestamp - a.timestamp;
+    if (dt <= MAX_FIX_GAP_MS) continue;
+    const d = haversineMeters(a.latitude, a.longitude, b.latitude, b.longitude);
+    if (d < MIN_MOVE_M) continue;
+    count += 1;
+    if (dt > longestMs) longestMs = dt;
+    bridgedKm += d / 1000;
+  }
+  return { count, longestMs, bridgedKm: Math.round(bridgedKm * 100) / 100 };
 };
 
 /**
@@ -168,6 +234,9 @@ export const buildRide = (
   if (distanceKm <= MIN_RIDE_KM) return null;
   const durationMs = startTime ? Math.max(0, endTime - startTime) : 0;
   const avgSpeedKmh = durationMs > 0 ? distanceKm / (durationMs / 3_600_000) : 0;
+  // Computed from the full route, before downsampling thins it — otherwise
+  // dropped points would read as holes that were never in the recording.
+  const gaps = trackGaps(route, pausedIntervals);
   return {
     id: String(endTime),
     date: new Date(endTime).toISOString(),
@@ -179,6 +248,7 @@ export const buildRide = (
     ...(maxSpeedKmh != null && maxSpeedKmh > 0
       ? { maxSpeedKmh: Math.round(maxSpeedKmh * 10) / 10 }
       : {}),
+    ...(gaps.count > 0 ? { gaps } : {}),
   };
 };
 

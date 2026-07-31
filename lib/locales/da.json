@@ -478,6 +478,7 @@
     "exportFailed": "Eksport mislykkedes",
     "exportFailedMsg": "GPX-filen kunne ikke oprettes eller deles på denne enhed.",
     "maxSpeed": "Maks",
+    "trackGaps": "⚠️ Huller i sporet — {{distance}} af dette er et skøn i lige linje, ikke en registreret rute.",
     "totalRides": "Ture",
     "totalDistance": "Samlet afstand",
     "totalTime": "Samlet tid",

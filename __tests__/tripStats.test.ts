@@ -4,11 +4,13 @@
 import {
   buildRide,
   formatDuration,
+  MAX_FIX_GAP_MS,
   MAX_SAVED_ROUTE_POINTS,
   maxSpeedKmhFromBgPoints,
   mergeBackgroundPoints,
   nextRideSeq,
   routeDistanceKm,
+  trackGaps,
   type GpsPoint,
   type SavedRide,
 } from "../lib/tripStats";
@@ -152,6 +154,105 @@ describe("buildRide", () => {
     expect(ride.route[0]).toEqual(long[0]);
     expect(ride.route[ride.route.length - 1]).toEqual(long[long.length - 1]);
     expect(ride.distanceKm).toBeCloseTo(routeDistanceKm(long), 1);
+  });
+});
+
+describe("trackGaps", () => {
+  const now = 1_760_000_000_000;
+
+  it("reports nothing for a continuous track", () => {
+    const route = [
+      pointNorthOf(59.9, 0, now),
+      pointNorthOf(59.9, 100, now + 3_000),
+      pointNorthOf(59.9, 200, now + 6_000),
+    ];
+    expect(trackGaps(route)).toEqual({ count: 0, longestMs: 0, bridgedKm: 0 });
+  });
+
+  it("flags the real Ferð 8/11 failure: 40 km bridged by one 1702 s gap", () => {
+    // Three points, exactly as the phone saved it on 2026-07-31: a fix at the
+    // start, another 3 s later, then a single chord across a 28-minute hole.
+    const route = [
+      pointNorthOf(59.4, 0, now),
+      pointNorthOf(59.4, 70, now + 3_000),
+      pointNorthOf(59.4, 40_610, now + 1_705_000),
+    ];
+    const gaps = trackGaps(route);
+    expect(gaps.count).toBe(1);
+    expect(gaps.longestMs).toBe(1_702_000);
+    expect(gaps.bridgedKm).toBeCloseTo(40.54, 1);
+    // The distance is still reported — a chord under-states the real road —
+    // but it is now known to be inferred rather than measured.
+    expect(routeDistanceKm(route)).toBeCloseTo(40.61, 1);
+  });
+
+  it("ignores a long stop that covered no ground", () => {
+    // Parked for an hour: a big time gap, but nothing was ridden through it.
+    const route = [
+      pointNorthOf(59.9, 0, now),
+      pointNorthOf(59.9, 1, now + 3_600_000),
+    ];
+    expect(trackGaps(route).count).toBe(0);
+  });
+
+  it("ignores gaps inside a paused interval, like routeDistanceKm", () => {
+    const route = [
+      pointNorthOf(59.9, 0, now),
+      pointNorthOf(59.9, 5_000, now + 600_000),
+    ];
+    expect(trackGaps(route, [[now, now + 600_000]]).count).toBe(0);
+  });
+
+  it("does not flag a gap exactly at the threshold", () => {
+    const route = [
+      pointNorthOf(59.9, 0, now),
+      pointNorthOf(59.9, 1_000, now + MAX_FIX_GAP_MS),
+    ];
+    expect(trackGaps(route).count).toBe(0);
+    expect(trackGaps([
+      pointNorthOf(59.9, 0, now),
+      pointNorthOf(59.9, 1_000, now + MAX_FIX_GAP_MS + 1),
+    ]).count).toBe(1);
+  });
+
+  it("sums several gaps and keeps the longest", () => {
+    const route = [
+      pointNorthOf(59.9, 0, now),
+      pointNorthOf(59.9, 1_000, now + 120_000),   // gap 1: 120 s, 1 km
+      pointNorthOf(59.9, 1_100, now + 123_000),
+      pointNorthOf(59.9, 3_100, now + 423_000),   // gap 2: 300 s, 2 km
+    ];
+    const gaps = trackGaps(route);
+    expect(gaps.count).toBe(2);
+    expect(gaps.longestMs).toBe(300_000);
+    expect(gaps.bridgedKm).toBeCloseTo(3, 1);
+  });
+});
+
+describe("buildRide gap reporting", () => {
+  const now = 1_760_000_000_000;
+
+  it("omits `gaps` entirely when the track is clean", () => {
+    const start = now - 120_000;
+    const route = [
+      pointNorthOf(59.9, 0, start),
+      pointNorthOf(59.9, 500, start + 60_000),
+      pointNorthOf(59.9, 1_000, now),
+    ];
+    expect(buildRide(route, start, now, 1)!.gaps).toBeUndefined();
+  });
+
+  it("attaches `gaps` when distance was inferred across a hole", () => {
+    const start = now - 1_705_000;
+    const route = [
+      pointNorthOf(59.4, 0, start),
+      pointNorthOf(59.4, 70, start + 3_000),
+      pointNorthOf(59.4, 40_610, now),
+    ];
+    const ride = buildRide(route, start, now, 1)!;
+    expect(ride.gaps?.count).toBe(1);
+    expect(ride.gaps?.bridgedKm).toBeCloseTo(40.54, 1);
+    expect(ride.distanceKm).toBeCloseTo(40.61, 1);
   });
 });
 

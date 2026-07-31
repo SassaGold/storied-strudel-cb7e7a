@@ -478,6 +478,7 @@
     "exportFailed": "Útflutningur mistókst",
     "exportFailedMsg": "Ekki tókst að búa til eða deila GPX-skránni á þessu tæki.",
     "maxSpeed": "Hám.",
+    "trackGaps": "⚠️ Göt í ferlinum — {{distance}} af þessu er ágiskun í beinni línu, ekki skráð leið.",
     "totalRides": "Ferðir",
     "totalDistance": "Heildarvegalengd",
     "totalTime": "Heildartími",

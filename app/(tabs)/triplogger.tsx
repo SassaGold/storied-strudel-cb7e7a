@@ -1091,6 +1091,15 @@ const RideHistorySection = memo(function RideHistorySection({
                 </View>
               )}
             </View>
+            {/* The track had holes: say which part of the distance was inferred,
+                rather than printing a clean number over a straight-line guess. */}
+            {ride.gaps != null && ride.gaps.count > 0 && (
+              <Text style={styles.rideGapWarning}>
+                {t("triplog.trackGaps", {
+                  distance: fmtDist(ride.gaps.bridgedKm, unitSystem),
+                })}
+              </Text>
+            )}
             {/* Action buttons */}
             <View style={styles.rideActions}>
               {ride.route.length > 1 && (
@@ -1683,6 +1692,16 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 3,
     textAlign: "center",
+  },
+  // Shown only when the saved track has holes in it, so a distance that was
+  // partly inferred is never read as a measured one.
+  rideGapWarning: {
+    color: COLORS.warning,
+    fontSize: 12,
+    lineHeight: 17,
+    paddingHorizontal: 14,
+    marginTop: -4,
+    marginBottom: 12,
   },
   // Action buttons row
   rideActions: {
