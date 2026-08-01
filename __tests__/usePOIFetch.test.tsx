@@ -167,6 +167,60 @@ describe("usePOIFetch", () => {
     expect(result.current.places[0].distanceMeters).toBeGreaterThan(1_000);
   });
 
+  it("drops the previous town's results once a fresh fix arrives, even when the new search fails", async () => {
+    // Field bug 2026-08-01: a fuel list fetched in Karlstad was still on screen
+    // in Årjäng, 90 km later, reading "Circle K — 21 m" — because a failed
+    // search never touched the places already in state. Once the position is
+    // known, on-screen results get the same re-measure as the cache.
+    mockedPosition.mockResolvedValueOnce({
+      coords: { latitude: 59.3804, longitude: 13.4654 }, // Karlstad
+    });
+    mockedFetchOsmPlaces.mockResolvedValueOnce([
+      { id: "k1", title: "Circle K", position: { lat: 59.3806, lng: 13.4656 }, dist: 21 },
+    ]);
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+    expect(result.current.places.map((p) => p.id)).toEqual(["k1"]);
+
+    // 90 km west, and this time Overpass fails.
+    mockedPosition.mockResolvedValueOnce({
+      coords: { latitude: 59.3942, longitude: 12.1365 }, // Årjäng
+    });
+    mockedFetchOsmPlaces.mockRejectedValue(new Error("Timeout"));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    expect(result.current.places).toEqual([]);
+    expect(result.current.error).toBe("LOAD_ERROR");
+  });
+
+  it("keeps previous results through a failed refresh in the same place", async () => {
+    mockedPosition.mockResolvedValue({
+      coords: { latitude: 59.3804, longitude: 13.4654 },
+    });
+    mockedFetchOsmPlaces.mockResolvedValueOnce([
+      { id: "k1", title: "Circle K", position: { lat: 59.3806, lng: 13.4656 }, dist: 21 },
+    ]);
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    mockedFetchOsmPlaces.mockRejectedValue(new Error("Timeout"));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    // Still nearby, so the list stands (re-measured), alongside the error.
+    expect(result.current.places.map((p) => p.id)).toEqual(["k1"]);
+    expect(result.current.error).toBe("LOAD_ERROR");
+  });
+
   it("reports the location error and skips fetching when permission is denied", async () => {
     mockRequestPermission.mockResolvedValue({ status: "denied" });
 

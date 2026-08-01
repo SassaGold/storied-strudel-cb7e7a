@@ -141,6 +141,16 @@ export function useEmergencyPlaces() {
       setUserLocation({ latitude, longitude });
       here = { latitude, longitude };
 
+      // Results already on screen live in state across navigations, so they
+      // need the same re-measure as the cache — a failed refresh must not
+      // leave the previous town's "nearest hospital" standing at its old
+      // distance (the Karlstad-list-in-Årjäng bug of 2026-08-01, on SOS).
+      setPlaces((prev) =>
+        prev.length
+          ? rescopeCachedPlaces(prev, latitude, longitude, EMERGENCY_EXPANDED_SEARCH_RADIUS_M)
+          : prev
+      );
+
       // Position known — a still-fresh cache can now be shown honestly, with
       // distances re-measured from here and anything left behind dropped.
       if (staleData && Date.now() - staleTs < CACHE_TTL_MS) {

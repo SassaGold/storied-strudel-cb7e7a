@@ -141,6 +141,12 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
+  // Same for places: loadPlaces has no deps, so reading `places` inside it sees
+  // the value captured at mount — permanently []. The catch below used that to
+  // decide whether anything was "displayed", which meant the guard never held.
+  const placesRef = useRef(places);
+  placesRef.current = places;
+
   // Generation counter — incremented on each new call and on cancel.
   // Allows in-flight calls to detect they've been superseded and bail out early.
   const activeCallRef = useRef(0);
@@ -208,6 +214,16 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
       here = { latitude, longitude };
+
+      // Results already on screen survive in state across navigations, so they
+      // need the same re-measure as the cache: a failed search used to leave
+      // the previous town's list standing at its old distances — Karlstad's
+      // "Circle K — 21 m" still on screen in Årjäng, 90 km later (2026-08-01).
+      setPlaces((prev) =>
+        prev.length
+          ? rescopeCachedPlaces(prev, latitude, longitude, searchRadiusKm * 1000)
+          : prev
+      );
 
       // Now that the position is known, the cache can be shown honestly:
       // distances re-measured from here, anything no longer nearby dropped.
@@ -279,7 +295,9 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       // `here` gates it: without a position there is no way to know whether any
       // of this is nearby, and a confident list of far-away places is worse than
       // an empty one. That was the 123 km "OKQ8 — 10 m" of 2026-07-31.
-      if (places.length === 0 && here) {
+      //
+      // Read through the ref: `places` here is the mount-time closure value.
+      if (placesRef.current.length === 0 && here) {
         try {
           const stale = await readTimedCache<Place>(cacheKey, Number.POSITIVE_INFINITY);
           if (stale && stale.data.length > 0 && activeCallRef.current === callId) {
