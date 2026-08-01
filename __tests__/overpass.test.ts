@@ -210,4 +210,41 @@ describe("fetchOverpass", () => {
     expect(secondCallEndpoints).toEqual([OVERPASS_ENDPOINTS[1]]);
     expect(secondCallEndpoints).not.toContain(OVERPASS_ENDPOINTS[0]);
   });
+
+  it("cools down a mirror that times out, so the next call skips it", async () => {
+    // Field case 2026-08-01: a mirror in a tarpit state (accepts the TCP
+    // connection, never answers) burned the full timeout on every search.
+    // A timeout must cool the mirror down exactly like a 429/504 does.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { fetchOverpass, OVERPASS_ENDPOINTS } = require("../lib/overpass");
+    const fetchMock = jest.fn()
+      // call 1: first mirror hangs until aborted, second answers
+      .mockRejectedValueOnce(Object.assign(new Error("Aborted"), { name: "AbortError" }))
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: headersWithRetryAfter(null),
+        json: async () => ({ elements: [{ id: 1 }] }),
+      })
+      // call 2: only the healthy mirror should be asked
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: headersWithRetryAfter(null),
+        json: async () => ({ elements: [{ id: 2 }] }),
+      });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(fetchOverpass("[out:json];node(1);out;", 1_000)).resolves.toEqual({
+      elements: [{ id: 1 }],
+    });
+    await expect(fetchOverpass("[out:json];node(2);out;", 1_000)).resolves.toEqual({
+      elements: [{ id: 2 }],
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const secondCallEndpoints = fetchMock.mock.calls.slice(2).map((args) => args[0]);
+    expect(secondCallEndpoints).toEqual([OVERPASS_ENDPOINTS[1]]);
+    expect(secondCallEndpoints).not.toContain(OVERPASS_ENDPOINTS[0]);
+  });
 });
