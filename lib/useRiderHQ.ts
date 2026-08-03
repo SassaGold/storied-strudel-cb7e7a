@@ -9,6 +9,7 @@ import {
     FORECAST_DAYS,
     FORECAST_DISPLAY_DAYS,
     HOURLY_SLOTS,
+    HQ_SNAPSHOT_MAX_MOVE_M,
     HTTP_FETCH_TIMEOUT_MS,
     NOMINATIM_REVERSE_GEOCODING_BASE_URL,
     OPEN_METEO_BASE_URL,
@@ -150,6 +151,29 @@ export function useRiderHQ(): RiderHQState {
       setLocation(position);
 
       const { latitude, longitude } = position.coords;
+
+      // Everything in the snapshot — town name, weather, road alerts — describes
+      // the coordinates it was taken at. Now that we know where the rider really
+      // is, anything measured somewhere else has to go immediately, not when the
+      // network happens to answer. Otherwise the screen prints the previous
+      // town's name directly above this position's coordinates, which is exactly
+      // what happened on 2026-08-03 ("Sandefjord" over Tønsberg's coordinates,
+      // with that morning's weather next to it).
+      //
+      // Clearing `cached` matters as much as clearing the state: the fallbacks
+      // below (`addressResult ?? cached?.address`) would otherwise put the wrong
+      // town straight back on screen the moment a fetch failed.
+      if (
+        cached &&
+        haversineKm(latitude, longitude, cached.coords.latitude, cached.coords.longitude) * 1000 >
+          HQ_SNAPSHOT_MAX_MOVE_M
+      ) {
+        cached = null;
+        setAddress(null);
+        setWeather(null);
+        setRoadAlerts([]);
+        setLastUpdated(null);
+      }
 
       // ── Nominatim Reverse Geocoding — free OSM, retried up to 3 times ────
       const addressPromise = withRetry(() =>

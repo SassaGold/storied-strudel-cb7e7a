@@ -19,7 +19,7 @@ import {
 import { useLocationPermission } from "./locationPermission";
 import { rescopeCachedPlaces } from "./usePOIFetch";
 import { readTimedCache, writeTimedCache } from "./storage";
-import { getCurrentPositionWithTimeout } from "./location";
+import { getPositionAllowingStale } from "./location";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -76,6 +76,8 @@ export function useEmergencyPlaces() {
   const [fromCache, setFromCache] = useState(false);
   /** Unix timestamp (ms) of the cache hit, or null if data is fresh. */
   const [cacheTs, setCacheTs] = useState<number | null>(null);
+  /** Age of the position these distances were measured from, when it is not current. */
+  const [staleFixAgeMs, setStaleFixAgeMs] = useState<number | null>(null);
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -116,6 +118,7 @@ export function useEmergencyPlaces() {
     if (activeCallRef.current !== callId) return;
     setLoading(true);
     setErrorKind(null);
+    setStaleFixAgeMs(null);
     try {
       const perm = await requestForegroundPermission();
       if (activeCallRef.current !== callId) return;
@@ -133,10 +136,15 @@ export function useEmergencyPlaces() {
         return;
       }
 
-      const pos = await getCurrentPositionWithTimeout({
-        accuracy: Location.Accuracy.Balanced,
-      });
+      // Unlike the other screens this one accepts an old fix rather than
+      // refusing it. A rider who needs the nearest hospital is usually stopped,
+      // and a position from a few minutes ago still points rescue at roughly the
+      // right place — whereas "couldn't get your location" points them nowhere.
+      // The age is surfaced instead, so the distances are read for what they are.
+      const { position: pos, ageMs: fixAgeMs, stale: fixStale } =
+        await getPositionAllowingStale({ accuracy: Location.Accuracy.Balanced });
       if (activeCallRef.current !== callId) return;
+      setStaleFixAgeMs(fixStale ? fixAgeMs : null);
       const { latitude, longitude } = pos.coords;
       setUserLocation({ latitude, longitude });
       here = { latitude, longitude };
@@ -275,5 +283,5 @@ export function useEmergencyPlaces() {
           ? t("sos.loadError")
           : null;
 
-  return { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch };
+  return { loading, error, places, fromCache, cacheTs, staleFixAgeMs, userLocation, loadPlaces, cancelSearch };
 }

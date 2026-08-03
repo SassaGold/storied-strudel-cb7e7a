@@ -181,6 +181,58 @@ describe("useRiderHQ", () => {
     expect(result.current.error).toBeNull();
   });
 
+  // 2026-08-03: the home screen showed "Sandefjord" — the town resolved on the
+  // previous run — directly above the coordinates of a fix taken ~10 km away in
+  // Tønsberg, with that morning's weather beside it. The snapshot describes
+  // where it was taken, so once the rider is known to be somewhere else it must
+  // go immediately, not when the network happens to answer.
+  it("drops a snapshot from another town as soon as the real position is known", async () => {
+    mockedGetItem.mockResolvedValue(JSON.stringify(cachedSnapshot));
+    // ~300 km from the cached Oslo snapshot.
+    mockedPosition.mockResolvedValue({
+      coords: { latitude: 60.3913, longitude: 5.3221 },
+    });
+    // Both fetches fail, so anything on screen can only have come from the cache.
+    mockRestEndpoints({
+      nominatim: new Error("Nominatim down"),
+      openMeteo: new Error("Open-Meteo down"),
+    });
+    mockedFetchOverpass.mockRejectedValue(new Error("Overpass down"));
+
+    const { result } = await renderHook(() => useRiderHQ());
+    await act(async () => {
+      await result.current.loadData();
+    });
+
+    // The old town must not be reinstated by the partial-failure merge.
+    expect(result.current.address).toBeNull();
+    expect(result.current.weather).toBeNull();
+    expect(result.current.roadAlerts).toEqual([]);
+    // The coordinates on screen are the real ones.
+    expect(result.current.location?.coords.latitude).toBe(60.3913);
+  });
+
+  it("keeps a snapshot taken essentially where the rider still is", async () => {
+    mockedGetItem.mockResolvedValue(JSON.stringify(cachedSnapshot));
+    // ~150 m from the cached snapshot — same town, same weather.
+    mockedPosition.mockResolvedValue({
+      coords: { latitude: OSLO.latitude + 0.00135, longitude: OSLO.longitude },
+    });
+    mockRestEndpoints({
+      nominatim: new Error("Nominatim down"),
+      openMeteo: new Error("Open-Meteo down"),
+    });
+    mockedFetchOverpass.mockRejectedValue(new Error("Overpass down"));
+
+    const { result } = await renderHook(() => useRiderHQ());
+    await act(async () => {
+      await result.current.loadData();
+    });
+
+    expect(result.current.address?.displayName).toBe("Cached Town");
+    expect(result.current.weather?.temperatureC).toBe(11);
+  });
+
   it("shows the cached snapshot without an error when GPS fails", async () => {
     mockedGetItem.mockResolvedValue(JSON.stringify(cachedSnapshot));
     mockedPosition.mockRejectedValue(new Error("GPS timeout"));

@@ -6,7 +6,7 @@
 import { renderHook, act } from "@testing-library/react-native";
 import * as Location from "expo-location";
 import { useEmergencyPlaces, type EmergencyPlace } from "../lib/useEmergencyPlaces";
-import { getCurrentPositionWithTimeout } from "../lib/location";
+import { getPositionAllowingStale } from "../lib/location";
 import { fetchOsmPlaces } from "../lib/osmPlaces";
 import { readTimedCache, writeTimedCache } from "../lib/storage";
 import { CACHE_TTL_MS } from "../lib/overpass";
@@ -28,7 +28,7 @@ jest.mock("react-i18next", () => ({
 }));
 
 jest.mock("../lib/location", () => ({
-  getCurrentPositionWithTimeout: jest.fn(),
+  getPositionAllowingStale: jest.fn(),
 }));
 
 jest.mock("../lib/osmPlaces", () => ({
@@ -55,7 +55,7 @@ jest.mock("expo-location", () => ({
 
 const mockedFetchOsmPlaces = fetchOsmPlaces as jest.Mock;
 const mockedReadCache = readTimedCache as jest.Mock;
-const mockedPosition = getCurrentPositionWithTimeout as jest.Mock;
+const mockedPosition = getPositionAllowingStale as jest.Mock;
 const mockedServicesEnabled = Location.hasServicesEnabledAsync as jest.Mock;
 
 // User position for all tests; item positions offset northwards so the
@@ -86,7 +86,7 @@ beforeEach(() => {
   mockedReadCache.mockResolvedValue(null);
   mockRequestPermission.mockResolvedValue({ status: "granted" });
   mockedServicesEnabled.mockResolvedValue(true);
-  mockedPosition.mockResolvedValue({ coords: USER });
+  mockedPosition.mockResolvedValue({ position: { coords: USER }, ageMs: 0, stale: false });
 });
 
 describe("useEmergencyPlaces", () => {
@@ -132,6 +132,42 @@ describe("useEmergencyPlaces", () => {
     expect(result.current.places.map((p) => p.id)).toEqual(["fresh"]);
     expect(result.current.fromCache).toBe(false);
     expect(result.current.cacheTs).toBeNull();
+  });
+
+  // The other screens refuse an old fix, because a wrong "restaurant 300 m" is
+  // just noise. Here refusing would leave someone who needs a hospital with
+  // nothing at all, so the fix is used and its age reported instead.
+  it("still lists services from an old fix, and reports how old it is", async () => {
+    mockedPosition.mockResolvedValue({
+      position: { coords: USER },
+      ageMs: 7 * 60_000,
+      stale: true,
+    });
+    mockedFetchOsmPlaces.mockResolvedValue([
+      osmItem("near", 0.001, { categories: [{ id: "hospital" }] }),
+    ]);
+
+    const { result } = await renderHook(() => useEmergencyPlaces());
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    expect(result.current.places.map((p) => p.id)).toEqual(["near"]);
+    expect(result.current.error).toBeNull();
+    expect(result.current.staleFixAgeMs).toBe(7 * 60_000);
+  });
+
+  it("reports no stale-fix age when the position is current", async () => {
+    mockedFetchOsmPlaces.mockResolvedValue([
+      osmItem("near", 0.001, { categories: [{ id: "hospital" }] }),
+    ]);
+
+    const { result } = await renderHook(() => useEmergencyPlaces());
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    expect(result.current.staleFixAgeMs).toBeNull();
   });
 
   it("falls back to an expired cache when the refresh fails", async () => {
