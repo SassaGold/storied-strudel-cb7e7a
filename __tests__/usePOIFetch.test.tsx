@@ -5,7 +5,7 @@
 
 import { renderHook, act, waitFor } from "@testing-library/react-native";
 import * as Location from "expo-location";
-import { poiRadiusLadder, usePOIFetch, type Place } from "../lib/usePOIFetch";
+import { poiRadiusLadder, rescopeCachedPlaces, usePOIFetch, type Place } from "../lib/usePOIFetch";
 import { getCurrentPositionWithTimeout } from "../lib/location";
 import { fetchOsmPlaces } from "../lib/osmPlaces";
 import { readTimedCache, writeTimedCache } from "../lib/storage";
@@ -114,7 +114,11 @@ describe("usePOIFetch", () => {
     );
   });
 
-  it("serves cached places immediately while the fresh fetch is in flight", async () => {
+  it("does not show cached places until the position is known", async () => {
+    // Cached distances were measured wherever the last search happened. Until
+    // we know where the rider is now, they cannot be trusted — so nothing is
+    // painted. This used to render immediately, which is how a station 123 km
+    // away came to be listed as "10 m" on a real ride.
     const cachedPlace = { ...mapPlaceItem(osmItem("cached", 50))! };
     mockedReadCache.mockResolvedValue({ data: [cachedPlace], ts: 12345 });
     // Position never resolves — the fetch stays in flight.
@@ -125,19 +129,96 @@ describe("usePOIFetch", () => {
       result.current.loadPlaces();
     });
 
-    await waitFor(() => {
-      expect(result.current.places.map((p) => p.id)).toEqual(["cached"]);
-    });
-    expect(result.current.fromCache).toBe(true);
-    expect(result.current.cacheTs).toBe(12345);
-    expect(result.current.loading).toBe(true);
+    await waitFor(() => expect(result.current.loading).toBe(true));
+    expect(result.current.places).toEqual([]);
+    expect(result.current.fromCache).toBe(false);
 
-    // Cancelling clears the spinner without touching the cached rows.
     await act(async () => {
       result.current.cancelSearch();
     });
     expect(result.current.loading).toBe(false);
-    expect(result.current.places.map((p) => p.id)).toEqual(["cached"]);
+  });
+
+  it("serves cached places once the position lands, re-measured from here", async () => {
+    // Two cached places: one still nearby, one left 120 km behind. The stored
+    // distanceMeters on both is a lie from the previous search location.
+    const near = { ...mapPlaceItem(osmItem("near", 50))! };
+    const leftBehind = {
+      ...mapPlaceItem(osmItem("left-behind", 10))!,
+      id: "left-behind",
+      latitude: 58.9,
+      longitude: 12.4,
+    };
+    mockedReadCache.mockResolvedValue({ data: [leftBehind, near], ts: 12345 });
+    mockedFetchOsmPlaces.mockReturnValue(new Promise(() => {})); // fetch stays in flight
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      result.current.loadPlaces();
+    });
+
+    await waitFor(() => {
+      expect(result.current.places.map((p) => p.id)).toEqual(["near"]);
+    });
+    expect(result.current.fromCache).toBe(true);
+    expect(result.current.cacheTs).toBe(12345);
+    // Re-measured against the current position, not the stale stored value.
+    expect(result.current.places[0].distanceMeters).not.toBe(50);
+    expect(result.current.places[0].distanceMeters).toBeGreaterThan(1_000);
+  });
+
+  it("drops the previous town's results once a fresh fix arrives, even when the new search fails", async () => {
+    // Field bug 2026-08-01: a fuel list fetched in Karlstad was still on screen
+    // in Årjäng, 90 km later, reading "Circle K — 21 m" — because a failed
+    // search never touched the places already in state. Once the position is
+    // known, on-screen results get the same re-measure as the cache.
+    mockedPosition.mockResolvedValueOnce({
+      coords: { latitude: 59.3804, longitude: 13.4654 }, // Karlstad
+    });
+    mockedFetchOsmPlaces.mockResolvedValueOnce([
+      { id: "k1", title: "Circle K", position: { lat: 59.3806, lng: 13.4656 }, dist: 21 },
+    ]);
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+    expect(result.current.places.map((p) => p.id)).toEqual(["k1"]);
+
+    // 90 km west, and this time Overpass fails.
+    mockedPosition.mockResolvedValueOnce({
+      coords: { latitude: 59.3942, longitude: 12.1365 }, // Årjäng
+    });
+    mockedFetchOsmPlaces.mockRejectedValue(new Error("Timeout"));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    expect(result.current.places).toEqual([]);
+    expect(result.current.error).toBe("LOAD_ERROR");
+  });
+
+  it("keeps previous results through a failed refresh in the same place", async () => {
+    mockedPosition.mockResolvedValue({
+      coords: { latitude: 59.3804, longitude: 13.4654 },
+    });
+    mockedFetchOsmPlaces.mockResolvedValueOnce([
+      { id: "k1", title: "Circle K", position: { lat: 59.3806, lng: 13.4656 }, dist: 21 },
+    ]);
+
+    const { result } = await renderHook(() => usePOIFetch(baseOptions));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    mockedFetchOsmPlaces.mockRejectedValue(new Error("Timeout"));
+    await act(async () => {
+      await result.current.loadPlaces();
+    });
+
+    // Still nearby, so the list stands (re-measured), alongside the error.
+    expect(result.current.places.map((p) => p.id)).toEqual(["k1"]);
+    expect(result.current.error).toBe("LOAD_ERROR");
   });
 
   it("reports the location error and skips fetching when permission is denied", async () => {
@@ -245,6 +326,34 @@ describe("usePOIFetch", () => {
   });
 });
 
+describe("rescopeCachedPlaces", () => {
+  const place = (id: string, lat: number, lon: number, stored: number): Place => ({
+    id, name: id, category: "restaurant", latitude: lat, longitude: lon, distanceMeters: stored,
+  });
+
+  it("replaces stored distances with ones measured from the current position", () => {
+    // The Arboga→Sigtuna case: a station cached 123 km ago still claiming 10 m.
+    const arboga = place("OKQ8", 59.42595, 15.82918, 10);
+    const [out] = rescopeCachedPlaces([arboga], 59.42600, 15.82930, 5_000);
+    expect(out.distanceMeters).toBeLessThan(50);
+    expect(out.distanceMeters).not.toBe(10);
+  });
+
+  it("drops places the rider has left behind", () => {
+    const arboga = place("OKQ8", 59.42595, 15.82918, 10);
+    // Now in Sigtuna, 123 km away — nothing cached is nearby any more.
+    expect(rescopeCachedPlaces([arboga], 59.65351, 17.95674, 5_000)).toEqual([]);
+  });
+
+  it("re-sorts by the new distances", () => {
+    const here = { lat: 59.9, lon: 10.7 };
+    const a = place("a", 59.905, 10.7, 10);   // ~556 m, but stored as nearest
+    const b = place("b", 59.901, 10.7, 900);  // ~111 m, but stored as farthest
+    expect(rescopeCachedPlaces([a, b], here.lat, here.lon, 5_000).map((p) => p.id))
+      .toEqual(["b", "a"]);
+  });
+});
+
 describe("poiRadiusLadder", () => {
   it("ascends and never exceeds the cap", () => {
     for (const km of [1, 2, 5, 10, 25, 50, 100, 500]) {
@@ -304,7 +413,10 @@ describe("stale cache fallback on failure", () => {
     // read, with an infinite TTL, still has yesterday's results.
     mockedReadCache
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ data: [{ id: "old", name: "Yesterday's cafe" }], ts: 1_000 });
+      .mockResolvedValueOnce({
+        data: [{ id: "old", name: "Yesterday's cafe", latitude: 59.9, longitude: 10.7 }],
+        ts: 1_000,
+      });
     mockedFetchOsmPlaces.mockRejectedValue(new Error("Overpass error 504"));
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
@@ -323,7 +435,10 @@ describe("stale cache fallback on failure", () => {
 
   it("does not overwrite live results with stale ones", async () => {
     // A fresh hit is already on screen; a later failure must not replace it.
-    mockedReadCache.mockResolvedValue({ data: [{ id: "fresh", name: "Open now" }], ts: 9_000 });
+    mockedReadCache.mockResolvedValue({
+      data: [{ id: "fresh", name: "Open now", latitude: 59.9, longitude: 10.7 }],
+      ts: 9_000,
+    });
     mockedFetchOsmPlaces.mockRejectedValue(new Error("Overpass error 504"));
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 

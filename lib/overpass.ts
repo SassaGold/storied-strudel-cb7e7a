@@ -109,6 +109,14 @@ export async function fetchOverpass(
       return await response.json();
     } catch (err) {
       clearTimeout(timeoutId);
+      // A mirror that hangs until the timeout — or refuses the connection —
+      // gets the same cooldown as one that answers 429/504. Without this,
+      // every later search re-pays the full timeout on the dead mirror before
+      // reaching a healthy one: measured 2026-08-01, a tarpitting mirror made
+      // every second search hang 40 s from a network where the other mirror
+      // answered in 5 s. If connectivity itself is down, every mirror cools
+      // and the all-cooling fallback above still tries them, so no lockout.
+      endpointCooldownUntil.set(endpoint, Date.now() + OVERPASS_ENDPOINT_COOLDOWN_MS);
       lastError =
         err instanceof Error && err.name === "AbortError"
           ? "Timeout"

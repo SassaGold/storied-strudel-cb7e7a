@@ -20,7 +20,7 @@ import * as Localization from "expo-localization";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { emergencyNumberForCountry } from "../../lib/config";
-import { getCurrentPositionWithTimeout } from "../../lib/location";
+import { getPositionAllowingStale } from "../../lib/location";
 import { useSettings, fmtDistShort } from "../../lib/settings";
 import { useEmergencyPlaces, type EmergencyPlace } from "../../lib/useEmergencyPlaces";
 import POIMap from "../../components/POIMap";
@@ -84,7 +84,7 @@ export default function EmergencyScreen() {
   const { requestForegroundPermission } = useLocationPermission();
 
   // Data from hook (loading, error, places, fromCache, cacheTs, loadPlaces)
-  const { loading, error, places, fromCache, cacheTs, userLocation, loadPlaces, cancelSearch } =
+  const { loading, error, places, fromCache, cacheTs, staleFixAgeMs, userLocation, loadPlaces, cancelSearch } =
     useEmergencyPlaces();
 
   // Auto-load nearby emergency services the first time the SOS screen opens, so
@@ -167,11 +167,23 @@ export default function EmergencyScreen() {
         Alert.alert(t("sos.permissionAlert"), t("sos.locationPermissionMsg"));
         return;
       }
-      const pos = await getCurrentPositionWithTimeout({ accuracy: Location.Accuracy.Balanced });
-      const { latitude, longitude } = pos.coords;
+      // Deliberately accepts an old fix — in an emergency a position from ten
+      // minutes ago still narrows the search — but never sends it as if it were
+      // current. Six decimal places is ~11 cm of implied precision, so an
+      // unlabelled stale fix reads as an exact address.
+      const { position, ageMs, stale } = await getPositionAllowingStale({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      const { latitude, longitude } = position.coords;
       const mapsLink = `https://maps.google.com/?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
       const coords = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-      const shareText = t("sos.shareText", { link: mapsLink, coords });
+      const staleNote = stale
+        ? "\n\n" +
+          (ageMs >= 3_600_000
+            ? t("sos.shareStaleHours", { count: Math.round(ageMs / 3_600_000) })
+            : t("sos.shareStaleMinutes", { count: Math.max(1, Math.round(ageMs / 60_000)) }))
+        : "";
+      const shareText = t("sos.shareText", { link: mapsLink, coords }) + staleNote;
 
       // On web, Share API is limited — copy to clipboard as fallback
       if (Platform.OS === "web") {
@@ -364,6 +376,19 @@ export default function EmergencyScreen() {
       {loading && places.length === 0 && <SkeletonList rows={4} tint="danger" />}
 
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      {/* Stale-position banner. Distances below were measured from a fix that is
+          no longer current, so say so — on this screen an unqualified
+          "hospital 200 m" is the worst thing the app can get wrong. */}
+      {staleFixAgeMs != null && places.length > 0 && (
+        <View style={styles.cacheBanner}>
+          <Text style={styles.cacheBannerText}>
+            {staleFixAgeMs >= 3_600_000
+              ? t("sos.staleFixHours", { count: Math.round(staleFixAgeMs / 3_600_000) })
+              : t("sos.staleFixMinutes", { count: Math.max(1, Math.round(staleFixAgeMs / 60_000)) })}
+          </Text>
+        </View>
+      )}
 
       {/* Cache banner */}
       {fromCache && places.length > 0 && (

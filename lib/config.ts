@@ -166,6 +166,38 @@ export const ROAD_MAX_RESULTS = 20;
 /** Timeout for a single getCurrentPositionAsync call before falling back (ms). */
 export const GPS_TIMEOUT_MS = 15_000;
 
+/**
+ * How old a cached GPS fix may be before it stops counting as "where you are".
+ *
+ * The fallback to `getLastKnownPositionAsync()` has no age limit of its own, so
+ * without this it will happily hand back a fix from hours ago. That is not
+ * theoretical: on 2026-08-03 the app served a cached fix from the owner's
+ * driveway — 2.5 m from his house, verified against a reading taken there that
+ * evening — while he was ~10 km away, and measured "restaurant 365 m" from it.
+ *
+ * 60 s is roughly 1.5 km at motorway speed, which is inside the smallest POI
+ * search radius (5 km), so a fix this fresh cannot move a result into the wrong
+ * town.
+ */
+export const MAX_FIX_AGE_MS = 60_000;
+
+/**
+ * How far the rider may have moved before the cached home-screen snapshot stops
+ * describing where they are.
+ *
+ * The snapshot exists so a cold start isn't a blank screen, which is worth
+ * keeping — but its town name, weather and road alerts all belong to the
+ * coordinates it was taken at. Once a fresh fix lands somewhere else they are
+ * about a different place, and leaving them on screen prints one town's name
+ * directly above another town's coordinates (observed 2026-08-03: "Sandefjord"
+ * over Tønsberg's coordinates, with that morning's weather beside it).
+ *
+ * Inside 2 km the town name is effectively always the same and the weather is
+ * indistinguishable, so this only fires on a real move.
+ */
+export const HQ_SNAPSHOT_MAX_MOVE_M = 2_000;
+
+
 // ── Trip logger ───────────────────────────────────────────────────────────────
 
 /** GPS update interval for the trip logger (ms). */

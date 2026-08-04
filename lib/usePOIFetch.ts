@@ -10,7 +10,7 @@ import { Linking } from "react-native";
 import { HTTP_FETCH_TIMEOUT_MS, OVERPASS_DEFAULT_TIMEOUT_MS, OVERPASS_RETRY_ATTEMPTS, POI_EXPANDED_RADIUS_FACTOR, POI_MAX_DISPLAY, POI_MAX_RADIUS_M, WIKIPEDIA_SUMMARY_URL } from "./config";
 import { fetchOsmPlaces, type OsmPlaceItem } from "./osmPlaces";
 import { useLocationPermission } from "./locationPermission";
-import { CACHE_TTL_MS, fetchWithTimeout, parseWikiTag, withRetry } from "./overpass";
+import { CACHE_TTL_MS, fetchWithTimeout, haversineMeters, parseWikiTag, withRetry } from "./overpass";
 import { readTimedCache, writeTimedCache } from "./storage";
 import { getCurrentPositionWithTimeout } from "./location";
 
@@ -65,6 +65,40 @@ export const poiRadiusLadder = (baseRadiusM: number): number[] => {
   return ladder;
 };
 
+/**
+ * Re-measure cached places against where the rider is *now*, dropping the ones
+ * that are no longer nearby.
+ *
+ * `distanceMeters` is baked into each Place when it is fetched, and the cache
+ * key carries no location — so a cache written in one town is served unchanged
+ * in the next one. Measured on a real ride 2026-07-31: stopped in Sigtuna, the
+ * fuel list offered "OKQ8 — 10 m" for a station in Arboga, 123 km back down
+ * the road. The age banner was honest; the distances were fiction, and distance
+ * is the thing a rider acts on.
+ *
+ * Coordinates travel with each Place, so the distances can simply be recomputed.
+ * Anything beyond the search radius is dropped rather than shown as far-away
+ * clutter: the cache is knowledge about *here*, and when none of it is here any
+ * more the honest answer is nothing.
+ */
+export const rescopeCachedPlaces = <T extends {
+  latitude: number;
+  longitude: number;
+  distanceMeters?: number;
+}>(
+  places: T[],
+  lat: number,
+  lon: number,
+  maxDistanceM: number
+): T[] =>
+  places
+    .map((p) => ({
+      ...p,
+      distanceMeters: haversineMeters(lat, lon, p.latitude, p.longitude),
+    }))
+    .filter((p) => (p.distanceMeters ?? Infinity) <= maxDistanceM)
+    .sort((a, b) => (a.distanceMeters ?? 0) - (b.distanceMeters ?? 0));
+
 /** Maps a single Overpass place item to a Place, or returns null to discard it. */
 export type MapPlaceItem = (item: OsmPlaceItem, userLat: number, userLon: number) => Place | null;
 
@@ -107,6 +141,12 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
+  // Same for places: loadPlaces has no deps, so reading `places` inside it sees
+  // the value captured at mount — permanently []. The catch below used that to
+  // decide whether anything was "displayed", which meant the guard never held.
+  const placesRef = useRef(places);
+  placesRef.current = places;
+
   // Generation counter — incremented on each new call and on cancel.
   // Allows in-flight calls to detect they've been superseded and bail out early.
   const activeCallRef = useRef(0);
@@ -133,18 +173,20 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       fetchLimit = 120,
     } = optionsRef.current;
 
-    // Serve cached data immediately so the user sees something while refreshing.
+    // Read the cache now, but do NOT paint it until we know where the rider is:
+    // its distances were measured wherever the last search happened, which on a
+    // ride can be a hundred kilometres back. Re-scoped below against the fresh
+    // position; see rescopeCachedPlaces.
     const hit = await readTimedCache<Place>(cacheKey, CACHE_TTL_MS);
     if (activeCallRef.current !== callId) return;
-    if (hit) {
-      setPlaces(hit.data);
-      setFromCache(true);
-      setCacheTs(hit.ts);
-    }
 
     if (activeCallRef.current !== callId) return;
     setLoading(true);
     setErrorKind(null);
+
+    // Where the rider actually is, once known — the yardstick any cached result
+    // has to be re-measured against, including in the catch below.
+    let here: { latitude: number; longitude: number } | null = null;
 
     try {
       const permission = await requestForegroundPermission();
@@ -171,6 +213,30 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
 
       const { latitude, longitude } = position.coords;
       setUserLocation({ latitude, longitude });
+      here = { latitude, longitude };
+
+      // Results already on screen survive in state across navigations, so they
+      // need the same re-measure as the cache: a failed search used to leave
+      // the previous town's list standing at its old distances — Karlstad's
+      // "Circle K — 21 m" still on screen in Årjäng, 90 km later (2026-08-01).
+      setPlaces((prev) =>
+        prev.length
+          ? rescopeCachedPlaces(prev, latitude, longitude, searchRadiusKm * 1000)
+          : prev
+      );
+
+      // Now that the position is known, the cache can be shown honestly:
+      // distances re-measured from here, anything no longer nearby dropped.
+      if (hit) {
+        const rescoped = rescopeCachedPlaces(
+          hit.data, latitude, longitude, searchRadiusKm * 1000
+        );
+        if (rescoped.length > 0) {
+          setPlaces(rescoped);
+          setFromCache(true);
+          setCacheTs(hit.ts);
+        }
+      }
 
       // Fetch and map POIs within a given radius (metres).
       const fetchWithinRadius = async (radiusM: number): Promise<Place[]> => {
@@ -218,8 +284,6 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
 
       // Fall back to expired cache rather than showing the rider nothing.
       //
-      // A fresh hit (< CACHE_TTL_MS) is already on screen from the read at the
-      // top of this function, so this only fires once the cache has aged out.
       // Overpass 504s under load — measured ~9 s per search, failing
       // intermittently — and on a roadside "here is what was nearby earlier"
       // beats an empty screen. Results are marked as cached with their real
@@ -227,13 +291,24 @@ export function usePOIFetch(options: UsePOIFetchOptions) {
       //
       // Only when nothing is displayed: never replace live results with older
       // ones, and never overwrite a fresher cache hit with a staler read.
-      if (places.length === 0) {
+      //
+      // `here` gates it: without a position there is no way to know whether any
+      // of this is nearby, and a confident list of far-away places is worse than
+      // an empty one. That was the 123 km "OKQ8 — 10 m" of 2026-07-31.
+      //
+      // Read through the ref: `places` here is the mount-time closure value.
+      if (placesRef.current.length === 0 && here) {
         try {
           const stale = await readTimedCache<Place>(cacheKey, Number.POSITIVE_INFINITY);
           if (stale && stale.data.length > 0 && activeCallRef.current === callId) {
-            setPlaces(stale.data);
-            setFromCache(true);
-            setCacheTs(stale.ts);
+            const rescoped = rescopeCachedPlaces(
+              stale.data, here.latitude, here.longitude, searchRadiusKm * 1000
+            );
+            if (rescoped.length > 0) {
+              setPlaces(rescoped);
+              setFromCache(true);
+              setCacheTs(stale.ts);
+            }
           }
         } catch {
           // Cache unreadable too — the error message already stands.

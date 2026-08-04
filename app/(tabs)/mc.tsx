@@ -28,7 +28,7 @@ import {
 import { CACHE_TTL_MS, haversineMeters } from "../../lib/overpass";
 import { fmtDistShort, useSettings } from "../../lib/settings";
 import { readTimedCache, storage } from "../../lib/storage";
-import { usePOIFetch, type Place } from "../../lib/usePOIFetch";
+import { rescopeCachedPlaces, usePOIFetch, type Place } from "../../lib/usePOIFetch";
 import PlaceInfoModal from "../../components/PlaceInfoModal";
 import POIMap from "../../components/POIMap";
 import HeaderBackdrop from "../../components/HeaderBackdrop";
@@ -283,6 +283,10 @@ export default function McScreen() {
   // switched tiles again before the read resolved.
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
+  // Read inside the cache-hydration callbacks below, which must re-measure
+  // cached distances against wherever the rider actually is.
+  const userLocationRef = useRef(userLocation);
+  userLocationRef.current = userLocation;
 
   // Cache-hydration generation. Bumped on every tile switch, Find press and
   // pull-to-refresh so a slow AsyncStorage read can never overwrite newer
@@ -303,9 +307,6 @@ export default function McScreen() {
             ? (savedSelected as Category)
             : "services";
 
-        // Populate places from cache (valid entries only — no network request).
-        const hit = await readMcCache(restoredCategory);
-
         // Bail out if the user already tapped a tile (or searched) while the
         // restore was in flight — their choice wins over the persisted one.
         if (hydrateGenRef.current !== gen) {
@@ -320,11 +321,10 @@ export default function McScreen() {
         if (restoredCategory !== "services") {
           setSelected(restoredCategory);
         }
-        if (hit) {
-          setPlaces(hit.data);
-          setFromCache(true);
-          setCacheTs(hit.ts);
-        }
+        // The cache is deliberately NOT painted here: at mount there is no
+        // position yet, so its distances cannot be re-measured and would be
+        // read as "nearby" wherever the rider actually is. The auto-load below
+        // fires immediately and serves the same cache once a fix exists.
       } catch {}
       initDoneRef.current = true;
       setInitDone(true);
@@ -441,10 +441,20 @@ export default function McScreen() {
                 // so previously found results reappear without pressing "Find".
                 // The generation check also protects against a slow read
                 // resolving after the user has started a fresh search.
+                // Only with a known position: cached distances were measured
+                // wherever that search ran, so re-measure and drop whatever the
+                // rider has since left behind. Without a fix we cannot tell
+                // "200 m away" from "120 km away", so we show nothing.
                 const gen = ++hydrateGenRef.current;
+                const from = userLocationRef.current;
+                if (!from) return;
                 readMcCache(key).then((hit) => {
                   if (!hit || selectedRef.current !== key || hydrateGenRef.current !== gen) return;
-                  setPlaces(hit.data);
+                  const rescoped = rescopeCachedPlaces(
+                    hit.data, from.latitude, from.longitude, effectiveSearchRadiusKm * 1000
+                  );
+                  if (rescoped.length === 0) return;
+                  setPlaces(rescoped);
                   setFromCache(true);
                   setCacheTs(hit.ts);
                 });
