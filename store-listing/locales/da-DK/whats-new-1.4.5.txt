@@ -1,0 +1,5 @@
+📍 Afstande du kan stole på.
+
+• Steder i nærheden måles fra hvor du er nu — ikke fra hvor du sidst søgte. Ikke længere '300 m' til et sted du kørte fra for en time siden.
+• En gemt tur siger til, hvis en del af afstanden er gættet hen over et hul i sporingen.
+• Starter du en tur uden baggrundsposition, får du besked — i stedet for at kun dele af turen gemmes.

@@ -1,0 +1,5 @@
+📍 Distances you can trust.
+
+• Nearby places are measured from where you are now — not from where you last searched. No more '300 m' to somewhere you left behind an hour ago.
+• A saved ride now tells you if part of its distance was guessed across a gap in the tracking.
+• Starting a ride warns you if background location is off, instead of quietly recording less than the whole trip.

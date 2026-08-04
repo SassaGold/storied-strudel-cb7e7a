@@ -1,0 +1,5 @@
+📍 Avstander du kan stole på.
+
+• Steder i nærheten måles fra der du er nå — ikke fra der du sist søkte. Ikke lenger «300 m» til et sted du kjørte fra for en time siden.
+• En lagret tur sier fra hvis deler av avstanden er gjettet over et hull i sporingen.
+• Starter du en tur uten bakgrunnsposisjon, får du beskjed — i stedet for at bare deler av turen blir lagret.
