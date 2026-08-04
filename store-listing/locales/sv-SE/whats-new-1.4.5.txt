@@ -1,0 +1,5 @@
+📍 Avstånd du kan lita på.
+
+• Platser i närheten mäts från där du är nu — inte från där du sökte sist. Inte längre '300 m' till ett ställe du körde från för en timme sedan.
+• En sparad tur säger till om en del av sträckan är gissad över ett hål i spårningen.
+• Startar du en tur utan bakgrundsposition får du veta det — i stället för att bara delar av turen sparas.

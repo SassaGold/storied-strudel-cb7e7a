@@ -1,0 +1,5 @@
+📍 Fjarlægðir sem þú getur treyst.
+
+• Staðir í nágrenninu eru mældir frá því hvar þú ert núna — ekki þar sem þú leitaðir síðast. Ekki lengur '300 m' á stað sem þú fórst frá fyrir klukkutíma.
+• Vistuð ferð segir frá ef hluti vegalengdarinnar var ágiskun yfir gat í skráningunni.
+• Ef þú byrjar ferð án bakgrunnsstaðsetningar færðu viðvörun — í stað þess að aðeins hluti ferðarinnar vistist.
