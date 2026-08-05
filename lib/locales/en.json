@@ -502,7 +502,7 @@
     "overpass": "Overpass API",
     "overpassDesc": "Queries to OpenStreetMap data are run through the Overpass API (overpass-api.de and mirror endpoints). Free to use, no account required.",
     "weather": "Open-Meteo",
-    "weatherDesc": "Weather forecasts and conditions are fetched from the Open-Meteo API. Free, open-source weather data. No API key required. Works in all browsers.",
+    "weatherDesc": "Weather forecasts and conditions are fetched from the Open-Meteo API. Free, open-source weather data. No API key required.",
     "weatherLicense": "© Open-Meteo contributors · CC BY 4.0",
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Place descriptions are fetched from the Wikipedia REST API where a Wikipedia tag is available in OpenStreetMap data. Wikipedia content is licensed under Creative Commons Attribution-ShareAlike.",

@@ -502,7 +502,7 @@
     "overpass": "Overpass API",
     "overpassDesc": "Spørringer til OpenStreetMap-data kjøres gjennom Overpass API (overpass-api.de og speilservere). Gratis å bruke, ingen konto kreves.",
     "weather": "Open-Meteo",
-    "weatherDesc": "Værvarsler og -forhold hentes fra Open-Meteo API. Gratis, open-source værdata. Ingen API-nøkkel kreves. Fungerer i alle nettlesere.",
+    "weatherDesc": "Værvarsler og -forhold hentes fra Open-Meteo API. Gratis, open-source værdata. Ingen API-nøkkel kreves.",
     "weatherLicense": "© Open-Meteo contributors · CC BY 4.0",
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Stedsbeskrivelser hentes fra Wikipedia REST API der en Wikipedia-tag er tilgjengelig i OpenStreetMap-data. Wikipedia-innhold er lisensiert under Creative Commons Attribution-ShareAlike.",

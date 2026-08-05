@@ -502,7 +502,7 @@
     "overpass": "Overpass API",
     "overpassDesc": "Frågor till OpenStreetMap-data körs via Overpass API (overpass-api.de och spegelservrar). Gratis att använda, inget konto krävs.",
     "weather": "Open-Meteo",
-    "weatherDesc": "Väderprognoser och -förhållanden hämtas från Open-Meteo API. Gratis, open-source väderdata. Ingen API-nyckel krävs. Fungerar i alla webbläsare.",
+    "weatherDesc": "Väderprognoser och -förhållanden hämtas från Open-Meteo API. Gratis, open-source väderdata. Ingen API-nyckel krävs.",
     "weatherLicense": "© Open-Meteo contributors · CC BY 4.0",
     "wikipedia": "Wikipedia",
     "wikipediaDesc": "Platsbeskrivningar hämtas från Wikipedia REST API där en Wikipedia-tagg finns tillgänglig i OpenStreetMap-data. Wikipedia-innehåll är licensierat under Creative Commons Attribution-ShareAlike.",
