@@ -16,6 +16,11 @@ import {
 export { OVERPASS_ENDPOINTS, CACHE_TTL_MS_CFG as CACHE_TTL_MS };
 
 const OVERPASS_RETRYABLE_STATUS = new Set([403, 429, 500, 502, 503, 504]);
+// Server-side failures that tend to clear on an immediate retry of the same
+// endpoint. Rate limits (403/429) are deliberately excluded — retrying into
+// a rate limit makes it worse.
+const OVERPASS_TRANSIENT_5XX = new Set([500, 502, 503, 504]);
+const OVERPASS_SAME_ENDPOINT_RETRY_DELAY_MS = 1_000;
 const OVERPASS_ENDPOINT_COOLDOWN_MINUTES = 5;
 const OVERPASS_ENDPOINT_COOLDOWN_MS = OVERPASS_ENDPOINT_COOLDOWN_MINUTES * 60 * 1_000;
 const endpointCooldownUntil = new Map<string, number>();
@@ -81,46 +86,61 @@ export async function fetchOverpass(
   const endpointsToTry = preferred.length > 0 ? preferred : orderedEndpoints;
 
   for (const endpoint of endpointsToTry) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-          // OSM usage etiquette: identify the app (also sent to Nominatim and
-          // the tile servers). Reduces the risk of being throttled.
-          "User-Agent": OSM_USER_AGENT,
-          Accept: "application/json",
-        },
-        body: `data=${encodeURIComponent(query)}`,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      if (!response.ok) {
-        if (OVERPASS_RETRYABLE_STATUS.has(response.status)) {
-          const retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After")) ?? OVERPASS_ENDPOINT_COOLDOWN_MS;
-          endpointCooldownUntil.set(endpoint, Date.now() + retryAfterMs);
+    // Up to two attempts per endpoint: a transient 5xx usually answers fast
+    // and clears on an immediate retry (measured 2026-08-06 against
+    // overpass-api.de: 504 after 7 s, then 200 with full results 3 s later).
+    // With a single healthy mirror configured, failing over on the first 504
+    // means failing outright. Timeouts get no second attempt — one has
+    // already cost the full timeoutMs.
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            // OSM usage etiquette: identify the app (also sent to Nominatim and
+            // the tile servers). Reduces the risk of being throttled.
+            "User-Agent": OSM_USER_AGENT,
+            Accept: "application/json",
+          },
+          body: `data=${encodeURIComponent(query)}`,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+          lastError = `Overpass error ${response.status}`;
+          if (OVERPASS_TRANSIENT_5XX.has(response.status) && attempt === 0) {
+            await new Promise<void>((resolve) =>
+              setTimeout(resolve, OVERPASS_SAME_ENDPOINT_RETRY_DELAY_MS)
+            );
+            continue;
+          }
+          if (OVERPASS_RETRYABLE_STATUS.has(response.status)) {
+            const retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After")) ?? OVERPASS_ENDPOINT_COOLDOWN_MS;
+            endpointCooldownUntil.set(endpoint, Date.now() + retryAfterMs);
+          }
+          break;
         }
-        lastError = `Overpass error ${response.status}`;
-        continue;
+        endpointCooldownUntil.delete(endpoint);
+        return await response.json();
+      } catch (err) {
+        clearTimeout(timeoutId);
+        // A mirror that hangs until the timeout — or refuses the connection —
+        // gets the same cooldown as one that answers 429/504. Without this,
+        // every later search re-pays the full timeout on the dead mirror before
+        // reaching a healthy one: measured 2026-08-01, a tarpitting mirror made
+        // every second search hang 40 s from a network where the other mirror
+        // answered in 5 s. If connectivity itself is down, every mirror cools
+        // and the all-cooling fallback above still tries them, so no lockout.
+        endpointCooldownUntil.set(endpoint, Date.now() + OVERPASS_ENDPOINT_COOLDOWN_MS);
+        lastError =
+          err instanceof Error && err.name === "AbortError"
+            ? "Timeout"
+            : "Network error";
+        break;
       }
-      endpointCooldownUntil.delete(endpoint);
-      return await response.json();
-    } catch (err) {
-      clearTimeout(timeoutId);
-      // A mirror that hangs until the timeout — or refuses the connection —
-      // gets the same cooldown as one that answers 429/504. Without this,
-      // every later search re-pays the full timeout on the dead mirror before
-      // reaching a healthy one: measured 2026-08-01, a tarpitting mirror made
-      // every second search hang 40 s from a network where the other mirror
-      // answered in 5 s. If connectivity itself is down, every mirror cools
-      // and the all-cooling fallback above still tries them, so no lockout.
-      endpointCooldownUntil.set(endpoint, Date.now() + OVERPASS_ENDPOINT_COOLDOWN_MS);
-      lastError =
-        err instanceof Error && err.name === "AbortError"
-          ? "Timeout"
-          : "Network error";
     }
   }
   throw new Error(lastError ?? "Overpass request failed");
