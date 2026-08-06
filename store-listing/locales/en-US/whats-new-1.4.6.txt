@@ -1,0 +1,5 @@
+🌍 Language polish across the app.
+
+• Emergency instructions, weather terms and dozens of other texts reviewed and corrected in Icelandic, Norwegian, Swedish and Danish.
+• Clearer, more consistent wording on the trip screen.
+• A few small fixes in the English texts too.

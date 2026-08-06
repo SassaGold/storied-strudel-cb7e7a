@@ -1,0 +1,5 @@
+🌍 Språkputs i hela appen.
+
+• Nödinstruktionerna och väderbegreppen har gåtts igenom och rättats.
+• Tydligare och mer konsekvent språk i Turlogg och Garaget.
+• Dussintals texter förbättrade i svenska, norska, danska och isländska.

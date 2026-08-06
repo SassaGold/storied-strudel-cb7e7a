@@ -1,0 +1,5 @@
+🌍 Sproglig oprydning i hele appen.
+
+• Nødinstruktionerne og vejrbegreberne er gennemgået og rettet.
+• Klarere og mere konsekvent sprog i Turlog og Garagen.
+• Dusinvis af tekster forbedret på dansk, norsk, svensk og islandsk.
