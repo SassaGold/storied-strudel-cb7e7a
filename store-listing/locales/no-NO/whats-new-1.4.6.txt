@@ -1,0 +1,5 @@
+🌍 Språkvask i hele appen.
+
+• Nødinstruksjonene og værbegrepene er gjennomgått og rettet.
+• Klarere og mer konsekvent språk i Turlogg og Garasjen.
+• Dusinvis av tekster forbedret i norsk, svensk, dansk og islandsk.
