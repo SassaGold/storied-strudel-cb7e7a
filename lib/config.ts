@@ -28,10 +28,15 @@ export const WIKIPEDIA_SUMMARY_URL = (lang: string, title: string) =>
  *  Requests round-robin across these (see fetchOverpass), so every entry here
  *  receives a share of rider coordinates — they are not ordered fallbacks.
  *  maps.mail.ru was dropped on 2026-07-25 for that reason: it is operated in
- *  Russia and was taking roughly a third of all POI queries. */
+ *  Russia and was taking roughly a third of all POI queries.
+ *  overpass.kumi.systems was dropped on 2026-08-06: dead since at least
+ *  2026-08-01 (accepts the connection then never answers, burning the full
+ *  timeout once its cooldown expired). No replacement passed vetting:
+ *  private.coffee hangs the same way, osm.ch serves Switzerland only, osm.jp
+ *  does not resolve. Re-add a second mirror here if a healthy one appears;
+ *  fetchOverpass keeps full multi-mirror failover support. */
 export const OVERPASS_ENDPOINTS = [
   "https://overpass-api.de/api/interpreter",
-  "https://overpass.kumi.systems/api/interpreter",
 ];
 
 /** Default per-request timeout for Overpass queries (ms). */
